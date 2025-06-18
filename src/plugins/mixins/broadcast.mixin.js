@@ -11,7 +11,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['campaigns', 'filters', 'dialer', 'teamInboxCampaigns']),
+    ...mapState(['campaigns', 'filters', 'dialer']),
     ...mapState('inbox', [
       'communications',
       'channelChangedFilterFields'
@@ -124,8 +124,7 @@ export default {
         })
         .listen('.user.in-app.communication.new_call', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.new_call', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -154,8 +153,7 @@ export default {
         })
         .listen('.user.in-app.communication.answered_call', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.answered_call', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -176,8 +174,7 @@ export default {
         })
         .listen('.user.in-app.communication.new_sms', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.new_sms', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -198,8 +195,7 @@ export default {
         })
         .listen('.user.in-app.communication.new_voicemail', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.new_voicemail', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -220,8 +216,7 @@ export default {
         })
         .listen('.user.in-app.communication.new_fax', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.new_fax', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -271,8 +266,7 @@ export default {
         })
         .listen('.user.desktop.communication.new_call', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.new_call', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -294,8 +288,7 @@ export default {
         })
         .listen('.user.desktop.communication.answered_call', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.answered_call', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -316,8 +309,7 @@ export default {
         })
         .listen('.user.desktop.communication.new_sms', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.new_sms', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -338,8 +330,7 @@ export default {
         })
         .listen('.user.desktop.communication.new_voicemail', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.new_voicemail', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -360,8 +351,7 @@ export default {
         })
         .listen('.user.desktop.communication.new_fax', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.new_fax', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
             if (event.tags) {
@@ -400,8 +390,7 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
           }
@@ -423,8 +412,7 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
           }
@@ -537,8 +525,7 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
           }
@@ -560,8 +547,7 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
           }
@@ -573,8 +559,7 @@ export default {
         })
         .listen('.incoming_number.created', (event) => {
           this.dispatchToMemoryMonitor('.incoming_number.created', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.incoming_number.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.incoming_number.campaign_id)
           if (campaign) {
             campaign.incoming_number = event.incoming_number.phone_number
             this.updateCampaign(campaign)

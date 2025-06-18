@@ -299,7 +299,7 @@ import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import AccountSelector from 'src/components/account-selector.vue'
 import { FINISHED } from 'src/constants/export-status'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
-import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
+import { getCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
 import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
 import teaminboxEmptyStateVideo from 'components/teaminbox/teaminbox-empty-state-video.vue'
 
@@ -357,8 +357,6 @@ export default {
   data () {
     return {
       loading: true,
-      loadingCampaigns: false,
-      loadingTeamInboxCampaigns: false,
       loadingRingGroups: false,
       loadingTeams: false,
       loadingContactLists: false,
@@ -434,7 +432,6 @@ export default {
     ...mapState([
       'dialer',
       'campaigns',
-      'teamInboxCampaigns',
       'isMobile',
       'ringGroups',
       'notifications',
@@ -446,7 +443,8 @@ export default {
       'showedKycDialog',
       'showedKycReloadDialog',
       'statics',
-      'isWidget'
+      'isWidget',
+      'campaignsIsLoading'
     ]),
 
     ...mapState('auth', [
@@ -1701,11 +1699,6 @@ export default {
         this.getLeadSources()
         this.getAttributeDictionaries()
         this.getMyQueueList()
-
-        // Load team inbox campaigns (no visibility limits) only if a team inbox is active
-        if (this.hasCompanyTeamInboxEnabled) {
-          getTeamInboxCampaigns(this)
-        }
       })
     },
 
@@ -1754,8 +1747,7 @@ export default {
         return null
       }
 
-      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-      const found = campaigns.find((campaign) => campaign.id === id)
+      const found = this.campaigns.find((campaign) => campaign.id === id)
 
       if (found) {
         return found
@@ -2756,7 +2748,6 @@ export default {
       'resetVuex',
       'setUsage',
       'setCampaigns',
-      'setTeamInboxCampaigns',
       'setCampaignsIsLoading',
       'setRingGroups',
       'setRingGroupsIsLoading',

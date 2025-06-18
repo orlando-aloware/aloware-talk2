@@ -97,7 +97,7 @@ export default {
       'lineIncomingNumberLoading',
       'lineIncomingNumber'
     ]),
-    ...mapState(['campaigns', 'teamInboxCampaigns']),
+    ...mapState(['campaigns']),
     ...mapState('TeamInbox', ['activeInbox']),
 
     /**
@@ -111,8 +111,7 @@ export default {
      * Returns the active campaigns
      */
     activeCampaigns () {
-      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-      return campaigns.filter(campaign => this.activeInboxCampaignIds?.includes(campaign.id))
+      return this.campaigns.filter(campaign => this.activeInboxCampaignIds?.includes(campaign.id))
     },
 
     selectedCampaign () {

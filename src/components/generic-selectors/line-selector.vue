@@ -91,6 +91,9 @@
           </div>
         </q-chip>
       </template>
+      <template v-slot:hint v-if="selectedId && lineInboxName">
+        Inbox: {{ lineInboxName }}
+      </template>
     </q-select>
   </div>
 </template>
@@ -101,13 +104,16 @@ import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import userMixin from 'src/plugins/mixins/user.mixin'
+import { COMPANY_AGENT } from 'src/constants/roles'
 
 export default {
   name: 'line-selector',
 
   mixins: [
     aclMixin,
-    selectorMixin
+    selectorMixin,
+    userMixin
   ],
 
   components: {
@@ -234,6 +240,11 @@ export default {
       default: false
     },
 
+    isDialer: {
+      type: Boolean,
+      default: false
+    },
+
     preSelectedTeamInboxLineId: {
       type: Number,
       default: null
@@ -304,12 +315,23 @@ export default {
 
     activeCampaignsAlphabeticalOrder () {
       if (this.campaignsAlphabeticalOrder.length) {
-        const campaigns = _.clone(this.campaignsAlphabeticalOrder)
+        const activeCampaigns = _.clone(this.campaignsAlphabeticalOrder)
           .filter(campaign => campaign.active === true)
 
+        if (this.shouldLimitAgentLinesVisibility) {
+          // Only show lines that the agent has access to
+          return activeCampaigns.filter(campaign => {
+            return campaign.user_id === this.profile.id ||
+              campaign.has_direct_ring_group_access ||
+              campaign.has_team_membership_access ||
+              campaign.has_direct_watching_access ||
+              campaign.has_team_watching_access
+          })
+        }
+
         return !this.preSelectedTeamInboxLineId
-          ? campaigns
-          : campaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id))
+          ? activeCampaigns
+          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id))
       }
 
       return []
@@ -341,6 +363,15 @@ export default {
       return this.campaigns.find(campaign => campaign.id === this.selectedId)
     },
 
+    lineInboxName () {
+      const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = this.selectedLine || {}
+      return ringGroup?.name || personalInbox?.name
+    },
+
+    shouldLimitAgentLinesVisibility () {
+      return this.isDialer && this.hasCompanyTeamInboxEnabled && this.hasRole(COMPANY_AGENT)
+    },
+
     noResultsText () {
       return !this.preSelectedTeamInboxLineId
         ? 'No results'
@@ -350,10 +381,6 @@ export default {
 
   created () {
     this.options = this.activeCampaignsAlphabeticalOrder
-
-    if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
-      this.selectedId = this.value
-    }
   },
 
   mounted () {
@@ -417,7 +444,11 @@ export default {
 
   watch: {
     value () {
-      if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
+      if (this.campaignsIsLoading || _.isEmpty(this.campaigns)) {
+        return
+      }
+
+      if (this.options.find(campaign => campaign.id === this.value)) {
         this.selectedId = this.value
       }
     },
