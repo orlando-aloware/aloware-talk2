@@ -70,12 +70,13 @@
 </template>
 
 <script>
-import CollapseButton from 'src/components/collapse-button.vue'
+import CollapseButton from 'src/components/teaminbox/collapse-button.vue'
 import SearchIcon from 'src/components/icons/search-icon.vue'
 import WatchIcon from 'src/components/icons/watch-icon.vue'
 import SearchInput from 'src/components/search-input.vue'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
 import { mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   props: {
@@ -110,7 +111,17 @@ export default {
       'activeInbox'
     ]),
 
-    ...mapState(['isMobile'])
+    ...mapState(['isMobile']),
+
+    ...mapFields('settings', ['isTeamInboxNavListCollapsed'])
+  },
+
+  mounted () {
+    if (this.isTeamInboxNavListCollapsed !== undefined) {
+      this.collapsed = this.isTeamInboxNavListCollapsed
+    } else if (window.innerWidth < 1367) {
+      this.collapsed = true
+    }
   },
 
   methods: {
