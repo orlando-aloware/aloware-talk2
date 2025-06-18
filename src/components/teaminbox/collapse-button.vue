@@ -8,7 +8,7 @@
     <b-tooltip custom-class="talk-table__tooltip"
                ref="tooltip"
                :target="`btn-collapse-${_uid}`">
-      {{ value ? 'Expand' : 'Collapse' }}
+      {{ collapsed ? 'Expand' : 'Collapse' }}
     </b-tooltip>
   </span>
 </template>
@@ -36,11 +36,11 @@ export default {
     }
   },
 
-  mounted () {
-    this.prepareTarget()
-  },
-
   computed: {
+    collapsed () {
+      return this.value
+    },
+
     ...mapFields('settings', [
       'isTeamInboxNavListCollapsed'
     ])
@@ -48,9 +48,9 @@ export default {
 
   methods: {
     toggle () {
-      this.isTeamInboxNavListCollapsed = !this.value
+      this.isTeamInboxNavListCollapsed = !this.collapsed
 
-      this.$emit('input', !this.value)
+      this.$emit('input', !this.collapsed)
       this.$refs.tooltip.$emit('close')
     },
 

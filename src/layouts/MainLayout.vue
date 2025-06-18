@@ -3079,6 +3079,12 @@ export default {
         !this.showContactsHeader) {
         this.setShowContactsHeader(true)
       }
+    },
+
+    isSidebarCollapsed (value) {
+      if (value) {
+        this.isSidebarExpanded = !value
+      }
     }
   },
 

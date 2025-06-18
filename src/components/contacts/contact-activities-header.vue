@@ -147,12 +147,12 @@
         <q-btn flat
                color="primary"
                class="open-contact-details-btn d-flex align-items-center justify-content-center px-2"
-               v-b-tooltip.html="{customClass: 'tooltip-dark'}"
-               :title="!isContactDetailsDrawerCollapsed ? 'Show contact details' : 'Hide contact details'"
+               v-b-tooltip.hover="{customClass: 'tooltip-dark'}"
+               :title="isContactDetailsDrawerCollapsed ? 'Show contact details' : 'Hide contact details'"
                @click="$emit('toggleDetails')">
           <phone-card-icon width="21" height="21" />
           <i class="ml-1 fa"
-             :class="[isContactDetailsDrawerCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
+             :class="[!isContactDetailsDrawerCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
         </q-btn>
 
         <q-btn

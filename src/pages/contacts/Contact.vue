@@ -47,7 +47,7 @@
         </contact-activities>
       </div>
       <div class="contact-details-container"
-           :class="{ 'contact-details--opened': !isContactDetailsDrawerCollapsed, 'hidden': !isWidget && !isContactDetailsDrawerCollapsed }"
+           :class="{ 'contact-details--opened': !isContactDetailsDrawerCollapsed, 'hidden': !isWidget && isContactDetailsDrawerCollapsed }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget && !isMobile">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
