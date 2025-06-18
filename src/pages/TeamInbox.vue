@@ -27,7 +27,6 @@ import TeamInboxSide from 'components/teaminbox/teaminbox-side'
 import { aclMixin, userMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
-import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
 import { mapFields } from 'vuex-map-fields'
 import { debounce } from 'lodash'
 
@@ -50,8 +49,7 @@ export default {
         TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
       ],
       // Store the unread count for the currently selected contact
-      currentContactUnreadCount: 0,
-      loadingTeamInboxCampaigns: false
+      currentContactUnreadCount: 0
     }
   },
 
@@ -124,17 +122,10 @@ export default {
         this.$router.replace({ name: 'Inbox' })
       }
     }
-    // Load team inbox campaigns
-    getTeamInboxCampaigns(this)
     this.resizeHandler()
   },
 
   methods: {
-    ...mapActions([
-      'setTeamInboxCampaigns',
-      'setCampaignsIsLoading'
-    ]),
-
     ...mapActions('TeamInbox', [
       'reset'
     ]),
