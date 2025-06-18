@@ -74,6 +74,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import 'src/css/variables.scss';
 .teaminbox-nav-item {
   padding: 10px 16px;
   border-radius: 10px;
@@ -123,7 +124,7 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #f44336;
+      background-color: $red-95;
     }
   }
 

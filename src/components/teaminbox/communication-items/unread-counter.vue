@@ -67,6 +67,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import 'src/css/variables.scss';
 .unread-badge {
   position: absolute;
   top: -10px;
@@ -80,7 +81,7 @@ export default {
   justify-content: center;
   overflow: hidden;
   transition: all 0.3s ease-out;
-  background-color: #f44336;
+  background-color: $red-95;
 
   &--unthreaded {
     height: 13px;
