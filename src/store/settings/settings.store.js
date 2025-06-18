@@ -72,6 +72,6 @@ export default function () {
     formIsValid: true,
     isSidebarCollapsed: undefined,
     isTeamInboxNavListCollapsed: undefined,
-    isContactDetailsDrawerCollapsed: false
+    isContactDetailsCollapsed: false
   }
 }

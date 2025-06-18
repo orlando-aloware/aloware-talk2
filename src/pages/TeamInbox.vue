@@ -77,7 +77,7 @@ export default {
 
     ...mapFields('settings', [
       'isTeamInboxNavListCollapsed',
-      'isContactDetailsDrawerCollapsed',
+      'isContactDetailsCollapsed',
       'isSidebarCollapsed'
     ]),
 
@@ -165,7 +165,7 @@ export default {
 
       if (width >= 785) {
         this.isTeamInboxNavListCollapsed = true
-        this.isContactDetailsDrawerCollapsed = true
+        this.isContactDetailsCollapsed = true
         this.isSidebarCollapsed = true
       }
     }

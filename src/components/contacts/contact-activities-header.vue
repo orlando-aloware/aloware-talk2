@@ -82,9 +82,18 @@
                flat
                class="contact-activities-actions__drawer_btn"
                data-testid="contact-activities-drawer-btn"
-               v-if="!isWidget || isMobile"
+               v-if="!isWidget"
                @click="$emit('toggleDrawer')">
           <information-circle-icon/>
+        </q-btn>
+        <q-btn borderless
+               flat
+               class="contact-activities-actions__mobile_btn"
+               data-testid="contact-activities-details-mobile-btn"
+               v-if="!isWidget"
+               @click="$emit('toggleDetails')">
+          <information-circle-icon width="33"
+                                   height="33"/>
         </q-btn>
       </div>
       <div class="contact-activities-actions__desktop d-flex flex-grow-1 justify-content-end">
@@ -148,11 +157,11 @@
                color="primary"
                class="open-contact-details-btn d-flex align-items-center justify-content-center px-2"
                v-b-tooltip.hover="{customClass: 'tooltip-dark'}"
-               :title="isContactDetailsDrawerCollapsed ? 'Show contact details' : 'Hide contact details'"
+               :title="isContactDetailsCollapsed ? 'Show contact details' : 'Hide contact details'"
                @click="$emit('toggleDetails')">
           <phone-card-icon width="21" height="21" />
           <i class="ml-1 fa"
-             :class="[!isContactDetailsDrawerCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
+             :class="[!isContactDetailsCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
         </q-btn>
 
         <q-btn
@@ -313,7 +322,7 @@ export default {
     ...mapState(['isMobile', 'isWidget']),
     ...mapState('TeamInbox', ['activeInboxId']),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
-    ...mapFields('settings', ['isContactDetailsDrawerCollapsed']),
+    ...mapFields('settings', ['isContactDetailsCollapsed']),
     resolveVariant () {
       switch (this.contact.task_status) {
         case ContactTaskStatus.STATUS_OPEN:

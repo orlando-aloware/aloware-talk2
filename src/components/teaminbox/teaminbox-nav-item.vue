@@ -29,7 +29,7 @@
       </div>
     </div>
     <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
-        placement="right"
+        :placement="isMobile ? 'bottom' : 'right'"
         :target="`teaminbox-nav-item-${_uid}`"
         boundary="window"
         :delay="500">
@@ -40,6 +40,7 @@
 
 <script>
 import InboxIcon from 'src/components/icons/inbox/inbox-icon.vue'
+import { mapState } from 'vuex'
 
 export default {
   props: {
@@ -71,6 +72,10 @@ export default {
 
   components: {
     InboxIcon
+  },
+
+  computed: {
+    ...mapState(['isMobile'])
   }
 }
 </script>

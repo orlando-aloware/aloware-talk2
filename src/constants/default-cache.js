@@ -20,6 +20,6 @@ export const DEFAULT_STATE = {
     'TeamInbox.activeInboxId',
     'settings.isSidebarCollapsed',
     'settings.isTeamInboxNavListCollapsed',
-    'settings.isContactDetailsDrawerCollapsed'
+    'settings.isContactDetailsCollapsed'
   ]
 }

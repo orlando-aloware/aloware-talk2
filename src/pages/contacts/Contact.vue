@@ -10,12 +10,12 @@
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{
-             'contact-activity--closed': isContactActivityWrapperClosed,
+             'contact-activity--closed': detailsOpen || contactListSidebarOpen,
              'inbox-activity-container-wrapper': teamInboxId
            }"
            v-if="isShowContactActivities">
         <contact-activities ref="contactActivities"
-                            :class="{ 'contact-activity--closed': isContactDetailsDrawerCollapsed }"
+                            :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
@@ -47,8 +47,8 @@
         </contact-activities>
       </div>
       <div class="contact-details-container"
-           :class="{ 'contact-details--opened': !isContactDetailsDrawerCollapsed, 'hidden': !isWidget && isContactDetailsDrawerCollapsed }"
-           v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget && !isMobile">
+           :class="{ 'contact-details--opened': !isContactDetailsCollapsed, 'hidden': isContactDetailsCollapsed && !isMobile }"
+           v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
                          :team-inbox-id="teamInboxId"
@@ -162,7 +162,7 @@ export default {
       'isWidget'
     ]),
 
-    ...mapFields('settings', ['isContactDetailsDrawerCollapsed']),
+    ...mapFields('settings', ['isContactDetailsCollapsed']),
 
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
@@ -184,10 +184,6 @@ export default {
 
     isMediumScreen () {
       return this.$q.screen.width >= MIN_TABLET_WIDTH && this.$q.screen.width <= MAX_TABLET_WIDTH
-    },
-
-    isContactActivityWrapperClosed () {
-      return (this.isContactDetailsDrawerCollapsed && !this.isMobile) || this.contactListSidebarOpen
     }
   },
 
@@ -196,6 +192,7 @@ export default {
       title: 'Contact',
       totalContacts: 0,
       drawer: false,
+      detailsOpen: false,
       contactListSidebarOpen: false,
       leaving: false,
       contactComponentListeners: {},
@@ -245,7 +242,8 @@ export default {
     },
 
     toggleDetails () {
-      this.isContactDetailsDrawerCollapsed = !this.isContactDetailsDrawerCollapsed
+      this.detailsOpen = !this.detailsOpen
+      this.isContactDetailsCollapsed = !this.isContactDetailsCollapsed
     }
   },
 
@@ -384,7 +382,7 @@ export default {
       })
     },
 
-    isContactDetailsDrawerCollapsed (value) {
+    isContactDetailsCollapsed (value) {
       if (value && this.isMobile) {
         this.$VueEvent.fire('hide_mobile_footer', false)
       }
