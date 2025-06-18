@@ -15147,7 +15147,7 @@ vue-template-es2015-compiler@^1.9.0:
 
 "vue-wave-surfer@git+https://github.com/aloware/vue-wave-sufver.git":
   version "1.0.1"
-  resolved "git+https://github.com/aloware/vue-wave-sufver.git#7d16ef73b175c5e9b93794f93ac5e9e497002cf6"
+  resolved "git+https://github.com/aloware/vue-wave-sufver.git#8a5e5203b017a09e9755dbbbc9e31569a4baca9c"
   dependencies:
     wavesurfer.js "^7.8.6"
 
