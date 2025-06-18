@@ -12,7 +12,7 @@ export const CREATOR_TYPE_POWER_DIALER = 5
 export const CREATOR_TYPE_SMS_REMINDER = 6
 // Communication that initiated from app notifications
 export const CREATOR_TYPE_APP_NOTIFICATIONS = 7
-// Communication that initiated from HubSpot
+// Communication that initiated from HubSpot Workflows
 export const CREATOR_TYPE_HUBSPOT_WORKFLOW = 8
 // Communication that initiated from Zapier
 export const CREATOR_TYPE_ZAPIER = 9

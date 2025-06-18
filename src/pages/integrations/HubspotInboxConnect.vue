@@ -250,7 +250,6 @@ export default {
 
   computed: {
     ...mapState('auth', ['authenticated']),
-    ...mapState(['ringGroups']),
 
     filteredCampaigns () {
       if (!this.searchQuery.trim()) return this.campaigns
@@ -290,7 +289,12 @@ export default {
         this.campaigns = response.data.data.campaigns
       } catch (error) {
         this.setupError = true
-        this.setupErrorMessage = error.response.data
+
+        if (error.response && error.response.status === 403) {
+          this.setupErrorMessage = "You don't have enough permissions to connect an Aloware SMS channel. Please make sure you have access to HubSpot's Integration Settings in Aloware or contact your administrator."
+        } else {
+          this.setupErrorMessage = error.response.data
+        }
       }
     },
 
@@ -357,11 +361,10 @@ export default {
 
   async created () {
     this.isLoading = true
+
     await this.handleAuthRedirect()
-    await Promise.all([
-      this.getSetupData(),
-      this.getRingGroups()
-    ])
+    await this.getSetupData()
+
     this.isLoading = false
   }
 }
@@ -497,8 +500,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 32px;
-  padding-top: 15%;
+  padding: 15% 32px 32px;
 }
 
 .error-container p {
