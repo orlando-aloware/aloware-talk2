@@ -267,11 +267,6 @@ export default {
         return false
       }
 
-      // if team inbox is enabled, visibility limits are not observed
-      if (this.hasCompanyTeamInboxEnabled) {
-        return true
-      }
-
       // checks if accessible_campaigns is available and then looks for communication campaign_id in that array
       if (this.profile.accessible_campaigns &&
         this.profile.line_access_limit &&
