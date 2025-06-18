@@ -91,7 +91,7 @@
           </div>
         </q-chip>
       </template>
-      <template v-slot:hint v-if="selectedId && lineInboxName">
+      <template v-slot:hint v-if="selectedId && lineInboxName && !hideBottomSpace">
         Inbox: {{ lineInboxName }}
       </template>
     </q-select>
