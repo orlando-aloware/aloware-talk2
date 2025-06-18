@@ -109,7 +109,7 @@
                 size="sm"
                 class="custom-action-button my-1"
                 data-testid="contact-info-call-button"
-                @click="callContact">
+                @click="onCallClick">
         <q-tooltip anchor="bottom middle"
                    data-testid="contact-info-call-tooltip"
                    self="center middle"
@@ -118,6 +118,35 @@
         </q-tooltip>
         <call-icon width="14"
                    height="14"/>
+        <q-popup-proxy v-model="showLineSelectorPopup"
+                       no-parent-event>
+          <div class="d-flex line-selector-wrapper">
+            <line-selector
+              class="line-selector flex-grow-1"
+              prepend="From:"
+              check-blocked-messaging
+              hide-bottom-space
+              :width="lineSelectorWidth"
+              :generic-multiselect="false"
+              :use-only-actives="true"
+              :pre-selected-team-inbox-line-id="contactLastLineUsedId"
+              @change="onLineChange"
+            >
+            </line-selector>
+            <q-btn
+              icon="img:app-icons/dialer/call_btn.svg"
+              size="32px"
+              class="icon-btn auto-size height-32 ml-1 mt-1"
+              align="right"
+              padding="none"
+              rounded
+              flat
+              :ripple="true"
+              :disable="!selectedLine"
+              @click="callContact">
+            </q-btn>
+          </div>
+        </q-popup-proxy>
       </b-button>
 
       <b-button variant="light"
@@ -282,6 +311,7 @@ import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
 import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
+import LineSelector from 'components/generic-selectors/line-selector'
 
 export default {
   name: 'contact-info',
@@ -316,7 +346,8 @@ export default {
     TimerIcon,
     MergeContactIcon,
     Avatar,
-    ContactNameForm
+    ContactNameForm,
+    LineSelector
   },
 
   computed: {
@@ -328,12 +359,18 @@ export default {
 
     ...mapState('auth', ['profile']),
 
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInboxId']),
+
     ...mapGetters('contacts', [
       'contact',
       'isContactNameEditOpen',
       'contactPhoneNumbers',
       'changingSelectedContact'
     ]),
+
+    lineSelectorWidth () {
+      return this.$q.screen.width <= 1366 ? '200px' : '220px'
+    },
 
     contactName () {
       if (this.contact) {
@@ -371,6 +408,14 @@ export default {
       }
 
       return null
+    },
+
+    contactLastLineUsedKey () {
+      return `${this.activeInboxId}-${this.contact.id}`
+    },
+
+    isFromTeamInbox () {
+      return !!this.activeInboxId
     }
   },
 
@@ -381,7 +426,10 @@ export default {
       isProcessingBlock: false,
       isVideoConferenceLinkSending: false,
       isRemovingFromPowerDialerLists: false,
-      LRN_NOT_PERFORMED
+      selectedLine: null,
+      showLineSelectorPopup: false,
+      LRN_NOT_PERFORMED,
+      contactLastLineUsedId: null
     }
   },
 
@@ -440,16 +488,37 @@ export default {
         return
       }
 
-      if (!this.isAlwaysAskEnabled && this.defaultOutboundCampaignId) {
-        data.outboundCampaignId = this.defaultOutboundCampaignId
-        this.$VueEvent.fire('makeCall', data)
+      if (!this.isFromTeamInbox) {
+        if (!this.isAlwaysAskEnabled && this.defaultOutboundCampaignId) {
+          // If the outbound calling mode is not always ask and there is a default outbound campaign id, use it
+          data.outboundCampaignId = this.defaultOutboundCampaignId
+        }
+      } else {
+        // If the call is being placed from the team inbox, use the selected line or the default outbound campaign id
+        data.outboundCampaignId = this.selectedLine || this.defaultOutboundCampaignId
+      }
+
+      this.$VueEvent.fire('makeCall', data)
+    },
+
+    onCallClick () {
+      const showLineSelectorPopup = this.isAlwaysAskEnabled ||
+        (this.defaultOutboundCampaignId && this.defaultOutboundCampaignId !== this.contactLastLineUsedId)
+
+      if (this.isFromTeamInbox && showLineSelectorPopup) {
+        // Show popup and wait for user to select line
+        this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
+        this.showLineSelectorPopup = !this.showLineSelectorPopup
         return
       }
 
-      this.$VueEvent.fire('callContact', data)
+      // If we don't need to show the line selector popup, directly call the contact
+      this.callContact()
     },
 
     callContact () {
+      this.showLineSelectorPopup = false
+
       const params = {
         timezone: this.contact.timezone,
         name: this.contact.name,
@@ -511,7 +580,17 @@ export default {
       }
 
       this.$handleErrors(error?.response, 'error')
+    },
+
+    onLineChange (line) {
+      this.selectedLine = line
     }
   }
 }
 </script>
+
+<style scoped>
+.line-selector-wrapper {
+  padding: 8px;
+}
+</style>

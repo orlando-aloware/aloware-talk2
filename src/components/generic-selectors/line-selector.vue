@@ -9,8 +9,7 @@
                           v-if="genericMultiselect"
                           @valuesUpdated="onInput">
     </generic-multi-select>
-    <q-select style="word-break: break-all;"
-              ref="lineSelect"
+    <q-select ref="lineSelect"
               options-selected-class="text-primary"
               class="q-basic-selector"
               color="primary"
@@ -33,7 +32,9 @@
               :multiple="multiple"
               :use-chips="useChips"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              :style="{ 'word-break': 'break-all', width }"
               :behavior="behavior"
+              :hide-bottom-space="hideBottomSpace"
               v-else
               v-model="selectedId"
               @popup-show="onShowMenu"
@@ -68,7 +69,7 @@
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="no-results text-grey">
-            No results
+            {{ noResultsText }}
           </q-item-section>
         </q-item>
       </template>
@@ -98,7 +99,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import { aclMixin, selectorMixin } from 'src/plugins/mixins'
@@ -242,6 +243,21 @@ export default {
     isDialer: {
       type: Boolean,
       default: false
+    },
+
+    preSelectedTeamInboxLineId: {
+      type: Number,
+      default: null
+    },
+
+    hideBottomSpace: {
+      type: Boolean,
+      default: false
+    },
+
+    width: {
+      type: String,
+      default: undefined
     }
   },
 
@@ -259,6 +275,8 @@ export default {
     ...mapState(['campaigns', 'campaignsIsLoading']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['profile']),
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox']),
+    ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
 
     placeholder () {
       if (this.customPlaceholder) {
@@ -311,7 +329,9 @@ export default {
           })
         }
 
-        return activeCampaigns
+        return !this.preSelectedTeamInboxLineId
+          ? activeCampaigns
+          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id))
       }
 
       return []
@@ -350,6 +370,12 @@ export default {
 
     shouldLimitAgentLinesVisibility () {
       return this.isDialer && this.hasCompanyTeamInboxEnabled && this.hasRole(COMPANY_AGENT)
+    },
+
+    noResultsText () {
+      return !this.preSelectedTeamInboxLineId
+        ? 'No results'
+        : 'No lines found in this inbox'
     }
   },
 
@@ -359,6 +385,12 @@ export default {
 
   mounted () {
     this.loadPlaceholder()
+
+    if (this.preSelectedTeamInboxLineId) {
+      // Line stickiness from the team inbox. Pre-select the last used line for the contact
+      const line = this.activeCampaignsAlphabeticalOrder.find(campaign => campaign.id === this.preSelectedTeamInboxLineId)
+      line && this.selectOption(line)
+    }
   },
 
   methods: {
