@@ -1148,13 +1148,11 @@ export default {
         return null
       }
 
-      // First check if campaign is passed with the communication object
       const communicationCampaign = _.get(this.communication, 'campaign', null)
       if (communicationCampaign && communicationCampaign.name) {
         return removeDeletedSuffix(communicationCampaign.name)
       }
 
-      // Otherwise look in the store
       const found = this.campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
       if (found) {
         return removeDeletedSuffix(found.name)
