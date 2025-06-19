@@ -47,24 +47,24 @@
       </div>
 
       <div
-        :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']"
-           v-else-if="!inboxes.length">
-        <team-inbox-empty-state v-if="isMobile">
-          <template #list-content>
-            <p class="info-text">
-              <strong>Connected Inboxes:</strong> See and collaborate on the real-time calls and messages being handled
-              by every active member of this team.
-            </p>
-            <p class="info-text">
-              <strong>Watching Inboxes:</strong> Give managers and supervisors a bird's-eye view of all communications
-              for coaching, quality, and to ensure no customer is left behind.
-            </p>
-            <p class="info-text">
-              <strong>Personal Inboxes:</strong> Unify the communications from everyone's direct lines into one shared,
-              organized space so you can stop guessing and start working together.
-            </p>
-          </template>
-        </team-inbox-empty-state>
+        v-else-if="!inboxes.length && !hasAnyInboxes"
+        :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']">
+          <team-inbox-empty-state v-if="isMobile">
+            <template #list-content>
+              <p class="info-text">
+                <strong>Connected Inboxes:</strong> See and collaborate on the real-time calls and messages being handled
+                by every active member of this team.
+              </p>
+              <p class="info-text">
+                <strong>Watching Inboxes:</strong> Give managers and supervisors a bird's-eye view of all communications
+                for coaching, quality, and to ensure no customer is left behind.
+              </p>
+              <p class="info-text">
+                <strong>Personal Inboxes:</strong> Unify the communications from everyone's direct lines into one shared,
+                organized space so you can stop guessing and start working together.
+              </p>
+            </template>
+          </team-inbox-empty-state>
 
         <template v-else>
           No Inboxes
@@ -127,7 +127,8 @@ export default {
       'hasMoreInboxes',
       'isLoadingInboxes',
       'inboxesUnreadCount',
-      'showRefreshInboxesButton'
+      'showRefreshInboxesButton',
+      'hasAnyInboxes'
     ]),
 
     ...mapState('auth', ['profile']),

@@ -10,7 +10,7 @@
                   data-testid="teaminbox-tab"
                   @contact-selected="onContactSelected" />
 
-    <div v-else-if="isTeamInboxesLoaded && !hasTeamInboxes && !isMobile"
+    <div v-else-if="isTeamInboxesLoaded && !hasAnyInboxes && !isMobile"
          class="teaminbox-side__empty-state">
       <team-inbox-empty-state />
     </div>
@@ -56,7 +56,8 @@ export default {
       'activeInboxId',
       'activeInbox',
       'inboxes',
-      'isLoadingInboxes'
+      'isLoadingInboxes',
+      'hasAnyInboxes'
     ]),
 
     ...mapState([

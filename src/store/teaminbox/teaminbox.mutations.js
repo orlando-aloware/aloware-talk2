@@ -10,6 +10,9 @@ export default {
   SET_INBOXES (state, inboxesFirstPage) {
     state.inboxes = [ ...inboxesFirstPage ]
   },
+  SET_HAS_ANY_INBOXES (state, hasAny) {
+    state.hasAnyInboxes = hasAny
+  },
   RESET_INBOXES (state) {
     state.inboxes = []
   },

@@ -979,7 +979,9 @@ export default {
         cancelToken: this.countSource.token
       })
         .then(response => {
-          this.setCommunicationsCount(response.data)
+          // Handle the case where the API returns a paginated response instead of just a count
+          const count = typeof response.data === 'number' ? response.data : (response.data.total || 0)
+          this.setCommunicationsCount(count)
         })
         .catch(thrown => {
           console.error('Error fetching communications count:', thrown)
