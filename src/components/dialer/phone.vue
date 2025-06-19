@@ -1989,7 +1989,7 @@ export default {
     },
 
     lineInboxName () {
-      const line = this.campaigns.find(campaign => campaign.id === this.dialer.communication.campaign_id)
+      const line = this.campaigns.find(campaign => campaign.id === this.dialer.communication?.campaign_id)
       const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = line || {}
       return ringGroup?.name || personalInbox?.name
     }
