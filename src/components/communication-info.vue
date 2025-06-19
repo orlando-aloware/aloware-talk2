@@ -860,6 +860,7 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+import { removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 import * as CommunicationCurrentStatus from '../constants/communication-current-status'
@@ -1147,11 +1148,17 @@ export default {
         return null
       }
 
-      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
+      // First check if campaign is passed with the communication object
+      const communicationCampaign = _.get(this.communication, 'campaign', null)
+      if (communicationCampaign && communicationCampaign.name) {
+        return removeDeletedSuffix(communicationCampaign.name)
+      }
 
+      // Otherwise look in the store
+      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
       const found = campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
       if (found) {
-        return found.name
+        return removeDeletedSuffix(found.name)
       }
 
       return null

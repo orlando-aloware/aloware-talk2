@@ -171,7 +171,11 @@ export default {
 
       this.getDesktopToken(true)
         .then(() => {
-          this.device.register()
+          try {
+            this.device.register()
+          } catch (err) {
+            console.error('[Reconnect Device] Can not register device. Error: ' + err, this.device.state)
+          }
           this.rebootPhone()
         })
     }
@@ -427,7 +431,7 @@ export default {
     // ping getDesktopToken every 24 hours
     this.$options.webrtcTokenRegenerateInterval = setInterval(() => {
       if (this.authenticated) {
-        this.getDesktopToken()
+        this.getDesktopToken(true)
       }
     }, 24 * 60 * 60 * 1000)
   },
@@ -707,7 +711,11 @@ export default {
 
         console.log('Reset device', reset)
         if (!reset) {
-          this.device.register()
+          try {
+            this.device.register()
+          } catch (err) {
+            console.error('[Reset Device] Can not register device. Error: ' + err, this.device.state)
+          }
         } else {
           this.device.updateToken(this.dialer.token)
         }

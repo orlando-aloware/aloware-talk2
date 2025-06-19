@@ -171,13 +171,8 @@ export default {
           name: 'Phone'
         }
 
-        this.$router.push(route, () => {
-          this.$VueEvent.fire('callContact', callData)
-        }, () => {
-          if (['Phone', 'Contact'].includes(this.$route.name)) {
-            this.$VueEvent.fire('callContact', callData)
-          }
-        })
+        this.$router.push(route)
+        this.$VueEvent.fire('callContact', callData)
       }).catch(() => {
         this.isPageLoading = false
       })

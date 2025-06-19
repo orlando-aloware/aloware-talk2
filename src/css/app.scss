@@ -8276,6 +8276,24 @@ button.grey-90 {
       .toast-header {
         display: none;
       }
+
+      // Fix for long caller names in incoming call notifications
+      .notification-details {
+        max-width: 180px !important;
+        overflow: hidden;
+      }
+
+      .title {
+        max-width: 160px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      .call-actions {
+        flex-shrink: 0;
+        min-width: 84px;
+      }
     }
 
     .toast-header {
@@ -8304,10 +8322,6 @@ button.grey-90 {
       text-decoration: none;
       padding: 0 0 !important;
 
-      > div {
-        padding: 12px 12px 15px 12px;
-      }
-
       .title {
         @include font-size($f-size-h5, 600, true);
         line-height: 18px;
@@ -8323,8 +8337,16 @@ button.grey-90 {
         padding-top: 1px;
       }
 
+      .call-fishing-queue-badge {
+        margin-left: 34px;
+      }
+
       .notification-icon {
-        padding-top: 2px;
+        padding: 14px 12px 15px 12px;
+      }
+
+      .notification-details, .call-actions, .call-fishing-actions {
+        padding: 12px 12px 15px 0;
       }
 
       .message-body {
@@ -10632,20 +10654,17 @@ screen and (max-width: 956px) {
       .toast-body {
         > .notification-body-wrapper {
           > div {
-            .notification-icon {
-              max-width: 32px;
-              width: 100%;
-            }
-
             > .notification-details {
               max-width: 150px;
               width: 100%;
               flex-grow: unset !important;
+              overflow: hidden;
             }
 
             > .call-actions {
               max-width: 84px;
               width: 100%;
+              flex-shrink: 0;
             }
           }
         }

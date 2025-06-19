@@ -780,6 +780,7 @@
 <script>
 import _ from 'lodash'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
@@ -807,13 +808,13 @@ import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import {
-  avatarMixin,
-  timezoneCheckMixin,
   aclMixin,
-  viewMixin,
+  avatarMixin,
   contactsListFiltersMixin,
   kycMixin,
-  userMixin
+  timezoneCheckMixin,
+  userMixin,
+  viewMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
@@ -822,7 +823,6 @@ import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-e
 import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
 import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
 import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
-import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 import AlAlert from 'components/alert/index.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
@@ -1920,7 +1920,14 @@ export default {
     },
 
     onCall (contact) {
-      this.checkContactTimezone(contact, () => { this.makeCall(contact) })
+      const params = {
+        timezone: contact.timezone,
+        name: contact.name,
+        calls_notifications_open_time: this.currentCompany.calls_notifications_open_time,
+        calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
+      }
+
+      this.checkContactTimezone(params, () => { this.makeCall(contact) })
     },
 
     makeCall (contact) {
