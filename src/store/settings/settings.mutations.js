@@ -1,7 +1,9 @@
 import _ from 'lodash'
 import * as SettingsDefault from 'src/constants/settings-default'
+import { updateField } from 'vuex-map-fields'
 
 export default {
+  updateField,
   SET_ITEMS: (state, items) => {
     state.items = items
   },

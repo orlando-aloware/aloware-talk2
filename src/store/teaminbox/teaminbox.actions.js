@@ -10,6 +10,9 @@ export default {
       commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
     }
   },
+  setHasAnyInboxes: ({ commit }, hasAny) => {
+    commit('SET_HAS_ANY_INBOXES', hasAny)
+  },
   resetInboxes: ({ commit }) => {
     commit('RESET_INBOXES')
   },
@@ -69,9 +72,6 @@ export default {
   },
   setShowRefreshCommunicationsButton: ({ commit }, show) => {
     commit('SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON', show)
-  },
-  setActiveFilters: ({ commit }, value) => {
-    commit('SET_ACTIVE_FILTERS', value)
   },
   setActiveSort: ({ commit }, value) => {
     commit('SET_ACTIVE_SORT', value)

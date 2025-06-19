@@ -1,4 +1,4 @@
-import { THREADED } from './teaminbox.store'
+import { THREADED, DEFAULT_FILTERS } from './teaminbox.store'
 
 export default {
   SET_ACTIVE_INBOX_ID (state, inbox) {
@@ -9,6 +9,9 @@ export default {
   },
   SET_INBOXES (state, inboxesFirstPage) {
     state.inboxes = [ ...inboxesFirstPage ]
+  },
+  SET_HAS_ANY_INBOXES (state, hasAny) {
+    state.hasAnyInboxes = hasAny
   },
   RESET_INBOXES (state) {
     state.inboxes = []
@@ -86,9 +89,6 @@ export default {
   SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON (state, show) {
     state.showRefreshCommunicationsButton = show
   },
-  SET_ACTIVE_FILTERS (state, filters) {
-    state.activeFilters = filters
-  },
   SET_ACTIVE_SORT (state, sort) {
     state.activeSort = sort
   },
@@ -133,7 +133,7 @@ export default {
     state.activeInboxContactUnreadCount = 0
     state.unreadCountLoaded = false
     state.viewMode = THREADED
-    state.activeFilters = {}
+    state.activeFilters = DEFAULT_FILTERS
     state.activeSort = {}
     state.teamInboxTutorialComponent = null
     state.contactsLastUsedLines = new Map()

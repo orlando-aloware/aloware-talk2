@@ -4,12 +4,21 @@ export const INBOX_TYPE_PERSONAL = 'personal'
 export const INBOX_TYPE_CONNECTED = 'connected'
 export const INBOX_TYPE_WATCHING = 'watching'
 export const SEARCH_FIELDS = ['lead_number', 'contact.name', 'campaign.name']
+export const DEFAULT_FILTERS = {
+  types: [],
+  directions: [],
+  my_contact: false,
+  unread_only: false,
+  task_status: [],
+  mention: false
+}
 
 export default function () {
   return {
     activeInboxId: null,
     activeInbox: {},
     inboxes: [],
+    hasAnyInboxes: false, // Flag to track if user has any inboxes (from initial load)
     isLoadingInboxes: false,
     inboxesUnreadCount: [],
     isLoadingInboxesUnreadCount: false,
@@ -24,7 +33,7 @@ export default function () {
     abortController: null,
     showRefreshInboxesButton: false,
     showRefreshCommunicationsButton: false,
-    activeFilters: {},
+    activeFilters: DEFAULT_FILTERS,
     activeSort: {},
     currentSearch: null,
     isInitialLoad: false,

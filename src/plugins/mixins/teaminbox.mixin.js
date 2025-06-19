@@ -39,7 +39,8 @@ export default {
       'setShowRefreshInboxesButton',
       'setShowRefreshCommunicationsButton',
       'setUnreadCountLoaded',
-      'setContactsLastUsedLines'
+      'setContactsLastUsedLines',
+      'setHasAnyInboxes'
     ]),
 
     async fetchInboxes (search = '') {
@@ -65,6 +66,11 @@ export default {
         })
 
         this.setInboxes(response.data)
+
+        // On initial load (no search), set the flag if user has any inboxes
+        if (!search && response.data.data && response.data.data.length > 0) {
+          this.setHasAnyInboxes(true)
+        }
       } catch (error) {
         if (error.name !== 'CanceledError') {
           this.$generalNotification('Error while fetching inboxes, please try again', 'error')
@@ -172,8 +178,28 @@ export default {
       const apiFilters = {}
 
       // Map filter keys to API parameters
-      if (filters.unreadonly) {
+      if (filters.unread_only) {
         apiFilters.unread_only = true
+      }
+
+      if (filters.types?.length) {
+        apiFilters.types = filters.types
+      }
+
+      if (filters.directions) {
+        apiFilters.directions = filters.directions
+      }
+
+      if (filters.my_contact) {
+        apiFilters.my_contact = true
+      }
+
+      if (filters?.task_status.length) {
+        apiFilters.task_status = filters.task_status
+      }
+
+      if (filters.mention) {
+        apiFilters.has_mention = true
       }
 
       // Map sort keys to API parameters
