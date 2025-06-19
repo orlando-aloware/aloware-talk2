@@ -49,35 +49,22 @@
       <div
         :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']"
            v-else-if="!inboxes.length">
-        <div v-if="isMobile" class="empty-state-aloai-style-mobile">
-          <div class="empty-state-header">
-            <h3 class="title-text">Build Your Team's Command Center!</h3>
-          </div>
-          <div class="empty-state-image-container">
-            <img :src="teamInboxImage"
-                 alt="How to request a line and ring group from admin"/>
-          </div>
-          <div class="empty-state-footer">
+        <team-inbox-empty-state v-if="isMobile">
+          <template #list-content>
             <p class="info-text">
-              Your new Team Inbox is ready to bring everyone together. This <strong>Team Inbox</strong> is designed to give you, your teammates, and your managers a single place to collaborate with full visibility.
+              <strong>Connected Inboxes:</strong> See and collaborate on the real-time calls and messages being handled
+              by every active member of this team.
             </p>
             <p class="info-text">
-              When your administrator configures it, this empty space transforms into a powerful, multi-layered view. It works by bringing together:
+              <strong>Watching Inboxes:</strong> Give managers and supervisors a bird's-eye view of all communications
+              for coaching, quality, and to ensure no customer is left behind.
             </p>
             <p class="info-text">
-              <strong>Connected Inboxes:</strong> See and collaborate on the real-time calls and messages being handled by every active member of this team.
+              <strong>Personal Inboxes:</strong> Unify the communications from everyone's direct lines into one shared,
+              organized space so you can stop guessing and start working together.
             </p>
-            <p class="info-text">
-              <strong>Watching Inboxes:</strong> Give managers and supervisors a bird's-eye view of all communications for coaching, quality, and to ensure no customer is left behind.
-            </p>
-            <p class="info-text">
-              <strong>Personal Inboxes:</strong> Unify the communications from everyone's direct lines into one shared, organized space so you can stop guessing and start working together.
-            </p>
-            <p class="info-text">
-              Ready to see the full picture? <strong>Contact your administrator</strong> and ask them to set up this Team Inbox to connect your entire team today!
-            </p>
-          </div>
-        </div>
+          </template>
+        </team-inbox-empty-state>
 
         <template v-else>
           No Inboxes
@@ -98,6 +85,7 @@
 
 <script>
 import TeamInboxNavType from './teaminbox-nav-type.vue'
+import TeamInboxEmptyState from './teaminbox-empty-state.vue'
 import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
@@ -110,11 +98,11 @@ import {
 } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
-import teamInboxImage from 'src/assets/teaminbox-request-line-instruction.jpg'
 
 export default {
   components: {
     TeamInboxNavType,
+    TeamInboxEmptyState,
     SearchInput,
     RefreshIcon
   },
@@ -127,8 +115,7 @@ export default {
     return {
       search: '',
       showSearchTooltip: false,
-      finishedInitialLoad: false,
-      teamInboxImage
+      finishedInitialLoad: false
     }
   },
 
@@ -161,12 +148,27 @@ export default {
       const watching = []
 
       this.inboxes.forEach(inbox => {
-        const isConnected = inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
-        const isWatching = inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
+        const {
+          teams,
+          call_waiting: callWaiting,
+          user_ids: userIds,
+          team_ids: teamIds,
+          watcher_user_ids: watcherUserIds,
+          watcher_team_user_ids: watcherTeamUserIds,
+          watcher_team_ids: watcherTeamIds
+        } = inbox
 
-        if (inbox.call_waiting && isConnected) {
+        const isConnected = userIds?.includes(this.profile.id) ||
+          teamIds?.some(id => this.teamsIds.includes(id)) ||
+          teams?.some(team => team.users?.some(user => user.id === this.profile.id))
+
+        const isWatching = watcherUserIds?.includes(this.profile.id) ||
+          watcherTeamUserIds?.includes(this.profile.id) ||
+          watcherTeamIds?.some(id => this.teamsIds.includes(id))
+
+        if (callWaiting && isConnected) {
           personal.push(inbox)
-        } else if (!inbox.call_waiting && isConnected) {
+        } else if (!callWaiting && isConnected) {
           connected.push(inbox)
         } else if (isWatching) {
           watching.push(inbox)
@@ -329,8 +331,10 @@ export default {
     allUserIds (ringGroup) {
       const connectedUserIds = ringGroup.connected_user_ids || []
       const watcherUserIds = ringGroup.watcher_user_ids || []
+      const watcherTeamsUserIds = ringGroup.watcher_team_user_ids || []
+      const usersConnectedToTeams = ringGroup.teams.map(team => team.users.map(user => user.id)).flat()
 
-      return [...connectedUserIds, ...watcherUserIds]
+      return [...connectedUserIds, ...watcherUserIds, ...watcherTeamsUserIds, ...usersConnectedToTeams]
     },
 
     newRingGroupListener (ringGroup) {
@@ -528,70 +532,6 @@ export default {
     padding: 10px;
     overflow-y: auto;
     box-sizing: border-box;
-
-    .empty-state-aloai-style-mobile {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      width: 100%;
-      background: url('/assets/images/fomo/Gradient.png') no-repeat center center;
-      background-size: cover;
-      background-position: center;
-
-      .empty-state-header {
-        text-align: center;
-        padding: 15px 10px 10px;
-
-        .title-text {
-          color: #000;
-          font-size: 18px;
-          font-weight: 700;
-          margin: 0;
-          line-height: 1.2;
-        }
-      }
-
-      .empty-state-image-container {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 0;
-        padding: 10px;
-
-        img {
-          max-width: 90%;
-          max-height: 100%;
-          object-fit: contain;
-          border-radius: 4px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-      }
-
-      .empty-state-footer {
-        padding: 10px 15px 15px;
-        text-align: left;
-
-        .info-text {
-          margin: 8px 0;
-          font-size: 13px;
-          line-height: 1.4;
-          color: #333;
-
-          &:first-child {
-            margin-top: 0;
-          }
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          strong {
-            font-weight: 600;
-          }
-        }
-      }
-    }
   }
 
   &__empty-state {
