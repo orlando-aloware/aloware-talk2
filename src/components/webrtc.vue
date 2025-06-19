@@ -1,6 +1,7 @@
 <template>
   <div class='webrtcClass'>
-    <phone @callCompleted="handleCallCompleted" />
+    <phone @callCompleted="handleCallCompleted"
+           @onPhoneVisible="onPhoneVisible"/>
 
     <dialer />
 
@@ -144,6 +145,10 @@ export default {
 
     handleCallCompleted () {
       this.$emit('callCompleted')
+    },
+
+    onPhoneVisible (status) {
+      this.$emit('phoneVisible', status)
     }
   },
 
