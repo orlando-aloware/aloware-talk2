@@ -292,10 +292,8 @@ export default {
 
         if (error.response && error.response.status === 403) {
           this.setupErrorMessage = "You don't have enough permissions to connect an Aloware SMS channel. Please make sure you have access to both HubSpot's Integration Settings and Campaign Lines in Aloware."
-        } else if (error.response && error.response.status === 400) {
-          this.setupErrorMessage = 'You are missing the required HubSpot OAuth scopes. Please re-authenticate in the Integration Settings to acquire these scopes.'
         } else {
-          this.setupErrorMessage = error.response.data
+          this.setupErrorMessage = error.response.data.error || error.response.data.message || 'An error occurred while fetching the setup data. Please try again later.'
         }
       }
     },
