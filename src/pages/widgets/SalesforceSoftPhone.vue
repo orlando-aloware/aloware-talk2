@@ -50,6 +50,7 @@
       @callCompleted="handleCallCompletedEvent"
       @changeCampaignId="handleChangeCampaignEvent"
       @handleCall="handleCall"
+      @phoneVisible="phoneVisible"
     />
   </div>
 </template>
@@ -124,6 +125,7 @@ export default {
       campaignId: null,
       defaultOutboundCampaignId: null,
       authProfile: null,
+      phoneVisibility: false,
       listeners: {
         userLoggedIn: null,
         agentStatusUpdated: null,
@@ -430,6 +432,10 @@ export default {
       this.checkContactTimezone(params, this.makeCall, this.cancelCall)
     },
 
+    phoneVisible (status) {
+      this.phoneVisibility = status
+    },
+
     cancelCall () {
       // remove loading page if there is no ask about line
       if (!this.isAlwaysAskModeEnabled()) {
@@ -648,11 +654,22 @@ export default {
         }
       }
     },
-    'dialer.parkedCall' () {
+    'dialer.parkedCall' (after, before) {
+      console.info('dialer.parkedCall',
+        {
+          'this.dialer?.parkedCall before': before,
+          'this.dialer?.parkedCall after': this.dialer?.parkedCall,
+          'this.dialer?.currentStatus': this.dialer?.currentStatus,
+          'this.widgetMessage': this.widgetMessage,
+          'this.profile.agent_status': this.profile.agent_status,
+          'this.phoneVisibility': this.phoneVisibility
+        }
+      )
       // switch message when parked call was finished by client
       if (this.dialer?.parkedCall === undefined &&
         this.dialer?.currentStatus === 'READY' &&
-        this.widgetMessage === WIDGET_MSG_HIDE) {
+        this.widgetMessage === WIDGET_MSG_HIDE &&
+        !this.phoneVisibility) {
         this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
       }
     }
