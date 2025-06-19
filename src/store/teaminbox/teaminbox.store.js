@@ -10,6 +10,7 @@ export default function () {
     activeInboxId: null,
     activeInbox: {},
     inboxes: [],
+    hasAnyInboxes: false, // Flag to track if user has any inboxes (from initial load)
     isLoadingInboxes: false,
     inboxesUnreadCount: [],
     isLoadingInboxesUnreadCount: false,
