@@ -47,7 +47,7 @@
         </contact-activities>
       </div>
       <div class="contact-details-container"
-           :class="{ 'contact-details--opened': detailsOpen }"
+           :class="{ 'contact-details--opened': !isContactDetailsCollapsed, 'hidden': isContactDetailsCollapsed && !isMobile }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
@@ -65,7 +65,7 @@
                 :breakpoint="0"
                 :width="300"
                 v-model="drawer"
-                v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
+                v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && (!isWidget || isMobile)">
         <compact-btn customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
                      variant="outlined-light"
                      borderless
@@ -118,6 +118,7 @@ import {
 } from 'src/constants/viewport-sizes'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { THREADED } from 'src/store/teaminbox/teaminbox.store'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'contact',
@@ -160,6 +161,8 @@ export default {
       'isMobile',
       'isWidget'
     ]),
+
+    ...mapFields('settings', ['isContactDetailsCollapsed']),
 
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
@@ -240,6 +243,7 @@ export default {
 
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
+      this.isContactDetailsCollapsed = !this.isContactDetailsCollapsed
     }
   },
 
@@ -378,8 +382,8 @@ export default {
       })
     },
 
-    detailsOpen (value) {
-      if (!value && this.isMobile) {
+    isContactDetailsCollapsed (value) {
+      if (value && this.isMobile) {
         this.$VueEvent.fire('hide_mobile_footer', false)
       }
     }

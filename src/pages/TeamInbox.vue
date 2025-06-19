@@ -27,7 +27,8 @@ import TeamInboxSide from 'components/teaminbox/teaminbox-side'
 import { aclMixin, userMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
-import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
+import { mapFields } from 'vuex-map-fields'
+import { debounce } from 'lodash'
 
 export default {
   name: 'TeamInbox',
@@ -48,8 +49,7 @@ export default {
         TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
       ],
       // Store the unread count for the currently selected contact
-      currentContactUnreadCount: 0,
-      loadingTeamInboxCampaigns: false
+      currentContactUnreadCount: 0
     }
   },
 
@@ -70,12 +70,10 @@ export default {
       'currentCompany'
     ]),
 
-    ...mapState([
-      'teamInboxCampaigns'
-    ]),
-
-    ...mapState([
-      'isMobile'
+    ...mapFields('settings', [
+      'isTeamInboxNavListCollapsed',
+      'isContactDetailsCollapsed',
+      'isSidebarCollapsed'
     ]),
 
     isMobileContactActive () {
@@ -120,16 +118,10 @@ export default {
         this.$router.replace({ name: 'Inbox' })
       }
     }
-    // Load team inbox campaigns
-    getTeamInboxCampaigns(this)
+    this.resizeHandler()
   },
 
   methods: {
-    ...mapActions([
-      'setTeamInboxCampaigns',
-      'setCampaignsIsLoading'
-    ]),
-
     ...mapActions('TeamInbox', [
       'reset'
     ]),
@@ -149,7 +141,22 @@ export default {
       // Only valid for team inbox, which are waiting for the backend to process the event
       this.$VueEvent.fire('mark_contact_communications_all_as_read', contact)
       this.$VueEvent.fire('contact_updated', contact)
-    }
+    },
+
+    resizeHandler: debounce(function () {
+      const width = this.$q.screen.width
+
+      if (width >= 1366) {
+        this.isTeamInboxNavListCollapsed = false
+        return
+      }
+
+      if (width >= 785) {
+        this.isTeamInboxNavListCollapsed = true
+        this.isContactDetailsCollapsed = true
+        this.isSidebarCollapsed = true
+      }
+    }, 100)
   },
 
   watch: {
@@ -158,6 +165,10 @@ export default {
       if (!enabled) {
         this.$router.replace({ name: 'Inbox' })
       }
+    },
+
+    '$q.screen.width' (width) {
+      this.resizeHandler()
     }
   },
 

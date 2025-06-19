@@ -296,7 +296,7 @@ import * as TrialStatus from 'src/constants/trial-account-status'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { MAX_SCREEN_WIDTH_MOBILE_HEADER } from 'src/constants/viewport-sizes'
 import talk2Api from 'src/plugins/api/api'
-import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
+import { getCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
 import * as storage from 'src/plugins/helpers/storage'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import store from 'src/store'
@@ -357,8 +357,6 @@ export default {
   data () {
     return {
       loading: true,
-      loadingCampaigns: false,
-      loadingTeamInboxCampaigns: false,
       loadingRingGroups: false,
       loadingTeams: false,
       loadingContactLists: false,
@@ -434,7 +432,6 @@ export default {
     ...mapState([
       'dialer',
       'campaigns',
-      'teamInboxCampaigns',
       'isMobile',
       'ringGroups',
       'notifications',
@@ -446,7 +443,8 @@ export default {
       'showedKycDialog',
       'showedKycReloadDialog',
       'statics',
-      'isWidget'
+      'isWidget',
+      'campaignsIsLoading'
     ]),
 
     ...mapState('auth', [
@@ -481,6 +479,10 @@ export default {
 
     ...mapFields('powerDialer', [
       'sessionPaused'
+    ]),
+
+    ...mapFields('settings', [
+      'isSidebarCollapsed'
     ]),
 
     isGuest () {
@@ -1247,11 +1249,11 @@ export default {
       this.sidebarVisible = true
     }
 
-    // using the negative because the default should be expanded, so whenever the value is falsy means expanded
-    const isSidebarCollapsed = localStorage.getItem('isSidebarCollapsed')
-
-    if (isSidebarCollapsed === 'true') {
-      this.isSidebarExpanded = false
+    if (this.isSidebarCollapsed !== undefined) {
+      // if user has collapsed the sidebar, keep it collapsed
+      this.isSidebarExpanded = !this.isSidebarCollapsed
+    } else {
+      this.isSidebarExpanded = window?.innerWidth && window.innerWidth > 1366
     }
 
     // check auth every 5 minutes
@@ -1560,8 +1562,7 @@ export default {
 
     toggleSidebarExpansion () {
       this.isSidebarExpanded = !this.isSidebarExpanded
-
-      localStorage.setItem('isSidebarCollapsed', !this.isSidebarExpanded)
+      this.isSidebarCollapsed = !this.isSidebarExpanded
     },
 
     toggleSidebar () {
@@ -1701,11 +1702,6 @@ export default {
         this.getLeadSources()
         this.getAttributeDictionaries()
         this.getMyQueueList()
-
-        // Load team inbox campaigns (no visibility limits) only if a team inbox is active
-        if (this.hasCompanyTeamInboxEnabled) {
-          getTeamInboxCampaigns(this)
-        }
       })
     },
 
@@ -1754,8 +1750,7 @@ export default {
         return null
       }
 
-      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-      const found = campaigns.find((campaign) => campaign.id === id)
+      const found = this.campaigns.find((campaign) => campaign.id === id)
 
       if (found) {
         return found
@@ -2756,7 +2751,6 @@ export default {
       'resetVuex',
       'setUsage',
       'setCampaigns',
-      'setTeamInboxCampaigns',
       'setCampaignsIsLoading',
       'setRingGroups',
       'setRingGroupsIsLoading',
@@ -3075,6 +3069,12 @@ export default {
       if (value <= MAX_SCREEN_WIDTH_MOBILE_HEADER && this.$q.screen.gt.sm &&
         !this.showContactsHeader) {
         this.setShowContactsHeader(true)
+      }
+    },
+
+    isSidebarCollapsed (value) {
+      if (value) {
+        this.isSidebarExpanded = !value
       }
     }
   },

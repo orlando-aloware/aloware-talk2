@@ -108,6 +108,12 @@
         </q-btn>
       </div>
     </div>
+    <div
+      v-if="lineInboxName && !isCallCompleted"
+      class="d-flex justify-center text-grey-82 text-xxs mt-n2 bg-blue-80"
+    >
+      {{ lineInboxName }}
+    </div>
     <div class="bg-dark d-flex align-items-center justify-content-center h-100 flex-grow-1 overflow-hidden"
          v-if="loadingPhone">
       <q-spinner-bars color="white"
@@ -1980,6 +1986,12 @@ export default {
 
     isContactReadOnly () {
       return Boolean(this.contact?.is_read_only) || false
+    },
+
+    lineInboxName () {
+      const line = this.campaigns.find(campaign => campaign.id === this.dialer.communication.campaign_id)
+      const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = line || {}
+      return ringGroup?.name || personalInbox?.name
     }
   },
 

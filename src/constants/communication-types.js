@@ -27,5 +27,8 @@ export const SMS_TYPE = 'sms'
 export const MMS_TYPE = 'MMS'
 export const EMAIL_TYPE = 'email'
 export const FAX_TYPE = 'fax'
-export const RVM_TYPE = 'Voicemail'
+export const RVM_TYPE = 'rvm'
 export const ANY_COMMUNICATION_TYPE = 'all'
+
+// types labels
+export const RVM_LABEL = 'Voicemail'

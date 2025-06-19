@@ -1030,7 +1030,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'teamInboxCampaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
+    ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('inbox', ['liveContacts', 'contacts']),
     ...mapState('broadcast', ['broadcasts']),
@@ -1155,8 +1155,7 @@ export default {
       }
 
       // Otherwise look in the store
-      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
-      const found = campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
+      const found = this.campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
       if (found) {
         return removeDeletedSuffix(found.name)
       }

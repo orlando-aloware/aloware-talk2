@@ -7,7 +7,6 @@
       <div class="avatar d-flex justify-content-center pb-1 position-relative"
            role="button">
         <b-badge class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
-                 variant="danger"
                  data-testid="inbox-tasks-item-badge"
                  pill
                  v-if="totalUnreads > 0">

@@ -82,7 +82,7 @@
                flat
                class="contact-activities-actions__drawer_btn"
                data-testid="contact-activities-drawer-btn"
-               v-if='!isWidget'
+               v-if="!isWidget"
                @click="$emit('toggleDrawer')">
           <information-circle-icon/>
         </q-btn>
@@ -90,7 +90,7 @@
                flat
                class="contact-activities-actions__mobile_btn"
                data-testid="contact-activities-details-mobile-btn"
-               v-if='!isWidget'
+               v-if="!isWidget"
                @click="$emit('toggleDetails')">
           <information-circle-icon width="33"
                                    height="33"/>
@@ -139,12 +139,10 @@
                class="text-decoration-none"
                data-testid="contact-activities-export-communications-btn"
                :disabled="loading"
+               v-b-tooltip.html="{customClass: 'tooltip-dark'}"
+               title="Export Communications"
                v-if="isAdmin && !isWidget && enableExport && !inPowerDialerPage"
                @click="handleExportCommunications">
-          <q-tooltip anchor="top middle"
-                     self="center middle">
-            Export Communications
-          </q-tooltip>
           <span v-if="!loading"
                 class="mx-2">
             <export-icon />
@@ -154,6 +152,16 @@
                           color="primary"
                           size="20px"
           />
+        </q-btn>
+        <q-btn flat
+               color="primary"
+               class="open-contact-details-btn d-flex align-items-center justify-content-center px-2"
+               v-b-tooltip.hover="{customClass: 'tooltip-dark'}"
+               :title="isContactDetailsCollapsed ? 'Show contact details' : 'Hide contact details'"
+               @click="$emit('toggleDetails')">
+          <phone-card-icon width="21" height="21" />
+          <i class="ml-1 fa"
+             :class="[!isContactDetailsCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
         </q-btn>
 
         <q-btn
@@ -232,7 +240,7 @@
         </q-btn>
       </div>
     </div>
-    <profile v-if="isMobile && $q.screen.lt.md && !isWidget"
+    <profile v-if="!isMobile && $q.screen.lt.md && !isWidget"
       :hideProfileInfo="true"></profile>
   </div>
 </template>
@@ -255,6 +263,8 @@ import { aclMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { mapGetters, mapState } from 'vuex'
 import ExportIcon from '../icons/export-icon.vue'
+import PhoneCardIcon from 'components/icons/phone-card-icon.vue'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'contact-activities-header',
@@ -275,7 +285,8 @@ export default {
     MailOpenIcon,
     EllipsisIcon,
     BackButton,
-    ExportIcon
+    ExportIcon,
+    PhoneCardIcon
   },
 
   props: {
@@ -311,6 +322,7 @@ export default {
     ...mapState(['isMobile', 'isWidget']),
     ...mapState('TeamInbox', ['activeInboxId']),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
+    ...mapFields('settings', ['isContactDetailsCollapsed']),
     resolveVariant () {
       switch (this.contact.task_status) {
         case ContactTaskStatus.STATUS_OPEN:

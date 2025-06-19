@@ -1,6 +1,7 @@
 <template>
   <div class="teaminbox-nav-list"
-       data-testid="teaminbox-nav-list">
+       data-testid="teaminbox-nav-list"
+       ref="teaminboxNavList">
     <div class="teaminbox-nav-list__header border-bottom d-flex flex-column justify-content-center">
       <search-input class="teaminbox-nav-list__header__search"
                     placeholder="Type ENTER to search inboxes..."
@@ -98,6 +99,7 @@ import {
 } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   components: {
@@ -135,6 +137,8 @@ export default {
     ...mapState(['isMobile', 'teams']),
 
     ...mapGetters('TeamInbox', ['getConnectedInboxesLength']),
+
+    ...mapFields('settings', ['isTeamInboxNavListCollapsed']),
 
     teamsIds () {
       return this.teams
