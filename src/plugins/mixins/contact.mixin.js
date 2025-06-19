@@ -233,7 +233,7 @@ export default {
     }
 
     this.listeners.newCommunication = (data) => {
-      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
+      if (!this.checkCommunicationMatchesUserAccessibility(data, this.teamInbox)) {
         return
       }
 
@@ -242,7 +242,7 @@ export default {
     }
 
     this.listeners.updateCommunication = (data) => {
-      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
+      if (!this.checkCommunicationMatchesUserAccessibility(data, this.teamInbox)) {
         return
       }
 

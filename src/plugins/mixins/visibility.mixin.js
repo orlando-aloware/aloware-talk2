@@ -283,14 +283,14 @@ export default {
       return true
     },
 
-    checkCommunicationMatchesUserAccessibility (communication) {
+    checkCommunicationMatchesUserAccessibility (communication, teamInbox = false) {
       // check auth exists to prevent js errors
       if (!this.profile) {
         return false
       }
 
-      // if team inbox is enabled, visibility limits are not observed
-      if (this.hasCompanyTeamInboxEnabled) {
+      // if this comes from team inbox, visibility limits are not observed
+      if (teamInbox && this.hasCompanyTeamInboxEnabled) {
         return true
       }
 

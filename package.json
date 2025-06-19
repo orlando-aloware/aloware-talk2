@@ -1,6 +1,6 @@
 {
   "name": "aloware-talk2",
-  "version": "1.69.0",
+  "version": "1.69.1",
   "description": "Aloware Agent Interface",
   "productName": "Talk",
   "author": "Aloware <support@aloware.com>",
@@ -36,7 +36,7 @@
     "@riophae/vue-treeselect": "^0.4.0",
     "@sentry/vue": "^7.106.1",
     "@sentry/webpack-plugin": "^1.21.0",
-    "@twilio/voice-sdk": "2.8",
+    "@twilio/voice-sdk": "2.13.0",
     "@vue-bootstrap-components/vue-bootstrap-autocomplete": "^2.15.3",
     "axios": "^1.6.7",
     "bootstrap": "^4.6.1",
