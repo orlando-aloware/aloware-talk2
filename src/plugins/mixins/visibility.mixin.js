@@ -261,10 +261,15 @@ export default {
       return true
     },
 
-    checkCommunicationMatchesUserAccessibility (communication) {
+    checkCommunicationMatchesUserAccessibility (communication, teamInbox = false) {
       // check auth exists to prevent js errors
       if (!this.profile) {
         return false
+      }
+
+      // if this comes from team inbox, visibility limits are not observed
+      if (teamInbox && this.hasCompanyTeamInboxEnabled) {
+        return true
       }
 
       // checks if accessible_campaigns is available and then looks for communication campaign_id in that array
