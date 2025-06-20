@@ -396,7 +396,16 @@ export default {
     },
 
     handleCallCompletedEvent () {
-      if (!this.dialer.parkedCall && this.dialer?.currentStatus !== 'MAKING_CALL') {
+      console.log('handleCallCompletedEvent',
+        {
+          'currentStatus': this.dialer?.currentStatus,
+          'parkedCall': this.dialer?.parkedCall
+        }
+      )
+
+      const skippedStatuses = ['MAKING_CALL', 'RECEIVED_CALL_INVITE', 'ANSWERING_CALL', 'CALL_CONNECTED']
+
+      if (!this.dialer.parkedCall && !skippedStatuses.includes(this.dialer?.currentStatus)) {
         this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
         this.startDialing = false
         this.enableClickToDial()
