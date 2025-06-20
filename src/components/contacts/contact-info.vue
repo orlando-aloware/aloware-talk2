@@ -305,7 +305,7 @@ import ContactAddReminderModal from 'src/components/contacts/contact-add-reminde
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
 import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
-import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin, userMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
@@ -327,7 +327,8 @@ export default {
     aclMixin,
     timezoneCheckMixin,
     integrationMixin,
-    contactMixin
+    contactMixin,
+    userMixin
   ],
 
   components: {
@@ -489,7 +490,7 @@ export default {
         return
       }
 
-      if (!this.isFromTeamInbox) {
+      if (!this.isFromTeamInbox || !this.hasCompanyTeamInboxLineManagementEnhancements) {
         if (!this.isAlwaysAskEnabled && this.defaultOutboundCampaignId) {
           // If the outbound calling mode is not always ask and there is a default outbound campaign id, use it
           data.outboundCampaignId = this.defaultOutboundCampaignId
@@ -499,18 +500,21 @@ export default {
         data.outboundCampaignId = this.selectedLine || this.defaultOutboundCampaignId
       }
 
-      this.$VueEvent.fire('makeCall', data)
+      const event = !data.outboundCampaignId ? 'callContact' : 'makeCall'
+      this.$VueEvent.fire(event, data)
     },
 
     onCallClick () {
-      const showLineSelectorPopup = this.isAlwaysAskEnabled ||
-        (this.defaultOutboundCampaignId && this.defaultOutboundCampaignId !== this.contactLastLineUsedId)
+      if (this.hasCompanyTeamInboxLineManagementEnhancements) {
+        const showLineSelectorPopup = this.isAlwaysAskEnabled ||
+          (this.defaultOutboundCampaignId && this.defaultOutboundCampaignId !== this.contactLastLineUsedId)
 
-      if (this.isFromTeamInbox && showLineSelectorPopup) {
-        // Show popup and wait for user to select line
-        this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
-        this.showLineSelectorPopup = !this.showLineSelectorPopup
-        return
+        if (this.isFromTeamInbox && showLineSelectorPopup) {
+          // Show popup and wait for user to select line
+          this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
+          this.showLineSelectorPopup = !this.showLineSelectorPopup
+          return
+        }
       }
 
       // If we don't need to show the line selector popup, directly call the contact
