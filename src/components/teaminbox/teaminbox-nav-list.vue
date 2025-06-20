@@ -47,9 +47,10 @@
         </b-overlay>
       </div>
 
+      <!-- Full empty state when user has no team inboxes at all -->
       <div
-        :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']"
-           v-else-if="!inboxes.length">
+        v-else-if="!inboxes.length && !hasAnyInboxes"
+        :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']">
         <team-inbox-empty-state v-if="isMobile">
           <template #list-content>
             <p class="info-text">
@@ -79,6 +80,20 @@
             Refresh
           </button>
         </template>
+      </div>
+
+      <!-- Simple empty state when user has inboxes but search/filter returns empty -->
+      <div class="text-center q-pa-md text-grey"
+           v-else-if="!inboxes.length">
+        No Inboxes
+
+        <br/>
+
+        <button class="btn btn-sm btn-primary mt-4"
+                v-if="showRefreshInboxesButton"
+                @click.prevent="onRefreshInboxes">
+          <refresh-icon color="#fff"/> Refresh
+        </button>
       </div>
     </div>
   </div>
@@ -129,7 +144,8 @@ export default {
       'hasMoreInboxes',
       'isLoadingInboxes',
       'inboxesUnreadCount',
-      'showRefreshInboxesButton'
+      'showRefreshInboxesButton',
+      'hasAnyInboxes'
     ]),
 
     ...mapState('auth', ['profile']),

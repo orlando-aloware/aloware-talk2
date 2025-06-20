@@ -39,7 +39,8 @@ export default {
       'setShowRefreshInboxesButton',
       'setShowRefreshCommunicationsButton',
       'setUnreadCountLoaded',
-      'setContactsLastUsedLines'
+      'setContactsLastUsedLines',
+      'setHasAnyInboxes'
     ]),
 
     async fetchInboxes (search = '') {
@@ -65,6 +66,11 @@ export default {
         })
 
         this.setInboxes(response.data)
+
+        // On initial load (no search), set the flag if user has any inboxes
+        if (!search && response.data.data && response.data.data.length > 0) {
+          this.setHasAnyInboxes(true)
+        }
       } catch (error) {
         if (error.name !== 'CanceledError') {
           this.$generalNotification('Error while fetching inboxes, please try again', 'error')

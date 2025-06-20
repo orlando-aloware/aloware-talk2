@@ -2,6 +2,7 @@ import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-
 import _ from 'lodash'
 
 export default {
+  persistedListId: state => state.persistedListId,
   opened: (state) => new Set(state.opened),
   isRemoveFolderOpen: (state) => !!state.removeFolder,
   folderToRemove: (state) => state.removeFolder || {},

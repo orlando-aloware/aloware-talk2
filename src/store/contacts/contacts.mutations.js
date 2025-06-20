@@ -140,6 +140,9 @@ export default {
   SET_SELECTED_LIST: (state, payload) => {
     state.selectedList = { ...state.selectedList, ...payload }
   },
+  SET_PERSISTED_LIST_ID: (state, listId) => {
+    state.persistedListId = listId
+  },
 
   SET_SELECTED_LIST_CONTACT_COUNT: (state, count) => {
     state.selectedList = { ...state.selectedList, contactCount: count }

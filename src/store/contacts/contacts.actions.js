@@ -89,6 +89,9 @@ export default {
   setSelectedList: ({ commit }, payload) => {
     commit('SET_SELECTED_LIST', payload)
   },
+  setPersistedListId: ({ commit }, listId) => {
+    commit('SET_PERSISTED_LIST_ID', listId)
+  },
 
   setSelectedListContactCount: ({ commit }, count) => {
     commit('SET_SELECTED_LIST_CONTACT_COUNT', count)

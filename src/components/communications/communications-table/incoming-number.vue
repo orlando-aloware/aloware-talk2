@@ -46,6 +46,9 @@ export default {
     ...mapState(['campaigns']),
 
     campaign () {
+      if (this.row.campaign) {
+        return this.row.campaign
+      }
       return this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
     },
 
