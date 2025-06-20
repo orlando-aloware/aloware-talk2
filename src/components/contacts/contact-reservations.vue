@@ -1,5 +1,5 @@
 <template>
-  <b-card class="integrations-wrapper border-0" v-if="!isEmpty(reservations)" data-testid="contact-reservations-wrapper">
+  <b-card class="integrations-wrapper border-0" v-if="!isEmpty(reservations?.reservations)" data-testid="contact-reservations-wrapper">
     <h4 class="mb-2">
       Guesty Reservations
     </h4>
@@ -16,6 +16,12 @@
               data-testid="contact-reservations-link"
               :href="reservation.reservation_link">
         <q-card-section data-testid="contact-reservations-card-section">
+          <div class="text-subtitle2" data-testid="contact-reservations-number">
+            Reservation number:
+            <div class='text-caption'>
+              {{ reservation.reservation_id }}
+            </div>
+          </div>
           <div class="text-subtitle2" data-testid="contact-reservations-confirmation-code">
             Confirmation Code:
             <div class='text-caption'>
