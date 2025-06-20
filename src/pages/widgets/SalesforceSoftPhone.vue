@@ -50,7 +50,6 @@
       @callCompleted="handleCallCompletedEvent"
       @changeCampaignId="handleChangeCampaignEvent"
       @handleCall="handleCall"
-      @phoneVisible="phoneVisible"
     />
   </div>
 </template>
@@ -125,7 +124,6 @@ export default {
       campaignId: null,
       defaultOutboundCampaignId: null,
       authProfile: null,
-      phoneVisibility: false,
       listeners: {
         userLoggedIn: null,
         agentStatusUpdated: null,
@@ -398,7 +396,16 @@ export default {
     },
 
     handleCallCompletedEvent () {
-      if (!this.dialer.parkedCall && this.dialer?.currentStatus !== 'MAKING_CALL') {
+      console.log('handleCallCompletedEvent',
+        {
+          'currentStatus': this.dialer?.currentStatus,
+          'parkedCall': this.dialer?.parkedCall
+        }
+      )
+
+      const skippedStatuses = ['MAKING_CALL', 'RECEIVED_CALL_INVITE', 'ANSWERING_CALL', 'CALL_CONNECTED']
+
+      if (!this.dialer.parkedCall && !skippedStatuses.includes(this.dialer?.currentStatus)) {
         this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
         this.startDialing = false
         this.enableClickToDial()
@@ -430,10 +437,6 @@ export default {
       }
 
       this.checkContactTimezone(params, this.makeCall, this.cancelCall)
-    },
-
-    phoneVisible (status) {
-      this.phoneVisibility = status
     },
 
     cancelCall () {
@@ -654,22 +657,11 @@ export default {
         }
       }
     },
-    'dialer.parkedCall' (after, before) {
-      console.info('dialer.parkedCall',
-        {
-          'this.dialer?.parkedCall before': before,
-          'this.dialer?.parkedCall after': this.dialer?.parkedCall,
-          'this.dialer?.currentStatus': this.dialer?.currentStatus,
-          'this.widgetMessage': this.widgetMessage,
-          'this.profile.agent_status': this.profile.agent_status,
-          'this.phoneVisibility': this.phoneVisibility
-        }
-      )
+    'dialer.parkedCall' () {
       // switch message when parked call was finished by client
       if (this.dialer?.parkedCall === undefined &&
         this.dialer?.currentStatus === 'READY' &&
-        this.widgetMessage === WIDGET_MSG_HIDE &&
-        !this.phoneVisibility) {
+        this.widgetMessage === WIDGET_MSG_HIDE) {
         this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
       }
     }
