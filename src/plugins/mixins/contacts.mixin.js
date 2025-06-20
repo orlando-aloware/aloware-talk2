@@ -1,4 +1,4 @@
-import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
@@ -71,6 +71,7 @@ export default {
       'setShouldUpdateSelectedListContactCount',
       'setSelectedListContactCount',
       'setSelectedList',
+      'setPersistedListId',
       'setListContactsLoaded',
       'setContact',
       'listLoaded',
@@ -366,6 +367,14 @@ export default {
         type: list.type
       })
 
+      if (this.$route.name !== 'Contact') {
+        if (listDataId === 'all') {
+          this.setPersistedListId(null)
+        } else {
+          this.setPersistedListId(listDataId)
+        }
+      }
+
       this.setAllContactsSelected(false)
       this.setIsDatatableSelectedAll(false)
 
@@ -557,14 +566,19 @@ export default {
       query.filter_groups = []
 
       // initial filter for static contact lists
-      if (this.$route?.query?.previousPage === 'Power Dialer' && this.selectedPdList?.type === ContactListTypes.STATIC) {
-        // use id from currently selected pd list
+      if (this.persistedListId && this.$route.name === 'Contact') {
+        // Maintain list selection when navigating within Contacts view to prevent unexpected contacts during scroll
+        const persistedList = this.lists[this.persistedListId]
+        if (persistedList && (persistedList.type === ContactListTypes.STATIC || persistedList.type === ContactListTypes.DYNAMIC_REMOTE_LIST)) {
+          query.list_id = this.persistedListId
+        }
+      } else if (this.$route?.query?.previousPage === 'Power Dialer' && this.selectedPdList?.type === ContactListTypes.STATIC) {
+        // Preserve list context when coming from Power Dialer
         query.list_id = this.selectedPdList.id
       } else if (this.$route.name === 'Contact' && this.selectedList?.type === ContactListTypes.STATIC) {
-        // use id from currently selected contacts list
+        // Use the active list selection in Contacts view
         query.list_id = this.selectedList.id
       } else if (this.list && (this.list.type === ContactListTypes.STATIC || this.list.type === ContactListTypes.DYNAMIC_REMOTE_LIST) && this.$route.path && !this.$route.path.includes('/add')) {
-        // use id from currently selected contacts list derived from route
         query.list_id = this.id
       }
 
@@ -1052,7 +1066,8 @@ export default {
       'currentListFilters',
       'changingSelectedContact',
       'selectedList',
-      'contact'
+      'contact',
+      'persistedListId'
     ]),
 
     ...mapState('cache', [
@@ -1307,6 +1322,10 @@ export default {
       const otherRoutesToContacts = !contactRoutes.includes(from.name) &&
         to.name === 'Contacts'
       const inOrOutOfContactsOrToPD = contactsToOtherRoutes || otherRoutesToContacts || to.name === 'Power Dialer'
+
+      if (contactsToOtherRoutes) {
+        this.setPersistedListId(null)
+      }
 
       if (inOrOutOfContactsOrToPD && this.$route.name === 'Contacts') {
         this.isNavigated = true
