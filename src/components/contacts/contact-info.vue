@@ -110,7 +110,7 @@
                 class="custom-action-button my-1"
                 data-testid="contact-info-call-button"
                 @click="onCallClick">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-call-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -131,6 +131,7 @@
               :use-only-actives="true"
               :pre-selected-team-inbox-line-id="contactLastLineUsedId"
               @change="onLineChange"
+              @initiateCall="forceInitiateCall"
             >
             </line-selector>
             <q-btn
@@ -156,7 +157,7 @@
                 v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
                 data-testid="contact-info-block-button"
                 @click="blockContact">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    self="center middle"
                    content-class="fs-12">
           Block
@@ -178,7 +179,7 @@
                 v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
                 data-testid="contact-info-unblock-button"
                 @click="unBlockContact">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    self="center middle"
                    content-class="fs-12">
           Unblock
@@ -204,7 +205,7 @@
                 :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-appointment-button"
                 @click="addAppointmentOpen(true)">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-add-appointment-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -218,7 +219,7 @@
                 :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-reminder-button"
                 @click="addReminderOpen(true)">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-add-reminder-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -232,7 +233,7 @@
                 data-testid="contact-info-add-power-dialer-button"
                 :disabled="isReadOnly"
                 @click="openPowerDialerModal">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-add-power-dialer-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -246,7 +247,7 @@
                 data-testid="contact-info-remove-power-dialer-button"
                 :disabled="isRemovingFromPowerDialerLists || !hasPowerDialerLists || isReadOnly"
                 @click="removeContactFromPowerDialerLists">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-remove-power-dialer-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -260,7 +261,7 @@
                 data-testid="contact-info-merge-button"
                 v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled && !isReadOnly"
                 @click="openMergeContactModal">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-merge-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -513,6 +514,11 @@ export default {
       }
 
       // If we don't need to show the line selector popup, directly call the contact
+      this.callContact()
+    },
+
+    forceInitiateCall (campaignId) {
+      this.selectedLine = campaignId
       this.callContact()
     },
 
