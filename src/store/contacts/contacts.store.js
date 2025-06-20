@@ -155,6 +155,7 @@ export default function () {
       name: 'All Contacts',
       contactCount: 0
     },
+    persistedListId: null,
     shouldUpdateSelectedListContactCount: false,
     selectedStaticList: {
       id: null,
