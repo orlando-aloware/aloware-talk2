@@ -382,6 +382,11 @@ export default {
 
   created () {
     this.options = this.activeCampaignsAlphabeticalOrder
+
+    if (this.preSelectedTeamInboxLineId && this.options.length === 1) {
+      // If there is only one line and the line is pre-selected, emit the event to initiate the call
+      this.$emit('initiateCall', this.options[0])
+    }
   },
 
   mounted () {
@@ -449,9 +454,7 @@ export default {
         return
       }
 
-      if (this.options.find(campaign => campaign.id === this.value)) {
-        this.selectedId = this.value
-      }
+      this.selectedId = this.value
     },
 
     selectedId (val) {
