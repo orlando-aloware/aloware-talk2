@@ -144,13 +144,14 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}contact/${id}/send-email`, params)
       },
 
-      addEngagement (id, params, fromTeamInbox) {
+      addEngagement (id, params, teamInboxId) {
         if (!id) {
           return null
         }
 
-        if (fromTeamInbox) {
+        if (teamInboxId) {
           params.from_team_inbox = true
+          params.ring_group_id = teamInboxId
         }
 
         return window.axios.post(`${suffixV1}calendar/events/contact/${id}/create`, params)

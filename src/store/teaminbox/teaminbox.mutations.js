@@ -1,6 +1,8 @@
 import { THREADED, DEFAULT_FILTERS } from './teaminbox.store'
+import { updateField } from 'vuex-map-fields'
 
 export default {
+  updateField,
   SET_ACTIVE_INBOX_ID (state, inbox) {
     state.activeInboxId = inbox
   },

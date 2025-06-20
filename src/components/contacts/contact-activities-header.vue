@@ -139,12 +139,12 @@
                class="text-decoration-none"
                data-testid="contact-activities-export-communications-btn"
                :disabled="loading"
-               v-b-tooltip.html="{customClass: 'tooltip-dark'}"
-               title="Export Communications"
                v-if="isAdmin && !isWidget && enableExport && !inPowerDialerPage"
                @click="handleExportCommunications">
-          <span v-if="!loading"
-                class="mx-2">
+          <span v-b-tooltip.html="{customClass: 'tooltip-dark'}"
+                title="Export Communications"
+                class="mx-2"
+                v-if="!loading">
             <export-icon />
           </span>
           <q-spinner-bars v-if="loading"
@@ -153,34 +153,21 @@
                           size="20px"
           />
         </q-btn>
-        <q-btn flat
-               color="primary"
-               class="open-contact-details-btn d-flex align-items-center justify-content-center px-2"
-               v-b-tooltip.hover="{customClass: 'tooltip-dark'}"
-               :title="isContactDetailsCollapsed ? 'Show contact details' : 'Hide contact details'"
-               @click="$emit('toggleDetails')">
-          <phone-card-icon width="21" height="21" />
-          <i class="ml-1 fa"
-             :class="[!isContactDetailsCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
-        </q-btn>
 
-        <q-btn
-          v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled"
-          borderless
-          flat
-          no-caps
-          type="a"
-          color="primary"
-          class="text-decoration-none"
-          :disable="isUpdatingStatus || isReadOnly"
-          data-testid="contact-activities-move-to-pending-btn"
-          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
-          <q-tooltip anchor="top middle"
-                     self="center middle">
-            Move to Pending
-          </q-tooltip>
-          <span v-if="!isUpdatingStatus"
-                class="mx-2">
+        <q-btn borderless
+               flat
+               no-caps
+               type="a"
+               color="primary"
+               class="text-decoration-none"
+               :disable="isUpdatingStatus || isReadOnly"
+               data-testid="contact-activities-move-to-pending-btn"
+               @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)"
+               v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled">
+          <span title="Move to Pending"
+                class="mx-2"
+                v-b-tooltip.html="{customClass: 'tooltip-dark'}"
+                v-if="!isUpdatingStatus">
             <timer-o-icon></timer-o-icon>
           </span>
           <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_PENDING"
@@ -199,12 +186,10 @@
                data-testid="contact-activities-reopen-btn"
                @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)"
                v-if="shouldDisplayClosedOrPendingContact">
-          <q-tooltip anchor="top middle"
-                     self="center middle">
-            Reopen
-          </q-tooltip>
-          <span v-if="!isUpdatingStatus"
-                class="mx-2">
+          <span title="Reopen"
+                class="mx-2"
+                v-b-tooltip.html="{customClass: 'tooltip-dark'}"
+                v-if="!isUpdatingStatus">
             <inbox-o-icon></inbox-o-icon>
           </span>
           <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_OPEN"
@@ -213,23 +198,20 @@
                           size="20px"
           />
         </q-btn>
-        <q-btn
-          borderless
-          flat
-          no-caps
-          type="a"
-          color="primary"
-          class="text-decoration-none"
-          :disable="isUpdatingStatus || isReadOnly"
-          data-testid="contact-activities-close-btn"
-          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)"
-          v-if="shouldDisplayContact">
-          <q-tooltip anchor="top middle"
-                     self="center middle">
-            Close
-          </q-tooltip>
-          <span v-if="!isUpdatingStatus"
-                class="mx-2">
+        <q-btn borderless
+               flat
+               no-caps
+               type="a"
+               color="primary"
+               class="text-decoration-none"
+               :disable="isUpdatingStatus || isReadOnly"
+               data-testid="contact-activities-close-btn"
+               @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)"
+               v-if="shouldDisplayContact">
+          <span title="Close"
+                class="mx-2"
+                v-b-tooltip.html="{customClass: 'tooltip-dark'}"
+                v-if="!isUpdatingStatus">
             <check-o-icon></check-o-icon>
           </span>
           <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_CLOSED"
@@ -237,6 +219,18 @@
                           color="primary"
                           size="20px"
           />
+        </q-btn>
+
+        <q-btn flat
+               color="primary"
+               class="open-contact-details-btn d-flex align-items-center justify-content-center px-2"
+               v-b-tooltip.hover="{customClass: 'tooltip-dark'}"
+               :title="isContactDetailsCollapsed ? 'Show contact details' : 'Hide contact details'"
+               @click="$emit('toggleDetails')">
+          <phone-card-icon width="21" height="21" color="#62666E"/>
+          <i class="ml-1 fa"
+             style="color:#62666E"
+             :class="[!isContactDetailsCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
         </q-btn>
       </div>
     </div>
