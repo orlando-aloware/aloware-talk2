@@ -47,7 +47,7 @@ export default {
     ]),
     ...mapActions('cache', ['setCurrentCompany']),
     broadcastInit () {
-      console.warn('initiating broadcast')
+      console.log('initiating broadcast')
 
       /**
        * Echo exposes an expressive API for subscribing to channels and listening

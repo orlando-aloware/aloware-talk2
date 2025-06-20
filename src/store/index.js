@@ -364,7 +364,6 @@ export default function (/* { ssrContext } */) {
       },
 
       setDialerCommunication ({ commit }, communication) {
-        console.warn('SET_DIALER_COMMUNICATION', communication)
         commit('SET_DIALER_COMMUNICATION', communication)
       },
 
@@ -373,7 +372,6 @@ export default function (/* { ssrContext } */) {
       },
 
       setDialerContact ({ commit }, contact) {
-        console.warn('SET_DIALER_CONTACT', contact)
         commit('SET_DIALER_CONTACT', contact)
       },
 

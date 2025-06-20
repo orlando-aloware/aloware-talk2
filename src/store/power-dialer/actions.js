@@ -123,7 +123,6 @@ export default {
    * Disposition API calls
    */
   async updateCallDisposition ({ commit }, params = {}) {
-    console.warn('updateCallDisposition 1')
     const res = await window.axios.post(`api/v1/communication/${params.id}/dispose-call`, {
       'call_disposition_id': params.params.call_disposition_id,
       paramsSerializer: qs.stringify
@@ -135,7 +134,6 @@ export default {
   },
 
   async updateContactDisposition ({ commit }, params = {}) {
-    console.warn('dispose 4')
     const res = await window.axios.post(`api/v1/contact/${params.id}/dispose`, {
       'disposition_status': params.params.disposition_status,
       paramsSerializer: qs.stringify

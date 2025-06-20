@@ -1207,7 +1207,6 @@ export default {
 
     dispose (dispositionStatus) {
       this.loadingDispose = true
-      console.warn('dispose 2')
       this.$axios.post(`/api/v1/contact/${this.communication.contact_id}/dispose`, { dispositionStatus }).then((res) => {
         this.loadingDispose = false
         this.$generalNotification('Contact disposed')

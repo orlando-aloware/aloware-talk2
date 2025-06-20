@@ -64,7 +64,6 @@ export default {
     ...mapActions(['setDialerContact']),
     changeContactDisposition (dispositionStatusId) {
       this.loadingContactDisposition = true
-      console.warn('dispose 3')
       this.contact.disposition_status_id = dispositionStatusId
       this.setDialerContact(this.contact)
       this.$axios.post('/api/v1/contact/' + this.contact.id + '/dispose', {

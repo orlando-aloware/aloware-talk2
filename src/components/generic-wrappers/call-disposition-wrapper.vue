@@ -52,7 +52,6 @@ export default {
     ...mapActions(['setDialerCommunication']),
     changeCallDisposition (callDispositionId) {
       this.loadingCallDisposition = true
-      console.warn('updateCallDisposition 3')
       this.communication.call_disposition_id = callDispositionId
       this.setDialerCommunication(this.communication)
       this.$axios.post('/api/v1/communication/' + this.communication.id + '/dispose-call', {

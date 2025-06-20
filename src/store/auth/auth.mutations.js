@@ -17,7 +17,6 @@ export default {
       // only update the properties if the new value
       // is not the same
       if (state.profile[index.data] !== profile[index.data]) {
-        console.log('SET_PROFILE', index.data, profile[index.data])
         Vue.set(state.profile, index.data, profile[index.data])
       }
     }
