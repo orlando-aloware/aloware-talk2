@@ -177,6 +177,11 @@ export default {
       // Transform filters to API parameters
       const apiFilters = {}
 
+      if (filters.from_date && filters.to_date) {
+        apiFilters.from_date = filters.from_date
+        apiFilters.to_date = filters.to_date
+      }
+
       // Map filter keys to API parameters
       if (filters.unread_only) {
         apiFilters.unread_only = true

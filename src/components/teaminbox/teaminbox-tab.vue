@@ -4,9 +4,11 @@
                        :search="search"
                        @search="search = $event" />
 
-    <TeamInboxChannelToggle @channel="onChannel"/>
+    <TeamInboxChannelToggle @channel="onChannel"
+                            @date-change="onFilterChange"/>
 
-    <TeamInboxFilters @filter-change="onFilterChange" @sort-change="onSortChange" />
+    <TeamInboxFilters @filter-change="onFilterChange"
+                      @sort-change="onSortChange" />
 
     <!-- Items List -->
     <div class="items-list blue-scroll"

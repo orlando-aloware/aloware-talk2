@@ -1,5 +1,9 @@
 <template>
   <div class="teaminbox-filters">
+    <div class="px-3 text-sm text-grey-90"
+         v-if="activeFilters.from_date">
+      {{ selectedDateRangePlaceholder }}
+    </div>
     <div class="d-flex justify-content-between align-items-center">
       <div class="teaminbox-filter flex-grow-1 overflow-hidden">
         <b-dropdown variant="outline-primary"
@@ -111,6 +115,7 @@ import { mapState, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import { navigationErrorHandler } from 'src/router/routes'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import moment from 'moment'
 
 export default {
   name: 'TeamInboxFilterSort',
@@ -133,6 +138,21 @@ export default {
 
     sortOption () {
       return this.activeSort && this.activeSort.order === 'asc' ? 'Oldest' : 'Newest'
+    },
+
+    selectedDateRangePlaceholder () {
+      const { from_date: fromDate, to_date: toDate, date_range: dateRange } = this.activeFilters
+
+      if (!fromDate && !toDate) {
+        return ''
+      }
+
+      if (dateRange !== 'custom') {
+        return `Showing communications for ${dateRange}`
+      }
+
+      const range = `${moment(fromDate).format('DD/MM/YYYY')} to ${moment(toDate).format('DD/MM/YYYY')}`
+      return `Showing communications from ${range}`
     },
 
     activeFiltersPlaceholder () {

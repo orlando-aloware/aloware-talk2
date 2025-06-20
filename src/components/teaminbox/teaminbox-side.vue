@@ -2,7 +2,7 @@
   <div data-testid="teaminbox-side"
        class="teaminbox-side">
     <TeamInboxNavList ref="teaminboxNavList"
-                      :class="['teaminbox-side__left', {'teaminbox-side__left--mobile-hidden': $route.name !== TEAMINBOXES_MENU_TITLE, 'no-max-width-collapse-button': isNavListCollapsed }]"
+                      :class="['teaminbox-side__left', {'teaminbox-side__left--mobile-hidden': $route.name !== TEAMINBOXES_MENU_TITLE, 'no-max-width-collapse-button': isNavListCollapsed && !isMobile }]"
                       data-testid="teaminbox-nav-list" />
     <TeamInboxTab v-if="getConnectedInboxesLength"
                   :class="['teaminbox-side__right', {'teaminbox-side__right--mobile-hidden': $route.name !== TEAMINBOXES_MENU_ITEMS_TITLE}]"
