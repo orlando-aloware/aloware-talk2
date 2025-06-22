@@ -47,9 +47,11 @@
 
 import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import CommunicationDetails from 'components/communication-details'
 import { userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+
 export default {
   name: 'Communication',
 
@@ -83,14 +85,16 @@ export default {
       this.isLoadingCommunication = true
       this.hasError = false
 
-      const params = {
-      }
+      // Check if we're in Team Inbox context
+      // For now, we use the same logic as before (company has team inbox enabled)
+      // But I think that this is not used at all honestly.
+      const isTeamInboxContext = this.hasCompanyTeamInboxEnabled
 
-      if (this.hasCompanyTeamInboxEnabled) {
-        params.from_team_inbox = true
-      }
+      const apiCall = isTeamInboxContext
+        ? talk2TeamInboxApi.communication.show(id)
+        : talk2Api.V1.communication.get(id)
 
-      talk2Api.V1.communication.get(id, params)
+      apiCall
         .then(res => {
           this.communication = res.data
         }).catch(err => {

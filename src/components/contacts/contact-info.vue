@@ -289,8 +289,8 @@
                         size="14px"/>
       </b-button>
     </div>
-    <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"></appointment-form-modal>
-    <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
+    <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact" :from-team-inbox="fromTeamInbox"></appointment-form-modal>
+    <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal" :from-team-inbox="fromTeamInbox"></contact-add-reminder-modal>
     <power-dialer-add-modal :params="addPowerDialerParams"
                             data-testid="contact-info-power-dialer-add-modal"
                             :redirect="false"
@@ -327,6 +327,7 @@ import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
 import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin, userMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
@@ -339,6 +340,10 @@ export default {
   props: {
     campaignId: {
       required: true
+    },
+    fromTeamInbox: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -623,7 +628,11 @@ export default {
       this.isExportingCommunications = true
 
       try {
-        await talk2Api.V2.contacts.exportCommunications(this.contact.id, this.teamInbox)
+        if (this.teamInbox) {
+          await talk2TeamInboxApi.contact.exportCommunications(this.contact.id)
+        } else {
+          await talk2Api.V2.contacts.exportCommunications(this.contact.id)
+        }
         this.$generalNotification('Contact communications export request has been successfully submitted and is queued for processing.')
       } catch (error) {
         console.log(error)

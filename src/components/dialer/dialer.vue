@@ -5,6 +5,7 @@
 <script>
 import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
+import teamInboxApi from 'src/plugins/api/teamInboxApi'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
@@ -564,14 +565,17 @@ export default {
         live: true
       }
 
+      let apiCall
       if (this.currentCompany.team_inbox_enabled) {
-        params.from_team_inbox = true
+        // Use Team Inbox V3 API when team inbox is enabled
+        apiCall = teamInboxApi.communication.info(params)
+      } else {
+        // Use regular V1 API
+        apiCall = this.$axios.get('/api/v1/communication/info', { params })
       }
 
       this.loadingCommunication = true
-      return this.$axios.get('/api/v1/communication/info', {
-        params
-      }).then(res => {
+      return apiCall.then(res => {
         if (this.dialer.communication && !force) {
           return Promise.resolve()
         }

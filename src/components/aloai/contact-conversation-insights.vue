@@ -359,6 +359,7 @@ import { marked } from 'marked'
 import { QSpinnerBars } from 'quasar'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import { mapActions, mapState } from 'vuex'
 
 export default {
@@ -375,6 +376,10 @@ export default {
       required: true
     },
     isReadOnly: {
+      type: Boolean,
+      default: false
+    },
+    fromTeamInbox: {
       type: Boolean,
       default: false
     }
@@ -620,10 +625,13 @@ export default {
         type: CommunicationTypes.NOTE
       }
 
-      talk2Api.V1.contact.addEngagement(this.contact.id, message)
-        .then(response => {
-          this.$generalNotification('Note has been added.')
-        })
+      const apiCall = this.fromTeamInbox
+        ? talk2TeamInboxApi.calendar.createEvent(this.contact.id, message)
+        : talk2Api.V1.contact.addEngagement(this.contact.id, message)
+
+      apiCall.then(response => {
+        this.$generalNotification('Note has been added.')
+      })
         .catch(error => {
           console.error(error)
           this.$handleErrors(error.response)

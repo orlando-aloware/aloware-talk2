@@ -1,6 +1,6 @@
 import { SEARCH_FIELDS, THREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 
 export default {
   computed: {
@@ -56,12 +56,11 @@ export default {
         const nextPage = 1
         const perPage = 50
 
-        const response = await talk2Api.V2.inbox.inboxes.get({
-          params: {
-            page: nextPage,
-            per_page: perPage,
-            ...(search ? { search } : {})
-          },
+        const response = await talk2TeamInboxApi.inboxes.list({
+          page: nextPage,
+          per_page: perPage,
+          ...(search ? { search } : {})
+        }, {
           signal: this.abortController.signal
         })
 
@@ -96,12 +95,11 @@ export default {
 
         const perPage = 50
         const nextPage = this.currentInboxesPage + 1
-        const response = await talk2Api.V2.inbox.inboxes.get({
-          params: {
-            page: nextPage,
-            per_page: perPage,
-            ...(search ? { search } : {})
-          },
+        const response = await talk2TeamInboxApi.inboxes.list({
+          page: nextPage,
+          per_page: perPage,
+          ...(search ? { search } : {})
+        }, {
           signal: this.abortController.signal
         })
 
@@ -215,28 +213,29 @@ export default {
         apiFilters.order = sort.order
       }
 
-      return talk2Api.V1.reports.communications.get({
-        params: {
-          inbox_id: inboxId,
-          page: nextPage,
-          per_page: 50,
-          ...(this.viewMode === THREADED ? { inbox_type: 'threaded' } : { inbox_type: 'unthreaded' }),
-          ...(search ? {
-            search_text: search,
-            search_fields: SEARCH_FIELDS
-          } : {}),
-          ...apiFilters
-        },
+      const params = {
+        inbox_id: inboxId,
+        page: nextPage,
+        per_page: 50,
+        inbox_type: this.viewMode === THREADED ? 'threaded' : 'unthreaded',
+        ...(search ? {
+          search_text: search,
+          search_fields: SEARCH_FIELDS
+        } : {}),
+        ...apiFilters
+      }
+
+      const config = {
         headers: { 'requested-from': 'api' },
         signal: this.abortController.signal
-      })
+      }
+
+      return talk2TeamInboxApi.reports.communications(params, config)
     },
 
     async checkInboxAccess (inboxId) {
-      const response = await talk2Api.V2.inbox.inboxes.get({
-        params: {
-          inbox_ids: [inboxId]
-        }
+      const response = await talk2TeamInboxApi.inboxes.list({
+        inbox_ids: [inboxId]
       })
 
       const inboxes = response?.data?.data || []
@@ -257,7 +256,12 @@ export default {
       const filters = this.$store.state.TeamInbox.activeFilters || {}
 
       try {
-        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds, filters)
+        const { data: newData } = await talk2TeamInboxApi.inboxes.unreadCount({
+          inbox_ids: inboxIds,
+          ...(contactIds && { contact_ids: contactIds }),
+          ...(filters?.from_date && { from_date: filters.from_date }),
+          ...(filters?.to_date && { to_date: filters.to_date })
+        })
         data = newData
 
         switch (data.length) {

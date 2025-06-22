@@ -39,9 +39,9 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
-import { mapState, mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { debounce } from 'lodash'
-import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
 
 export default {
@@ -329,7 +329,10 @@ export default {
     },
 
     async getUnreadCount (ringGroupId, contactId) {
-      const response = await talk2Api.V2.inbox.inboxes.unreadCount([ringGroupId], [contactId])
+      const response = await talk2TeamInboxApi.inboxes.unreadCount({
+        inbox_ids: [ringGroupId],
+        contact_ids: [contactId]
+      })
       return response.data.find(item => item.ring_group_id === ringGroupId && item.contact_id === contactId)?.unread_count || 0
     },
 

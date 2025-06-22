@@ -16,7 +16,7 @@
       <div class="details-component-container h-100"
            ref="detailsComponentContainer">
         <template v-if="!saveBarOnly">
-          <contact-info data-testid="contact-details-info" :campaign-id="campaignId"/>
+          <contact-info data-testid="contact-details-info" :campaign-id="campaignId" :from-team-inbox="fromTeamInbox"/>
           <contact-sequence class="w-100"
                             data-testid="contact-details-sequence"
                             :contact="contact"
@@ -25,6 +25,7 @@
           <contact-conversation-insights :contact="contact"
                                          data-testid="contact-conversation-insights"
                                          :is-read-only="isReadOnly"
+                                         :from-team-inbox="fromTeamInbox"
                                          v-if="contact && shouldSeeExperimentalXproAiFeatures"/>
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"

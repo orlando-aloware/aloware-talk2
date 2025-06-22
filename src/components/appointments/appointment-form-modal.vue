@@ -179,6 +179,7 @@ import ContactLineSelector from 'components/contact-line-selector'
 import PredefinedTimeSelector from 'components/predefined-time-selector'
 import NumberOfDaysSelector from 'components/number-of-days-selector'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import DateSelector from 'components/date-selector'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
@@ -200,6 +201,10 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    fromTeamInbox: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -287,17 +292,23 @@ export default {
     },
     onSubmit () {
       this.isSaving = true
-      talk2Api.V1.contact[(this.id ? 'updateEngagement' : 'addEngagement')](this.contact.id, this.getParams())
-        .then(() => {
-          this.$generalNotification(`Event has been ${(this.id ? 'updated.' : 'added.')}`)
-          this.onHidden()
-        }).catch(error => {
-          console.log(error)
-          this.$generalNotification(`Error while ${(this.id ? 'adding' : 'updating')} event.`, 'error')
-        }).finally(() => {
-          this.isSaving = false
-        })
+      const apiCall = this.fromTeamInbox
+        ? (this.id 
+          ? talk2TeamInboxApi.calendar.updateEvent(this.contact.id, this.id, this.getParams())
+          : talk2TeamInboxApi.calendar.createEvent(this.contact.id, this.getParams()))
+        : talk2Api.V1.contact[(this.id ? 'updateEngagement' : 'addEngagement')](this.contact.id, this.getParams())
+
+      apiCall.then(() => {
+        this.$generalNotification(`Event has been ${(this.id ? 'updated.' : 'added.')}`)
+        this.onHidden()
+      }).catch(error => {
+        console.log(error)
+        this.$generalNotification(`Error while ${(this.id ? 'adding' : 'updating')} event.`, 'error')
+      }).finally(() => {
+        this.isSaving = false
+      })
     },
+
     getParams () {
       const params = {
         date: this.appointment.date,

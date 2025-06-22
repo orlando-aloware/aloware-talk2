@@ -61,6 +61,7 @@ import {
   selectorMixin
 } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
 
 export default {
@@ -278,7 +279,15 @@ export default {
 
     getIncomingNumber () {
       this.isBusy = true
-      return talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id, this.teamInbox).then(response => {
+      
+      let apiCall
+      if (this.teamInbox) {
+        apiCall = talk2TeamInboxApi.contact.getIncomingNumber(this.contact.id, this.selectedLine.id)
+      } else {
+        apiCall = talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id)
+      }
+      
+      return apiCall.then(response => {
         this.incomingNumber = response.data
       }).finally(() => {
         this.isBusy = false
@@ -325,7 +334,14 @@ export default {
       if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
         this.setLineIncomingNumberLoading(true)
 
-        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
+        let apiCall
+        if (this.teamInbox) {
+          apiCall = talk2TeamInboxApi.contact.getIncomingNumber(this.contact.id, this.selectedCampaign.id)
+        } else {
+          apiCall = talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id)
+        }
+
+        apiCall.then(response => {
           this.setLineIncomingNumber(response.data)
         }).finally(() => {
           this.setLineIncomingNumberLoading(false)
