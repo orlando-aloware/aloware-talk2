@@ -33,6 +33,7 @@
     <TeamInboxDateFilter @date-change="onDateChange"/>
   </div>
 </template>
+
 <script>
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
