@@ -252,6 +252,10 @@ export default {
       this.fetchContact()
     }
 
+    if (this.isMobile && !this.isContactDetailsCollapsed) {
+      this.isContactDetailsCollapsed = true
+    }
+
     this.contactComponentListeners.contactUpdated = (data) => {
       const contactId = parseInt(data.id)
 
