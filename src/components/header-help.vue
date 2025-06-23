@@ -63,11 +63,17 @@
 </template>
 
 <script>
+import UserMixin from 'src/plugins/mixins/user.mixin'
 import * as Roles from 'src/constants/roles'
 import { mapGetters, mapState } from 'vuex'
 import VueCookies from 'vue-cookies'
+import { CID_AND_LINES_DEMO } from 'src/plugins/helpers/navattic'
 
 export default {
+  mixins: [
+    UserMixin
+  ],
+
   data () {
     return {
       env: null,
@@ -112,7 +118,7 @@ export default {
     },
 
     shouldShowLinesTutorial () {
-      return this.shouldShowTeamInboxTutorial
+      return this.shouldShowTeamInboxTutorial && this.hasCompanyTeamInboxLineManagementEnhancements
     }
   },
 
@@ -146,7 +152,7 @@ export default {
     },
 
     showLinesTutorial () {
-      // this.$navattic.openPopup(CID_AND_LINES_DEMO)
+      this.$navattic.openPopup(CID_AND_LINES_DEMO)
     }
   },
 
