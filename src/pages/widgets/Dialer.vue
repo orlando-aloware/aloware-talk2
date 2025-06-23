@@ -388,7 +388,6 @@ export default {
         return
       }
 
-      // this.showAlertAgentOnCall = false
       this.widgetMessage = WIDGET_MSG_HIDE
       this.startDialing = true
 
@@ -448,7 +447,6 @@ export default {
           this.startDialing = false
         }
 
-        // this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
         if (!this.defaultOutboundCampaignId) {
           this.campaignId = null
         }
