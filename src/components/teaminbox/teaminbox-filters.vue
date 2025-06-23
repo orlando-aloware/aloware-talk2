@@ -6,7 +6,8 @@
     </div>
     <div class="d-flex justify-content-between align-items-center">
       <div class="teaminbox-filter flex-grow-1 overflow-hidden">
-        <b-dropdown variant="outline-primary"
+        <b-dropdown ref="filtersDropdown"
+                    variant="outline-primary"
                     no-caret
                     no-flip
                     size="sm"
@@ -21,7 +22,25 @@
             </span>
           </template>
           <div class="filter-group">
-            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Channels</h5>
+            <h5 class="form-label text-sm text-grey mx-2 my-1">Status</h5>
+            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                             :value="true"
+                             v-model="activeFilters.unread_only"
+                             @change="onFilterChange">
+              Unread
+            </b-form-checkbox>
+          </div>
+          <div class="filter-group">
+            <h5 class="form-label text-sm text-grey mx-2 my-1">Contact</h5>
+            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                             :value="true"
+                             v-model="activeFilters.my_contact"
+                             @change="onFilterChange">
+              My Contacts
+            </b-form-checkbox>
+          </div>
+          <div class="filter-group">
+            <h5 class="form-label text-sm text-grey mx-2 my-1">Channels</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
                              :key="option.value"
@@ -30,9 +49,15 @@
                              @change="onFilterChange">
               {{ option.label }}
             </b-form-checkbox>
+            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                             :value="true"
+                             v-model="activeFilters.mention"
+                             @change="onFilterChange">
+              Mentions
+            </b-form-checkbox>
           </div>
           <div class="filter-group">
-            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Direction</h5>
+            <h5 class="form-label text-sm text-grey mx-2 my-1">Direction</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
                              :key="option.value"
@@ -42,26 +67,8 @@
               {{ option.label }}
             </b-form-checkbox>
           </div>
-          <div class="filter-group">
-            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Contact</h5>
-            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                             :value="true"
-                             v-model="activeFilters.my_contact"
-                             @change="onFilterChange">
-              My Contacts
-            </b-form-checkbox>
-          </div>
-          <div class="filter-group">
-            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Status</h5>
-            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                             :value="true"
-                             v-model="activeFilters.unread_only"
-                             @change="onFilterChange">
-              Unread
-            </b-form-checkbox>
-          </div>
-          <div class="filter-group">
-            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Task Status</h5>
+          <div class="filter-group" v-if="isContactStatusControlEnabled">
+            <h5 class="form-label text-sm text-grey mx-2 my-1">Task Status</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
                              :key="option.value"
@@ -71,15 +78,13 @@
               {{ option.label }}
             </b-form-checkbox>
           </div>
-          <div class="filter-group">
-            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Mentions</h5>
-            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                             :value="true"
-                             v-model="activeFilters.mention"
-                             @change="onFilterChange">
-              Where I'm mentioned
-            </b-form-checkbox>
-          </div>
+          <b-link href="#"
+                  class="custom-link text-decoration-none d-block p-1 px-2"
+                  data-testid="teaminbox-clear-filters-btn"
+                  :disabled="isResetFiltersDisabled"
+                  @click="resetFilters">
+            Clear all filters
+          </b-link>
         </b-dropdown>
       </div>
       <div class="teaminbox-sort flex-even flex-shrink-0">
@@ -111,10 +116,12 @@
 <script>
 import SortUpIcon from '../../components/icons/inbox/sort-up-icon.vue'
 import SortDownIcon from '../../components/icons/inbox/sort-down-icon.vue'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import { navigationErrorHandler } from 'src/router/routes'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import { DEFAULT_FILTERS } from 'src/store/teaminbox/teaminbox.store'
+import { isEqual } from 'lodash'
 import moment from 'moment'
 
 export default {
@@ -130,8 +137,8 @@ export default {
   },
 
   computed: {
+    ...mapGetters('cache', ['isContactStatusControlEnabled']),
     ...mapState('TeamInbox', ['activeSort']),
-
     ...mapFields('TeamInbox', [
       'activeFilters'
     ]),
@@ -180,6 +187,18 @@ export default {
       }
 
       return '/ ' + (!selectedFilters.length ? 'All' : selectedFilters.join(', '))
+    },
+
+    isResetFiltersDisabled () {
+      const props = ['types', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention']
+
+      for (const key of props) {
+        if (!isEqual(this.activeFilters[key], DEFAULT_FILTERS[key])) {
+          return false
+        }
+      }
+
+      return true
     }
   },
 
@@ -243,6 +262,12 @@ export default {
         query[param] = value
       }
       this.$router.replace({ query }).catch(navigationErrorHandler)
+    },
+
+    resetFilters () {
+      this.$refs.filtersDropdown.visible = false
+      this.activeFilters = { ...DEFAULT_FILTERS }
+      this.onFilterChange()
     }
   }
 }

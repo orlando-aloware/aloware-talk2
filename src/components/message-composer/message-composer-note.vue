@@ -116,7 +116,7 @@ export default {
         type: CommunicationTypes.NOTE
       })
 
-      talk2Api.V1.contact.addEngagement(this.contact.id, message, this.teamInbox)
+      talk2Api.V1.contact.addEngagement(this.contact.id, message, this.teamInboxId)
         .then(response => {
           this.resetMessageComposerNote()
           this.$generalNotification('Note has been added.')

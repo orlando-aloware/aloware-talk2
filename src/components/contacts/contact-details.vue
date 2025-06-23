@@ -69,7 +69,7 @@
                                 :team-inbox-id="teamInboxId"
                                 :from-team-inbox="fromTeamInbox"
                                 :is-read-only="isReadOnly"/>
-          <contact-reservations v-if="contact && showGuestyReservations()"
+          <contact-reservations v-if="contact"
                                 data-testid="contact-details-reservations"
                                 :contact="contact"/>
           <contact-reservations-messages v-if="contact && showGuestyReservations()"

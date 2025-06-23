@@ -325,13 +325,14 @@ export default {
               campaign.has_direct_ring_group_access ||
               campaign.has_team_membership_access ||
               campaign.has_direct_watching_access ||
-              campaign.has_team_watching_access
+              campaign.has_team_watching_access ||
+              campaign.ivr_id
           })
         }
 
         return !this.preSelectedTeamInboxLineId
           ? activeCampaigns
-          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id))
+          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id) || campaign.ivr_id)
       }
 
       return []
@@ -369,7 +370,9 @@ export default {
     },
 
     shouldLimitAgentLinesVisibility () {
-      return this.isDialer && this.hasCompanyTeamInboxEnabled && this.hasRole(COMPANY_AGENT)
+      return this.isDialer &&
+        this.hasRole(COMPANY_AGENT) &&
+        this.hasCompanyTeamInboxLineManagementEnhancements
     },
 
     noResultsText () {
@@ -381,6 +384,11 @@ export default {
 
   created () {
     this.options = this.activeCampaignsAlphabeticalOrder
+
+    if (this.preSelectedTeamInboxLineId && this.options.length === 1) {
+      // If there is only one line and the line is pre-selected, emit the event to initiate the call
+      this.$emit('initiateCall', this.options[0])
+    }
   },
 
   mounted () {
@@ -448,9 +456,7 @@ export default {
         return
       }
 
-      if (this.options.find(campaign => campaign.id === this.value)) {
-        this.selectedId = this.value
-      }
+      this.selectedId = this.value
     },
 
     selectedId (val) {
