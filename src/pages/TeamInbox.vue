@@ -167,8 +167,56 @@ export default {
       }
     },
 
-    '$q.screen.width' (width) {
+    '$q.screen.width' () {
       this.resizeHandler()
+    },
+
+    // When expanding TeamInbox nav list, close ContactDetails if needed
+    isTeamInboxNavListCollapsed (collapsed) {
+      if (collapsed) {
+        return
+      }
+
+      const width = this.$q.screen.width
+      if (width < 785 || width > 1500) {
+        return
+      }
+
+      if (!this.isContactDetailsCollapsed && !this.isSidebarCollapsed) {
+        this.isContactDetailsCollapsed = true
+      }
+    },
+
+    // When expanding ContactDetails, collapse sidebar if needed
+    isContactDetailsCollapsed (collapsed) {
+      if (collapsed) {
+        return
+      }
+
+      const width = this.$q.screen.width
+      if (width < 785 || width > 1500) {
+        return
+      }
+
+      if (!this.isTeamInboxNavListCollapsed && !this.isSidebarCollapsed) {
+        this.isSidebarCollapsed = true
+      }
+    },
+
+    // When expanding sidebar, collapse ContactDetails if needed
+    isSidebarCollapsed (collapsed) {
+      if (collapsed) {
+        return
+      }
+
+      const width = this.$q.screen.width
+      if (width < 785 || width > 1500) {
+        return
+      }
+
+      if (!this.isTeamInboxNavListCollapsed && !this.isContactDetailsCollapsed) {
+        this.isContactDetailsCollapsed = true
+      }
     }
   },
 
