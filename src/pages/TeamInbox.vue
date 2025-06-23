@@ -155,7 +155,10 @@ export default {
         this.isTeamInboxNavListCollapsed = true
         this.isContactDetailsCollapsed = true
         this.isSidebarCollapsed = true
+        return
       }
+
+      this.isTeamInboxNavListCollapsed = false
     }, 100)
   },
 
