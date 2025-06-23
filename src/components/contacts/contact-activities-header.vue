@@ -43,16 +43,6 @@
             Mark all as read ({{ unreadCount }})
           </b-dropdown-item>
 
-          <b-dropdown-item href=""
-                           data-testid="contact-activities-export-communications-item"
-                           class="d-flex"
-                           :disabled="loading"
-                           v-if="isAdmin && !isWidget && enableExport && !inPowerDialerPage"
-                           @click="handleExportCommunications">
-            <export-icon class="mark-all-as-read-icon dropdown-icon" />
-            Export Communications
-          </b-dropdown-item>
-
           <b-dropdown-item href="#"
                            :disable="isUpdatingStatus || isReadOnly"
                            v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled"
@@ -130,28 +120,6 @@
           <span v-else class="mx-2 d-flex align-items-center">
             <span>Mark all as read ({{ unreadCount }})</span>
           </span>
-        </q-btn>
-        <q-btn borderless
-               flat
-               no-caps
-               type="a"
-               color="primary"
-               class="text-decoration-none"
-               data-testid="contact-activities-export-communications-btn"
-               :disabled="loading"
-               v-if="isAdmin && !isWidget && enableExport && !inPowerDialerPage"
-               @click="handleExportCommunications">
-          <span v-b-tooltip.html="{customClass: 'tooltip-dark'}"
-                title="Export Communications"
-                class="mx-2"
-                v-if="!loading">
-            <export-icon />
-          </span>
-          <q-spinner-bars v-if="loading"
-                          class="pl-1 pr-1"
-                          color="primary"
-                          size="20px"
-          />
         </q-btn>
 
         <q-btn borderless
@@ -256,7 +224,6 @@ import { cloneDeep } from 'src/plugins/helpers/functions'
 import { aclMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { mapGetters, mapState } from 'vuex'
-import ExportIcon from '../icons/export-icon.vue'
 import PhoneCardIcon from 'components/icons/phone-card-icon.vue'
 import { mapFields } from 'vuex-map-fields'
 
@@ -279,7 +246,6 @@ export default {
     MailOpenIcon,
     EllipsisIcon,
     BackButton,
-    ExportIcon,
     PhoneCardIcon
   },
 
@@ -301,10 +267,6 @@ export default {
       type: Number,
       required: false,
       default: 0
-    },
-    enableExport: {
-      type: Boolean,
-      default: true
     },
     isReadOnly: {
       type: Boolean,
@@ -359,7 +321,6 @@ export default {
       ContactTaskStatus,
       isUpdatingStatus: false,
       nextStat: null,
-      loading: false,
       processingMarkAllAsRead: false,
       TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
     }
@@ -410,20 +371,6 @@ export default {
       }
 
       this.$router.push(path.join('/'))
-    },
-
-    async handleExportCommunications () {
-      this.loading = true
-
-      try {
-        await talk2Api.V2.contacts.exportCommunications(this.contact.id, this.teamInbox)
-        this.$generalNotification('Contact communications export request has been successfully submitted and is queued for processing.')
-      } catch (error) {
-        console.log(error)
-        this.$generalNotification('Unable to process export request! Please try again later.', 'error')
-      } finally {
-        this.loading = false
-      }
     }
   },
   watch: {

@@ -269,6 +269,25 @@
         </q-tooltip>
         <merge-contact-icon/>
       </b-button>
+      <b-button variant="light"
+                size="sm"
+                class="custom-action-button my-1"
+                data-testid="contact-info-export-button"
+                :disabled="isExportingCommunications || isReadOnly"
+                v-if="isAdmin"
+                @click="handleExportCommunications">
+        <q-tooltip anchor="top middle"
+                   data-testid="contact-info-export-tooltip"
+                   self="center middle"
+                   content-class="fs-12">
+          Export communications
+        </q-tooltip>
+        <i class="fa fa-arrow-up-from-bracket" v-if="!isExportingCommunications"></i>
+        <q-spinner-bars v-if="isExportingCommunications"
+                        class="mr-1"
+                        color="blue"
+                        size="14px"/>
+      </b-button>
     </div>
     <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"></appointment-form-modal>
     <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
@@ -305,7 +324,7 @@ import ContactAddReminderModal from 'src/components/contacts/contact-add-reminde
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
 import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
-import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin, userMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
@@ -328,7 +347,8 @@ export default {
     timezoneCheckMixin,
     integrationMixin,
     contactMixin,
-    userMixin
+    userMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -369,6 +389,8 @@ export default {
       'contactPhoneNumbers',
       'changingSelectedContact'
     ]),
+
+    ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
     lineSelectorWidth () {
       return this.$q.screen.width <= 1366 ? '200px' : '220px'
@@ -431,7 +453,8 @@ export default {
       selectedLine: null,
       showLineSelectorPopup: false,
       LRN_NOT_PERFORMED,
-      contactLastLineUsedId: null
+      contactLastLineUsedId: null,
+      isExportingCommunications: false
     }
   },
 
@@ -594,6 +617,20 @@ export default {
 
     onLineChange (line) {
       this.selectedLine = line
+    },
+
+    async handleExportCommunications () {
+      this.isExportingCommunications = true
+
+      try {
+        await talk2Api.V2.contacts.exportCommunications(this.contact.id, this.teamInbox)
+        this.$generalNotification('Contact communications export request has been successfully submitted and is queued for processing.')
+      } catch (error) {
+        console.log(error)
+        this.$generalNotification('Unable to process export request! Please try again later.', 'error')
+      } finally {
+        this.isExportingCommunications = false
+      }
     }
   }
 }
