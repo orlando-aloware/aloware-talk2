@@ -50,6 +50,7 @@ export default {
 
   methods: {
     ...mapActions(['setDialerCommunication']),
+
     changeCallDisposition (callDispositionId) {
       this.loadingCallDisposition = true
       this.communication.call_disposition_id = callDispositionId
