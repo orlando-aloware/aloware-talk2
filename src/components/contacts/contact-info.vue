@@ -110,7 +110,7 @@
                 class="custom-action-button my-1"
                 data-testid="contact-info-call-button"
                 @click="onCallClick">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-call-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -131,6 +131,7 @@
               :use-only-actives="true"
               :pre-selected-team-inbox-line-id="contactLastLineUsedId"
               @change="onLineChange"
+              @initiateCall="forceInitiateCall"
             >
             </line-selector>
             <q-btn
@@ -156,7 +157,7 @@
                 v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
                 data-testid="contact-info-block-button"
                 @click="blockContact">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    self="center middle"
                    content-class="fs-12">
           Block
@@ -178,7 +179,7 @@
                 v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
                 data-testid="contact-info-unblock-button"
                 @click="unBlockContact">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    self="center middle"
                    content-class="fs-12">
           Unblock
@@ -204,7 +205,7 @@
                 :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-appointment-button"
                 @click="addAppointmentOpen(true)">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-add-appointment-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -218,7 +219,7 @@
                 :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-reminder-button"
                 @click="addReminderOpen(true)">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-add-reminder-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -232,7 +233,7 @@
                 data-testid="contact-info-add-power-dialer-button"
                 :disabled="isReadOnly"
                 @click="openPowerDialerModal">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-add-power-dialer-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -246,7 +247,7 @@
                 data-testid="contact-info-remove-power-dialer-button"
                 :disabled="isRemovingFromPowerDialerLists || !hasPowerDialerLists || isReadOnly"
                 @click="removeContactFromPowerDialerLists">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-remove-power-dialer-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -260,7 +261,7 @@
                 data-testid="contact-info-merge-button"
                 v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled && !isReadOnly"
                 @click="openMergeContactModal">
-        <q-tooltip anchor="bottom middle"
+        <q-tooltip anchor="top middle"
                    data-testid="contact-info-merge-tooltip"
                    self="center middle"
                    content-class="fs-12">
@@ -304,7 +305,7 @@ import ContactAddReminderModal from 'src/components/contacts/contact-add-reminde
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
 import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
-import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin, userMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
@@ -326,7 +327,8 @@ export default {
     aclMixin,
     timezoneCheckMixin,
     integrationMixin,
-    contactMixin
+    contactMixin,
+    userMixin
   ],
 
   components: {
@@ -488,7 +490,7 @@ export default {
         return
       }
 
-      if (!this.isFromTeamInbox) {
+      if (!this.isFromTeamInbox || !this.hasCompanyTeamInboxLineManagementEnhancements) {
         if (!this.isAlwaysAskEnabled && this.defaultOutboundCampaignId) {
           // If the outbound calling mode is not always ask and there is a default outbound campaign id, use it
           data.outboundCampaignId = this.defaultOutboundCampaignId
@@ -498,21 +500,29 @@ export default {
         data.outboundCampaignId = this.selectedLine || this.defaultOutboundCampaignId
       }
 
-      this.$VueEvent.fire('makeCall', data)
+      const event = !data.outboundCampaignId ? 'callContact' : 'makeCall'
+      this.$VueEvent.fire(event, data)
     },
 
     onCallClick () {
-      const showLineSelectorPopup = this.isAlwaysAskEnabled ||
-        (this.defaultOutboundCampaignId && this.defaultOutboundCampaignId !== this.contactLastLineUsedId)
+      if (this.hasCompanyTeamInboxLineManagementEnhancements) {
+        const showLineSelectorPopup = this.isAlwaysAskEnabled ||
+          (this.defaultOutboundCampaignId && this.defaultOutboundCampaignId !== this.contactLastLineUsedId)
 
-      if (this.isFromTeamInbox && showLineSelectorPopup) {
-        // Show popup and wait for user to select line
-        this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
-        this.showLineSelectorPopup = !this.showLineSelectorPopup
-        return
+        if (this.isFromTeamInbox && showLineSelectorPopup) {
+          // Show popup and wait for user to select line
+          this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
+          this.showLineSelectorPopup = !this.showLineSelectorPopup
+          return
+        }
       }
 
       // If we don't need to show the line selector popup, directly call the contact
+      this.callContact()
+    },
+
+    forceInitiateCall (campaignId) {
+      this.selectedLine = campaignId
       this.callContact()
     },
 
