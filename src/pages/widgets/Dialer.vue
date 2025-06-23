@@ -125,7 +125,6 @@ export default {
       extensionsVisibility: true,
       extensions: null,
       timeout: null,
-      // showAlertAgentOnCall: false,
       callSdkOptions: {
         // Whether to log various inbound/outbound messages to console
         debugMode: true,
@@ -269,8 +268,7 @@ export default {
     ]),
 
     async postDialNumber () {
-      // this.showAlertCallFinished = false
-      // this.$bvModal.hide('daytime-hours-confirmation')
+      this.$bvModal.hide('daytime-hours-confirmation')
       this.isPreparingToCall = true
 
       try {
@@ -292,6 +290,12 @@ export default {
 
         if (this.validateHasActiveCallStatus()) {
           return
+        }
+
+        // if dialing is initiating and current profile status is on wrap-up, then means that somewhere else wrap-up screen is not closed,
+        // we need to initiate end wrap-up session to adequately tracking dialing statuses changes
+        if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          this.resetAgentStatus()
         }
 
         this.$VueEvent.fire('resetCall')
@@ -316,19 +320,16 @@ export default {
       if (this.apiKey) {
         storage.local.setItem('api_token', this.apiKey)
       }
-      // this.loading = true
 
       await this.check().then((res) => {
         storage.local.setItem('company_id', res.data.user.company.id)
         this.setCurrentCompany(res.data.user.company)
         this.resetVuex(['all'])
-        // this.loading = false
         this.initialized = true
         this.handleUserLogin()
       }).catch((err) => {
         console.log('Error: api key is not valid', err)
         this.$handleErrors(err.response)
-        // this.loading = false
         if (this.$route.name !== 'Login') {
           this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
         }
@@ -358,7 +359,6 @@ export default {
         this.setProfile(profile)
       }).catch(err => {
         this.$handleErrors(err.response)
-        // this.criticalErrorHappened = true
         this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
         if (this.extensions) {
           this.extensions.callEnded()
@@ -485,6 +485,7 @@ export default {
       this.defineDefaultOutboundCampaignId()
 
       this.campaignId = this.defaultOutboundCampaignId
+      console.warn('onCancelCall')
 
       // if the call is canceled, we close the widget in HS
       setTimeout(() => {
@@ -522,13 +523,10 @@ export default {
           !this.isDialed) {
           console.warn('handleAgentStatusUpdate WIDGET_MSG_SHOW_ALERT_CALL_FINISHED 2', this.profile?.last_call, this.dialer?.communication)
           this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
-          // this.showAlertCallFinished = true
-          // this.showAlertAgentOnCall = false
         } else if (this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
           this.isFirstLoading &&
           agentStatus === AgentStatus.AGENT_STATUS_ON_CALL &&
           !this.isDialed) {
-          // this.showAlertCallFinished = false
           // @todo check if this correct
           console.warn('handleAgentStatusUpdate WIDGET_MSG_HIDE 2')
           this.widgetMessage = WIDGET_MSG_HIDE
@@ -647,23 +645,24 @@ export default {
         status = true
       }
 
-      // @todo check if this position is correct
       // define last call values to track useful updates if needed
-      if (status && lastCall) {
-        this.setDialerCommunication(lastCall)
-        this.setDialerContact(lastCall?.contact)
-      }
+      if (status) {
+        // @todo check if this position is correct
+        if (lastCall) {
+          this.setDialerCommunication(lastCall)
+          this.setDialerContact(lastCall?.contact)
+        }
 
-      // do not show a widget message when force disposition, in this case, the dialer will appear with wrap-up page
-      if (status &&
-        lastCall &&
-        // the last call should not be held
-        lastCall.current_status2 !== CURRENT_STATUS_HOLD_NEW &&
-        this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
-        this.checkForceDisposition) {
-        this.setDialerCurrentStatus('WRAP_UP')
-      } else {
-        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+        // do not show a widget message when force disposition, in this case, the dialer will appear with wrap-up page
+        if (lastCall &&
+          // the last call should not be held
+          lastCall.current_status2 !== CURRENT_STATUS_HOLD_NEW &&
+          this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
+          this.checkForceDisposition) {
+          this.setDialerCurrentStatus('WRAP_UP')
+        } else {
+          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+        }
       }
 
       return status
