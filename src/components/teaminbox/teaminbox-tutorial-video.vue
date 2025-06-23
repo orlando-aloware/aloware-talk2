@@ -7,6 +7,7 @@
     cookie-name="team-inbox"
     title="Explore Aloware Team Inboxes"
     video-url="https://www.loom.com/embed/652f7476d7414d329e855da6ae3e387d?sid=64064e95-2401-4dc7-85bd-82cc84123916"
+    @close="onCloseModal"
   />
 </template>
 <script>
@@ -19,7 +20,10 @@ export default {
   methods: {
     ...mapActions('TeamInbox', [
       'setTeamInboxTutorialComponent'
-    ])
+    ]),
+    onCloseModal () {
+      this.$VueEvent.fire('teaminbox-tutorial-video-closed')
+    }
   },
   mounted () {
     this.setTeamInboxTutorialComponent(this.$refs.teamInboxTutorialComponent)
