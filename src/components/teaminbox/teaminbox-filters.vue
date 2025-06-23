@@ -148,11 +148,11 @@ export default {
       }
 
       if (dateRange !== 'custom') {
-        return `Showing communications for ${dateRange}`
+        return `Results for ${dateRange}`
       }
 
-      const range = `${moment(fromDate).format('DD/MM/YYYY')} to ${moment(toDate).format('DD/MM/YYYY')}`
-      return `Showing communications from ${range}`
+      const range = `${moment(fromDate).format('MM/DD/YYYY')} to ${moment(toDate).format('MM/DD/YYYY')}`
+      return `Results from ${range}`
     },
 
     activeFiltersPlaceholder () {
