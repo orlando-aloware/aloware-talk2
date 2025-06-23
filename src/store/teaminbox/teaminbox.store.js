@@ -33,7 +33,7 @@ export default function () {
     abortController: null,
     showRefreshInboxesButton: false,
     showRefreshCommunicationsButton: false,
-    activeFilters: DEFAULT_FILTERS,
+    activeFilters: { ...DEFAULT_FILTERS },
     activeSort: {},
     currentSearch: null,
     isInitialLoad: false,

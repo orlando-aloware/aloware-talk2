@@ -135,7 +135,7 @@ export default {
     state.activeInboxContactUnreadCount = 0
     state.unreadCountLoaded = false
     state.viewMode = THREADED
-    state.activeFilters = DEFAULT_FILTERS
+    state.activeFilters = { ...DEFAULT_FILTERS }
     state.activeSort = {}
     state.teamInboxTutorialComponent = null
     state.contactsLastUsedLines = new Map()

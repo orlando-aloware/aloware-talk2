@@ -17,7 +17,7 @@
               {{ activeFiltersPlaceholder }}
             </span>
           </template>
-          <div class="filter-group">
+          <div class="filter-group no-select">
             <h5 class="form-label text-sm text-grey mx-2 my-1">Status</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="true"
@@ -26,7 +26,7 @@
               Unread
             </b-form-checkbox>
           </div>
-          <div class="filter-group">
+          <div class="filter-group no-select">
             <h5 class="form-label text-sm text-grey mx-2 my-1">Contact</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="true"
@@ -35,7 +35,7 @@
               My Contacts
             </b-form-checkbox>
           </div>
-          <div class="filter-group">
+          <div class="filter-group no-select">
             <h5 class="form-label text-sm text-grey mx-2 my-1">Channels</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
@@ -52,7 +52,7 @@
               Mentions
             </b-form-checkbox>
           </div>
-          <div class="filter-group">
+          <div class="filter-group no-select">
             <h5 class="form-label text-sm text-grey mx-2 my-1">Direction</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
@@ -63,7 +63,7 @@
               {{ option.label }}
             </b-form-checkbox>
           </div>
-          <div class="filter-group" v-if="isContactStatusControlEnabled">
+          <div class="filter-group no-select" v-if="isContactStatusControlEnabled">
             <h5 class="form-label text-sm text-grey mx-2 my-1">Task Status</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
