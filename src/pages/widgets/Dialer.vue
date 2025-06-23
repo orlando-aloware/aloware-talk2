@@ -369,7 +369,7 @@ export default {
     },
 
     async handleDialNumber () {
-      console.warn('Handle')
+      console.log('Handle')
       console.log('CurrentStatus:', this.dialer?.currentStatus)
 
       if (this.validateHasActiveCallStatus()) {
@@ -381,16 +381,6 @@ export default {
         this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
         return
       }
-
-      console.log(
-        'last_call',
-        this.profile?.last_call,
-        this.dialer?.communication,
-        this.agentStatus,
-        this.checkForceDisposition,
-        this.profile,
-        this.initialized
-      )
 
       // don't allow to make a call if there's a parked call
       if (this.dialer?.parkedCall) {
@@ -418,7 +408,6 @@ export default {
         }, 1000)
       } else {
         // do not handle call but show dialer, it supposes to show wrap-up or other useful UI
-        console.log('isReady', this.dialer?.isReady)
       }
     },
 
@@ -442,10 +431,16 @@ export default {
     },
 
     handleCallCompletedEvent (skipCallFinished = false) {
+      const skippedStatuses = ['MAKING_CALL', 'RECEIVED_CALL_INVITE', 'ANSWERING_CALL', 'CALL_CONNECTED']
+
+      // some logic can send wrong status of call completed in a short time when call is just initiating
+      if (skippedStatuses.includes(this.dialer?.currentStatus)) {
+        return
+      }
+
       if (this.extensions) {
         this.extensions.callEnded()
 
-        // @todo check if correct
         if (!this.dialer.parkedCall) {
           if (!skipCallFinished) {
             this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
@@ -485,7 +480,6 @@ export default {
       this.defineDefaultOutboundCampaignId()
 
       this.campaignId = this.defaultOutboundCampaignId
-      console.warn('onCancelCall')
 
       // if the call is canceled, we close the widget in HS
       setTimeout(() => {
@@ -505,30 +499,14 @@ export default {
         const agentStatus = data.agent_status
         this.setAgentStatus(agentStatus)
 
-        console.log(
-          'handleAgentStatusUpdate',
-          {
-            'this.widgetMessage': this.widgetMessage,
-            'this.isFirstLoading': this.isFirstLoading,
-            'this.isDialed': this.isDialed,
-            'agentStatus': agentStatus,
-            'previousStatus': previousStatus,
-            'this.dialer.parkedCall': this.dialer.parkedCall,
-            'this.dialer.currentStatus': this.dialer?.currentStatus
-          }
-        )
-
         if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS &&
           this.widgetMessage === WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
           !this.isDialed) {
-          console.warn('handleAgentStatusUpdate WIDGET_MSG_SHOW_ALERT_CALL_FINISHED 2', this.profile?.last_call, this.dialer?.communication)
           this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
         } else if (this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
           this.isFirstLoading &&
           agentStatus === AgentStatus.AGENT_STATUS_ON_CALL &&
           !this.isDialed) {
-          // @todo check if this correct
-          console.warn('handleAgentStatusUpdate WIDGET_MSG_HIDE 2')
           this.widgetMessage = WIDGET_MSG_HIDE
         }
 
@@ -536,6 +514,7 @@ export default {
         if (this.widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_FINISHED) {
           return
         }
+
         // Automatically close the widget when replying from another tab
         if (this.isDialed && !this.dialer.call && !this.dialer.communication && this.dialer.parkedCall && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
           this.isDialed = false
@@ -550,12 +529,7 @@ export default {
           previousStatus === AGENT_STATUS_ON_WRAP_UP) {
           this.isDialed = false
           this.onCancelCall()
-          // return
         }
-
-        // if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-        //   this.handleDialNumber()
-        // }
       }
     },
 
@@ -623,8 +597,6 @@ export default {
         status = true
       }
 
-      console.warn('checkAgentHasActiveCallInAnotherDevice', this.profile.agent_status, this.dialer?.currentStatus)
-
       const statuses = [
         'MAKING_CALL',
         'CALL_CONNECTED',
@@ -647,7 +619,6 @@ export default {
 
       // define last call values to track useful updates if needed
       if (status) {
-        // @todo check if this position is correct
         if (lastCall) {
           this.setDialerCommunication(lastCall)
           this.setDialerContact(lastCall?.contact)
@@ -672,28 +643,15 @@ export default {
       this.widgetMessage = WIDGET_MSG_HIDE
       this.isDialed = false
 
-      console.log(
-        'CHECK WRAP_UP',
-        this.dialer?.currentStatus,
-        this.checkDialerForceDisposition,
-        this.checkForceDisposition,
-        this.currentCompany?.force_call_disposition,
-        this.profile?.last_call?.call_disposition_id,
-        this.profile?.last_call
-      )
-
       if (this.dialer?.currentStatus === 'WRAP_UP' && !this.checkDialerForceDisposition) {
-        console.log('endWrapUp')
         this.$VueEvent.fire('endWrapUp')
       }
 
       if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
-        console.log('hangupCall')
         this.$VueEvent.fire('hangupCall')
       }
 
       if (!this.checkDialerForceDisposition) {
-        console.log('resetCall')
         this.$VueEvent.fire('resetCall')
       }
 
@@ -709,8 +667,7 @@ export default {
         })
       }
     },
-    widgetMessage (to, from) {
-      console.warn('changed widgetMessage', from + ' => ' + to)
+    widgetMessage (to) {
       // stop dialing if there is a widget message
       if (to !== WIDGET_MSG_HIDE && this.startDialing) {
         this.startDialing = false
@@ -718,8 +675,6 @@ export default {
     },
     extensionsVisibility () {
       if (this.extensionsVisibility) {
-        // @todo check if this needed
-        console.warn('extensionsVisibility changed to true', this.profile?.agent_status)
         if (this.profile && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
           this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
         }
@@ -727,23 +682,6 @@ export default {
         // if hidden, reset HubSpot dial number
         this.setHubspotDialNumber(null)
       }
-    },
-
-    'dialer.currentStatus' (to, from) {
-      console.warn('dialer.currentStatus', from + '=>' + to, this.profile.agent_status, this.checkForceDisposition)
-
-      // if (this.isLoadingDialer) {
-      //   return
-      // }
-      //
-      // const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
-      // if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
-      //   (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition)) &&
-      //   !this.isDialed) {
-      //   this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
-      //   // this.showAlertAgentOnCall = true
-      //   // this.showAlertCallFinished = false
-      // }
     }
   }
 }
