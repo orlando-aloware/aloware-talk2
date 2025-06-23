@@ -1,6 +1,6 @@
 <template>
   <div class="teaminbox-filters">
-    <div class="px-3 text-sm text-grey-90"
+    <div class="selected-date-placeholder text-sm text-grey-90"
          v-if="activeFilters.from_date">
       {{ selectedDateRangePlaceholder }}
     </div>
@@ -291,5 +291,9 @@ export default {
   margin-bottom: 2px;
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.selected-date-placeholder {
+  padding: 1px 12px 0 12px;
 }
 </style>
