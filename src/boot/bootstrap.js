@@ -32,6 +32,7 @@ import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
 import { Vuelidate } from 'vuelidate'
 import HighchartsThemes from './HighchartsTheme'
+import { Navattic } from 'src/plugins/helpers/navattic'
 
 Screen.setSizes({
   sm: 300,
@@ -84,6 +85,7 @@ Vue.use(PortalVue)
 Vue.use(VueWaveSurfer)
 Vue.use(Vuelidate)
 Vue.use(BusinessHours)
+Vue.use(Navattic)
 Vue.use(VueHighcharts, { Highcharts })
 
 window.Bowser = Bowser

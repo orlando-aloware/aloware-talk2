@@ -48,6 +48,14 @@
                  @click="watchTeamInboxEmptyVideo">
             SHOW VIDEO
           </q-btn>
+          <q-btn color="primary"
+                 v-if="shouldShowLinesTutorial"
+                 class="full-width text-caption mt-1"
+                 size="sm"
+                 v-close-popup
+                 @click="showLinesTutorial">
+            LINES TUTORIAL
+          </q-btn>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
@@ -101,6 +109,10 @@ export default {
       return this.$route.path.startsWith('/team-inboxes') &&
         this.isTeamInboxesLoaded &&
         !this.hasTeamInboxes
+    },
+
+    shouldShowLinesTutorial () {
+      return this.shouldShowTeamInboxTutorial
     }
   },
 
@@ -131,6 +143,10 @@ export default {
       cookies.remove(`team-inbox-empty-state-${this.profile?.id}`)
 
       this.$store.state.TeamInbox.teamInboxEmptyStateVideoComponent.openModal()
+    },
+
+    showLinesTutorial () {
+      // this.$navattic.openPopup(CID_AND_LINES_DEMO)
     }
   },
 
