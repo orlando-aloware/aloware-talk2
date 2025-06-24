@@ -512,7 +512,7 @@ export default {
         return
       }
 
-      if (!this.isFromTeamInbox || !this.hasCompanyTeamInboxLineManagementEnhancements) {
+      if (!this.isFromTeamInbox) {
         if (!this.isAlwaysAskEnabled && this.defaultOutboundCampaignId) {
           // If the outbound calling mode is not always ask and there is a default outbound campaign id, use it
           data.outboundCampaignId = this.defaultOutboundCampaignId
@@ -522,21 +522,18 @@ export default {
         data.outboundCampaignId = this.selectedLine || this.defaultOutboundCampaignId
       }
 
-      const event = !data.outboundCampaignId ? 'callContact' : 'makeCall'
-      this.$VueEvent.fire(event, data)
+      this.$VueEvent.fire('makeCall', data)
     },
 
     onCallClick () {
-      if (this.hasCompanyTeamInboxLineManagementEnhancements) {
-        const showLineSelectorPopup = this.isAlwaysAskEnabled ||
-          (this.defaultOutboundCampaignId && this.defaultOutboundCampaignId !== this.contactLastLineUsedId)
+      const showLineSelectorPopup = this.isAlwaysAskEnabled ||
+        (this.defaultOutboundCampaignId && this.defaultOutboundCampaignId !== this.contactLastLineUsedId)
 
-        if (this.isFromTeamInbox && showLineSelectorPopup) {
-          // Show popup and wait for user to select line
-          this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
-          this.showLineSelectorPopup = !this.showLineSelectorPopup
-          return
-        }
+      if (this.isFromTeamInbox && showLineSelectorPopup) {
+        // Show popup and wait for user to select line
+        this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
+        this.showLineSelectorPopup = !this.showLineSelectorPopup
+        return
       }
 
       // If we don't need to show the line selector popup, directly call the contact

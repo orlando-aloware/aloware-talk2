@@ -369,9 +369,7 @@ export default {
     },
 
     shouldLimitAgentLinesVisibility () {
-      return this.isDialer &&
-        this.hasRole(COMPANY_AGENT) &&
-        this.hasCompanyTeamInboxLineManagementEnhancements
+      return this.isDialer && this.hasCompanyTeamInboxEnabled && this.hasRole(COMPANY_AGENT)
     },
 
     noResultsText () {
