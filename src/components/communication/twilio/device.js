@@ -101,7 +101,7 @@ export default class TwilioDevice extends MainDevice {
     if (this._device) {
       this._device.disconnectAll()
       this._device.destroy()
-      this._device = null
+      // this._device = null
     }
     this._is_initialized = false
   }
