@@ -325,8 +325,12 @@ export default {
     this.dialerListeners.cacheCommunicationFromEvent = (communication) => {
       if (communication && communication.id) {
         console.log('Caching communication from event:', communication.id)
-        this.communicationCache.clear()
         this.communicationCache.set(communication.id, communication)
+        const contactId = this.dialer.customParameters?.ContactId
+        console.log('SHOW COMMUNICATION CACHE?', contactId, communication.contact?.id)
+        if (this.dialer.call &&  this.isSmartQueueOnlyEnabled(communication) && contactId === communication.contact?.id) {
+          this.showCommunicationCache(communication)
+        }
       }
     }
 
@@ -411,16 +415,11 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      const [key, cachedCommunication] = this.communicationCache.entries().next().value
-      console.log('CACHED COMMUNICATION?', cachedCommunication)
-      if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication)) {
-        console.log('Using cached communication for incoming call:', cachedCommunication.id)
-        this.communicationCache.delete(key)
-        this.$VueEvent.fire('new_in_app_call', cachedCommunication)
-        this.processActionNotification(cachedCommunication, 'call')
-        this.addNonOwnedLiveContact(cachedCommunication)
-
-        return
+      const [, cachedCommunication] = this.communicationCache.entries().next().value
+      const contactId = this.dialer.customParameters?.ContactId
+      console.log('CACHED COMMUNICATION?', cachedCommunication, contactId)
+      if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication) && contactId === cachedCommunication.contact?.id ) {
+        this.showCommunicationCache(cachedCommunication)
       }
 
       this.getCommunication(call.callSid, call.from).then(res => {
@@ -557,6 +556,16 @@ export default {
 
     forceRefreshCommunication () {
       return this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
+    },
+
+    showCommunicationCache (cachedCommunication) {
+      console.log('Using cached communication for incoming call:', cachedCommunication.id)
+      this.$VueEvent.fire('new_in_app_call', cachedCommunication)
+      this.processActionNotification(cachedCommunication, 'call')
+      this.addNonOwnedLiveContact(cachedCommunication)
+      this.communicationCache.clear()
+
+      return
     },
 
     getCommunication (sid, from, getCommunicationTry = 1, force = false) {
