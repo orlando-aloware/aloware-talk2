@@ -7,7 +7,7 @@
               data-testid="contact-dnc-actions-button"
               :disabled="disabled"
               @click="dncContact">
-      <q-tooltip anchor="top middle"
+      <q-tooltip anchor="bottom middle"
                  data-testid="contact-dnc-actions-tooltip"
                  self="center middle"
                  content-class="fs-12"
@@ -32,7 +32,7 @@
               data-testid="contact-undnc-actions-button"
               @click="onShowUnDncModal">
       <q-tooltip v-if="contact.is_dnc"
-                 anchor="top middle"
+                 anchor="bottom middle"
                  data-testid="contact-undnc-actions-tooltip"
                  self="center middle">
         Un-DNC
