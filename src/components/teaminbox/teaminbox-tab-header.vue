@@ -183,7 +183,7 @@ export default {
 .teaminbox-tab__header {
   display: flex;
   align-items: center;
-  padding: 14px 16px;
+  padding: 14px 12px;
   width: 100%;
 
   &__label {

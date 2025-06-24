@@ -10,7 +10,10 @@ export const DEFAULT_FILTERS = {
   my_contact: false,
   unread_only: false,
   task_status: [],
-  mention: false
+  mention: false,
+  date_range: null,
+  from_date: null,
+  to_date: null
 }
 
 export default function () {

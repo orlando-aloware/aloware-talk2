@@ -1,5 +1,9 @@
 <template>
   <div class="teaminbox-filters">
+    <div class="selected-date-placeholder text-sm text-grey-90"
+         v-if="activeFilters.from_date">
+      {{ selectedDateRangePlaceholder }}
+    </div>
     <div class="d-flex justify-content-between align-items-center">
       <div class="teaminbox-filter flex-grow-1 overflow-hidden">
         <b-dropdown ref="filtersDropdown"
@@ -118,6 +122,7 @@ import { navigationErrorHandler } from 'src/router/routes'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { DEFAULT_FILTERS } from 'src/store/teaminbox/teaminbox.store'
 import { isEqual } from 'lodash'
+import moment from 'moment'
 
 export default {
   name: 'TeamInboxFilterSort',
@@ -140,6 +145,21 @@ export default {
 
     sortOption () {
       return this.activeSort && this.activeSort.order === 'asc' ? 'Oldest' : 'Newest'
+    },
+
+    selectedDateRangePlaceholder () {
+      const { from_date: fromDate, to_date: toDate, date_range: dateRange } = this.activeFilters
+
+      if (!fromDate && !toDate) {
+        return ''
+      }
+
+      if (dateRange !== 'custom') {
+        return `Results for ${dateRange}`
+      }
+
+      const range = `${moment(fromDate).format('MM/DD/YYYY')} to ${moment(toDate).format('MM/DD/YYYY')}`
+      return `Results from ${range}`
     },
 
     activeFiltersPlaceholder () {
@@ -271,5 +291,9 @@ export default {
   margin-bottom: 2px;
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.selected-date-placeholder {
+  padding: 1px 12px 0 12px;
 }
 </style>
