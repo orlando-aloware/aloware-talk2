@@ -326,7 +326,7 @@ export default {
       if (communication && communication.id) {
         console.log('Caching communication from event:', communication.id)
         this.communicationCache.set(communication.id, communication)
-        const contactId = this.dialer.customParameters?.ContactId
+        const contactId = this.dialer.call.customParameters?.ContactId
         console.log('SHOW COMMUNICATION CACHE?', contactId, communication.contact?.id)
         if (this.dialer.call && this.isSmartQueueOnlyEnabled(communication) && contactId === communication.contact?.id) {
           this.showCommunicationCache(communication)
@@ -416,7 +416,7 @@ export default {
       }
 
       const [, cachedCommunication] = this.communicationCache.entries().next().value
-      const contactId = this.dialer.customParameters?.ContactId
+      const contactId = this.dialer.call.customParameters?.ContactId
       console.log('CACHED COMMUNICATION?', cachedCommunication, contactId)
       if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication) && contactId === cachedCommunication.contact?.id) {
         this.showCommunicationCache(cachedCommunication)
