@@ -90,9 +90,6 @@
           </div>
         </q-chip>
       </template>
-      <template v-slot:hint v-if="selectedId && lineInboxName">
-        Inbox: {{ lineInboxName }}
-      </template>
     </q-select>
   </div>
 </template>
@@ -103,16 +100,13 @@ import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
-import userMixin from 'src/plugins/mixins/user.mixin'
-import { COMPANY_AGENT } from 'src/constants/roles'
 
 export default {
   name: 'line-selector',
 
   mixins: [
     aclMixin,
-    selectorMixin,
-    userMixin
+    selectorMixin
   ],
 
   components: {
@@ -237,6 +231,21 @@ export default {
     isReadOnly: {
       type: Boolean,
       default: false
+    },
+
+    preSelectedTeamInboxLineId: {
+      type: Number,
+      default: null
+    },
+
+    hideBottomSpace: {
+      type: Boolean,
+      default: false
+    },
+
+    width: {
+      type: String,
+      default: undefined
     }
   },
 
@@ -328,6 +337,10 @@ export default {
 
   created () {
     this.options = this.activeCampaignsAlphabeticalOrder
+
+    if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
+      this.selectedId = this.value
+    }
   },
 
   mounted () {
@@ -385,11 +398,7 @@ export default {
 
   watch: {
     value () {
-      if (this.campaignsIsLoading || _.isEmpty(this.campaigns)) {
-        return
-      }
-
-      if (this.options.find(campaign => campaign.id === this.value)) {
+      if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
         this.selectedId = this.value
       }
     },

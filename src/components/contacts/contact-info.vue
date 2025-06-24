@@ -402,7 +402,8 @@ export default {
       isProcessingBlock: false,
       isVideoConferenceLinkSending: false,
       isRemovingFromPowerDialerLists: false,
-      LRN_NOT_PERFORMED
+      LRN_NOT_PERFORMED,
+      isExportingCommunications: false
     }
   },
 
