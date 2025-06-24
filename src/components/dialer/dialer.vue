@@ -411,14 +411,16 @@ export default {
       }
 
       const cachedCommunication = this.findCommunicationInCache(call.callSid)
+      console.log('CACHED COMMUNICATION?',cachedCommunication)
       if (cachedCommunication) {
-        if (this.isSmartQueueOnlyEnabled()) {
-          this.removeCommunicationFromCache(cachedCommunication.id)
-        }
         console.log('Using cached communication for incoming call:', cachedCommunication.id)
         this.$VueEvent.fire('new_in_app_call', cachedCommunication)
         this.processActionNotification(cachedCommunication, 'call')
         this.addNonOwnedLiveContact(cachedCommunication)
+
+        if (this.isSmartQueueOnlyEnabled()) {
+          this.removeCommunicationFromCache(cachedCommunication.id)
+        }
 
         return
       }
