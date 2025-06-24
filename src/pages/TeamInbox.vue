@@ -153,7 +153,6 @@ export default {
 
       if (width >= 785) {
         this.isTeamInboxNavListCollapsed = true
-        this.isContactDetailsCollapsed = true
         this.isSidebarCollapsed = true
         return
       }
@@ -186,7 +185,7 @@ export default {
       }
 
       if (!this.isContactDetailsCollapsed && !this.isSidebarCollapsed) {
-        this.isContactDetailsCollapsed = true
+        this.isSidebarCollapsed = true
       }
     },
 
@@ -218,7 +217,7 @@ export default {
       }
 
       if (!this.isTeamInboxNavListCollapsed && !this.isContactDetailsCollapsed) {
-        this.isContactDetailsCollapsed = true
+        this.isTeamInboxNavListCollapsed = true
       }
     }
   },

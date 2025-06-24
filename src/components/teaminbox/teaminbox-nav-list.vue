@@ -156,6 +156,8 @@ export default {
 
     ...mapFields('settings', ['isTeamInboxNavListCollapsed']),
 
+    ...mapFields('TeamInbox', ['activeFilters']),
+
     teamsIds () {
       return this.teams
         .filter(team => team.users.includes(this.profile.id))
@@ -220,6 +222,10 @@ export default {
           inboxes: this.parsedInboxes.watching
         }
       ]
+    },
+
+    dateFilter () {
+      return `${this.activeFilters.from_date}|${this.activeFilters.to_date}`
     }
   },
 
@@ -426,6 +432,16 @@ export default {
     checkUrlInboxIdPermission () {
       const urlInboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : null
       return !urlInboxId || this.findInboxById(urlInboxId)
+    },
+
+    loadInboxesUnreadCount () {
+      const inboxIds = Object.keys(this.parsedInboxes ?? {}).flatMap((parsedInbox) => this.parsedInboxes[parsedInbox].map((inbox) => inbox.id))
+
+      if (!inboxIds.length) {
+        return
+      }
+
+      this.fetchInboxesUnreadCount(inboxIds)
     }
   },
 
@@ -484,14 +500,8 @@ export default {
       }
     },
 
-    parsedInboxes (parsedInboxes) {
-      const inboxIds = Object.keys(parsedInboxes ?? {}).flatMap((parsedInbox) => parsedInboxes[parsedInbox].map((inbox) => inbox.id))
-
-      if (!inboxIds.length) {
-        return
-      }
-
-      this.fetchInboxesUnreadCount(inboxIds)
+    parsedInboxes () {
+      this.loadInboxesUnreadCount()
     },
 
     search (val) {
@@ -510,6 +520,12 @@ export default {
         // Handles edge cases when an inbox is assigned to the user while they have the page open without any existing inboxes
         this.onInboxSelect(this.getFirstInboxId())
       }
+    },
+
+    dateFilter () {
+      this.setUnreadCountLoaded(false)
+      this.setInboxesUnreadCount([])
+      this.loadInboxesUnreadCount()
     }
   },
 
