@@ -411,7 +411,7 @@ export default {
       }
 
       const cachedCommunication = this.findCommunicationInCache(call.callSid)
-      console.log('CACHED COMMUNICATION?',cachedCommunication)
+      console.log('CACHED COMMUNICATION?', cachedCommunication)
       if (cachedCommunication) {
         console.log('Using cached communication for incoming call:', cachedCommunication.id)
         this.$VueEvent.fire('new_in_app_call', cachedCommunication)
