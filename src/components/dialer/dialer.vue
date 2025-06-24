@@ -325,6 +325,7 @@ export default {
     this.dialerListeners.cacheCommunicationFromEvent = (communication) => {
       if (communication && communication.id) {
         console.log('Caching communication from event:', communication.id)
+        this.communicationCache.clear()
         this.communicationCache.set(communication.id, communication)
       }
     }
@@ -410,17 +411,14 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      const cachedCommunication = this.findCommunicationInCache(call.callSid)
+      const [key, cachedCommunication] = this.communicationCache.entries().next().value
       console.log('CACHED COMMUNICATION?', cachedCommunication)
-      if (cachedCommunication) {
+      if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication)) {
         console.log('Using cached communication for incoming call:', cachedCommunication.id)
+        this.communicationCache.delete(key)
         this.$VueEvent.fire('new_in_app_call', cachedCommunication)
         this.processActionNotification(cachedCommunication, 'call')
         this.addNonOwnedLiveContact(cachedCommunication)
-
-        if (this.isSmartQueueOnlyEnabled()) {
-          this.removeCommunicationFromCache(cachedCommunication.id)
-        }
 
         return
       }
@@ -449,12 +447,7 @@ export default {
       this.connection = null
       this.$closeActionNotification('incomingCall')
 
-      if (this.isSmartQueueOnlyEnabled()) {
-        const cachedCommunication = this.findCommunicationInCache(call.callSid)
-        if (cachedCommunication) {
-          this.removeCommunicationFromCache(cachedCommunication.id)
-        }
-      }
+      this.communicationCache.clear()
     })
 
     this.getDesktopToken()
@@ -940,14 +933,6 @@ export default {
         this.dialerCallPrep(call)
         this.startCallTimer()
         this.setDialerCurrentStatus('CALL_CONNECTED')
-
-        // Check if we already have this communication in cache
-        const cachedCommunication = this.findCommunicationInCache(this.dialer.call.callSid)
-        if (cachedCommunication && this.dialer.communication && this.dialer.communication.id === cachedCommunication.id) {
-          console.log('Communication already loaded from cache, skipping API call')
-          return
-        }
-
         this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
           .catch((err) => {
             console.log(err)
@@ -972,12 +957,7 @@ export default {
         this.backToDial('Talk-Connection.OnCancel')
         this.$closeActionNotification('incomingCall')
 
-        if (this.isSmartQueueOnlyEnabled()) {
-          const cachedCommunication = this.findCommunicationInCache(this.dialer.call?.callSid)
-          if (cachedCommunication) {
-            this.removeCommunicationFromCache(cachedCommunication.id)
-          }
-        }
+        this.communicationCache.clear()
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
@@ -990,10 +970,6 @@ export default {
       console.log('Call ended', call)
       console.log('** Parked call', this.dialer.parkedCall)
       console.log('** Dialer call', this.dialer.call)
-
-      if (this.isSmartQueueOnlyEnabled() && this.dialer.communication) {
-        this.removeCommunicationFromCache(this.dialer.communication.id)
-      }
 
       // don't do anything if there is no communication
       if (!this.dialer.communication) {
@@ -1048,14 +1024,6 @@ export default {
       console.log('Hanging up call')
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
-
-      // Remove from cache if smart queue only is enabled
-      if (this.isSmartQueueOnlyEnabled()) {
-        const cachedCommunication = this.findCommunicationInCache(this.dialer.call?.callSid)
-        if (cachedCommunication) {
-          this.removeCommunicationFromCache(cachedCommunication.id)
-        }
-      }
 
       // If we're in an AI agent takeover mode and still muted, make sure we drop the AI agent
       if (this.dialer.aiAgentTakeover && this.dialer.isMuted && this.dialer.communication) {
@@ -1137,14 +1105,6 @@ export default {
       if (this.connection) {
         // rejecting an incoming call
         this.connection.reject()
-      }
-
-      // Remove from cache if smart queue only is enabled
-      if (this.isSmartQueueOnlyEnabled()) {
-        const cachedCommunication = this.findCommunicationInCache(this.dialer.call?.callSid)
-        if (cachedCommunication) {
-          this.removeCommunicationFromCache(cachedCommunication.id)
-        }
       }
 
       // set agent status to busy if it's an answer by browser/apps user
@@ -1644,11 +1604,6 @@ export default {
         return
       }
 
-      // Remove from cache if smart queue only is enabled
-      if (this.isSmartQueueOnlyEnabled() && this.dialer.communication) {
-        this.removeCommunicationFromCache(this.dialer.communication.id)
-      }
-
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()
@@ -2117,26 +2072,6 @@ export default {
       if (this.tokenRetryTimeout) {
         clearTimeout(this.tokenRetryTimeout)
         this.tokenRetryTimeout = null
-      }
-    },
-
-    findCommunicationInCache (sid) {
-      if (sid) {
-        console.log('COMMUNICATION IN CACHE', this.communicationCache)
-        for (const [, communication] of this.communicationCache) {
-          if (communication.call_sid === sid) {
-            return communication
-          }
-        }
-      }
-
-      return null
-    },
-
-    removeCommunicationFromCache (communicationId) {
-      if (communicationId && this.communicationCache.has(communicationId)) {
-        console.log('Removing communication from cache:', communicationId)
-        this.communicationCache.delete(communicationId)
       }
     },
 
