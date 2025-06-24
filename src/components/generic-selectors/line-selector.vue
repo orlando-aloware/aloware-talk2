@@ -325,14 +325,13 @@ export default {
               campaign.has_direct_ring_group_access ||
               campaign.has_team_membership_access ||
               campaign.has_direct_watching_access ||
-              campaign.has_team_watching_access ||
-              campaign.ivr_id
+              campaign.has_team_watching_access
           })
         }
 
         return !this.preSelectedTeamInboxLineId
           ? activeCampaigns
-          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id) || campaign.ivr_id)
+          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id))
       }
 
       return []
