@@ -142,6 +142,7 @@ export default {
             }
             console.log('.user.in-app.communication.new_call - event.communication', event.communication)
             this.$VueEvent.fire('new_in_app_call', event.communication)
+            this.$VueEvent.fire('dialer_new_in_app_call', event.communication)
           }
         })
         .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {

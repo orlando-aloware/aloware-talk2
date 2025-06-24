@@ -68,7 +68,8 @@ export default {
       tokenRetryCount: 0,
       tokenRetryTimeout: null,
       maxTokenRetries: 3,
-      baseRetryDelay: 1000 // 1 second base delay
+      baseRetryDelay: 1000, // 1 second base delay
+      communicationCache: new Map()
     }
   },
 
@@ -321,6 +322,13 @@ export default {
       }
     }
 
+    this.dialerListeners.cacheCommunicationFromEvent = (communication) => {
+      if (communication && communication.id) {
+        console.log('Caching communication from event:', communication.id)
+        this.communicationCache.set(communication.id, communication)
+      }
+    }
+
     this.startDialerEvents()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -402,6 +410,19 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
+      const cachedCommunication = this.findCommunicationInCache(call.callSid)
+      if (cachedCommunication) {
+        if (this.isSmartQueueOnlyEnabled()) {
+          this.removeCommunicationFromCache(cachedCommunication.id)
+        }
+        console.log('Using cached communication for incoming call:', cachedCommunication.id)
+        this.$VueEvent.fire('new_in_app_call', cachedCommunication)
+        this.processActionNotification(cachedCommunication, 'call')
+        this.addNonOwnedLiveContact(cachedCommunication)
+
+        return
+      }
+
       this.getCommunication(call.callSid, call.from).then(res => {
         console.log('GET INCOMING COMMUNICATION', call.callSid)
         if (res) {
@@ -425,6 +446,13 @@ export default {
       this.backToDial('Talk-Device.OnCancel')
       this.connection = null
       this.$closeActionNotification('incomingCall')
+
+      if (this.isSmartQueueOnlyEnabled()) {
+        const cachedCommunication = this.findCommunicationInCache(call.callSid)
+        if (cachedCommunication) {
+          this.removeCommunicationFromCache(cachedCommunication.id)
+        }
+      }
     })
 
     this.getDesktopToken()
@@ -495,6 +523,7 @@ export default {
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.listen('dialer_new_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
     },
 
     stopDialerEvents () {
@@ -528,6 +557,7 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.stop('dialer_new_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
     },
 
     forceRefreshCommunication () {
@@ -908,6 +938,14 @@ export default {
         this.dialerCallPrep(call)
         this.startCallTimer()
         this.setDialerCurrentStatus('CALL_CONNECTED')
+
+        // Check if we already have this communication in cache
+        const cachedCommunication = this.findCommunicationInCache(this.dialer.call.callSid)
+        if (cachedCommunication && this.dialer.communication && this.dialer.communication.id === cachedCommunication.id) {
+          console.log('Communication already loaded from cache, skipping API call')
+          return
+        }
+
         this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
           .catch((err) => {
             console.log(err)
@@ -931,6 +969,13 @@ export default {
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial('Talk-Connection.OnCancel')
         this.$closeActionNotification('incomingCall')
+
+        if (this.isSmartQueueOnlyEnabled()) {
+          const cachedCommunication = this.findCommunicationInCache(this.dialer.call?.callSid)
+          if (cachedCommunication) {
+            this.removeCommunicationFromCache(cachedCommunication.id)
+          }
+        }
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
@@ -943,6 +988,10 @@ export default {
       console.log('Call ended', call)
       console.log('** Parked call', this.dialer.parkedCall)
       console.log('** Dialer call', this.dialer.call)
+
+      if (this.isSmartQueueOnlyEnabled() && this.dialer.communication) {
+        this.removeCommunicationFromCache(this.dialer.communication.id)
+      }
 
       // don't do anything if there is no communication
       if (!this.dialer.communication) {
@@ -997,6 +1046,14 @@ export default {
       console.log('Hanging up call')
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
+
+      // Remove from cache if smart queue only is enabled
+      if (this.isSmartQueueOnlyEnabled()) {
+        const cachedCommunication = this.findCommunicationInCache(this.dialer.call?.callSid)
+        if (cachedCommunication) {
+          this.removeCommunicationFromCache(cachedCommunication.id)
+        }
+      }
 
       // If we're in an AI agent takeover mode and still muted, make sure we drop the AI agent
       if (this.dialer.aiAgentTakeover && this.dialer.isMuted && this.dialer.communication) {
@@ -1078,6 +1135,14 @@ export default {
       if (this.connection) {
         // rejecting an incoming call
         this.connection.reject()
+      }
+
+      // Remove from cache if smart queue only is enabled
+      if (this.isSmartQueueOnlyEnabled()) {
+        const cachedCommunication = this.findCommunicationInCache(this.dialer.call?.callSid)
+        if (cachedCommunication) {
+          this.removeCommunicationFromCache(cachedCommunication.id)
+        }
       }
 
       // set agent status to busy if it's an answer by browser/apps user
@@ -1577,6 +1642,11 @@ export default {
         return
       }
 
+      // Remove from cache if smart queue only is enabled
+      if (this.isSmartQueueOnlyEnabled() && this.dialer.communication) {
+        this.removeCommunicationFromCache(this.dialer.communication.id)
+      }
+
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()
@@ -2046,6 +2116,34 @@ export default {
         clearTimeout(this.tokenRetryTimeout)
         this.tokenRetryTimeout = null
       }
+    },
+
+    findCommunicationInCache (sid) {
+      if (sid) {
+        for (const [, communication] of this.communicationCache) {
+          if (communication.call_sid === sid) {
+            return communication
+          }
+        }
+      }
+
+      return null
+    },
+
+    removeCommunicationFromCache (communicationId) {
+      if (communicationId && this.communicationCache.has(communicationId)) {
+        console.log('Removing communication from cache:', communicationId)
+        this.communicationCache.delete(communicationId)
+      }
+    },
+
+    isSmartQueueOnlyEnabled (communication) {
+      if (!communication || !communication.ring_group_id) {
+        return false
+      }
+
+      const ringGroup = this.ringGroups.find(rg => rg.id === communication.ring_group_id)
+      return ringGroup && ringGroup.should_queue && !ringGroup.fishing_mode
     }
   },
 
@@ -2069,6 +2167,9 @@ export default {
 
     // Clear token retry timeout
     this.resetTokenRetryState()
+
+    // Clear communication cache
+    this.communicationCache.clear()
 
     // Destroy the Twilio device to avoid having multiple Twilio device instances.
     console.log('Destroying Twilio device')
