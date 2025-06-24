@@ -403,6 +403,7 @@ export default {
       }
 
       this.getCommunication(call.callSid, call.from).then(res => {
+        console.log('GET INCOMING COMMUNICATION', call.callSid)
         if (res) {
           this.$VueEvent.fire('new_in_app_call', res.data)
           this.processActionNotification(res.data, 'call')

@@ -375,6 +375,7 @@ export default {
           this.$VueEvent.fire('user_logout', event)
         })
         .listen('.communication.created', (event) => {
+          console.log('COMMUNICATION CREATED - USER', event)
           this.dispatchToMemoryMonitor('.communication.created', event)
           if (event.tags) {
             event.communication.tags = event.tags
@@ -510,6 +511,7 @@ export default {
           }
         })
         .listen('.communication.created', (event) => {
+          console.log('COMMUNICATION CREATED - COMPANY', event)
           this.dispatchToMemoryMonitor('.communication.created', event)
           if (event.tags) {
             event.communication.tags = event.tags
