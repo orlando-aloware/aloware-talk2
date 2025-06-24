@@ -2120,6 +2120,7 @@ export default {
 
     findCommunicationInCache (sid) {
       if (sid) {
+        console.log('COMMUNICATION IN CACHE', this.communicationCache)
         for (const [, communication] of this.communicationCache) {
           if (communication.call_sid === sid) {
             return communication
