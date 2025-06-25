@@ -50,6 +50,7 @@ export default {
     ]),
 
     playAudio (shouldPlayFishingNotificationSound = false) {
+      console.trace()
       if (!this.enableAudio) {
         return
       }
