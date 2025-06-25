@@ -323,7 +323,7 @@ export default {
     }
 
     this.dialerListeners.cacheCommunicationFromEvent = (communication) => {
-      if (!this.isSmartQueueOnlyEnabled(cachedCommunication)) {
+      if (!this.isSmartQueueOnlyEnabled(communication)) {
         return
       }
       if (communication && communication.id && this.dialer.communication?.id !== communication.id) {
