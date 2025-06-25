@@ -237,7 +237,7 @@ export default {
       taskStatusOptions: [
         { label: 'Open', value: 'open' },
         { label: 'Pending', value: 'pending' },
-        { label: 'Close', value: 'close' }
+        { label: 'Closed', value: 'closed' }
       ],
       sorts: {
         Newest: {},
