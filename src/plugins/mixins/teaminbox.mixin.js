@@ -250,8 +250,11 @@ export default {
       let data = []
 
       this.setIsLoadingInboxesUnreadCount(true)
+
+      const filters = this.$store.state.TeamInbox.activeFilters || {}
+
       try {
-        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds)
+        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds, filters)
         data = newData
 
         switch (data.length) {

@@ -25,8 +25,7 @@
             <h5 class="form-label text-sm text-grey mx-2 my-1">Status</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="true"
-                             v-model="activeFilters.unread_only"
-                             @change="onFilterChange">
+                             v-model="selectedFilters.unread_only">
               Unread
             </b-form-checkbox>
           </div>
@@ -34,8 +33,7 @@
             <h5 class="form-label text-sm text-grey mx-2 my-1">Contact</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="true"
-                             v-model="activeFilters.my_contact"
-                             @change="onFilterChange">
+                             v-model="selectedFilters.my_contact">
               My Contacts
             </b-form-checkbox>
           </div>
@@ -44,15 +42,13 @@
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
                              :key="option.value"
-                             v-model="activeFilters.types"
-                             v-for="option in typeOptions"
-                             @change="onFilterChange">
+                             v-model="selectedFilters.types"
+                             v-for="option in typeOptions">
               {{ option.label }}
             </b-form-checkbox>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="true"
-                             v-model="activeFilters.mention"
-                             @change="onFilterChange">
+                             v-model="selectedFilters.mention">
               Mentions
             </b-form-checkbox>
           </div>
@@ -61,9 +57,8 @@
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
                              :key="option.value"
-                             v-model="activeFilters.directions"
-                             v-for="option in directionOptions"
-                             @change="onFilterChange">
+                             v-model="selectedFilters.directions"
+                             v-for="option in directionOptions">
               {{ option.label }}
             </b-form-checkbox>
           </div>
@@ -72,19 +67,26 @@
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
                              :key="option.value"
-                             v-model="activeFilters.task_status"
-                             v-for="option in taskStatusOptions"
-                             @change="onFilterChange">
+                             v-model="selectedFilters.task_status"
+                             v-for="option in taskStatusOptions">
               {{ option.label }}
             </b-form-checkbox>
           </div>
-          <b-link href="#"
-                  class="custom-link text-decoration-none d-block p-1 px-2"
-                  data-testid="teaminbox-clear-filters-btn"
-                  :disabled="isResetFiltersDisabled"
-                  @click="resetFilters">
-            Clear all filters
-          </b-link>
+          <div class="d-flex justify-between mt-1 pr-1">
+            <b-link href="#"
+                    class="custom-link text-decoration-none d-block p-1 px-2"
+                    data-testid="teaminbox-clear-filters-btn"
+                    :disabled="isResetFiltersDisabled"
+                    @click="resetFilters">
+              Clear All
+            </b-link>
+            <compact-btn variant="success"
+                         data-testid="teaminbox-apply-filters-btn"
+                         :disabled="!hasFilterChanges"
+                         @clicked="onApply">
+              Apply
+            </compact-btn>
+          </div>
         </b-dropdown>
       </div>
       <div class="teaminbox-sort flex-even flex-shrink-0">
@@ -123,16 +125,19 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { DEFAULT_FILTERS } from 'src/store/teaminbox/teaminbox.store'
 import { isEqual } from 'lodash'
 import moment from 'moment'
+import CompactBtn from 'components/compact-btn'
 
 export default {
   name: 'TeamInboxFilterSort',
 
   components: {
     SortUpIcon,
-    SortDownIcon
+    SortDownIcon,
+    CompactBtn
   },
 
   mounted () {
+    this.selectedFilters = { ...this.activeFilters }
     this.initializeFiltersAndSort()
   },
 
@@ -163,42 +168,58 @@ export default {
     },
 
     activeFiltersPlaceholder () {
-      const selectedFilters = []
+      const filters = []
       if (this.activeFilters.types.length) {
         const selectedOptions = this.typeOptions.filter((option) => this.activeFilters.types.includes(option.value))
-        selectedFilters.push(...selectedOptions.map((option) => option.label))
+        filters.push(...selectedOptions.map((option) => option.label))
+      }
+      if (this.activeFilters.mention) {
+        filters.push('Mentions')
       }
       if (this.activeFilters.directions.length) {
         const selectedOptions = this.directionOptions.filter((option) => this.activeFilters.directions.includes(option.value))
-        selectedFilters.push(...selectedOptions.map((option) => option.label))
+        filters.push(...selectedOptions.map((option) => option.label))
       }
       if (this.activeFilters.my_contact) {
-        selectedFilters.push('My Contacts')
+        filters.push('My Contacts')
       }
       if (this.activeFilters.unread_only) {
-        selectedFilters.push('Unread')
+        filters.push('Unread')
       }
       if (this.activeFilters.task_status.length) {
         const selectedOptions = this.taskStatusOptions.filter((option) => this.activeFilters.task_status.includes(option.value))
-        selectedFilters.push(...selectedOptions.map((option) => option.label))
-      }
-      if (this.activeFilters.mention) {
-        selectedFilters.push('Mentions')
+        filters.push(...selectedOptions.map((option) => option.label))
       }
 
-      return '/ ' + (!selectedFilters.length ? 'All' : selectedFilters.join(', '))
+      return '/ ' + (!filters.length ? 'All' : filters.join(', '))
     },
 
     isResetFiltersDisabled () {
+      if (this.activeFilters.from_date && this.activeFilters.to_date) {
+        return false
+      }
+
       const props = ['types', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention']
 
       for (const key of props) {
-        if (!isEqual(this.activeFilters[key], DEFAULT_FILTERS[key])) {
+        if (!isEqual(this.selectedFilters[key], DEFAULT_FILTERS[key])) {
           return false
         }
       }
 
       return true
+    },
+
+    hasFilterChanges () {
+      const props = ['types', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention']
+
+      for (const key of props) {
+        if (!isEqual(this.selectedFilters[key], this.activeFilters[key])) {
+          return true
+        }
+      }
+
+      return false
     }
   },
 
@@ -216,12 +237,13 @@ export default {
       taskStatusOptions: [
         { label: 'Open', value: 'open' },
         { label: 'Pending', value: 'pending' },
-        { label: 'Close', value: 'close' }
+        { label: 'Closed', value: 'closed' }
       ],
       sorts: {
         Newest: {},
         Oldest: { order: 'asc' }
-      }
+      },
+      selectedFilters: {}
     }
   },
 
@@ -230,6 +252,20 @@ export default {
 
     onFilterChange () {
       this.$emit('filter-change', this.activeFilters)
+    },
+
+    onApply () {
+      delete this.selectedFilters.date_range
+      delete this.selectedFilters.from_date
+      delete this.selectedFilters.to_date
+
+      this.activeFilters = {
+        ...this.activeFilters,
+        ...this.selectedFilters
+      }
+
+      this.$refs.filtersDropdown.visible = false
+      this.onFilterChange()
     },
 
     setSortOption (option) {
@@ -266,7 +302,10 @@ export default {
 
     resetFilters () {
       this.$refs.filtersDropdown.visible = false
+
       this.activeFilters = { ...DEFAULT_FILTERS }
+      this.selectedFilters = { ...DEFAULT_FILTERS }
+
       this.onFilterChange()
     }
   }
