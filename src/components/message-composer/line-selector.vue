@@ -125,7 +125,9 @@ export default {
      */
     activeCampaigns () {
       const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-      return campaigns.filter(campaign => this.activeCampaignsIds?.includes(campaign.id))
+      const availableInboxCampaigns = campaigns.filter(campaign => this.activeCampaignsIds?.includes(campaign.id))
+      const ivrCampaigns = campaigns.filter(campaign => this.activeInbox?.ivrs?.some(ivr => ivr.id === campaign.ivr_id))
+      return Array.from(new Set([...availableInboxCampaigns, ...ivrCampaigns]))
     },
 
     selectedCampaign () {
