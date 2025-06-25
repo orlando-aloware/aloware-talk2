@@ -27,11 +27,7 @@ export const getCampaignsData = function (context, options = {}) {
     return Promise.resolve()
   }
 
-  if (context[loadingFlag]) {
-    // Avoid duplicate requests
-    return Promise.resolve()
-  }
-
+  context[loadingFlag] = true
   // Set loading state
   if (typeof context[setLoadingAction] === 'function') {
     context[setLoadingAction](true)
@@ -48,25 +44,32 @@ export const getCampaignsData = function (context, options = {}) {
       if (typeof context[setAction] === 'function') {
         context[setAction](res.data)
       }
-
-      return Promise.resolve()
-    })
-    .catch((err) => {
-      console.log(err)
-      return Promise.reject()
-    })
-    .finally(() => {
+      context[loadingFlag] = false
       // Reset loading state
       if (typeof context[setLoadingAction] === 'function') {
         context[setLoadingAction](false)
       } else {
         setCampaignsIsLoading(context, false)
       }
+
+      return Promise.resolve()
+    })
+    .catch((err) => {
+      console.log(err)
+      context[loadingFlag] = false
+      // Reset loading state on error
+      if (typeof context[setLoadingAction] === 'function') {
+        context[setLoadingAction](false)
+      } else {
+        setCampaignsIsLoading(context, false)
+      }
+
+      return Promise.reject()
     })
 }
 
 /**
- * Fetches campaigns data
+ * Fetches regular campaign data
  * @param {Object} context - Vue component context with access to Vuex actions
  * @returns {Promise} - Promise that resolves when campaigns are loaded
  */
@@ -74,7 +77,23 @@ export const getCampaigns = function (context) {
   return getCampaignsData(context, {
     setAction: 'setCampaigns',
     setLoadingAction: 'setCampaignsIsLoading',
-    loadingFlag: 'campaignsIsLoading,'
+    loadingFlag: 'loadingCampaigns'
+  })
+}
+
+/**
+ * Fetches team inbox campaign data
+ * @param {Object} context - Vue component context with access to Vuex actions
+ * @returns {Promise} - Promise that resolves when team inbox campaigns are loaded
+ */
+export const getTeamInboxCampaigns = function (context) {
+  return getCampaignsData(context, {
+    setAction: 'setTeamInboxCampaigns',
+    setLoadingAction: 'setCampaignsIsLoading',
+    loadingFlag: 'loadingTeamInboxCampaigns',
+    params: {
+      from_team_inbox: true
+    }
   })
 }
 

@@ -9,7 +9,8 @@
                           v-if="genericMultiselect"
                           @valuesUpdated="onInput">
     </generic-multi-select>
-    <q-select ref="lineSelect"
+    <q-select style="word-break: break-all;"
+              ref="lineSelect"
               options-selected-class="text-primary"
               class="q-basic-selector"
               color="primary"
@@ -32,9 +33,7 @@
               :multiple="multiple"
               :use-chips="useChips"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-              :style="{ 'word-break': 'break-all', width }"
               :behavior="behavior"
-              :hide-bottom-space="hideBottomSpace"
               v-else
               v-model="selectedId"
               @popup-show="onShowMenu"
@@ -69,7 +68,7 @@
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="no-results text-grey">
-            {{ noResultsText }}
+            No results
           </q-item-section>
         </q-item>
       </template>
@@ -91,29 +90,23 @@
           </div>
         </q-chip>
       </template>
-      <template v-slot:hint v-if="selectedId && lineInboxName && !hideBottomSpace">
-        Inbox: {{ lineInboxName }}
-      </template>
     </q-select>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
-import userMixin from 'src/plugins/mixins/user.mixin'
-import { COMPANY_AGENT } from 'src/constants/roles'
 
 export default {
   name: 'line-selector',
 
   mixins: [
     aclMixin,
-    selectorMixin,
-    userMixin
+    selectorMixin
   ],
 
   components: {
@@ -240,11 +233,6 @@ export default {
       default: false
     },
 
-    isDialer: {
-      type: Boolean,
-      default: false
-    },
-
     preSelectedTeamInboxLineId: {
       type: Number,
       default: null
@@ -275,8 +263,6 @@ export default {
     ...mapState(['campaigns', 'campaignsIsLoading']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['profile']),
-    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox']),
-    ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
 
     placeholder () {
       if (this.customPlaceholder) {
@@ -315,24 +301,8 @@ export default {
 
     activeCampaignsAlphabeticalOrder () {
       if (this.campaignsAlphabeticalOrder.length) {
-        const activeCampaigns = _.clone(this.campaignsAlphabeticalOrder)
+        return _.clone(this.campaignsAlphabeticalOrder)
           .filter(campaign => campaign.active === true)
-
-        if (this.shouldLimitAgentLinesVisibility) {
-          // Only show lines that the agent has access to
-          return activeCampaigns.filter(campaign => {
-            return campaign.user_id === this.profile.id ||
-              campaign.has_direct_ring_group_access ||
-              campaign.has_team_membership_access ||
-              campaign.has_direct_watching_access ||
-              campaign.has_team_watching_access ||
-              campaign.ivr_id
-          })
-        }
-
-        return !this.preSelectedTeamInboxLineId
-          ? activeCampaigns
-          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id) || campaign.ivr_id)
       }
 
       return []
@@ -362,43 +332,19 @@ export default {
 
     selectedLine () {
       return this.campaigns.find(campaign => campaign.id === this.selectedId)
-    },
-
-    lineInboxName () {
-      const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = this.selectedLine || {}
-      return ringGroup?.name || personalInbox?.name
-    },
-
-    shouldLimitAgentLinesVisibility () {
-      return this.isDialer &&
-        this.hasRole(COMPANY_AGENT) &&
-        this.hasCompanyTeamInboxLineManagementEnhancements
-    },
-
-    noResultsText () {
-      return !this.preSelectedTeamInboxLineId
-        ? 'No results'
-        : 'No lines found in this inbox'
     }
   },
 
   created () {
     this.options = this.activeCampaignsAlphabeticalOrder
 
-    if (this.preSelectedTeamInboxLineId && this.options.length === 1) {
-      // If there is only one line and the line is pre-selected, emit the event to initiate the call
-      this.$emit('initiateCall', this.options[0])
+    if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
+      this.selectedId = this.value
     }
   },
 
   mounted () {
     this.loadPlaceholder()
-
-    if (this.preSelectedTeamInboxLineId) {
-      // Line stickiness from the team inbox. Pre-select the last used line for the contact
-      const line = this.activeCampaignsAlphabeticalOrder.find(campaign => campaign.id === this.preSelectedTeamInboxLineId)
-      line && this.selectOption(line)
-    }
   },
 
   methods: {
@@ -452,11 +398,9 @@ export default {
 
   watch: {
     value () {
-      if (this.campaignsIsLoading || _.isEmpty(this.campaigns)) {
-        return
+      if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
+        this.selectedId = this.value
       }
-
-      this.selectedId = this.value
     },
 
     selectedId (val) {

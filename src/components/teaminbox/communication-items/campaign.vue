@@ -30,19 +30,17 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'teamInboxCampaigns']),
 
     displayCampaign () {
       // Use campaign prop if available (for deleted campaigns)
       if (this.campaign) {
         return this.campaign
       }
-
       // Otherwise look in store
       if (this.campaignId) {
-        return this.campaigns.find(campaign => campaign.id === this.campaignId)
+        return this.teamInbox ? this.teamInboxCampaigns.find(campaign => campaign.id === this.campaignId) : this.campaigns.find(campaign => campaign.id === this.campaignId)
       }
-
       return null
     },
 
