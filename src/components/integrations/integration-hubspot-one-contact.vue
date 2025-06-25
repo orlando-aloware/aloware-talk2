@@ -187,6 +187,7 @@
     </b-button>
     <!-- End See All Matches Link -->
     <slot name="duplicates-section"></slot>
+    <slot name="conversation-threads-section"></slot>
     <slot name="company-section"></slot>
   </div>
 </template>

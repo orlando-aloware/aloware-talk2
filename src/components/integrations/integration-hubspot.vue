@@ -10,7 +10,7 @@
     >
     <!-- Loading Indicator -->
       <div v-if="isLoading" class="loading-indicator">
-        <span class="loading-text text-caption">Loading {{ loadedSections }}/3</span>
+        <span class="loading-text text-caption">Loading {{ loadedSections }}/4</span>
         <div class="loading-details">
           <div class="loading-item">
             <i :class="contactIntegrationDataLoaded ? 'fas fa-check' : 'fas fa-spinner fa-spin'" />
@@ -23,6 +23,10 @@
           <div class="loading-item">
             <i :class="contactIntegrationDataLoaded && !isLoadingCompanyAssociation ? 'fas fa-check' : 'fas fa-spinner fa-spin'" />
             Associated Company
+          </div>
+          <div class="loading-item">
+            <i :class="contactIntegrationDataLoaded && !isLoadingConversationThreads ? 'fas fa-check' : 'fas fa-spinner fa-spin'" />
+            Conversation Threads
           </div>
         </div>
       </div>
@@ -80,6 +84,55 @@
               </div>
             </template>
             <!-- End Duplicate Contacts Section -->
+          </template>
+          <template #conversation-threads-section>
+            <template v-if="integrationData.conversation_threads?.length > 0">
+              <q-separator v-if="integrationData.properties"></q-separator>
+              <q-card-section>
+                <div class="text-muted">
+                  This contact has synced conversation threads with an Inbox in HubSpot
+                </div>
+                <div v-if="integrationData.conversation_threads && integrationData.conversation_threads.length > 0" class="mt-2">
+                  <q-card class="conversation-threads mb-1"
+                          v-for="(thread, index) in integrationData.conversation_threads"
+                          :key="index"
+                          flat bordered>
+                    <q-card-section>
+                      <q-card-section class="p-0">
+                        <h6 class="mb-2">
+                          <b-link class="conversation-thread-title ml-0"
+                                  :href="thread.link"
+                                  data-testid="integration-hubspot-conversation-link"
+                                  target="_blank">
+                            {{ thread.channel_account_name }}
+                          </b-link>
+                        </h6>
+                        <p class="mb-1 d-flex" data-testid="integration-hubspot-conversation-status">
+                          <span class="data-icon-label">Status: </span>
+                          <span class="data-value ml-1">
+                            <q-tooltip anchor="top middle"
+                                       self="center middle">
+                              {{ thread.is_active ? 'Open' : 'Closed' }}
+                            </q-tooltip>
+                            {{ thread.is_active ? 'Open' : 'Closed' }}
+                          </span>
+                        </p>
+                        <p class="mb-1 d-flex" data-testid="integration-hubspot-conversation-status">
+                          <span class="data-icon-label">Last Message: </span>
+                          <span class="data-value ml-1">
+                            <q-tooltip anchor="top middle"
+                                       self="center middle">
+                              {{ thread.latest_message_timestamp | dateTimePassed }}
+                            </q-tooltip>
+                            {{ thread.latest_message_timestamp | dateTimePassed }}
+                          </span>
+                        </p>
+                      </q-card-section>
+                    </q-card-section>
+                  </q-card>
+                </div>
+              </q-card-section>
+            </template>
           </template>
           <template #company-section>
             <!-- Start Company Association -->
@@ -260,7 +313,7 @@ export default {
     ...mapState(['statics', 'isWidget']),
 
     isLoading () {
-      return !this.contactIntegrationDataLoaded || this.isLoadingLifecycleStages || this.isLoadingCompanyAssociation
+      return !this.contactIntegrationDataLoaded || this.isLoadingLifecycleStages || this.isLoadingCompanyAssociation || this.isLoadingConversationThreads
     },
 
     loadedSections () {
@@ -271,7 +324,9 @@ export default {
         // Only count these if contact info is loaded
         if (!this.isLoadingLifecycleStages) count++
         if (!this.isLoadingCompanyAssociation) count++
+        if (!this.isLoadingConversationThreads) count++
       }
+
       return count
     },
 
@@ -331,6 +386,7 @@ export default {
       showDuplicates: false,
       isLoadingLifecycleStages: false,
       isLoadingCompanyAssociation: false,
+      isLoadingConversationThreads: false,
       forceComponentReloadFlag: true
     }
   },
@@ -357,6 +413,7 @@ export default {
           // Load the other sections
           this.setLifecycleStagesSection()
           this.setCompanyAssociationSection(this.contact.id)
+          this.setConversationThreads(this.contact.id)
         })
     },
 
@@ -406,6 +463,35 @@ export default {
         this.$handleErrors(error.response)
       } finally {
         this.isLoadingCompanyAssociation = false
+      }
+    },
+
+    /**
+     * Load the conversation threads section
+     *
+     * @param contactId
+     * @returns {Promise<void>}
+     */
+    async setConversationThreads (contactId) {
+      this.isLoadingConversationThreads = true
+
+      try {
+        const response = await this.getHubspotContactConversationThreads(contactId)
+
+        // Create a new object with all the current properties and the new ones
+        // This ensures Vue's reactivity system detects the change
+        this.integrationData = {
+          ...this.integrationData,
+          conversation_threads: response.data.conversation_threads
+        }
+
+        console.log('conversation_threads', this.integrationData.conversation_threads)
+
+        this.forceRerenderHubspotOneComponent()
+      } catch (error) {
+        this.$handleErrors(error.response)
+      } finally {
+        this.isLoadingConversationThreads = false
       }
     },
 

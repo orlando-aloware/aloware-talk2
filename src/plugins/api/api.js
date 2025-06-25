@@ -420,6 +420,7 @@ const talk2Api = {
 
         /**
          * Get HubSpot Inbox Configuration Data
+         *
          * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
          */
         getInboxSetupData () {
@@ -428,11 +429,22 @@ const talk2Api = {
 
         /**
          * Connect HubSpot Inbox to a company
+         *
          * @param params
-         * @returns {Promise<axios.AxiosResponse<any>>}
+         * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object>>}
          */
         connectInbox (params) {
           return window.axios.post(`${suffixV1}/integrations/hubspot/inbox/connect`, params)
+        },
+
+        /**
+         * Retrieve the conversation threads of a contact
+         *
+         * @param contactId
+         * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object>>}
+         */
+        getContactConversationThreads (contactId) {
+          return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/conversation-threads/${contactId}`)
         }
       },
 

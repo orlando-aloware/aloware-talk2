@@ -89,6 +89,10 @@ export default {
 
     async getHubspotContactCompanyAssociation (contactId) {
       return talk2Api.V1.integrations.hubspot.getContactCompanyAssociation(contactId)
+    },
+
+    async getHubspotContactConversationThreads (contactId) {
+      return talk2Api.V1.integrations.hubspot.getContactConversationThreads(contactId)
     }
   }
 }
