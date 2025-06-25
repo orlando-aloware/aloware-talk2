@@ -196,8 +196,8 @@
             no-caps
             left
             :auto-close="true"
-            :disable="!canRedialNow && !canRedialLater"
-            :color="canRedialNow || canRedialLater ? 'blue-7' : 'grey-8'">
+            :disable="redialDropdownDisabled"
+            :color="!redialDropdownDisabled ? 'blue-7' : 'grey-8'">
             <template v-slot:label>
               <refresh-icon class="mr-2"
                            color="white"/>
@@ -205,8 +205,8 @@
                 <q-tooltip content-class="bg-grey-light11"
                            anchor="bottom middle"
                            self="center middle"
-                           v-if="dialer.currentStatus === 'CALL_CONNECTED' && !canRedialNow && !canRedialLater">
-                  This contact has already been redialed once
+                           v-if="redialDropdownDisabled && redialDropdownTooltip">
+                  {{ redialDropdownTooltip }}
                 </q-tooltip>
                 Redial
               </div>
@@ -872,6 +872,34 @@ export default {
 
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
+    },
+
+    redialDropdownDisabled () {
+      if (this.isForcedCallDisposition && !this.isCallDisposed) {
+        return true
+      }
+
+      if (this.isForcedContactDisposition && !this.isContactDisposed) {
+        return true
+      }
+
+      return !this.canRedialNow && !this.canRedialLater
+    },
+
+    redialDropdownTooltip () {
+      if (!this.statusCallConnected) {
+        return
+      }
+
+      if (this.isForcedCallDisposition && !this.isCallDisposed) {
+        return 'Please select a Call Disposition'
+      }
+
+      if (this.isForcedContactDisposition && !this.isContactDisposed) {
+        return 'Please select a Contact Disposition'
+      }
+
+      return 'This contact has already been redialed once'
     }
   },
 
@@ -1409,10 +1437,6 @@ export default {
 
         console.log(`%c Redial required, pushing to ${redialNow ? 'TOP' : 'BOTTOM'}`, 'background: yellow; color: #000;')
 
-        if (redialNow) {
-          this.$VueEvent.fire('clearCallDispositionStatus')
-        }
-
         this.activeTask.forcedRedial = true
         return
       }
@@ -1548,7 +1572,7 @@ export default {
       this.sessionPhoneExpansion = ''
     },
 
-    async onRedial (redial, forcedRedial = false) {
+    async onRedial (redialNow, forcedRedial = false) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
 
@@ -1559,7 +1583,7 @@ export default {
       })
 
       let task = null
-      if (redial) {
+      if (redialNow) {
         // get the current task
         task = this.activeTask
       } else {
@@ -1577,14 +1601,18 @@ export default {
       }
 
       this.redialedTask = this.$jsonClone(this.activeTask)
-      this.redialedTask.redialed_now = redial
+      this.redialedTask.redialed_now = redialNow
       this.verifyAgentOnCall = true
 
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('pauseWrapUp', true)
       }
 
-      this.redialTask(this.activeTask, redial, forcedRedial).then(() => {
+      if (redialNow) {
+        this.$VueEvent.fire('clearCallDispositionStatus')
+      }
+
+      this.redialTask(this.activeTask, redialNow, forcedRedial).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
@@ -1596,7 +1624,7 @@ export default {
             this.isRedialClicked = false
             // if it's redial now, we should skip wrap up
             this.wrapUp = false
-            this.skipWrapUp = redial
+            this.skipWrapUp = redialNow
             this.processSession()
           }, 1000)
 
