@@ -124,6 +124,7 @@ export default {
         })
         .listen('.user.in-app.communication.new_call', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.new_call', event)
+          console.log('NEW CALL - USER', event.communication)
           const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
@@ -399,6 +400,7 @@ export default {
         })
         .listen('.communication.updated', (event) => {
           this.dispatchToMemoryMonitor('.communication.updated', event)
+          console.log('COMMUNICATION UPDATED - USER', event.communication)
           if (event.tags) {
             event.communication.tags = event.tags
             event.communication.tag_ids = event.communication.tags.map((a) => a.id)
@@ -535,6 +537,7 @@ export default {
         })
         .listen('.communication.updated', (event) => {
           this.dispatchToMemoryMonitor('.communication.updated', event)
+          console.log('COMMUNICATION UPDATED - COMPANY', event.communication)
           if (event.tags) {
             event.communication.tags = event.tags
             event.communication.tag_ids = event.communication.tags.map((a) => a.id)
