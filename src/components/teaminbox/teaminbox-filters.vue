@@ -248,7 +248,6 @@ export default {
       typeOptions: [
         { label: 'Calls', value: CommunicationTypes.CALL_TYPE },
         { label: 'Messages', value: CommunicationTypes.SMS_TYPE }
-        // { label: 'Voicemails', value: CommunicationTypes.RVM_TYPE }
       ],
       directionOptions: [
         { label: 'Inbound', value: 'inbound' },
