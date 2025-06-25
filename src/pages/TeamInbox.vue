@@ -29,6 +29,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { mapFields } from 'vuex-map-fields'
 import { debounce } from 'lodash'
+import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'TeamInbox',
@@ -49,7 +50,8 @@ export default {
         TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
       ],
       // Store the unread count for the currently selected contact
-      currentContactUnreadCount: 0
+      currentContactUnreadCount: 0,
+      loadingTeamInboxCampaigns: false
     }
   },
 
@@ -74,6 +76,14 @@ export default {
       'isTeamInboxNavListCollapsed',
       'isContactDetailsCollapsed',
       'isSidebarCollapsed'
+    ]),
+
+    ...mapState([
+      'teamInboxCampaigns'
+    ]),
+
+    ...mapState([
+      'isMobile'
     ]),
 
     isMobileContactActive () {
@@ -118,10 +128,19 @@ export default {
         this.$router.replace({ name: 'Inbox' })
       }
     }
+
     this.resizeHandler()
+
+    // Load team inbox campaigns
+    getTeamInboxCampaigns(this)
   },
 
   methods: {
+    ...mapActions([
+      'setTeamInboxCampaigns',
+      'setCampaignsIsLoading'
+    ]),
+
     ...mapActions('TeamInbox', [
       'reset'
     ]),
@@ -153,9 +172,11 @@ export default {
 
       if (width >= 785) {
         this.isTeamInboxNavListCollapsed = true
-        this.isContactDetailsCollapsed = true
         this.isSidebarCollapsed = true
+        return
       }
+
+      this.isTeamInboxNavListCollapsed = false
     }, 100)
   },
 
@@ -183,7 +204,7 @@ export default {
       }
 
       if (!this.isContactDetailsCollapsed && !this.isSidebarCollapsed) {
-        this.isContactDetailsCollapsed = true
+        this.isSidebarCollapsed = true
       }
     },
 
@@ -215,7 +236,7 @@ export default {
       }
 
       if (!this.isTeamInboxNavListCollapsed && !this.isContactDetailsCollapsed) {
-        this.isContactDetailsCollapsed = true
+        this.isTeamInboxNavListCollapsed = true
       }
     }
   },

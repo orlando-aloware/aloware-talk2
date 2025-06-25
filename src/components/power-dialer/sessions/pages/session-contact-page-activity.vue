@@ -15,7 +15,6 @@
                              :communications="filteredCommunications"
                              :campaign-id="selectedCampaignId"
                              v-if="contact"
-                             :enable-export="false"
                              @mark-all-as-read="markAllAsRead"
                              @toggleDrawer="toggleDrawer"
                              @toggleDetails="toggleDetails">

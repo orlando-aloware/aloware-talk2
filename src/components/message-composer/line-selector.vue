@@ -91,8 +91,11 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact']),
-    ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
-    ...mapState(['campaigns']),
+    ...mapState('contacts', [
+      'lineIncomingNumberLoading',
+      'lineIncomingNumber'
+    ]),
+    ...mapState(['campaigns', 'teamInboxCampaigns']),
     ...mapState('TeamInbox', ['activeInbox']),
 
     /**
@@ -103,10 +106,26 @@ export default {
     },
 
     /**
+     * Returns the active campaigns ids
+     */
+    activeCampaignsIds () {
+      const callWaitingIds = Array.isArray(this.activeInbox?.campaign_ids_as_call_waiting_ring_group)
+        ? this.activeInbox.campaign_ids_as_call_waiting_ring_group
+        : this.activeInbox?.campaign_ids_as_call_waiting_ring_group
+          ? [this.activeInbox.campaign_ids_as_call_waiting_ring_group]
+          : []
+
+      return this.activeInbox?.campaign_ids
+        ? [...this.activeInbox.campaign_ids, ...callWaitingIds]
+        : callWaitingIds
+    },
+
+    /**
      * Returns the active campaigns
      */
     activeCampaigns () {
-      return this.campaigns.filter(campaign => this.activeInboxCampaignIds?.includes(campaign.id) || campaign.ivr_id)
+      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+      return campaigns.filter(campaign => this.activeCampaignsIds?.includes(campaign.id))
     },
 
     selectedCampaign () {

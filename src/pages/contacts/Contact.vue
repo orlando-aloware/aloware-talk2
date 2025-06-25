@@ -252,6 +252,10 @@ export default {
       this.fetchContact()
     }
 
+    if (this.isMobile && !this.isContactDetailsCollapsed) {
+      this.isContactDetailsCollapsed = true
+    }
+
     this.contactComponentListeners.contactUpdated = (data) => {
       const contactId = parseInt(data.id)
 
@@ -383,8 +387,12 @@ export default {
     },
 
     isContactDetailsCollapsed (value) {
-      if (value && this.isMobile) {
-        this.$VueEvent.fire('hide_mobile_footer', false)
+      if (value) {
+        this.detailsOpen = false
+
+        if (this.isMobile) {
+          this.$VueEvent.fire('hide_mobile_footer', false)
+        }
       }
     }
   },

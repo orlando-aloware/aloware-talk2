@@ -10,7 +10,10 @@ export const DEFAULT_FILTERS = {
   my_contact: false,
   unread_only: false,
   task_status: [],
-  mention: false
+  mention: false,
+  date_range: null,
+  from_date: null,
+  to_date: null
 }
 
 export default function () {
@@ -33,7 +36,7 @@ export default function () {
     abortController: null,
     showRefreshInboxesButton: false,
     showRefreshCommunicationsButton: false,
-    activeFilters: DEFAULT_FILTERS,
+    activeFilters: { ...DEFAULT_FILTERS },
     activeSort: {},
     currentSearch: null,
     isInitialLoad: false,

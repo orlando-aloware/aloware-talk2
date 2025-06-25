@@ -508,7 +508,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources', 'isWidget']),
+    ...mapState(['campaigns', 'teamInboxCampaigns', 'workflows', 'dispositionStatuses', 'leadSources', 'isWidget']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
     ...mapState('inbox', [
@@ -760,7 +760,8 @@ export default {
       }
 
       id = parseInt(id)
-      const found = this.campaigns.find(campaign => campaign.id === id)
+      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
+      const found = campaigns.find(campaign => campaign.id === id)
 
       if (found) {
         return found
