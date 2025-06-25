@@ -323,14 +323,9 @@ export default {
     }
 
     this.dialerListeners.cacheCommunicationFromEvent = (communication) => {
-      if (communication && communication.id) {
+      if (communication && communication.id && this.dialer.communication?.id !== communication.id) {
         console.log('Caching communication from event:', communication.id)
         this.communicationCache.set(communication.id, communication)
-        const contactId = this.dialer.call.customParameters?.ContactId
-        console.log('SHOW COMMUNICATION CACHE?', contactId, communication.contact?.id)
-        if (this.dialer.call && this.isSmartQueueOnlyEnabled(communication) && contactId === communication.contact?.id) {
-          this.showCommunicationCache(communication)
-        }
       }
     }
 
@@ -414,12 +409,15 @@ export default {
       if (this.$q.platform.is.electron) {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
-
       const [, cachedCommunication] = this.communicationCache.entries().next().value
       const contactId = this.dialer.call.customParameters?.ContactId
-      console.log('CACHED COMMUNICATION?', cachedCommunication, contactId)
-      if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication) && contactId === cachedCommunication.contact?.id) {
+      console.log('CACHED COMMUNICATION?', cachedCommunication.contact_id, contactId)
+      if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication) && contactId === cachedCommunication.contact_id) {
+        console.log('USED CACHED COMMUNICATION')
         this.showCommunicationCache(cachedCommunication)
+        this.stopNotificationAudio()
+
+        return
       }
 
       this.getCommunication(call.callSid, call.from).then(res => {
@@ -517,7 +515,7 @@ export default {
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
-      this.$VueEvent.listen('new_communication', this.dialerListeners.cacheCommunicationFromEvent)
+      this.$VueEvent.listen('dialer_new_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
     },
 
     stopDialerEvents () {
@@ -551,7 +549,7 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
-      this.$VueEvent.stop('new_communication', this.dialerListeners.cacheCommunicationFromEvent)
+      this.$VueEvent.stop('dialer_new_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
     },
 
     forceRefreshCommunication () {
@@ -563,10 +561,13 @@ export default {
       this.$VueEvent.fire('new_in_app_call', cachedCommunication)
       this.processActionNotification(cachedCommunication, 'call')
       this.addNonOwnedLiveContact(cachedCommunication)
+      this.stopNotificationAudio()
+
       this.communicationCache.clear()
     },
 
     getCommunication (sid, from, getCommunicationTry = 1, force = false) {
+      console.trace()
       console.log('Getting communication', sid, from, getCommunicationTry)
 
       if (this.dialer.communication && !force) {

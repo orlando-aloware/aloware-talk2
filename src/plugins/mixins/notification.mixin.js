@@ -79,6 +79,14 @@ export default {
       this.fishingModeNotificationAudio.pause()
     },
 
+    stopNotificationAudio () {
+      if (!this.enableAudio) {
+        return
+      }
+      console.log('pause audio')
+      this.notificationAudio.pause()
+    },
+
     processRemoveFromNotification (communication) {
       if (!communication) {
         return
