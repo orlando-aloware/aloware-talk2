@@ -78,7 +78,7 @@
                     data-testid="teaminbox-clear-filters-btn"
                     :disabled="isResetFiltersDisabled"
                     @click="resetFilters">
-              Clear
+              Clear All
             </b-link>
             <compact-btn variant="success"
                          data-testid="teaminbox-apply-filters-btn"
@@ -195,6 +195,10 @@ export default {
     },
 
     isResetFiltersDisabled () {
+      if (this.activeFilters.from_date && this.activeFilters.to_date) {
+        return false
+      }
+
       const props = ['types', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention']
 
       for (const key of props) {
