@@ -25,7 +25,8 @@
                      placement="right"
                      boundary="window"
                      triggers="hover"
-                     target="teaminbox-datepicker-btn">
+                     target="teaminbox-datepicker-btn"
+                     v-if="!isMobile">
             Click to filter by date
           </b-tooltip>
         </q-btn>
@@ -35,6 +36,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import CalendarIcon from 'components/icons/calendar-icon.vue'
 import DateRangePicker from 'vue2-daterange-picker'
@@ -53,6 +55,7 @@ export default {
   },
 
   computed: {
+    ...mapState(['isMobile']),
     ...mapFields('TeamInbox', ['activeFilters']),
 
     dateHasChanges () {
@@ -182,6 +185,12 @@ export default {
   .daterangepicker.opensright {
     left: initial;
     right: 0;
+
+    @media screen and (max-width: 784px) {
+      max-height: 350px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
 
     @media screen and (min-width: 785px) {
       left: -225px;

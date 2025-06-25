@@ -12,65 +12,78 @@
                     no-flip
                     size="sm"
                     class="filter-dropdown mw-100"
-                    toggle-class="ellipse"
+                    toggle-class="mw-100"
                     menu-class="shadow-sm"
                     boundary="window">
           <template #button-content>
-            <span>Filter by</span>
-            <span class="text-sm text-grey-90">
-              {{ activeFiltersPlaceholder }}
-            </span>
+            <div id="teaminbox-filters-placeholder" class="ellipse">
+              <span>Filter by</span>
+              <span class="text-sm text-grey-90">
+                {{ activeFiltersPlaceholder }}
+              </span>
+            </div>
+
+            <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+                       placement="bottomleft"
+                       target="teaminbox-filters-placeholder"
+                       boundary="window"
+                       :offset="activeFiltersText !== 'All' ? 20 : 10"
+                       v-if="activeFiltersTooltip && !isMobile">
+              {{ activeFiltersTooltip }}
+            </b-tooltip>
           </template>
-          <div class="filter-group no-select">
-            <h5 class="form-label text-sm text-grey mx-2 my-1">Status</h5>
-            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                             :value="true"
-                             v-model="selectedFilters.unread_only">
-              Unread
-            </b-form-checkbox>
-          </div>
-          <div class="filter-group no-select">
-            <h5 class="form-label text-sm text-grey mx-2 my-1">Contact</h5>
-            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                             :value="true"
-                             v-model="selectedFilters.my_contact">
-              My Contacts
-            </b-form-checkbox>
-          </div>
-          <div class="filter-group no-select">
-            <h5 class="form-label text-sm text-grey mx-2 my-1">Channels</h5>
-            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                             :value="option.value"
-                             :key="option.value"
-                             v-model="selectedFilters.types"
-                             v-for="option in typeOptions">
-              {{ option.label }}
-            </b-form-checkbox>
-            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                             :value="true"
-                             v-model="selectedFilters.mention">
-              Mentions
-            </b-form-checkbox>
-          </div>
-          <div class="filter-group no-select">
-            <h5 class="form-label text-sm text-grey mx-2 my-1">Direction</h5>
-            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                             :value="option.value"
-                             :key="option.value"
-                             v-model="selectedFilters.directions"
-                             v-for="option in directionOptions">
-              {{ option.label }}
-            </b-form-checkbox>
-          </div>
-          <div class="filter-group no-select" v-if="isContactStatusControlEnabled">
-            <h5 class="form-label text-sm text-grey mx-2 my-1">Contact Task Status</h5>
-            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                             :value="option.value"
-                             :key="option.value"
-                             v-model="selectedFilters.task_status"
-                             v-for="option in taskStatusOptions">
-              {{ option.label }}
-            </b-form-checkbox>
+          <div class="filter-options-container">
+            <div class="filter-group no-select">
+              <h5 class="form-label text-sm text-grey mx-2 my-1">Status</h5>
+              <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                               :value="true"
+                               v-model="selectedFilters.unread_only">
+                Unread
+              </b-form-checkbox>
+            </div>
+            <div class="filter-group no-select">
+              <h5 class="form-label text-sm text-grey mx-2 my-1">Contact</h5>
+              <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                               :value="true"
+                               v-model="selectedFilters.my_contact">
+                My Contacts
+              </b-form-checkbox>
+            </div>
+            <div class="filter-group no-select">
+              <h5 class="form-label text-sm text-grey mx-2 my-1">Channels</h5>
+              <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                               :value="option.value"
+                               :key="option.value"
+                               v-model="selectedFilters.types"
+                               v-for="option in typeOptions">
+                {{ option.label }}
+              </b-form-checkbox>
+              <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                               :value="true"
+                               v-model="selectedFilters.mention">
+                Mentions
+              </b-form-checkbox>
+            </div>
+            <div class="filter-group no-select">
+              <h5 class="form-label text-sm text-grey mx-2 my-1">Direction</h5>
+              <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                               :value="option.value"
+                               :key="option.value"
+                               v-model="selectedFilters.directions"
+                               v-for="option in directionOptions">
+                {{ option.label }}
+              </b-form-checkbox>
+            </div>
+            <div class="filter-group no-select" v-if="isContactStatusControlEnabled">
+              <h5 class="form-label text-sm text-grey mx-2 my-1">Contact Task Status</h5>
+              <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                              :value="option.value"
+                              :key="option.value"
+                              v-model="selectedFilters.task_status"
+                              v-for="option in taskStatusOptions">
+                {{ option.label }}
+              </b-form-checkbox>
+            </div>
           </div>
           <div class="d-flex justify-between mt-1 pr-1">
             <b-link href="#"
@@ -89,7 +102,7 @@
           </div>
         </b-dropdown>
       </div>
-      <div class="teaminbox-sort flex-even flex-shrink-0">
+      <div class="teaminbox-sort flex-shrink-0">
         <b-dropdown variant="outline-primary"
                     size="sm"
                     class="sort-dropdown"
@@ -142,11 +155,10 @@ export default {
   },
 
   computed: {
+    ...mapState(['isMobile']),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
     ...mapState('TeamInbox', ['activeSort']),
-    ...mapFields('TeamInbox', [
-      'activeFilters'
-    ]),
+    ...mapFields('TeamInbox', ['activeFilters']),
 
     sortOption () {
       return this.activeSort && this.activeSort.order === 'asc' ? 'Oldest' : 'Newest'
@@ -167,7 +179,7 @@ export default {
       return `Results from ${range}`
     },
 
-    activeFiltersPlaceholder () {
+    activeFiltersText () {
       const filters = []
       if (this.activeFilters.types.length) {
         const selectedOptions = this.typeOptions.filter((option) => this.activeFilters.types.includes(option.value))
@@ -191,7 +203,15 @@ export default {
         filters.push(...selectedOptions.map((option) => option.label))
       }
 
-      return '/ ' + (!filters.length ? 'All' : filters.join(', '))
+      return !filters.length ? 'All' : filters.join(', ')
+    },
+
+    activeFiltersPlaceholder () {
+      return '/ ' + this.activeFiltersText
+    },
+
+    activeFiltersTooltip () {
+      return 'Filter by ' + this.activeFiltersText
     },
 
     isResetFiltersDisabled () {
@@ -313,6 +333,12 @@ export default {
 </script>
 
 <style scoped>
+@media screen and (max-width: 784px) {
+  .filter-options-container {
+    max-height: 240px;
+    overflow-y: auto;
+  }
+}
 .filter-group .form-label {
   font-weight: 400;
   font-size: 14px;
