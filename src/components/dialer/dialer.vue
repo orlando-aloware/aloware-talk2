@@ -323,12 +323,15 @@ export default {
     }
 
     this.dialerListeners.cacheCommunicationFromEvent = (communication) => {
+      if (!this.isSmartQueueOnlyEnabled(cachedCommunication)) {
+        return
+      }
       if (communication && communication.id && this.dialer.communication?.id !== communication.id) {
         console.log('Caching communication from event:', communication.id)
         this.communicationCache.set(communication.id, communication)
       }
       console.log(communication.attempting_users?.includes(this.profile.id), this.agentStatus === AgentStatus.AGENT_STATUS_RINGING)
-      if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+      if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING || (this.dialer.call && this.dialer.call.state === 'pending')) {
         this.showCommunicationCache(communication)
       }
     }
