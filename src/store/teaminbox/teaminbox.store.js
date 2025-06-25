@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 export const THREADED = 1
 export const UNTHREADED = 2
 export const INBOX_TYPE_PERSONAL = 'personal'
@@ -11,9 +13,9 @@ export const DEFAULT_FILTERS = {
   unread_only: false,
   task_status: [],
   mention: false,
-  date_range: null,
-  from_date: null,
-  to_date: null
+  date_range: 'Last 30 Days',
+  from_date: moment().subtract(30, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss'),
+  to_date: moment().endOf('day').format('MM/DD/YYYY HH:mm:ss')
 }
 
 export default function () {

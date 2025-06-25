@@ -1018,11 +1018,11 @@ const talk2Api = {
             params.contact_ids = contactIds
           }
 
-          if (filters.from_date) {
+          if (filters?.from_date) {
             params.from_date = filters.from_date
           }
 
-          if (filters.to_date) {
+          if (filters?.to_date) {
             params.to_date = filters.to_date
           }
 
