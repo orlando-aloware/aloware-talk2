@@ -327,6 +327,10 @@ export default {
         console.log('Caching communication from event:', communication.id)
         this.communicationCache.set(communication.id, communication)
       }
+      console.log(communication.attempting_users?.includes(this.profile.id), this.agentStatus === AgentStatus.AGENT_STATUS_RINGING)
+      if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+        this.showCommunicationCache(communication)
+      }
     }
 
     this.startDialerEvents()
@@ -515,7 +519,7 @@ export default {
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
-      this.$VueEvent.listen('dialer_new_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
+      this.$VueEvent.listen('dialer_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
     },
 
     stopDialerEvents () {
@@ -549,7 +553,7 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
-      this.$VueEvent.stop('dialer_new_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
+      this.$VueEvent.stop('dialer_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
     },
 
     forceRefreshCommunication () {
