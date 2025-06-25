@@ -160,8 +160,7 @@ export default {
       }
 
       if (dateRange !== 'custom') {
-        const range = dateRange === 'This Month So Far' ? 'this month to date' : dateRange.toLowerCase()
-        return `Results from ${range}`
+        return `Results from ${dateRange.toLowerCase()}`
       }
 
       const range = `${moment(fromDate).format('MM/DD/YYYY')} to ${moment(toDate).format('MM/DD/YYYY')}`

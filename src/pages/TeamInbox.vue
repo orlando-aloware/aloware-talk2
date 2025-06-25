@@ -167,19 +167,16 @@ export default {
 
       if (width >= 1366) {
         this.isTeamInboxNavListCollapsed = false
-        this.isContactDetailsCollapsed = false
         return
       }
 
       if (width >= 785) {
         this.isTeamInboxNavListCollapsed = true
-        this.isContactDetailsCollapsed = false
         this.isSidebarCollapsed = true
         return
       }
 
       this.isTeamInboxNavListCollapsed = false
-      this.isContactDetailsCollapsed = true
     }, 100)
   },
 
