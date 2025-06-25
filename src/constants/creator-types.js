@@ -75,6 +75,6 @@ export const ALL_CREATOR_TYPES = [
   },
   {
     id: CREATOR_TYPE_SALESFORCE,
-    label: 'Salesforce'
+    label: 'Salesforce Workflow'
   }
 ]
