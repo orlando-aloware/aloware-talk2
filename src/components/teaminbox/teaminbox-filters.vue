@@ -63,7 +63,7 @@
             </b-form-checkbox>
           </div>
           <div class="filter-group no-select" v-if="isContactStatusControlEnabled">
-            <h5 class="form-label text-sm text-grey mx-2 my-1">Task Status</h5>
+            <h5 class="form-label text-sm text-grey mx-2 my-1">Contact Task Status</h5>
             <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                              :value="option.value"
                              :key="option.value"
@@ -160,7 +160,8 @@ export default {
       }
 
       if (dateRange !== 'custom') {
-        return `Results for ${dateRange}`
+        const range = dateRange === 'This Month So Far' ? 'this month to date' : dateRange.toLowerCase()
+        return `Results from ${range}`
       }
 
       const range = `${moment(fromDate).format('MM/DD/YYYY')} to ${moment(toDate).format('MM/DD/YYYY')}`
@@ -195,7 +196,7 @@ export default {
     },
 
     isResetFiltersDisabled () {
-      if (this.activeFilters.from_date && this.activeFilters.to_date) {
+      if (this.activeFilters.date_range !== 'Last 30 Days') {
         return false
       }
 
