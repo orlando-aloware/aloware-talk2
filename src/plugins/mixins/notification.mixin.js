@@ -50,7 +50,6 @@ export default {
     ]),
 
     playAudio (shouldPlayFishingNotificationSound = false) {
-      console.trace()
       if (!this.enableAudio) {
         return
       }
@@ -83,7 +82,7 @@ export default {
       if (!this.enableAudio) {
         return
       }
-      console.log('pause audio')
+
       this.notificationAudio.pause()
     },
 

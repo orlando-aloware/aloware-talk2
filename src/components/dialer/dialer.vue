@@ -327,14 +327,16 @@ export default {
     this.dialerListeners.cacheCommunicationFromEvent = (communication) => {
       const notificationCommId = { data: _.get(this.notifications, 'incomingCall.communication.id', null) }
 
+      // Smart Queue only
       if (!this.isSmartQueueOnlyEnabled(communication) || notificationCommId !== null) {
         return
       }
+
       if (communication && communication.id && this.dialer.communication?.id !== communication.id) {
         console.log('Caching communication from event:', communication.id)
         this.communicationCache.set(communication.id, communication)
       }
-      console.log(communication.attempting_users?.includes(this.profile.id), this.agentStatus === AgentStatus.AGENT_STATUS_RINGING)
+
       if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING || (this.dialer.call && this.dialer.call.state === 'pending')) {
         this.showCommunicationCache(communication)
       }
@@ -422,9 +424,7 @@ export default {
       }
       const [, cachedCommunication] = this.communicationCache.entries().next().value
       const contactId = this.dialer.call.customParameters?.ContactId
-      console.log('CACHED COMMUNICATION?', cachedCommunication.contact_id, contactId)
       if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication) && contactId === cachedCommunication.contact_id) {
-        console.log('USED CACHED COMMUNICATION')
         this.showCommunicationCache(cachedCommunication)
         this.stopNotificationAudio()
 
@@ -432,7 +432,6 @@ export default {
       }
 
       this.getCommunication(call.callSid, call.from).then(res => {
-        console.log('GET INCOMING COMMUNICATION', call.callSid)
         if (res) {
           this.$VueEvent.fire('new_in_app_call', res.data)
           this.processActionNotification(res.data, 'call')
@@ -568,7 +567,6 @@ export default {
     },
 
     showCommunicationCache (cachedCommunication) {
-      console.log('Using cached communication for incoming call:', cachedCommunication.id)
       this.$VueEvent.fire('new_in_app_call', cachedCommunication)
       this.processActionNotification(cachedCommunication, 'call')
       this.addNonOwnedLiveContact(cachedCommunication)
@@ -578,7 +576,6 @@ export default {
     },
 
     getCommunication (sid, from, getCommunicationTry = 1, force = false) {
-      console.trace()
       console.log('Getting communication', sid, from, getCommunicationTry)
 
       if (this.dialer.communication && !force) {
@@ -2108,6 +2105,12 @@ export default {
     'dialer.currentStatus': function (value) {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
+      }
+    },
+
+    agentStatus (value) {
+      if (value === AgentStatus.AGENT_STATUS_RINGING) {
+        this.showCommunicationCache(communication)
       }
     }
   },
