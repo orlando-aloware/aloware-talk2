@@ -324,6 +324,16 @@ export default {
         this.setDefaultLine()
         this.showPlaceholder()
       }
+    },
+    'campaignsToUse': {
+      handler: function (newCampaigns) {
+        if (newCampaigns?.length > 0 && this.campaignId && this.contact?.id) {
+          if (!this.selectedLine) {
+            this.setDefaultLine()
+          }
+        }
+      },
+      immediate: true
     }
   }
 }
