@@ -658,8 +658,8 @@ export default {
       }
 
       // Check if we've exceeded the maximum retry attempts (company-specific)
-      if (this.currentCompany?.id === 7113 && this.tokenRetryCount >= this.maxTokenRetries) {
-        console.log('Maximum token retry attempts reached for company 7113')
+      if ([7113, 2584, 1629].includes(this.currentCompany?.id) && this.tokenRetryCount >= this.maxTokenRetries) {
+        console.log('Maximum token retry attempts reached')
         this.setDialerIsReady(false)
         this.setDialerCurrentStatus('OFFLINE')
         return Promise.reject(new Error('Maximum token retry attempts reached'))
@@ -1828,8 +1828,8 @@ export default {
         this.$Sentry.captureException(err)
       }
 
-      // Apply retry mechanism only to 31009 error (No transport available) for company ID 7113
-      if (err.code === 31009 && this.currentCompany?.id === 7113) {
+      // Apply retry mechanism only to 31009 error (No transport available) for company ID 7113, 2584, 1629
+      if (err.code === 31009 && [7113, 2584, 1629].includes(this.currentCompany?.id)) {
         // Increment retry count
         this.tokenRetryCount++
 

@@ -1009,13 +1009,21 @@ const talk2Api = {
           return window.axios.get(`${suffixV2}inboxes`, data)
         },
 
-        unreadCount (inboxIds, contactIds = null) {
+        unreadCount (inboxIds, contactIds = null, filters) {
           const params = {
             inbox_ids: inboxIds
           }
 
           if (contactIds) {
             params.contact_ids = contactIds
+          }
+
+          if (filters?.from_date) {
+            params.from_date = filters.from_date
+          }
+
+          if (filters?.to_date) {
+            params.to_date = filters.to_date
           }
 
           return window.axios.post(`${suffixV2}inboxes/unread-count`, params)
