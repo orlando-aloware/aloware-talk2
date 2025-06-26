@@ -31,6 +31,7 @@ export default {
 
   beforeDestroy () {
     this.stopMainEvents()
+    this.broadcastLeave()
   },
 
   methods: {

@@ -89,6 +89,16 @@ export default {
       return this.dialer.communication?.call_disposition_id
     },
 
+    // get force disposition status from current user session
+    checkDialerForceDisposition () {
+      const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
+        !this.dialer?.contact?.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
+        !this.dialer?.communication?.call_disposition_id
+      return shouldForceContactDisposition || shouldForceCallDisposition
+    },
+
+    // get force disposition from cached last_call
     checkForceDisposition () {
       const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
         !this.profile?.last_call?.contact?.disposition_status_id
