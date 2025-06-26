@@ -90,7 +90,7 @@
               <q-separator v-if="integrationData.properties"></q-separator>
               <q-card-section>
                 <div class="text-muted">
-                  This contact has synced conversation threads with an Inbox in HubSpot
+                  This contact has synced conversation threads with Inboxes in HubSpot {{ integrationData.total_threads > 1 ? `(${integrationData.conversation_threads.length} of ${integrationData.total_threads} shown)` : '' }}.
                 </div>
                 <div v-if="integrationData.conversation_threads && integrationData.conversation_threads.length > 0" class="mt-2">
                   <q-card class="conversation-threads mb-1"
@@ -115,6 +115,16 @@
                               {{ thread.is_active ? 'Open' : 'Closed' }}
                             </q-tooltip>
                             {{ thread.is_active ? 'Open' : 'Closed' }}
+                          </span>
+                        </p>
+                        <p class="mb-1 d-flex" data-testid="integration-hubspot-conversation-created">
+                          <span class="data-icon-label">Created: </span>
+                          <span class="data-value ml-1">
+                            <q-tooltip anchor="top middle"
+                                       self="center middle">
+                              {{ thread.created_at | dateTimePassed }}
+                            </q-tooltip>
+                            {{ thread.created_at | dateTimePassed }}
                           </span>
                         </p>
                         <p class="mb-1 d-flex" data-testid="integration-hubspot-conversation-status">
@@ -482,10 +492,9 @@ export default {
         // This ensures Vue's reactivity system detects the change
         this.integrationData = {
           ...this.integrationData,
-          conversation_threads: response.data.conversation_threads
+          conversation_threads: response.data.conversation_threads,
+          total_threads: response.data.total_threads
         }
-
-        console.log('conversation_threads', this.integrationData.conversation_threads)
 
         this.forceRerenderHubspotOneComponent()
       } catch (error) {
