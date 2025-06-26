@@ -9,7 +9,8 @@
         </span>
       </div>
       <profile class="p-0"
-               :hide-profile-info="true"/>
+               :hide-profile-info="true"
+               v-if="!fromTeamInbox"/>
     </div>
     <div class="contact-details-wrapper h-100 flex-grow-1 overflow-hidden">
       <div class="details-component-container h-100"
