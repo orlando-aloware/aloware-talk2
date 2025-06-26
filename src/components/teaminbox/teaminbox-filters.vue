@@ -16,11 +16,14 @@
                     menu-class="shadow-sm"
                     boundary="window">
           <template #button-content>
-            <div id="teaminbox-filters-placeholder" class="ellipse">
-              <span>Filter by</span>
-              <span class="text-sm text-grey-90">
-                {{ activeFiltersPlaceholder }}
-              </span>
+            <div id="teaminbox-filters-placeholder" class="ellipse d-flex align-items-center">
+              <i class="fa fa-chevron-down fs-8 mr-1"></i>
+              <div>
+                <span>Filter by</span>
+                <span class="text-sm text-grey-90">
+                  {{ activeFiltersPlaceholder }}
+                </span>
+              </div>
             </div>
 
             <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
@@ -104,16 +107,17 @@
       </div>
       <div class="teaminbox-sort flex-shrink-0">
         <b-dropdown variant="outline-primary"
+                    no-caret
                     size="sm"
                     class="sort-dropdown"
                     right
                     boundary="window">
           <template #button-content>
-            <span v-if="sortOption === 'Newest'">
-              <sort-up-icon class="mr-1" /> Newest
+            <span v-if="sortOption === 'Newest'" class="d-flex align-items-center">
+              <sort-up-icon class="mr-1" /> Newest <i class="fa fa-chevron-down fs-8 ml-1"></i>
             </span>
-            <span v-else-if="sortOption === 'Oldest'">
-              <sort-down-icon class="mr-1" /> Oldest
+            <span v-else-if="sortOption === 'Oldest'" class="d-flex align-items-center">
+              <sort-down-icon class="mr-1" /> Oldest <i class="fa fa-chevron-down fs-8 ml-1"></i>
             </span>
           </template>
           <b-dropdown-item :active="sortOption === 'Newest'" @click="setSortOption('Newest')">
