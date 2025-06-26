@@ -426,7 +426,6 @@ export default {
       const contactId = this.dialer.call.customParameters?.ContactId
       if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication) && contactId === cachedCommunication.contact_id) {
         this.showCommunicationCache(cachedCommunication)
-        this.stopNotificationAudio()
 
         return
       }
@@ -2105,12 +2104,6 @@ export default {
     'dialer.currentStatus': function (value) {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
-      }
-    },
-
-    agentStatus (value) {
-      if (value === AgentStatus.AGENT_STATUS_RINGING) {
-        this.showCommunicationCache(communication)
       }
     }
   },
