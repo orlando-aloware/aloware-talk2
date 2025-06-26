@@ -422,7 +422,12 @@ export default {
       if (this.$q.platform.is.electron) {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
-      const [, cachedCommunication] = this.communicationCache.entries().next().value
+
+      let cachedCommunication = null
+      if (this.communicationCache.size > 0) {
+        [, cachedCommunication] = this.communicationCache.entries().next().value
+      }
+      
       const contactId = this.dialer.call.customParameters?.ContactId
       if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication) && contactId === cachedCommunication.contact_id) {
         this.showCommunicationCache(cachedCommunication)
