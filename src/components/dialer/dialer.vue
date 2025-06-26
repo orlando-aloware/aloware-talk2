@@ -328,7 +328,7 @@ export default {
       const notificationCommId = { data: _.get(this.notifications, 'incomingCall.communication.id', null) }
 
       // Smart Queue only
-      if (!this.isSmartQueueOnlyEnabled(communication) || notificationCommId !== null) {
+      if (!this.isSmartQueueOnlyEnabled(communication) || notificationCommId.data !== null) {
         return
       }
 
@@ -427,7 +427,7 @@ export default {
       if (this.communicationCache.size > 0) {
         [, cachedCommunication] = this.communicationCache.entries().next().value
       }
-      
+
       const contactId = this.dialer.call.customParameters?.ContactId
       if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication) && contactId === cachedCommunication.contact_id) {
         this.showCommunicationCache(cachedCommunication)
