@@ -216,6 +216,11 @@ if (gotTheLock) {
   app.quit()
 }
 
+// Quit when all windows are closed.  Necessary for Windows.
+app.on('window-all-closed', () => {
+  app.quit()
+})
+
 // remove so we can register each time as we run the app.
 app.removeAsDefaultProtocolClient('alowaretalk')
 app.removeAsDefaultProtocolClient('tel')
