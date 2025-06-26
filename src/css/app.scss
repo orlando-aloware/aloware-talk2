@@ -10544,12 +10544,6 @@ screen and (max-width: 956px) {
     display: block !important;
     max-width: unset !important;
 
-    .details-component-container {
-      > div {
-        margin-right: 10px !important;
-      }
-    }
-
     .mobile-header {
       padding-right: 13px !important;
 
@@ -16830,6 +16824,17 @@ hr {
 
 .overflow-visible {
   overflow: visible !important;
+}
+
+.teaminbox {
+  .mobile-header-labels {
+    .mobile-back-btn {
+      margin-left: 4px;
+    }
+    .contact-name {
+      margin-left: 10px;
+    }
+  }
 }
 
 .teaminbox-filters {
