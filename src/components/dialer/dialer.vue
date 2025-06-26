@@ -84,6 +84,8 @@ export default {
 
     ...mapState(['isWidget', 'isSalesforceWidget']),
 
+    ...mapState(['notifications']),
+
     ...mapFields('powerDialer', [
       'activeTask',
       'sessionPaused',
@@ -323,7 +325,9 @@ export default {
     }
 
     this.dialerListeners.cacheCommunicationFromEvent = (communication) => {
-      if (!this.isSmartQueueOnlyEnabled(communication)) {
+      const notificationCommId = { data: _.get(this.notifications, 'incomingCall.communication.id', null) }
+
+      if (!this.isSmartQueueOnlyEnabled(communication) || notificationCommId !== null) {
         return
       }
       if (communication && communication.id && this.dialer.communication?.id !== communication.id) {
