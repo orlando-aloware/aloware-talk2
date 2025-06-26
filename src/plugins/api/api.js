@@ -144,13 +144,14 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}contact/${id}/send-email`, params)
       },
 
-      addEngagement (id, params, fromTeamInbox) {
+      addEngagement (id, params, teamInboxId) {
         if (!id) {
           return null
         }
 
-        if (fromTeamInbox) {
+        if (teamInboxId) {
           params.from_team_inbox = true
+          params.ring_group_id = teamInboxId
         }
 
         return window.axios.post(`${suffixV1}calendar/events/contact/${id}/create`, params)
@@ -158,22 +159,6 @@ const talk2Api = {
 
       updateEngagement (contactId, eventId, params) {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
-      },
-
-      getLineIncomingNumber (contactId, lineId, fromTeamInbox = false) {
-        if (!contactId || !lineId) {
-          return null
-        }
-
-        const params = {}
-
-        if (fromTeamInbox) {
-          params.from_team_inbox = fromTeamInbox
-        }
-
-        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {
-          params
-        })
       },
 
       getIntegrationData (contactId, params) {
@@ -1024,13 +1009,21 @@ const talk2Api = {
           return window.axios.get(`${suffixV2}inboxes`, data)
         },
 
-        unreadCount (inboxIds, contactIds = null) {
+        unreadCount (inboxIds, contactIds = null, filters) {
           const params = {
             inbox_ids: inboxIds
           }
 
           if (contactIds) {
             params.contact_ids = contactIds
+          }
+
+          if (filters?.from_date) {
+            params.from_date = filters.from_date
+          }
+
+          if (filters?.to_date) {
+            params.to_date = filters.to_date
           }
 
           return window.axios.post(`${suffixV2}inboxes/unread-count`, params)

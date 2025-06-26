@@ -6,7 +6,7 @@
                    width="22px"
                    data-testid="inbox-tasks-item-component"
                    :is="iconComponent"
-                   :class="['disposition-icon', `disposition-icon--${iconComponent}`, isLiveCallItem && 'live-call-pulse']">
+                   :class="['flex-shrink-0 disposition-icon', `disposition-icon--${iconComponent}`, isLiveCallItem && 'live-call-pulse']">
         </component>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text last-communication__label"

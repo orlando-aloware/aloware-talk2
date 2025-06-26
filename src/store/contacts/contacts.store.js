@@ -155,6 +155,7 @@ export default function () {
       name: 'All Contacts',
       contactCount: 0
     },
+    persistedListId: null,
     shouldUpdateSelectedListContactCount: false,
     selectedStaticList: {
       id: null,
@@ -256,8 +257,6 @@ export default function () {
       workflow: null
     },
     sequenceInfoLoading: false,
-    lineIncomingNumber: null,
-    lineIncomingNumberLoading: false,
     communicationsSummary: {
       first_outbound_call: null,
       summaries: {

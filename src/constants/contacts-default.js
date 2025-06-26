@@ -235,8 +235,6 @@ export const DEFAULT_STATE = {
     workflow: null
   },
   sequenceInfoLoading: false,
-  lineIncomingNumber: null,
-  lineIncomingNumberLoading: false,
   communicationsSummary: {
     first_outbound_call: null,
     summaries: {

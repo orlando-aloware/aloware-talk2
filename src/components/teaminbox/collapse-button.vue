@@ -8,13 +8,14 @@
     <b-tooltip custom-class="talk-table__tooltip"
                ref="tooltip"
                :target="`btn-collapse-${_uid}`">
-      {{ value ? 'Expand' : 'Collapse' }}
+      {{ collapsed ? 'Expand' : 'Collapse' }}
     </b-tooltip>
   </span>
 </template>
 
 <script>
 import CollapseIcon from 'src/components/icons/collapse-icon.vue'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'collapse-button',
@@ -35,19 +36,21 @@ export default {
     }
   },
 
-  mounted () {
-    this.prepareTarget()
+  computed: {
+    collapsed () {
+      return this.value
+    },
+
+    ...mapFields('settings', [
+      'isTeamInboxNavListCollapsed'
+    ])
   },
 
   methods: {
     toggle () {
-      if (this.value) {
-        this.target.classList.remove('no-max-width-collapse-button')
-      } else {
-        this.target.classList.add('no-max-width-collapse-button')
-      }
+      this.isTeamInboxNavListCollapsed = !this.collapsed
 
-      this.$emit('input', !this.value)
+      this.$emit('input', !this.collapsed)
       this.$refs.tooltip.$emit('close')
     },
 

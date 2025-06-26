@@ -1,6 +1,8 @@
-import { THREADED } from './teaminbox.store'
+import { THREADED, DEFAULT_FILTERS } from './teaminbox.store'
+import { updateField } from 'vuex-map-fields'
 
 export default {
+  updateField,
   SET_ACTIVE_INBOX_ID (state, inbox) {
     state.activeInboxId = inbox
   },
@@ -89,9 +91,6 @@ export default {
   SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON (state, show) {
     state.showRefreshCommunicationsButton = show
   },
-  SET_ACTIVE_FILTERS (state, filters) {
-    state.activeFilters = filters
-  },
   SET_ACTIVE_SORT (state, sort) {
     state.activeSort = sort
   },
@@ -136,7 +135,7 @@ export default {
     state.activeInboxContactUnreadCount = 0
     state.unreadCountLoaded = false
     state.viewMode = THREADED
-    state.activeFilters = {}
+    state.activeFilters = { ...DEFAULT_FILTERS }
     state.activeSort = {}
     state.teamInboxTutorialComponent = null
     state.contactsLastUsedLines = new Map()

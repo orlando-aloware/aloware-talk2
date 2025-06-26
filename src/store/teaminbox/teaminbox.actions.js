@@ -73,9 +73,6 @@ export default {
   setShowRefreshCommunicationsButton: ({ commit }, show) => {
     commit('SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON', show)
   },
-  setActiveFilters: ({ commit }, value) => {
-    commit('SET_ACTIVE_FILTERS', value)
-  },
   setActiveSort: ({ commit }, value) => {
     commit('SET_ACTIVE_SORT', value)
   },

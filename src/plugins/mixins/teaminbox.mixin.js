@@ -177,9 +177,34 @@ export default {
       // Transform filters to API parameters
       const apiFilters = {}
 
+      if (filters.from_date && filters.to_date) {
+        apiFilters.from_date = filters.from_date
+        apiFilters.to_date = filters.to_date
+      }
+
       // Map filter keys to API parameters
-      if (filters.unreadonly) {
+      if (filters.unread_only) {
         apiFilters.unread_only = true
+      }
+
+      if (filters.types?.length) {
+        apiFilters.types = filters.types
+      }
+
+      if (filters.directions) {
+        apiFilters.directions = filters.directions
+      }
+
+      if (filters.my_contact) {
+        apiFilters.my_contact = true
+      }
+
+      if (filters?.task_status.length) {
+        apiFilters.task_status = filters.task_status
+      }
+
+      if (filters.mention) {
+        apiFilters.has_mention = true
       }
 
       // Map sort keys to API parameters
@@ -225,8 +250,11 @@ export default {
       let data = []
 
       this.setIsLoadingInboxesUnreadCount(true)
+
+      const filters = this.$store.state.TeamInbox.activeFilters || {}
+
       try {
-        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds)
+        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds, filters)
         data = newData
 
         switch (data.length) {

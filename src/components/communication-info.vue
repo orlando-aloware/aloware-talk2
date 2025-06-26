@@ -1148,7 +1148,6 @@ export default {
         return null
       }
 
-      // First check if campaign is passed with the communication object
       const communicationCampaign = _.get(this.communication, 'campaign', null)
       if (communicationCampaign && communicationCampaign.name) {
         return removeDeletedSuffix(communicationCampaign.name)

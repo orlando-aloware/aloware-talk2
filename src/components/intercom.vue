@@ -17,7 +17,8 @@ export default {
       intercomBannerHeight: 0,
       env: null,
       app_id: process.env.INTERCOM_APP_ID,
-      timeInterval: null
+      timeInterval: null,
+      alreadySetup: false
     }
   },
 
@@ -35,7 +36,11 @@ export default {
 
   methods: {
     setup (newRoute = false) {
-      if (!this.authenticated || !this.profile?.enabled || this.isWhiteLabel) {
+      if (!this.authenticated || !this.profile?.enabled || this.isWhiteLabel || this.alreadySetup) {
+        if (this.alreadySetup) {
+          this.prepareTopMenuFix(newRoute)
+        }
+
         return
       }
 
@@ -59,22 +64,27 @@ export default {
             has_name: this.profile.name !== null && this.profile.name !== undefined
           })
 
-          this.timeInterval = setInterval(() => {
-            let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
-            let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
-
-            if (intercomIframeHeight !== this.intercomBannerHeight || newRoute) {
-              this.fixTopMenu(intercomIframeHeight)
-            }
-
-            this.intercomBannerHeight = intercomIframeHeight
-          }, 1 * 1000)
+          this.alreadySetup = true
+          this.prepareTopMenuFix(newRoute)
         } else {
           console.log('[Intercom] Not loaded')
         }
       }).catch(err => {
         console.log(err)
       })
+    },
+
+    prepareTopMenuFix (newRoute = false) {
+      this.timeInterval = setInterval(() => {
+        let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
+        let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
+
+        if (intercomIframeHeight !== this.intercomBannerHeight || newRoute) {
+          this.fixTopMenu(intercomIframeHeight)
+        }
+
+        this.intercomBannerHeight = intercomIframeHeight
+      }, 1 * 1000)
     },
 
     fixTopMenu () {

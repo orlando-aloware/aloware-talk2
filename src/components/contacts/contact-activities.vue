@@ -10,7 +10,6 @@
       :hasUnreads="hasUnreads"
       :unreadCount="unreadCount"
       :contact="contact"
-      :enable-export="enableExport"
       :team-inbox-id="teamInboxId"
       :from-team-inbox="fromTeamInbox"
       :is-read-only="isReadOnly"
@@ -109,10 +108,6 @@ export default {
     loadingCommunications: {
       type: Boolean,
       default: false
-    },
-    enableExport: {
-      type: Boolean,
-      default: true
     },
     teamInboxUnreadCount: {
       type: Number,

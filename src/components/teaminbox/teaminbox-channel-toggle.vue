@@ -30,6 +30,7 @@
         </div>
       </template>
     </q-btn-toggle>
+    <TeamInboxDateFilter @date-change="onDateChange"/>
   </div>
 </template>
 
@@ -38,10 +39,13 @@ import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import { navigationErrorHandler } from 'src/router/routes'
+import TeamInboxDateFilter from 'src/components/teaminbox/teaminbox-date-filter.vue'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   components: {
-    InformationCircleIcon
+    InformationCircleIcon,
+    TeamInboxDateFilter
   },
 
   mounted () {
@@ -52,6 +56,8 @@ export default {
     ...mapState('TeamInbox', [
       'viewMode'
     ]),
+
+    ...mapFields('TeamInbox', ['activeFilters']),
 
     options () {
       return [
@@ -111,6 +117,10 @@ export default {
       const query = { ...this.$route.query }
       query.viewMode = viewMode === THREADED ? 'Threaded' : 'Unthreaded'
       this.$router.replace({ query }).catch(navigationErrorHandler)
+    },
+
+    onDateChange () {
+      this.$emit('date-change', this.activeFilters)
     }
   },
 
@@ -124,12 +134,14 @@ export default {
 
 <style lang="scss">
 .channel-toggle-wrapper {
-  padding: 2px 16px;
+  padding: 2px 12px;
   width: 100%;
   min-width: 200px;
+  display: flex;
+  align-items: center;
 
   .channel-toggle {
-    width: 100%;
+    flex: 1;
 
     .q-btn {
       min-height: 28px;

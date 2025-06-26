@@ -1,9 +1,22 @@
+import moment from 'moment'
+
 export const THREADED = 1
 export const UNTHREADED = 2
 export const INBOX_TYPE_PERSONAL = 'personal'
 export const INBOX_TYPE_CONNECTED = 'connected'
 export const INBOX_TYPE_WATCHING = 'watching'
 export const SEARCH_FIELDS = ['lead_number', 'contact.name', 'campaign.name']
+export const DEFAULT_FILTERS = {
+  types: [],
+  directions: [],
+  my_contact: false,
+  unread_only: false,
+  task_status: [],
+  mention: false,
+  date_range: 'Last 30 Days',
+  from_date: moment().subtract(30, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss'),
+  to_date: moment().endOf('day').format('MM/DD/YYYY HH:mm:ss')
+}
 
 export default function () {
   return {
@@ -25,7 +38,7 @@ export default function () {
     abortController: null,
     showRefreshInboxesButton: false,
     showRefreshCommunicationsButton: false,
-    activeFilters: {},
+    activeFilters: { ...DEFAULT_FILTERS },
     activeSort: {},
     currentSearch: null,
     isInitialLoad: false,
