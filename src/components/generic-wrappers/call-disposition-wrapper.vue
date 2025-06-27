@@ -9,6 +9,7 @@
 
 <script>
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'call-disposition-wrapper',
@@ -48,8 +49,12 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setDialerCommunication']),
+
     changeCallDisposition (callDispositionId) {
       this.loadingCallDisposition = true
+      this.communication.call_disposition_id = callDispositionId
+      this.setDialerCommunication(this.communication)
       this.$axios.post('/api/v1/communication/' + this.communication.id + '/dispose-call', {
         call_disposition_id: callDispositionId
       }).then((res) => {

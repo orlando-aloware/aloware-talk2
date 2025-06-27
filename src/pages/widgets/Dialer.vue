@@ -2,11 +2,13 @@
   <div>
     <b-overlay
       class="h-100 w-100 position-absolute"
+      bg-color='#15163f'
+      opacity='1'
       :show="isLoadingDialer"
     >
       <template #overlay>
         <q-spinner-bars
-          color="primary"
+          color="white"
           size="2em"
         />
       </template>
@@ -19,16 +21,16 @@
 
     <div
       class="p-3"
-      v-if="criticalErrorHappened"
+      v-if="widgetMessage === WIDGET_MSG_CRITICAL_ERROR_HAPPENED"
     >
       <p><strong>Something went wrong</strong></p>
       <hr>
-      <p>For some reason we couldn’t complete the call. Please refresh the page and try again.</p>
+      <p>For some reason we couldn't complete the call. Please refresh the page and try again.</p>
     </div>
 
     <div
       class="p-3"
-      v-else-if="showAlertAgentOnCall"
+      v-else-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL"
     >
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
@@ -38,20 +40,28 @@
 
     <div
       class="p-3"
-      v-else-if="showAlertCallFinished && dialer && !dialer.parkedCall"
+      v-else-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_FINISHED && dialer && !dialer.parkedCall"
     >
       <p><strong>Call Finished</strong></p>
       <hr>
       <p>Please close this window or click the back button to continue.</p>
     </div>
 
+    <div class="p-3"
+         v-else-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED">
+      <p><strong>Phone number is not chosen</strong></p>
+      <hr>
+      <p>Please click to a phone number to start dialing.</p>
+    </div>
+
     <webrtc
-      :carrierName="authProfile.carrier_name"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
-      v-else-if="allowed"
-      @callConnected="handleCallConnectedEvent"
+      :init-broadcast='false'
+      :start-dialing="startDialing"
+      v-show='widgetMessage === WIDGET_MSG_HIDE && !isLoadingDialer'
+      v-if="allowed"
       @callCompleted="handleCallCompletedEvent"
       @changeCampaignId="handleChangeCampaignEvent"
       @handleCall="handleCall"
@@ -67,9 +77,16 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import * as storage from 'src/plugins/helpers/storage'
 import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin } from 'src/plugins/mixins'
-import useContactApi from 'src/shared/composables/use-contact-api.composable'
 import CallingExtensionsManager from 'src/utils/CallingExtensionsManager'
 import { mapActions, mapState } from 'vuex'
+import { CURRENT_STATUS_HOLD_NEW } from 'src/constants/communication-current-status'
+import { AGENT_STATUS_ACCEPTING_CALLS, AGENT_STATUS_ON_CALL, AGENT_STATUS_ON_WRAP_UP } from 'src/constants/agent-status'
+
+const WIDGET_MSG_HIDE = 1
+const WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL = 2
+const WIDGET_MSG_SHOW_ALERT_CALL_FINISHED = 3
+const WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED = 4
+const WIDGET_MSG_CRITICAL_ERROR_HAPPENED = 5
 
 export default {
   name: 'Dialer',
@@ -89,9 +106,15 @@ export default {
 
   data () {
     return {
+      WIDGET_MSG_HIDE,
+      WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL,
+      WIDGET_MSG_SHOW_ALERT_CALL_FINISHED,
+      WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED,
+      WIDGET_MSG_CRITICAL_ERROR_HAPPENED,
+      widgetMessage: WIDGET_MSG_HIDE,
       isFirstLoading: true,
       isDialed: false,
-      loading: false,
+      startDialing: false,
       small: false,
       initialized: false,
       needsExtensions: false,
@@ -102,8 +125,6 @@ export default {
       extensionsVisibility: true,
       extensions: null,
       timeout: null,
-      showAlertAgentOnCall: false,
-      defaultCampaignInitialized: false,
       callSdkOptions: {
         // Whether to log various inbound/outbound messages to console
         debugMode: true,
@@ -124,11 +145,10 @@ export default {
             this.extensions.initialized(payload)
           },
           onDialNumber: async (event) => {
-            this.criticalErrorHappened = false
             this.setHubspotDialNumber(event)
 
-            // do not continue if we not logged-in
-            if (!this.initialized) {
+            // do not continue if we not logged-in or we're already dialing
+            if (!this.initialized || this.isDialed) {
               return
             }
 
@@ -143,15 +163,15 @@ export default {
           }
         }
       },
-      contactName: '',
-      contactTimezone: '',
-      companyName: '',
-      contactId: '',
+      contactDetails: {
+        contactName: '',
+        contactTimezone: '',
+        companyName: '',
+        contactId: ''
+      },
       campaignId: null,
       defaultOutboundCampaignId: null,
-      showAlertCallFinished: false,
-      criticalErrorHappened: false,
-      authProfile: null,
+      isPreparingToCall: false,
       listeners: {
         userLoggedIn: null,
         agentStatusUpdated: null
@@ -161,29 +181,23 @@ export default {
     }
   },
 
-  setup () {
-    const { getLastUsedCallLineByContactId } = useContactApi()
-
-    return {
-      getLastUsedCallLineByContactId
-    }
-  },
-
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
     ...mapState(['dialer', 'hubspotDialNumber']),
 
     allowed () {
-      return this.authProfile && this.initialized && this.defaultCampaignInitialized
+      return this.profile && this.initialized
     },
 
     isLoadingDialer () {
+      if (this.isPreparingToCall || !this.initialized) {
+        return true
+      }
+
       return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) &&
-        !this.showAlertAgentOnCall &&
-        !this.showAlertCallFinished &&
         !this.dialer?.parkedCall &&
-        !this.criticalErrorHappened
+        this.widgetMessage === WIDGET_MSG_HIDE
     }
   },
 
@@ -236,13 +250,17 @@ export default {
       logoutUser: 'logout',
       check: 'check',
       clear: 'clear',
-      setAgentStatus: 'setAgentStatus'
+      setAgentStatus: 'setAgentStatus',
+      setProfile: 'setProfile'
     }),
 
     ...mapActions([
       'resetVuex',
       'setIsWidget',
-      'setHubspotDialNumber'
+      'setHubspotDialNumber',
+      'setDialerCommunication',
+      'setDialerContact',
+      'setDialerCurrentStatus'
     ]),
 
     ...mapActions('cache', [
@@ -250,118 +268,145 @@ export default {
     ]),
 
     async postDialNumber () {
-      this.showAlertCallFinished = false
+      this.$bvModal.hide('daytime-hours-confirmation')
+      this.isPreparingToCall = true
 
-      do {
-        if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
-          console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
+      try {
+        this.widgetMessage = WIDGET_MSG_HIDE
+
+        do {
+          if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
+            console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
+          }
+
+          if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+            console.log('waiting for agent to become available to make the call', this.dialer.currentStatus)
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
+        } while (this.dialer.currentStatus === 'GENERATING_TOKEN')
+
+        await this.getContact()
+
+        if (this.validateHasActiveCallStatus()) {
+          return
         }
 
-        if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-          console.log('waiting for agent to become available to make the call', this.agentStatus)
+        // if dialing is initiating and current profile status is on wrap-up, then means that somewhere else wrap-up screen is not closed,
+        // we need to initiate end wrap-up session to adequately tracking dialing statuses changes
+        if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          this.resetAgentStatus()
         }
 
-        await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
-      } while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)
-
-      this.checkAndResetCallDisposition()
-      await this.getContact()
-
-      await this.findDefaultOutboundCampaign()
-
-      if (this.isAlwaysAskModeEnabled()) {
-        this.handleDialNumber()
+        this.$VueEvent.fire('resetCall')
+      } catch {
+        return
+      } finally {
+        this.isPreparingToCall = false
       }
+
+      if (!this.isAlwaysAskModeEnabled()) {
+        this.defineDefaultOutboundCampaignId()
+
+        if (this.defaultOutboundCampaignId) {
+          this.campaignId = this.defaultOutboundCampaignId
+        }
+      }
+
+      await this.handleDialNumber()
     },
 
     async init () {
       if (this.apiKey) {
         storage.local.setItem('api_token', this.apiKey)
       }
-      this.loading = true
 
       await this.check().then((res) => {
         storage.local.setItem('company_id', res.data.user.company.id)
         this.setCurrentCompany(res.data.user.company)
         this.resetVuex(['all'])
-        this.authProfile = res.data?.user
-        this.loading = false
         this.initialized = true
         this.handleUserLogin()
       }).catch((err) => {
         console.log('Error: api key is not valid', err)
         this.$handleErrors(err.response)
-        this.loading = false
         if (this.$route.name !== 'Login') {
           this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
         }
       })
     },
 
-    checkAndResetCallDisposition () {
-      if (!this.checkForceDisposition) {
-        this.$VueEvent.fire('resetCall')
-      }
-    },
-
-    setContactDetails (contact) {
-      this.contactName = this.getContactName(contact)
-      this.contactTimezone = contact.timezone
-      this.companyName = contact.company_name
-      this.contactId = contact.id
-    },
-
-    getContactEmitPayload () {
-      return {
-        currentNumber: this.hubspotDialNumber?.phoneNumber,
-        contactName: this.contactName,
-        companyName: this.companyName,
-        contactId: this.contactId,
-        contactTimezone: this.contactTimezone
-      }
-    },
-
     async getContact () {
+      const withLastUsedCallLine = this.isAlwaysAskModeEnabled()
+
       await this.$axios.post('/api/v1/integrations/hubspot/find-contact', {
-        params: this.hubspotDialNumber
+        params: this.hubspotDialNumber,
+        with_last_used_call_line: withLastUsedCallLine,
+        with_last_call: true
       }).then(res => {
-        this.setContactDetails(res.data)
-        this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
+        const contact = res?.data?.contact
+        this.contactDetails.contactName = this.getContactName(contact)
+        this.contactDetails.contactTimezone = contact.timezone
+        this.contactDetails.companyName = contact.company_name
+        this.contactDetails.contactId = contact.id
+
+        if (withLastUsedCallLine) {
+          this.campaignId = res?.data?.last_used_call_line
+        }
+        const profile = {
+          'last_call': res?.data?.last_call
+        }
+        this.setProfile(profile)
       }).catch(err => {
         this.$handleErrors(err.response)
-        this.criticalErrorHappened = true
+        this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
         if (this.extensions) {
           this.extensions.callEnded()
         }
+
+        throw err
       })
     },
 
     async handleDialNumber () {
       console.log('Handle')
       console.log('CurrentStatus:', this.dialer?.currentStatus)
-      if (this.checkAgentHasActiveCallInAnotherDevice()) {
-        this.showAlertAgentOnCall = true
+
+      if (this.validateHasActiveCallStatus()) {
         return
       }
 
       // stop if modal is disabled
       if (!this.extensionsVisibility) {
+        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
         return
       }
 
       // don't allow to make a call if there's a parked call
       if (this.dialer?.parkedCall) {
+        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
         return
       }
 
-      this.showAlertAgentOnCall = false
+      this.widgetMessage = WIDGET_MSG_HIDE
+      this.startDialing = true
 
-      if (this.canHandleDialNumber()) {
+      if (this.needsExtensions &&
+        this.extensionsInitialized &&
+        this.extensionsVisibility &&
+        this.initialized &&
+        this.profile &&
+        this.dialer?.isReady &&
+        // if isAlwaysAskModeEnabled is true then dialing will be triggered from select campaign dialog component
+        (this.campaignId !== null ? !this.isAlwaysAskModeEnabled() : false) &&
+        (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? !this.checkForceDisposition : true)) {
         this.handleCall()
       } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
           this.handleDialNumber()
         }, 1000)
+      } else {
+        // do not handle call but show dialer, it supposes to show wrap-up or other useful UI
       }
     },
 
@@ -377,22 +422,31 @@ export default {
       // if empty then onDialNumber event was not called - skip calling,
       // if not empty then dialer was called, and we are here after login page so we must dial the number
       if (!this.hubspotDialNumber) {
+        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED
         return
       }
 
       this.postDialNumber()
     },
 
-    handleCallConnectedEvent () {
-      if (this.needsExtensions && this.extensionsInitialized) {
-        this.extensions.callAnswered()
-      }
-    },
-
     handleCallCompletedEvent (skipCallFinished = false) {
+      const skippedStatuses = ['MAKING_CALL', 'RECEIVED_CALL_INVITE', 'ANSWERING_CALL', 'CALL_CONNECTED']
+
+      // some logic can send wrong status of call completed in a short time when call is just initiating
+      if (skippedStatuses.includes(this.dialer?.currentStatus)) {
+        return
+      }
+
       if (this.extensions) {
         this.extensions.callEnded()
-        this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
+
+        if (!this.dialer.parkedCall) {
+          if (!skipCallFinished) {
+            this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
+          }
+          this.startDialing = false
+        }
+
         if (!this.defaultOutboundCampaignId) {
           this.campaignId = null
         }
@@ -404,17 +458,14 @@ export default {
     },
 
     handleCall () {
-      this.loading = true
-      const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
-
       // if there's a call in progress or in wrap up, we omit the call
-      if (isCallInProgressOrWrapUp.includes(this.dialer?.currentStatus)) {
+      if (this.validateHasActiveCallStatus()) {
         return
       }
 
       const params = {
-        timezone: this.contactTimezone,
-        name: this.contactName,
+        timezone: this.contactDetails.contactTimezone,
+        name: this.contactDetails.contactName,
         calls_notifications_open_time: this.currentCompany.calls_notifications_open_time,
         calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
       }
@@ -424,13 +475,7 @@ export default {
     },
 
     onCancelCall () {
-      if (this.shouldUseCompanyCampaignId()) {
-        this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
-      } else if (this.shouldUseProfileCampaignId()) {
-        this.defaultOutboundCampaignId = this.authProfile.default_outbound_campaign_id
-      } else { // if there's no a line by default, we remove the selected line
-        this.defaultOutboundCampaignId = null
-      }
+      this.defineDefaultOutboundCampaignId()
 
       this.campaignId = this.defaultOutboundCampaignId
 
@@ -448,17 +493,26 @@ export default {
         this.profile?.id === data.user_id &&
         this.profile.agent_status !== data.agent_status
       ) {
+        const previousStatus = this.profile.agent_status
         const agentStatus = data.agent_status
         this.setAgentStatus(agentStatus)
 
-        if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.isDialed) {
-          this.showAlertCallFinished = false
+        if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS &&
+          this.widgetMessage === WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
+          !this.isDialed) {
+          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
+        } else if (this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
+          this.isFirstLoading &&
+          agentStatus === AgentStatus.AGENT_STATUS_ON_CALL &&
+          !this.isDialed) {
+          this.widgetMessage = WIDGET_MSG_HIDE
         }
 
         // if we finished - don't need to handle dial number
-        if (this.showAlertCallFinished) {
+        if (this.widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_FINISHED) {
           return
         }
+
         // Automatically close the widget when replying from another tab
         if (this.isDialed && !this.dialer.call && !this.dialer.communication && this.dialer.parkedCall && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
           this.isDialed = false
@@ -466,52 +520,55 @@ export default {
           return
         }
 
-        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-          this.handleDialNumber()
+        // close widget if finish button in wrap-up page was not clicked but dialing started from another place
+        if (this.isDialed &&
+          [AGENT_STATUS_ACCEPTING_CALLS, AGENT_STATUS_ON_CALL].includes(agentStatus) &&
+          this.dialer?.currentStatus === 'WRAP_UP' &&
+          previousStatus === AGENT_STATUS_ON_WRAP_UP) {
+          this.isDialed = false
+          this.onCancelCall()
         }
       }
     },
 
     makeCall () {
       if (this.callDisabled || this.campaignId === null) {
+        this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
+        this.$generalNotification('The dialer does not meet all the required criteria to start calling.', 'error', 5000, true)
         return
       }
 
+      if (this.validateHasActiveCallStatus()) {
+        return
+      }
+
+      this.widgetMessage = WIDGET_MSG_HIDE
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.hubspotDialNumber?.phoneNumber),
         outboundCampaignId: this.campaignId.toString(),
-        contactName: this.contactName,
-        companyName: this.companyName,
-        contactId: this.contactId
+        contactName: this.contactDetails.contactName,
+        companyName: this.contactDetails.companyName,
+        contactId: this.contactDetails.contactId
       })
     },
 
-    async findDefaultOutboundCampaign () {
-      if (this.isAlwaysAskModeEnabled()) {
-        await this.setLastUsedCallLine()
-        this.defaultCampaignInitialized = true
-        return
-      }
-
+    defineDefaultOutboundCampaignId () {
       if (this.shouldUseCompanyCampaignId()) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
       } else if (this.shouldUseProfileCampaignId()) {
-        this.defaultOutboundCampaignId = this.authProfile.default_outbound_campaign_id
+        this.defaultOutboundCampaignId = this.profile.default_outbound_campaign_id
+      } else { // if there's no a line by default, we remove the selected line
+        this.defaultOutboundCampaignId = null
       }
-
-      if (this.defaultOutboundCampaignId) {
-        this.setCampaignIdAndDialNumber()
-      }
-
-      this.defaultCampaignInitialized = true
     },
 
     isAlwaysAskModeEnabled () {
-      if (!this.authProfile) return false
+      if (!this.profile) {
+        return false
+      }
 
       const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
-
-      const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK
+      const isUserAlwaysAsk = this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK
 
       return isCompanyAlwaysAsk || isUserAlwaysAsk
     },
@@ -519,54 +576,72 @@ export default {
     shouldUseCompanyCampaignId () {
       return this.currentCompany &&
         (this.currentCompany.force_outbound_line ||
-          (this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT &&
-            !this.authProfile.default_outbound_campaign_id))
+          (this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT &&
+            !this.profile.default_outbound_campaign_id))
     },
 
     shouldUseProfileCampaignId () {
-      return this.authProfile &&
-        this.authProfile.default_outbound_campaign_id &&
-        this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT
+      return this.profile &&
+        this.profile.default_outbound_campaign_id &&
+        this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT
     },
 
-    setCampaignIdAndDialNumber () {
-      this.campaignId = this.defaultOutboundCampaignId
-      this.handleDialNumber()
-    },
+    // status validates before starting dialing
+    validateHasActiveCallStatus () {
+      let status = false
 
-    canHandleDialNumber () {
-      return this.needsExtensions &&
-        this.extensionsInitialized &&
-        this.extensionsVisibility &&
-        this.initialized &&
-        this.authProfile &&
-        this.dialer?.isReady &&
-        // if isAlwaysAskModeEnabled is true then dialing will be triggered from select campaign dialog component
-        (this.campaignId !== null ? !this.isAlwaysAskModeEnabled() : false) &&
-        (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? !this.checkForceDisposition : true)
-    },
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
+        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition)) {
+        status = true
+      }
 
-    checkAgentHasActiveCallInAnotherDevice () {
       const statuses = [
         'MAKING_CALL',
         'CALL_CONNECTED',
         'HANGING_UP_CALL',
         'CALL_DISCONNECTED',
-        'WRAP_UP'
+        'WRAP_UP',
+        'ANSWERING_CALL'
       ]
 
-      return this.dialer &&
-        this.profile &&
-        this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
-        !statuses.includes(this.dialer?.currentStatus)
+      if (statuses.includes(this.dialer?.currentStatus)) {
+        status = true
+      }
+
+      const lastCall = this.profile?.last_call
+
+      // check if there is no last communication on hold
+      if (lastCall && lastCall.current_status2 === CURRENT_STATUS_HOLD_NEW) {
+        status = true
+      }
+
+      // define last call values to track useful updates if needed
+      if (status) {
+        if (lastCall) {
+          this.setDialerCommunication(lastCall)
+          this.setDialerContact(lastCall?.contact)
+        }
+
+        // do not show a widget message when force disposition, in this case, the dialer will appear with wrap-up page
+        if (lastCall &&
+          // the last call should not be held
+          lastCall.current_status2 !== CURRENT_STATUS_HOLD_NEW &&
+          this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
+          this.checkForceDisposition) {
+          this.setDialerCurrentStatus('WRAP_UP')
+        } else {
+          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+        }
+      }
+
+      return status
     },
 
     endActiveCall () {
-      this.showAlertAgentOnCall = false
-      this.showAlertCallFinished = false
+      this.widgetMessage = WIDGET_MSG_HIDE
       this.isDialed = false
 
-      if (this.dialer?.currentStatus === 'WRAP_UP') {
+      if (this.dialer?.currentStatus === 'WRAP_UP' && !this.checkDialerForceDisposition) {
         this.$VueEvent.fire('endWrapUp')
       }
 
@@ -574,19 +649,11 @@ export default {
         this.$VueEvent.fire('hangupCall')
       }
 
-      this.$VueEvent.fire('resetCall')
-      this.handleCallCompletedEvent(true)
-    },
-
-    async setLastUsedCallLine () {
-      if (this.campaignId || !this.contactId) return
-
-      try {
-        const data = await this.getLastUsedCallLineByContactId(this.contactId)
-        this.handleChangeCampaignEvent(data.campaign_id)
-      } catch (error) {
-        this.$handleErrors(error.response)
+      if (!this.checkDialerForceDisposition) {
+        this.$VueEvent.fire('resetCall')
       }
+
+      this.handleCallCompletedEvent(true)
     }
   },
 
@@ -598,27 +665,20 @@ export default {
         })
       }
     },
-    extensionsVisibility () {
-      if (this.extensionsVisibility) {
-        this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-      } else {
-        this.showAlertCallFinished = true
-        // if hidden, reset HubSpot dial number
-        this.setHubspotDialNumber(null)
+    widgetMessage (to) {
+      // stop dialing if there is a widget message
+      if (to !== WIDGET_MSG_HIDE && this.startDialing) {
+        this.startDialing = false
       }
     },
-
-    'dialer.currentStatus' () {
-      if (this.isLoadingDialer) {
-        return
-      }
-
-      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
-      if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
-        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition)) &&
-        !this.isDialed) {
-        this.showAlertAgentOnCall = true
-        this.showAlertCallFinished = false
+    extensionsVisibility () {
+      if (this.extensionsVisibility) {
+        if (this.profile && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+        }
+      } else {
+        // if hidden, reset HubSpot dial number
+        this.setHubspotDialNumber(null)
       }
     }
   }
