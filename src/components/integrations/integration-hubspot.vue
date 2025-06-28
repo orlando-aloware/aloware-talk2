@@ -127,16 +127,6 @@
                             {{ thread.created_at | dateTimePassed }}
                           </span>
                         </p>
-                        <p class="mb-1 d-flex" data-testid="integration-hubspot-conversation-status">
-                          <span class="data-icon-label">Last Message: </span>
-                          <span class="data-value ml-1">
-                            <q-tooltip anchor="top middle"
-                                       self="center middle">
-                              {{ thread.latest_message_timestamp | dateTimePassed }}
-                            </q-tooltip>
-                            {{ thread.latest_message_timestamp | dateTimePassed }}
-                          </span>
-                        </p>
                       </q-card-section>
                     </q-card-section>
                   </q-card>
