@@ -129,7 +129,9 @@ function createWindow () {
   })
 
   mainWindow.on('close', (event) => {
-    if (!isQuiting) {
+    // On Windows, allow the window to close normally to quit the app
+    // On other platforms (macOS), hide the window to keep the app running
+    if (process.platform !== 'win32' && !isQuiting) {
       event.preventDefault()
       mainWindow.hide()
       event.returnValue = false
