@@ -1934,10 +1934,10 @@
     debug "^4.1.1"
     fs-extra "^9.0.1"
 
-"@electron/notarize@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@electron/notarize/-/notarize-2.3.0.tgz#9659cf6c92563dd69411afce229f52f9f7196227"
-  integrity sha512-EiTBU0BwE7HZZjAG1fFWQaiQpCuPrVGn7jPss1kUjD6eTTdXXd29RiZqEqkgN7xqt/Pgn4g3I7Saqovanrfj3w==
+"@electron/notarize@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@electron/notarize/-/notarize-2.5.0.tgz#d4d25356adfa29df4a76bd64a8bd347237cd251e"
+  integrity sha512-jNT8nwH1f9X5GEITXaQ8IF/KdskvIkOFfB2CvwumsveVidzpSc+mvhhTMdAGSYF3O+Nq49lJ7y+ssODRXu06+A==
   dependencies:
     debug "^4.1.1"
     fs-extra "^9.0.1"
@@ -2944,17 +2944,17 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
-"@twilio/voice-errors@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@twilio/voice-errors/-/voice-errors-1.4.0.tgz#0ab954085a32a00442814e56c95936908871ff6e"
-  integrity sha512-7BCg9MPz+KQ0JJ6Rl5W3Zw3E+i3Tt77VZw3/2i3Z+IPZITmCOQLu1nKx/0Nlj505Xtfr7eY9Mcern5PfIoBW0w==
+"@twilio/voice-errors@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@twilio/voice-errors/-/voice-errors-1.7.0.tgz#44c93f4bffad64d869fbdc70f0042b1e5566fa01"
+  integrity sha512-9TvniWpzU0iy6SYFAcDP+HG+/mNz2yAHSs7+m0DZk86lE+LoTB6J/ZONTPuxXrXWi4tso/DulSHuA0w7nIQtGg==
 
-"@twilio/voice-sdk@2.8":
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/@twilio/voice-sdk/-/voice-sdk-2.8.0.tgz#9ae50a9d32a879fb295d011c68d6dd12078e4826"
-  integrity sha512-0mEi1I6skZoHmc27wNin8TnWr0PWLVFQ4v9W16FEi8sLURC1bE7w1zvaK8n92Jm8AdN9xMSnnop2iYnkCokQzA==
+"@twilio/voice-sdk@2.13.0":
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/@twilio/voice-sdk/-/voice-sdk-2.13.0.tgz#323e596da0b2e2c46fd65bbbb15e2fbb3b6fa5eb"
+  integrity sha512-W1TzCnmlycBAqS6ae4Z1cSskm/nzymobyIgoMYnuUbaRKT5jkmODH85hpmvOKdU7Q4R0hD4+0LSMue+v5SYEYw==
   dependencies:
-    "@twilio/voice-errors" "1.4.0"
+    "@twilio/voice-errors" "1.7.0"
     "@types/md5" "2.3.2"
     events "3.3.0"
     loglevel "1.6.7"
@@ -6487,14 +6487,6 @@ electron-notarize@^0.1.1:
   dependencies:
     debug "^4.1.1"
     fs-extra "^8.0.1"
-
-electron-notarize@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/electron-notarize/-/electron-notarize-0.3.0.tgz#b93c606306eac558b250c78ff95273ddb9fedf0a"
-  integrity sha512-tuDw8H0gcDOalNLv6RM2CwGvUXU60MPGZRDEmd0ppX+yP5XqL8Ec2DuXyz9J7WQSA3aRCfzIgH8C5CAivDYWMw==
-  dependencies:
-    debug "^4.1.1"
-    fs-extra "^8.1.0"
 
 electron-notarize@^1.1.1:
   version "1.2.2"
@@ -15155,7 +15147,7 @@ vue-template-es2015-compiler@^1.9.0:
 
 "vue-wave-surfer@git+https://github.com/aloware/vue-wave-sufver.git":
   version "1.0.1"
-  resolved "git+https://github.com/aloware/vue-wave-sufver.git#11603abab9544cd89d63959da9f33acf27bb787e"
+  resolved "git+https://github.com/aloware/vue-wave-sufver.git#8a5e5203b017a09e9755dbbbc9e31569a4baca9c"
   dependencies:
     wavesurfer.js "^7.8.6"
 
@@ -15228,9 +15220,9 @@ watchpack@^1.7.4:
     watchpack-chokidar2 "^2.0.1"
 
 wavesurfer.js@^7.8.6:
-  version "7.8.6"
-  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-7.8.6.tgz#753eb22c93c27225a1c878f13d1a1bee073365dd"
-  integrity sha512-EDexkMwkkQBTWruhfWQRkTtvRggtKFTPuJX/oZ5wbIZEfyww9EBeLr2mtkxzA1S8TlWPx6adY5WyjOlNYNyHSg==
+  version "7.9.5"
+  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-7.9.5.tgz#e06707cc28e59283556df0ea16bb5503fe3a9243"
+  integrity sha512-ioOG9chuAn0bF2NYYKkZtaxjcQK/hFskLg8ViLYbJHhWPk1N5wWtuqVhqeh2ZWT2SK3t0E8UkD7lLDLuZQQaSA==
 
 wbuf@^1.1.0, wbuf@^1.7.3:
   version "1.7.3"

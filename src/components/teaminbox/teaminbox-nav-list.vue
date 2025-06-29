@@ -1,6 +1,7 @@
 <template>
   <div class="teaminbox-nav-list"
-       data-testid="teaminbox-nav-list">
+       data-testid="teaminbox-nav-list"
+       ref="teaminboxNavList">
     <div class="teaminbox-nav-list__header border-bottom d-flex flex-column justify-content-center">
       <search-input class="teaminbox-nav-list__header__search"
                     placeholder="Type ENTER to search inboxes..."
@@ -46,7 +47,42 @@
         </b-overlay>
       </div>
 
-      <!-- Empty state -->
+      <!-- Full empty state when user has no team inboxes at all -->
+      <div
+        v-else-if="!inboxes.length && !hasAnyInboxes"
+        :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']">
+        <team-inbox-empty-state v-if="isMobile">
+          <template #list-content>
+            <p class="info-text">
+              <strong>Connected Inboxes:</strong> See and collaborate on the real-time calls and messages being handled
+              by every active member of this team.
+            </p>
+            <p class="info-text">
+              <strong>Watching Inboxes:</strong> Give managers and supervisors a bird's-eye view of all communications
+              for coaching, quality, and to ensure no customer is left behind.
+            </p>
+            <p class="info-text">
+              <strong>Personal Inboxes:</strong> Unify the communications from everyone's direct lines into one shared,
+              organized space so you can stop guessing and start working together.
+            </p>
+          </template>
+        </team-inbox-empty-state>
+
+        <template v-else>
+          No Inboxes
+
+          <br/>
+
+          <button class="btn btn-sm btn-primary mt-4"
+                  v-if="showRefreshInboxesButton"
+                  @click.prevent="onRefreshInboxes">
+            <refresh-icon color="#fff"/>
+            Refresh
+          </button>
+        </template>
+      </div>
+
+      <!-- Simple empty state when user has inboxes but search/filter returns empty -->
       <div class="text-center q-pa-md text-grey"
            v-else-if="!inboxes.length">
         No Inboxes
@@ -65,17 +101,25 @@
 
 <script>
 import TeamInboxNavType from './teaminbox-nav-type.vue'
+import TeamInboxEmptyState from './teaminbox-empty-state.vue'
 import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
-import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
-import { mapState, mapActions, mapGetters } from 'vuex'
+import {
+  INBOX_TYPE_CONNECTED,
+  INBOX_TYPE_PERSONAL,
+  INBOX_TYPE_WATCHING,
+  UNTHREADED
+} from 'src/store/teaminbox/teaminbox.store'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   components: {
     TeamInboxNavType,
+    TeamInboxEmptyState,
     SearchInput,
     RefreshIcon
   },
@@ -100,7 +144,8 @@ export default {
       'hasMoreInboxes',
       'isLoadingInboxes',
       'inboxesUnreadCount',
-      'showRefreshInboxesButton'
+      'showRefreshInboxesButton',
+      'hasAnyInboxes'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -108,6 +153,10 @@ export default {
     ...mapState(['isMobile', 'teams']),
 
     ...mapGetters('TeamInbox', ['getConnectedInboxesLength']),
+
+    ...mapFields('settings', ['isTeamInboxNavListCollapsed']),
+
+    ...mapFields('TeamInbox', ['activeFilters']),
 
     teamsIds () {
       return this.teams
@@ -121,12 +170,27 @@ export default {
       const watching = []
 
       this.inboxes.forEach(inbox => {
-        const isConnected = inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
-        const isWatching = inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
+        const {
+          teams,
+          call_waiting: callWaiting,
+          user_ids: userIds,
+          team_ids: teamIds,
+          watcher_user_ids: watcherUserIds,
+          watcher_team_user_ids: watcherTeamUserIds,
+          watcher_team_ids: watcherTeamIds
+        } = inbox
 
-        if (inbox.call_waiting && isConnected) {
+        const isConnected = userIds?.includes(this.profile.id) ||
+          teamIds?.some(id => this.teamsIds.includes(id)) ||
+          teams?.some(team => team.users?.some(user => user.id === this.profile.id))
+
+        const isWatching = watcherUserIds?.includes(this.profile.id) ||
+          watcherTeamUserIds?.includes(this.profile.id) ||
+          watcherTeamIds?.some(id => this.teamsIds.includes(id))
+
+        if (callWaiting && isConnected) {
           personal.push(inbox)
-        } else if (!inbox.call_waiting && isConnected) {
+        } else if (!callWaiting && isConnected) {
           connected.push(inbox)
         } else if (isWatching) {
           watching.push(inbox)
@@ -158,6 +222,10 @@ export default {
           inboxes: this.parsedInboxes.watching
         }
       ]
+    },
+
+    dateFilter () {
+      return `${this.activeFilters.from_date}|${this.activeFilters.to_date}`
     }
   },
 
@@ -289,8 +357,10 @@ export default {
     allUserIds (ringGroup) {
       const connectedUserIds = ringGroup.connected_user_ids || []
       const watcherUserIds = ringGroup.watcher_user_ids || []
+      const watcherTeamsUserIds = ringGroup.watcher_team_user_ids || []
+      const usersConnectedToTeams = ringGroup.teams.map(team => team.users.map(user => user.id)).flat()
 
-      return [...connectedUserIds, ...watcherUserIds]
+      return [...connectedUserIds, ...watcherUserIds, ...watcherTeamsUserIds, ...usersConnectedToTeams]
     },
 
     newRingGroupListener (ringGroup) {
@@ -362,6 +432,16 @@ export default {
     checkUrlInboxIdPermission () {
       const urlInboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : null
       return !urlInboxId || this.findInboxById(urlInboxId)
+    },
+
+    loadInboxesUnreadCount () {
+      const inboxIds = Object.keys(this.parsedInboxes ?? {}).flatMap((parsedInbox) => this.parsedInboxes[parsedInbox].map((inbox) => inbox.id))
+
+      if (!inboxIds.length) {
+        return
+      }
+
+      this.fetchInboxesUnreadCount(inboxIds)
     }
   },
 
@@ -420,14 +500,8 @@ export default {
       }
     },
 
-    parsedInboxes (parsedInboxes) {
-      const inboxIds = Object.keys(parsedInboxes ?? {}).flatMap((parsedInbox) => parsedInboxes[parsedInbox].map((inbox) => inbox.id))
-
-      if (!inboxIds.length) {
-        return
-      }
-
-      this.fetchInboxesUnreadCount(inboxIds)
+    parsedInboxes () {
+      this.loadInboxesUnreadCount()
     },
 
     search (val) {
@@ -446,6 +520,12 @@ export default {
         // Handles edge cases when an inbox is assigned to the user while they have the page open without any existing inboxes
         this.onInboxSelect(this.getFirstInboxId())
       }
+    },
+
+    dateFilter () {
+      this.setUnreadCountLoaded(false)
+      this.setInboxesUnreadCount([])
+      this.loadInboxesUnreadCount()
     }
   },
 
@@ -467,7 +547,7 @@ export default {
   height: 100%;
   background-color: #fff;
   color: #000;
-  padding: 7px 0 7px 7px;
+  padding: 7px 0 7px 0;
 
   &__header {
     width: 100%;
@@ -485,8 +565,26 @@ export default {
     display: flex;
     flex-direction: column;
     row-gap: 10px;
-    padding: 10px 0px 10px 10px;
+    padding: 10px;
     overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  &__empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+
+    .mobile-empty-state-image {
+      max-width: calc(100% - 20px);
+      max-height: 80vh;
+      object-fit: contain;
+      box-sizing: border-box;
+    }
   }
 }
 </style>

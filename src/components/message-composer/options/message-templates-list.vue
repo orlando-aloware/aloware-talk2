@@ -114,7 +114,10 @@ export default {
       const query = this.searchQuery.toLowerCase().trim()
       return this.templates.filter(template => {
         const nameMatch = template.name && template.name.toLowerCase().includes(query)
-        const bodyMatch = template.body && template.body.toLowerCase().includes(query)
+
+        // Word matching for body content
+        const bodyMatch = template.body && this.matchWords(template.body.toLowerCase(), query)
+
         return nameMatch || bodyMatch
       })
     },
@@ -134,6 +137,18 @@ export default {
     ...mapActions('contacts', ['setSmsTemplateModal']),
     templateSelected (template) {
       this.$emit('templateSelected', template)
+    },
+
+    matchWords (text, query) {
+      // Split query into individual words
+      const queryWords = query.split(/\s+/).filter(word => word.length > 0)
+
+      // Check if all query words exist as complete words in the text
+      return queryWords.every(queryWord => {
+        // Use word boundary regex to match complete words only
+        const wordRegex = new RegExp(`\\b${queryWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+        return wordRegex.test(text)
+      })
     },
 
     canEdit (template) {

@@ -489,6 +489,19 @@ export default {
 
     async onDeleteTask (data) {
       this.isDeleting = true
+      if ('communication_id' in data) {
+        const index = this.powerDialerTasks[TaskType.IN_QUEUE].findIndex(task => task.communication_id === data.communication_id)
+        if (index !== -1) {
+          this.powerDialerTasks[TaskType.IN_QUEUE].splice(index, 1)
+        }
+
+        this.isDeleting = false
+        return
+      }
+
+      const incomingCalls = this.powerDialerTasks[TaskType.IN_QUEUE].filter(task =>
+        task && typeof task === 'object' && 'communication_id' in task
+      )
 
       return this.$axios
         .delete(
@@ -505,6 +518,7 @@ export default {
 
           const newInQueueList = this.filterNewInQueueTasks(response.data.data, TaskType.IN_QUEUE, false, false)
           this.powerDialerTasks[TaskType.IN_QUEUE] = newInQueueList
+          this.powerDialerTasks[TaskType.IN_QUEUE].unshift(...incomingCalls)
 
           this.$generalNotification(res.data.message)
           this.isDeleting = false

@@ -40,7 +40,6 @@
     </div>
 
     <webrtc
-      :carrierName="authProfile.carrier_name"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
@@ -396,7 +395,16 @@ export default {
     },
 
     handleCallCompletedEvent () {
-      if (!this.dialer.parkedCall && this.dialer?.currentStatus !== 'MAKING_CALL') {
+      console.log('handleCallCompletedEvent',
+        {
+          'currentStatus': this.dialer?.currentStatus,
+          'parkedCall': this.dialer?.parkedCall
+        }
+      )
+
+      const skippedStatuses = ['MAKING_CALL', 'RECEIVED_CALL_INVITE', 'ANSWERING_CALL', 'CALL_CONNECTED']
+
+      if (!this.dialer.parkedCall && !skippedStatuses.includes(this.dialer?.currentStatus)) {
         this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
         this.startDialing = false
         this.enableClickToDial()
@@ -421,8 +429,8 @@ export default {
       }
 
       const params = {
-        timezone: this.contact.timezone,
-        name: this.contact.name,
+        timezone: this.contactTimezone,
+        name: this.contactName,
         calls_notifications_open_time: this.currentCompany.calls_notifications_open_time,
         calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
       }

@@ -332,7 +332,6 @@ body,
 
 @media (min-width: 605px) {
   .contact-details-container {
-    margin-left: 10px;
     margin-top: 10px;
   }
 }
@@ -7651,6 +7650,7 @@ table.datatable {
   min-height: 71px;
 
   .contact-unread-badge {
+    background-color: $red-95;
     left: 38px;
     top: -8px;
     height: 20px;
@@ -8293,6 +8293,24 @@ button.grey-90 {
       .toast-header {
         display: none;
       }
+
+      // Fix for long caller names in incoming call notifications
+      .notification-details {
+        max-width: 180px !important;
+        overflow: hidden;
+      }
+
+      .title {
+        max-width: 160px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      .call-actions {
+        flex-shrink: 0;
+        min-width: 84px;
+      }
     }
 
     .toast-header {
@@ -8321,10 +8339,6 @@ button.grey-90 {
       text-decoration: none;
       padding: 0 0 !important;
 
-      > div {
-        padding: 12px 12px 15px 12px;
-      }
-
       .title {
         @include font-size($f-size-h5, 600, true);
         line-height: 18px;
@@ -8340,8 +8354,16 @@ button.grey-90 {
         padding-top: 1px;
       }
 
+      .call-fishing-queue-badge {
+        margin-left: 34px;
+      }
+
       .notification-icon {
-        padding-top: 2px;
+        padding: 14px 12px 15px 12px;
+      }
+
+      .notification-details, .call-actions, .call-fishing-actions {
+        padding: 12px 12px 15px 0;
       }
 
       .message-body {
@@ -9318,6 +9340,11 @@ span.mention {
   max-width: 250px;
   width: 100%;
 
+  &.hidden {
+    width: 0;
+    margin: 0;
+  }
+
   &-drawer {
     aside {
       border-radius: 0.25rem;
@@ -9360,9 +9387,15 @@ span.mention {
 .contact-activity-wrapper {
   width: 100%;
 
+  @media screen and (min-width: 605px) {
+    margin-right: 10px;
+  }
+
   &.inbox-activity-container-wrapper {
-    padding: 10px 0;
     background: $grey-40;
+    @media screen and (min-width: 785px) {
+      padding: 10px 0;
+    }
   }
 }
 
@@ -9400,6 +9433,10 @@ span.mention {
       width: 100%;
       height: 100%;
     }
+  }
+
+  .open-contact-details-btn {
+    margin-right: -10px;
   }
 }
 
@@ -9617,7 +9654,7 @@ screen and (max-width: 956px) {
   }
 }
 
-@media (min-width: 1319px) {
+@media (min-width: 1367px) {
   .contact-details-container {
     max-width: 330px;
   }
@@ -10524,12 +10561,6 @@ screen and (max-width: 956px) {
     display: block !important;
     max-width: unset !important;
 
-    .details-component-container {
-      > div {
-        margin-right: 10px !important;
-      }
-    }
-
     .mobile-header {
       padding-right: 13px !important;
 
@@ -10649,20 +10680,17 @@ screen and (max-width: 956px) {
       .toast-body {
         > .notification-body-wrapper {
           > div {
-            .notification-icon {
-              max-width: 32px;
-              width: 100%;
-            }
-
             > .notification-details {
               max-width: 150px;
               width: 100%;
               flex-grow: unset !important;
+              overflow: hidden;
             }
 
             > .call-actions {
               max-width: 84px;
               width: 100%;
+              flex-shrink: 0;
             }
           }
         }
@@ -13692,7 +13720,7 @@ h1.contact-list-name-label {
 }
 
 .compliance-badge {
-  background-color: #f44336;
+  background-color: $red-95;
   color: white;
   padding: 8px;
   border-radius: 8px;
@@ -16815,23 +16843,43 @@ hr {
   overflow: visible !important;
 }
 
-.teaminbox-filter-sort {
-  .filter-dropdown,
-  .sort-dropdown,
-  .filter-dropdown.show,
-  .sort-dropdown.show {
-    .btn {
+.teaminbox {
+  .mobile-header-labels {
+    .mobile-back-btn {
+      margin-left: 4px;
+    }
+    .contact-name {
+      margin-left: 10px;
+    }
+  }
+}
+
+.teaminbox-filters {
+  background-color: white;
+
+  .teaminbox-filter .dropdown-toggle {
+    margin: 3px 3px 3px 16px;
+  }
+
+  .teaminbox-sort .dropdown-toggle {
+    margin: 2px 16px 2px 2px;
+  }
+
+  .btn.dropdown-toggle {
+    border: 1px solid transparent !important;
+    background-color: transparent !important;
+    color: #040404 !important;
+
+    &:hover, &:focus {
       border: 1px solid transparent !important;
       background-color: transparent !important;
       color: #040404 !important;
-
-      &:hover, &:focus {
-        border: 1px solid transparent !important;
-        background-color: transparent !important;
-        color: #040404 !important;
-      }
     }
+  }
 
+  .filter-dropdown,
+  .sort-dropdown,
+  .sort-dropdown.show {
     ul.dropdown-menu {
       padding-top: 2px;
       padding-bottom: 2px;
@@ -16841,6 +16889,24 @@ hr {
       font-size: 12px;
       line-height: 1.5;
       padding: 5px 15px;
+    }
+  }
+
+  .team-inbox-filter-checkbox-control {
+    padding-left: 32px;
+    padding-right: 10px;
+
+    label {
+      width: 100%;
+    }
+
+    &:hover {
+      background-color: $grey-60;
+    }
+
+    &:active, &:focus {
+      background-color: $primary;
+      color: $white;
     }
   }
 }

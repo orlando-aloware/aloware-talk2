@@ -1,4 +1,4 @@
-import { THREADED, SEARCH_FIELDS } from 'src/store/teaminbox/teaminbox.store'
+import { SEARCH_FIELDS, THREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
@@ -39,7 +39,8 @@ export default {
       'setShowRefreshInboxesButton',
       'setShowRefreshCommunicationsButton',
       'setUnreadCountLoaded',
-      'setContactsLastUsedLines'
+      'setContactsLastUsedLines',
+      'setHasAnyInboxes'
     ]),
 
     async fetchInboxes (search = '') {
@@ -65,6 +66,11 @@ export default {
         })
 
         this.setInboxes(response.data)
+
+        // On initial load (no search), set the flag if user has any inboxes
+        if (!search && response.data.data && response.data.data.length > 0) {
+          this.setHasAnyInboxes(true)
+        }
       } catch (error) {
         if (error.name !== 'CanceledError') {
           this.$generalNotification('Error while fetching inboxes, please try again', 'error')
@@ -171,9 +177,34 @@ export default {
       // Transform filters to API parameters
       const apiFilters = {}
 
+      if (filters.from_date && filters.to_date) {
+        apiFilters.from_date = filters.from_date
+        apiFilters.to_date = filters.to_date
+      }
+
       // Map filter keys to API parameters
-      if (filters.unreadonly) {
+      if (filters.unread_only) {
         apiFilters.unread_only = true
+      }
+
+      if (filters.types?.length) {
+        apiFilters.types = filters.types
+      }
+
+      if (filters.directions) {
+        apiFilters.directions = filters.directions
+      }
+
+      if (filters.my_contact) {
+        apiFilters.my_contact = true
+      }
+
+      if (filters?.task_status.length) {
+        apiFilters.task_status = filters.task_status
+      }
+
+      if (filters.mention) {
+        apiFilters.has_mention = true
       }
 
       // Map sort keys to API parameters
@@ -219,8 +250,11 @@ export default {
       let data = []
 
       this.setIsLoadingInboxesUnreadCount(true)
+
+      const filters = this.$store.state.TeamInbox.activeFilters || {}
+
       try {
-        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds)
+        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds, filters)
         data = newData
 
         switch (data.length) {

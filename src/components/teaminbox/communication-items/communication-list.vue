@@ -37,6 +37,7 @@
                        :contact-name="item.contact?.name"
                        :contact-phone-number="item.contact?.phone_number || item.lead_number"
                        :campaign-id="item.campaign_id"
+                       :campaign="item.campaign"
                        :disposition-status="item.disposition_status2"
                        :type="item.type"
                        :direction="item.direction"
@@ -88,6 +89,7 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapState } from 'vuex'
+
 export default {
   components: {
     Communication,
@@ -168,7 +170,7 @@ export default {
 
       if (item.type === CommunicationTypes.RVM) {
         const direction = item.direction === CommunicationDirections.INBOUND ? CommunicationDirections.INBOUND_STRING : CommunicationDirections.OUTBOUND_STRING
-        return `${direction} ${CommunicationTypes.RVM_TYPE}`
+        return `${direction} ${CommunicationTypes.RVM_LABEL}`
       }
 
       return ''

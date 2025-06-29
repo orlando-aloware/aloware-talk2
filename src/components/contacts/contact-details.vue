@@ -9,7 +9,8 @@
         </span>
       </div>
       <profile class="p-0"
-               :hide-profile-info="true"/>
+               :hide-profile-info="true"
+               v-if="!fromTeamInbox"/>
     </div>
     <div class="contact-details-wrapper h-100 flex-grow-1 overflow-hidden">
       <div class="details-component-container h-100"
@@ -69,7 +70,7 @@
                                 :team-inbox-id="teamInboxId"
                                 :from-team-inbox="fromTeamInbox"
                                 :is-read-only="isReadOnly"/>
-          <contact-reservations v-if="contact && showGuestyReservations()"
+          <contact-reservations v-if="contact"
                                 data-testid="contact-details-reservations"
                                 :contact="contact"/>
           <contact-reservations-messages v-if="contact && showGuestyReservations()"

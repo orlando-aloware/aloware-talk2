@@ -89,6 +89,9 @@ export default {
   setSelectedList: ({ commit }, payload) => {
     commit('SET_SELECTED_LIST', payload)
   },
+  setPersistedListId: ({ commit }, listId) => {
+    commit('SET_PERSISTED_LIST_ID', listId)
+  },
 
   setSelectedListContactCount: ({ commit }, count) => {
     commit('SET_SELECTED_LIST_CONTACT_COUNT', count)
@@ -349,12 +352,6 @@ export default {
   },
   setSequenceInfoLoading: ({ commit }, value) => {
     commit('SET_SEQUENCE_INFO_LOADING', value)
-  },
-  setLineIncomingNumber: ({ commit }, payload) => {
-    commit('SET_LINE_INCOMING_NUMBER', payload)
-  },
-  setLineIncomingNumberLoading: ({ commit }, value) => {
-    commit('SET_LINE_INCOMING_NUMBER_LOADING', value)
   },
   setIsContactMixinUsed: ({ commit }, value) => {
     commit('SET_IS_CONTACT_MIXIN_USED', value)

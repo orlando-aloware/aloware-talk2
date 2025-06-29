@@ -262,6 +262,10 @@ export default {
           params.page = this.inQueueFetchTasks.currentPage + 1
         }
 
+        const incomingCalls = this.powerDialerTasks.in_queue.filter(task =>
+          task && typeof task === 'object' && 'communication_id' in task
+        )
+
         this.getTaskByFilter(params)
           .then(res => {
             this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
@@ -280,6 +284,9 @@ export default {
               this.powerDialerTasks[taskType] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
             }
 
+            if (status === AutoDialTaskStatus.STATUS_QUEUED) {
+              this.powerDialerTasks[taskType].unshift(...incomingCalls)
+            }
             // no more queued tasks
             if (this.powerDialerTasks?.in_queue?.length === 0 && status === AutoDialTaskStatus.STATUS_QUEUED) {
               this.$VueEvent.fire('initiate_session_no_tasks')

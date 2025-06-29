@@ -11,6 +11,7 @@
         <trial-expired-modal v-if="showTrialExpiredModal"/>
         <cancelled-account-modal v-else-if="showCancelledAccountModal"/>
         <trial-banner v-else-if="showIsTrialBanner"/>
+        <teaminbox-empty-state-video v-else-if="showTeamInboxEmptyStateVideo"/>
         <teaminbox-tutorial-video v-else-if="showTeamInboxTutorialVideo"/>
       </template>
       <div class="h-100"
@@ -233,8 +234,17 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
-import { mapFields } from 'vuex-map-fields'
+import DialerForm from 'components/dialer/dialer-form'
+import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
+import Phone from 'components/dialer/phone'
+import KycFillDialog from 'components/kyc-fill-dialog.vue'
+import KycReloadDialog from 'components/kyc-reload-dialog.vue'
+import Modal from 'components/modal.vue'
+import ProFeatureDialog from 'components/pro-feature-dialog.vue'
+import teaminboxEmptyStateVideo from 'components/teaminbox/teaminbox-empty-state-video.vue'
+import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
+import TrialBanner from 'components/trial-banner.vue'
+import _ from 'lodash'
 import {
   accessMixin,
   aclMixin,
@@ -254,17 +264,14 @@ import {
   visibilityMixin,
   webrtcMixin
 } from 'src/boot/mixins'
-import AppHeader from 'src/components/layout/app-header'
-import AppFooter from 'src/components/layout/app-footer'
-import AppSidebar from 'src/components/layout/app-sidebar'
+import AccountSelector from 'src/components/account-selector.vue'
+import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import Dialer from 'src/components/dialer/dialer'
+import AppFooter from 'src/components/layout/app-footer'
+import AppHeader from 'src/components/layout/app-header'
+import AppSidebar from 'src/components/layout/app-sidebar'
+import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 import * as AgentStatus from 'src/constants/agent-status'
-import * as CommunicationTypes from 'src/constants/communication-types'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import * as MetricOptionGroups from 'src/constants/metric-option-groups'
-import * as AppDefaultLogin from 'src/constants/user-default-login'
-import * as CommunicationDirection from 'src/constants/communication-direction'
-import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import {
   ALL_INPROGRESS_STATUSES,
   COMPLETED_STATUSES,
@@ -274,32 +281,27 @@ import {
   INCOMING_STATUSES,
   INPROGRESS_UNCONNECTED_STATUSES
 } from 'src/constants/communication-current-status'
-import _ from 'lodash'
-import DialerForm from 'components/dialer/dialer-form'
-import Phone from 'components/dialer/phone'
-import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
-import * as storage from 'src/plugins/helpers/storage'
-import ProFeatureDialog from 'components/pro-feature-dialog.vue'
-import KycFillDialog from 'components/kyc-fill-dialog.vue'
-import KycReloadDialog from 'components/kyc-reload-dialog.vue'
-import store from 'src/store'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import { FINISHED } from 'src/constants/export-status'
 import {
   TYPE_COMMUNICATION,
   TYPE_EXPORT_CONTACT_LIST_ITEMS,
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS
 } from 'src/constants/export-types-default'
-import Modal from 'components/modal.vue'
-import talk2Api from 'src/plugins/api/api'
-import { MAX_SCREEN_WIDTH_MOBILE_HEADER } from 'src/constants/viewport-sizes'
-import TrialBanner from 'components/trial-banner.vue'
+import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import * as TrialStatus from 'src/constants/trial-account-status'
-import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
-import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
-import AccountSelector from 'src/components/account-selector.vue'
-import { FINISHED } from 'src/constants/export-status'
-import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
+import { MAX_SCREEN_WIDTH_MOBILE_HEADER } from 'src/constants/viewport-sizes'
+import talk2Api from 'src/plugins/api/api'
 import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
-import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
+import * as storage from 'src/plugins/helpers/storage'
+import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import store from 'src/store'
+import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'MyLayout',
@@ -328,7 +330,8 @@ export default {
     TrialExpiredModal,
     CancelledAccountModal,
     AccountSelector,
-    teaminboxTutorialVideo
+    teaminboxTutorialVideo,
+    teaminboxEmptyStateVideo
   },
 
   mixins: [
@@ -418,6 +421,16 @@ export default {
       'timezones'
     ]),
 
+    ...mapState('TeamInbox', {
+      teamInboxStoreInboxes: 'inboxes',
+      isLoadingTeamInboxes: 'isLoadingInboxes'
+    }),
+
+    ...mapGetters('TeamInbox', [
+      'isTeamInboxesLoaded',
+      'hasTeamInboxes'
+    ]),
+
     ...mapState([
       'dialer',
       'campaigns',
@@ -470,6 +483,10 @@ export default {
       'sessionPaused'
     ]),
 
+    ...mapFields('settings', [
+      'isSidebarCollapsed'
+    ]),
+
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
@@ -490,8 +507,18 @@ export default {
       return this.isTrial && this.companyHasTrialStatus && !this.isWidget
     },
 
+    showTeamInboxEmptyStateVideo () {
+      // Show empty state video when on Team Inbox route AND user has no inboxes
+      return this.$route.name.includes(TEAMINBOXES_MENU_TITLE) &&
+        this.isTeamInboxesLoaded &&
+        !this.hasTeamInboxes
+    },
+
     showTeamInboxTutorialVideo () {
-      return this.$route.name.includes(TEAMINBOXES_MENU_TITLE)
+      // Show tutorial video when on Team Inbox route AND user has inboxes
+      return this.$route.name.includes(TEAMINBOXES_MENU_TITLE) &&
+        this.isTeamInboxesLoaded &&
+        this.hasTeamInboxes
     },
 
     companyHasTrialStatus () {
@@ -886,7 +913,7 @@ export default {
       // or current status is not queued / ring all, close call notification
       if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
         !INCOMING_STATUSES.includes(communication.current_status2)) {
-        console.log('Communication when event closeCallNotifications : ', communication)
+        console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
       }
 
@@ -1224,21 +1251,24 @@ export default {
       this.sidebarVisible = true
     }
 
-    // using the negative because the default should be expanded, so whenever the value is falsy means expanded
-    const isSidebarCollapsed = localStorage.getItem('isSidebarCollapsed')
-
-    if (isSidebarCollapsed === 'true') {
-      this.isSidebarExpanded = false
+    if (this.isSidebarCollapsed !== undefined) {
+      // if user has collapsed the sidebar, keep it collapsed
+      this.isSidebarExpanded = !this.isSidebarCollapsed
+    } else {
+      this.isSidebarExpanded = window?.innerWidth && window.innerWidth > 1366
     }
 
     // check auth every 5 minutes
     const checkInterval = 5 * 60 * 1000
 
     // Handled outdated company info which caused the refresh loop problem
-    if (!this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled) {
+    if (this.profile?.company_id && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
       this.$axios.get('/api/v1/company/' + this.profile.company_id)
         .then((res) => {
           this.setCurrentCompany(res.data)
+        })
+        .catch(err => {
+          console.error('Error fetching company info:', err)
         })
     }
 
@@ -1534,8 +1564,7 @@ export default {
 
     toggleSidebarExpansion () {
       this.isSidebarExpanded = !this.isSidebarExpanded
-
-      localStorage.setItem('isSidebarCollapsed', !this.isSidebarExpanded)
+      this.isSidebarCollapsed = !this.isSidebarExpanded
     },
 
     toggleSidebar () {
@@ -2829,6 +2858,10 @@ export default {
 
       this.checkDebounce()
 
+      if (this.profile?.company && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
+        this.setCurrentCompany(this.profile.company)
+      }
+
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
@@ -3045,6 +3078,12 @@ export default {
       if (value <= MAX_SCREEN_WIDTH_MOBILE_HEADER && this.$q.screen.gt.sm &&
         !this.showContactsHeader) {
         this.setShowContactsHeader(true)
+      }
+    },
+
+    isSidebarCollapsed (value) {
+      if (value) {
+        this.isSidebarExpanded = !value
       }
     }
   },

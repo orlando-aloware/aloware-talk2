@@ -1,6 +1,8 @@
-import { THREADED } from './teaminbox.store'
+import { THREADED, DEFAULT_FILTERS } from './teaminbox.store'
+import { updateField } from 'vuex-map-fields'
 
 export default {
+  updateField,
   SET_ACTIVE_INBOX_ID (state, inbox) {
     state.activeInboxId = inbox
   },
@@ -9,6 +11,9 @@ export default {
   },
   SET_INBOXES (state, inboxesFirstPage) {
     state.inboxes = [ ...inboxesFirstPage ]
+  },
+  SET_HAS_ANY_INBOXES (state, hasAny) {
+    state.hasAnyInboxes = hasAny
   },
   RESET_INBOXES (state) {
     state.inboxes = []
@@ -86,9 +91,6 @@ export default {
   SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON (state, show) {
     state.showRefreshCommunicationsButton = show
   },
-  SET_ACTIVE_FILTERS (state, filters) {
-    state.activeFilters = filters
-  },
   SET_ACTIVE_SORT (state, sort) {
     state.activeSort = sort
   },
@@ -110,6 +112,9 @@ export default {
   SET_TEAM_INBOX_TUTORIAL_COMPONENT (state, ref) {
     state.teamInboxTutorialComponent = ref
   },
+  SET_TEAM_INBOX_EMPTY_STATE_VIDEO_COMPONENT (state, ref) {
+    state.teamInboxEmptyStateVideoComponent = ref
+  },
   SET_CONTACTS_LAST_USED_LINE (state, { inboxId, contactId, lastLineUsed }) {
     state.contactsLastUsedLines.set(`${inboxId}-${contactId}`, lastLineUsed)
   },
@@ -130,7 +135,7 @@ export default {
     state.activeInboxContactUnreadCount = 0
     state.unreadCountLoaded = false
     state.viewMode = THREADED
-    state.activeFilters = {}
+    state.activeFilters = { ...DEFAULT_FILTERS }
     state.activeSort = {}
     state.teamInboxTutorialComponent = null
     state.contactsLastUsedLines = new Map()

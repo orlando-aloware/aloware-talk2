@@ -15,13 +15,11 @@
                     width="20px"
                     v-if="isLoadingUnreadCount"/>
         <q-badge pill
-                color="danger"
                 rounded
                 v-else-if="unreadCount < 99">
           {{ unreadCount }}
         </q-badge>
         <q-badge pill
-                 color="danger"
                  rounded
                  v-else>
           99<sup>+</sup>
@@ -29,17 +27,19 @@
       </div>
     </div>
     <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
-        placement="right"
+        :placement="isMobile ? 'bottom' : 'right'"
         :target="`teaminbox-nav-item-${_uid}`"
         boundary="window"
-        :delay="500">
-        {{ label }} - {{ unreadCount }} unread communications
+        :delay="500"
+        v-if="tooltipText">
+        {{ tooltipText }}
     </b-tooltip>
   </div>
 </template>
 
 <script>
 import InboxIcon from 'src/components/icons/inbox/inbox-icon.vue'
+import { mapState } from 'vuex'
 
 export default {
   props: {
@@ -71,11 +71,38 @@ export default {
 
   components: {
     InboxIcon
+  },
+
+  computed: {
+    ...mapState(['isMobile']),
+
+    tooltipText () {
+      if (this.isMobile) {
+        return ''
+      }
+
+      if (this.label?.length <= 19 && this.unreadCount <= 99) {
+        return ''
+      }
+
+      let text = ''
+
+      if (this.label?.length > 19) {
+        text = this.label
+      }
+
+      if (this.unreadCount > 99) {
+        text += `${text ? ' -' : ''} ${this.unreadCount} unread communications`
+      }
+
+      return text
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import 'src/css/variables.scss';
 .teaminbox-nav-item {
   padding: 10px 16px;
   border-radius: 10px;
@@ -116,13 +143,16 @@ export default {
     transition: all 0.3s ease-out;
 
     .q-badge {
-      font-size: 9px;
-      width: 27px;
-      height: 27px;
+      font-size: 10px;
+      line-height: 11px;
+      font-weight: bold;
+      width: 21px;
+      height: 21px;
       border-radius: 100px;
       display: flex;
       justify-content: center;
       align-items: center;
+      background-color: $red-95;
     }
   }
 

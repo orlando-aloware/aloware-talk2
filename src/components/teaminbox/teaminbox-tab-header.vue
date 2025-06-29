@@ -6,21 +6,41 @@
                      v-if="collapseTarget && !isMobile"/>
 
     <template v-if="!isSearchActive">
-      <label class="teaminbox-tab__header__label ellipse"
-             :id="`teaminbox-tab-header-label-${_uid}`"
-             v-if="activeInbox.name">
-        {{ activeInbox.name }}
+      <div class="d-flex align-items-center position-relative max-w-100 overflow-hidden pr-1">
+        <label class="teaminbox-tab__header__label ellipse"
+               :id="`teaminbox-tab-header-label-${_uid}`"
+               v-if="activeInbox.name">
+          {{ activeInbox.name }}
+        </label>
         <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
-          placement="right"
-          :target="`teaminbox-tab-header-label-${_uid}`"
-          boundary="window"
-          :delay="500">
+                   placement="right"
+                   boundary="window"
+                   :target="`teaminbox-tab-header-label-${_uid}`"
+                   :delay="500">
           {{ activeInbox.name }}
         </b-tooltip>
-      </label>
+        <b-badge pill
+                 class="unread-badge mr-1"
+                 :id="`teaminbox-tab-header-unread-counter-${_uid}`"
+                 v-if="collapsed && activeInboxUnreadCount > 0">
+          <span>
+            <template v-if="activeInboxUnreadCount <= 99">{{ activeInboxUnreadCount }}</template>
+            <template v-else>99<sup>+</sup></template>
+          </span>
+          <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+                     placement="right"
+                     boundary="window"
+                     :target="`teaminbox-tab-header-unread-counter-${_uid}`"
+                     :delay="500"
+                     v-if="activeInboxUnreadCount > 99">
+            {{ activeInboxUnreadCount }} unread communications
+          </b-tooltip>
+        </b-badge>
+      </div>
+
       <q-space></q-space>
 
-      <span class="cursor-pointer mr-2"
+      <span class="cursor-pointer mr-2 comms-page-icon-position-fix"
             :id="`teaminbox-tab-open-comms-page-icon-${_uid}`"
             @click="openCommunicationsPage">
         <watch-icon />
@@ -32,7 +52,7 @@
         </b-tooltip>
       </span>
 
-      <span class="cursor-pointer"
+      <span class="cursor-pointer search-icon-position-fix"
             :id="`teaminbox-tab-search-icon-${_uid}`"
             @click="onEnterSearch">
         <search-icon color="#256eff"
@@ -70,12 +90,13 @@
 </template>
 
 <script>
-import CollapseButton from 'src/components/collapse-button.vue'
+import CollapseButton from 'src/components/teaminbox/collapse-button.vue'
 import SearchIcon from 'src/components/icons/search-icon.vue'
 import WatchIcon from 'src/components/icons/watch-icon.vue'
 import SearchInput from 'src/components/search-input.vue'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
 import { mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   props: {
@@ -107,10 +128,29 @@ export default {
   computed: {
     ...mapState('TeamInbox', [
       'viewMode',
-      'activeInbox'
+      'activeInbox',
+      'inboxesUnreadCount'
     ]),
 
-    ...mapState(['isMobile'])
+    ...mapState(['isMobile']),
+
+    ...mapFields('settings', ['isTeamInboxNavListCollapsed']),
+
+    activeInboxUnreadCount () {
+      if (!this.activeInbox?.id) {
+        return 0
+      }
+
+      return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === this.activeInbox.id)?.unread_count || 0
+    }
+  },
+
+  mounted () {
+    if (this.isTeamInboxNavListCollapsed !== undefined) {
+      this.collapsed = this.isTeamInboxNavListCollapsed
+    } else if (window.innerWidth < 1367) {
+      this.collapsed = true
+    }
   },
 
   methods: {
@@ -163,23 +203,28 @@ export default {
       }
 
       this.$emit('search', search)
+    },
+
+    isTeamInboxNavListCollapsed () {
+      this.collapsed = this.isTeamInboxNavListCollapsed
     }
   }
 }
 </script>
 
 <style lang="scss">
+@import 'src/css/variables.scss';
 .teaminbox-tab__header {
   display: flex;
   align-items: center;
-  padding: 14px 16px;
+  padding: 14px 12px;
   width: 100%;
 
   &__label {
+    position: relative;
     margin: 0px;
     font-weight: 500;
     font-size: 16px;
-    flex-grow: 1;
   }
 
   &__search {
@@ -202,6 +247,28 @@ export default {
         }
       }
     }
+  }
+
+  .unread-badge {
+    cursor: pointer;
+    flex-shrink: 0;
+    margin: 0 5px;
+    font-size: 10px;
+    font-weight: bold;
+    height: 19px;
+    width: 19px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $red-95;
+  }
+
+  .comms-page-icon-position-fix {
+    margin-top: -4px;
+  }
+
+  .search-icon-position-fix {
+    margin-top: -3px;
   }
 }
 </style>

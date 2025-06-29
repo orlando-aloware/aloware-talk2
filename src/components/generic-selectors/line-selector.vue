@@ -231,6 +231,21 @@ export default {
     isReadOnly: {
       type: Boolean,
       default: false
+    },
+
+    preSelectedTeamInboxLineId: {
+      type: Number,
+      default: null
+    },
+
+    hideBottomSpace: {
+      type: Boolean,
+      default: false
+    },
+
+    width: {
+      type: String,
+      default: undefined
     }
   },
 
