@@ -112,7 +112,7 @@
       v-if="lineInboxName && !isCallCompleted"
       class="d-flex justify-center text-grey-82 text-xxs mt-n2 bg-blue-80"
     >
-      {{ lineInboxName }}
+      Inbox: {{ lineInboxName }}
     </div>
     <div class="bg-dark d-flex align-items-center justify-content-center h-100 flex-grow-1 overflow-hidden"
          v-if="loadingPhone">
