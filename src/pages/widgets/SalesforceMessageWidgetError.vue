@@ -5,23 +5,23 @@
       <p class="q-mb-lg">{{ errorMessage }}</p>
 
       <div v-if="errorCode === HubspotMessageError.ERROR_NO_MATCHING_ALOWARE_AND_CRM_ACCOUNT_ID">
-        <p>Fix by re-authenticating the {{ whiteLabelName }} Salesforce integration from <a
+        <p>Fix by re-authenticating the Aloware Salesforce integration from <a
             class="text-blue"
             target="_blank"
             :href="integrationSettingsUrl"
           >Salesforce Settings</a>.</p>
       </div>
       <div v-else-if="errorCode === HubspotMessageError.ERROR_CONNECTED_ALOWARE_ACCOUNT_TO_CRM_DELETED">
-        <p>Fix by uninstalling the {{ whiteLabelName }} app in Salesforce.</p>
+        <p>Fix by uninstalling the Aloware app in Salesforce.</p>
       </div>
       <div v-else-if="errorCode === HubspotMessageError.ERROR_ALOWARE_ACCOUNT_SUSPENDED">
-        <p>Fix by sending an email to {{ whiteLabelName }} Support (<a
+        <p>Fix by sending an email to Aloware Support (<a
             class="text-blue"
             href="mailto:support@aloware.com"
           >support@aloware.com</a>).</p>
       </div>
       <div v-else-if="errorCode === HubspotMessageError.ERROR_CRM_INTEGRATION_DISABLED">
-        <p>Fix by enabling the Salesforce integration in {{ whiteLabelName }} from <a
+        <p>Fix by enabling the Salesforce integration in Aloware from <a
             class="text-blue"
             target="_blank"
             :href="integrationSettingsUrl"
@@ -30,12 +30,12 @@
       <div v-else-if="errorCode === HubspotMessageError.ERROR_CONTACT_FETCH_FAILED">
         <p>Try the following steps:</p>
         <p>1. Try refreshing the page.</p>
-        <p>2. If error persists, try re-authenticating the {{ whiteLabelName }} Salesforce integration from <a
+        <p>2. If error persists, try re-authenticating the Aloware Salesforce integration from <a
             target="_blank"
             class="text-blue"
             :href="integrationSettingsUrl"
           >Salesforce Settings</a>.</p>
-        <p>3. If error persists, take a full screenshot and email {{ whiteLabelName }} Support (<a
+        <p>3. If error persists, take a full screenshot and email Aloware Support (<a
             class="text-blue"
             href="mailto:support@aloware.com"
           >support@aloware.com</a>).</p>
@@ -77,10 +77,10 @@
               data-testid="integration-salesforce-sync-tooltip"
               :offset="[0, 50]"
             >
-              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and Salesforce.</p>
+              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between Aloware and Salesforce.</p>
               <p class="font-weight-bold">You'll want to click on this button if:</p>
               <p class="mt-1 mb-0">- The contact was recently merged in Salesforce with another contact.</p>
-              <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and Salesforce data on
+              <p class="mt-0 mb-0">- You notice any inconsistencies between Aloware and Salesforce data on
                 this contact.</p>
             </q-tooltip>
           </b-button>
@@ -88,7 +88,7 @@
       </div>
       <div v-else>
         <p>An unknown error has occurred.</p>
-        <p>Please contact {{ whiteLabelName }} Support at
+        <p>Please contact Aloware Support at
           <a class="text-blue" href="mailto:support@aloware.com">support@aloware.com</a>
           regarding this issue.
         </p>
@@ -99,15 +99,9 @@
 <script>
 import * as HubspotMessageError from 'src/constants/hubspot-message-widget-errors'
 import talk2Api from 'src/plugins/api/api'
-import {
-  whiteLabelMixin
-} from 'src/plugins/mixins'
 
 export default {
   name: 'salesforce-message-widget-error',
-  mixins: [
-    whiteLabelMixin
-  ],
   data () {
     return {
       HubspotMessageError,
