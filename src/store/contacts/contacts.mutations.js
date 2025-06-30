@@ -525,6 +525,12 @@ export default {
   SET_SEQUENCE_INFO_LOADING (state, value) {
     state.sequenceInfoLoading = value
   },
+  SET_LINE_INCOMING_NUMBER (state, payload) {
+    state.lineIncomingNumber = payload
+  },
+  SET_LINE_INCOMING_NUMBER_LOADING (state, value) {
+    state.lineIncomingNumberLoading = value
+  },
   SET_IS_CONTACT_MIXIN_USED (state, value) {
     state.isContactMixinUsed = value
   },
