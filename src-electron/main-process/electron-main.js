@@ -136,9 +136,13 @@ function createWindow () {
     }
   })
 
-  mainWindow.webContents.on('new-window', function (event, url) {
-    event.preventDefault()
+  // Handle all new window requests to open in external browser
+  // This replaces the deprecated 'new-window' event for Electron 22+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    // Open the URL in the user's default browser
     shell.openExternal(url)
+    // Prevent creating a new Electron window
+    return { action: 'deny' }
   })
 }
 
