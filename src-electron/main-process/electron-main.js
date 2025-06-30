@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray, dialog } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeTheme, shell, Tray } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import { Registry } from 'rage-edit'
@@ -136,13 +136,35 @@ function createWindow () {
     }
   })
 
-  // Handle all new window requests to open in external browser
+  // Handle all new window requests
   // This replaces the deprecated 'new-window' event for Electron 22+
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    // Open the URL in the user's default browser
-    shell.openExternal(url)
-    // Prevent creating a new Electron window
-    return { action: 'deny' }
+    // Parse the URL to determine if it should open internally or externally
+    try {
+      const parsedUrl = new URL(url)
+
+      // Check if it's an internal app route (file:// protocol or localhost)
+      const isInternalRoute = parsedUrl.protocol === 'file:' ||
+        parsedUrl.hostname === 'localhost' ||
+        parsedUrl.hostname === '127.0.0.1'
+
+      // Check if it's a widget route or internal navigation
+      const isWidgetNavigation = url.includes('?widget=true') ||
+        url.includes('&widget=true')
+
+      // Allow internal windows for app navigation
+      if (isInternalRoute || isWidgetNavigation) {
+        return { action: 'allow' }
+      }
+
+      // Open all external URLs (CRM links, etc.) in the user's default browser
+      shell.openExternal(url)
+      return { action: 'deny' }
+    } catch (e) {
+      // If URL parsing fails, open externally as a safe default
+      shell.openExternal(url)
+      return { action: 'deny' }
+    }
   })
 }
 
