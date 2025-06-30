@@ -19,5 +19,18 @@ export default {
   // Check if user has any team inboxes attached
   hasTeamInboxes: state => {
     return state.inboxes && state.inboxes.length > 0
+  },
+
+  // Get the campaign ids for the active inbox
+  activeInboxCampaignIds: state => {
+    const callWaitingIds = Array.isArray(state.activeInbox?.campaign_ids_as_call_waiting_ring_group)
+      ? state.activeInbox.campaign_ids_as_call_waiting_ring_group
+      : state.activeInbox?.campaign_ids_as_call_waiting_ring_group
+        ? [state.activeInbox.campaign_ids_as_call_waiting_ring_group]
+        : []
+
+    return state.activeInbox?.campaign_ids
+      ? [...state.activeInbox.campaign_ids, ...callWaitingIds]
+      : callWaitingIds
   }
 }
