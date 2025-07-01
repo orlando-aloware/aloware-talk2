@@ -10,21 +10,29 @@ export default {
         }
 
         // agent name filter
-        const name = !state.filters.agent
-          ? true
-          : agent.name.toUpperCase().includes(state.filters.agent.toUpperCase())
+        if (state.filters.agent && !agent.name.toUpperCase().includes(state.filters.agent.toUpperCase())) {
+          return false
+        }
 
         // status filter
-        const status = state.filters.agentStatus === 'all'
-          ? true
-          : agent.agent_status === state.filters.agentStatus
+        if (state.filters.agentStatus !== 'all' && agent.agent_status !== state.filters.agentStatus) {
+          return false
+        }
 
         // ring group filter
-        const ringGroup = !state.filters.ringGroup
-          ? true
-          : agent.ring_group_ids.includes(state.filters.ringGroup)
+        if (state.filters.ringGroup && !agent.ring_group_ids.includes(state.filters.ringGroup)) {
+          return false
+        }
 
-        return name && status && ringGroup
+        // team filter
+        if (state.filters.teamId) {
+          const team = rootState?.teams?.find(team => team.id === state.filters.teamId)
+          if (!team || !team.users.includes(agent.id)) {
+            return false
+          }
+        }
+
+        return true
       })
   },
 
@@ -37,15 +45,15 @@ export default {
   },
 
   getLiveCalls: (state, getters, rootState) => {
-    return filterCalls(state.calls.live, { users: rootState.users, ...state })
+    return filterCalls(state.calls.live, rootState)
   },
 
   getParkedCalls: (state, getters, rootState) => {
-    return filterCalls(state.calls.parked, { users: rootState.users, ...state })
+    return filterCalls(state.calls.parked, rootState)
   },
 
   getQueuedCalls: (state, getters, rootState) => {
-    return filterCalls(state.calls.queued, { users: rootState.users, ...state })
+    return filterCalls(state.calls.queued, rootState)
   },
 
   getSummary: (state) => {
