@@ -759,7 +759,7 @@ export default {
     async ignoreFishing () {
       if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
         try {
-          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { redirect_to_voicemail: true })
+          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
         } catch (error) {
           console.error('Failed to force terminate communication:', error)
         }
