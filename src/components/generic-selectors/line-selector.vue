@@ -394,6 +394,11 @@ export default {
   mounted () {
     this.loadPlaceholder()
 
+    // Set initial value if campaigns are already loaded
+    if (this.value && !this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
+      this.selectedId = this.value
+    }
+
     if (this.preSelectedTeamInboxLineId) {
       // Line stickiness from the team inbox. Pre-select the last used line for the contact
       const line = this.activeCampaignsAlphabeticalOrder.find(campaign => campaign.id === this.preSelectedTeamInboxLineId)
@@ -451,12 +456,12 @@ export default {
   },
 
   watch: {
-    value () {
+    value (value) {
       if (this.campaignsIsLoading || _.isEmpty(this.campaigns)) {
         return
       }
 
-      this.selectedId = this.value
+      this.selectedId = value
     },
 
     selectedId (val) {
