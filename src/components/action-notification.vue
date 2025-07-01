@@ -756,10 +756,15 @@ export default {
       this.setShowPhone(true)
     },
 
-    ignoreFishing () {
-      if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
-        talk2Api.V1.communication.agentForceTerminate(this.communication.id, { redirect_to_voicemail: true })
+    async ignoreFishing () {
+      try {
+        if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
+          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { redirect_to_voicemail: true })
+        }
+      } catch (error) {
+        console.error('Failed to force terminate communication:', error)
       }
+      
       this.$closeActionNotification('callFishing')
       console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
       this.closeCallNotifications(this.id, this.communicationId)
