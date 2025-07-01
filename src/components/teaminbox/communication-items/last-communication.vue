@@ -125,7 +125,7 @@ export default {
 
 <style scoped lang="scss">
 .last-communication {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
 
   &__label {
