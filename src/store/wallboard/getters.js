@@ -20,8 +20,22 @@ export default {
         }
 
         // ring group filter
-        if (state.filters.ringGroup && !agent.ring_group_ids.includes(state.filters.ringGroup)) {
-          return false
+        if (state.filters.ringGroup) {
+          // check if ring group has teams configured and agent is in the team
+          const ringGroup = rootState.ringGroups?.find((rg) => rg.id === state.filters.ringGroup)
+          let isAgentInRingGroupTeam = false
+          if (ringGroup) {
+            for (const team of ringGroup?.teams ?? []) {
+              if (team.users?.some((teamUser) => teamUser.id === agent.id)) {
+                isAgentInRingGroupTeam = true
+                break
+              }
+            }
+          }
+
+          if (!isAgentInRingGroupTeam && !agent.ring_group_ids.includes(state.filters.ringGroup)) {
+            return false
+          }
         }
 
         // team filter
