@@ -100,15 +100,15 @@
           >
             <i
               class="fa fa-sync-alt"
-              v-if="!isSyncing"
+              v-if="!isForceCreating"
             ></i>
             <q-spinner-bars
-              v-if="isSyncing"
+              v-if="isForceCreating"
               data-testid="integration-salesforce-sync-spinner"
               color="white"
             >
             </q-spinner-bars>
-            {{ isSyncing ? 'Syncing...' : 'Sync with Aloware' }}
+            {{ isForceCreating ? 'Syncing...' : 'Sync with Aloware' }}
           </b-button>
         </b-row>
       </div>
@@ -132,6 +132,7 @@ export default {
     return {
       HubspotMessageError,
       isSyncing: false,
+      isForceCreating: false,
       integrationData: null,
       contactIntegrationDataLoaded: false
     }
@@ -161,12 +162,17 @@ export default {
   },
   methods: {
     forceCreateAlowareContact () {
-      this.isSyncing = true
+      this.isForceCreating = true
       talk2Api.V1.contact.forceCreateAlowareContactViaSalesforce(this.objectId, this.objectType).then(response => {
-        this.isSyncing = false
-        window.location.href = response.data.uri
+        this.isForceCreating = false
+        if (response.data && response.data.uri) {
+          window.location.href = response.data.uri
+        } else {
+          this.$generalNotification('Contact created successfully, but navigation failed. Please refresh the page.', 'warning')
+          console.warn('Missing URI in response:', response)
+        }
       }).catch(error => {
-        this.isSyncing = false
+        this.isForceCreating = false
         this.$generalNotification('Failed to create Aloware contact. Please try again.', 'error')
         console.error('Error creating Aloware contact:', error)
       })
