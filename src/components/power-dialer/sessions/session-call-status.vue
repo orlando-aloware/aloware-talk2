@@ -154,14 +154,31 @@
     <div class="t-menu-2 no-border w-100"
          :class="isMinimized ? 'd-none' : ''">
       <div class="d-flex align-items-center pt-3 px-3 pb-0 flex-wrap justify-content-between">
-        <div class="font-weight-bold flex-grow-1 session-call-status w-100"
-             style="max-width: 176px;">
-          <q-chip color="grey-50"
-                  class="p-0">
-            <div :class="`text-15 text-lowercase text-capitalize px-2`"
-                 v-html="statusDisplayText">
-            </div>
-          </q-chip>
+        <div class="d-flex align-items-center flex-wrap">
+          <div class="font-weight-bold flex-grow-1 session-call-status"
+               style="max-width: 176px;">
+            <q-chip color="grey-50"
+                    class="p-0">
+              <div :class="`text-15 text-lowercase text-capitalize px-2`"
+                   v-html="statusDisplayText">
+              </div>
+            </q-chip>
+          </div>
+          <q-btn ripple
+                 size="sm"
+                 color="success"
+                 v-if="showStartDialingButton"
+                 @click="startDialing">
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="bottom middle"
+                       self="center middle">
+              Skip Warm-Up and Start Dialing
+            </q-tooltip>
+            <span class="px-2">
+              <call-icon class="mr-1" color="#fff" style="margin-top: -2px"/>
+              Start Dialing
+            </span>
+          </q-btn>
         </div>
 
         <div class="w-100 justify-content-end d-flex align-items-center"
@@ -259,6 +276,12 @@
                  :color="canNextTask ? 'grey-4' : 'grey-8'"
                  :disabled="!canNextTask"
                  @click="onNextTask(false, true)">
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="bottom middle"
+                       self="center middle"
+                       v-if="!canNextTask && nextTooltip">
+              {{ nextTooltip }}
+            </q-tooltip>
             <play-bar-icon class="mr-1"
                          :color="canNextTask ? '#FF3B3B' : '#62666E'"
             />
@@ -403,6 +426,12 @@
                  :color="endSessionButtonColor"
                  :class="endSessionButtonClass"
                  @click="onToggleEnd">
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="bottom middle"
+                       self="center middle"
+                       v-if="isEndSessionDisabled && endSessionTooltip">
+              {{ endSessionTooltip }}
+            </q-tooltip>
 
             <end-call-icon class="mr-2"
                          color="#62666E"/>
@@ -452,6 +481,7 @@ import UnHoldIcon from 'components/icons/pause-icon-3'
 import RefreshIcon from 'components/icons/refresh-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
+import CallIcon from 'components/icons/call-icon'
 import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
@@ -488,7 +518,8 @@ export default {
     StopIcon,
     EndCallIcon,
     RecordIcon,
-    RefreshIcon
+    RefreshIcon,
+    CallIcon
   },
 
   mixins: [
@@ -751,13 +782,28 @@ export default {
     },
 
     canNextTask () {
-      // should be able to next task even if wrap-up is not paused and
-      // status is on warm up period and no manual skip (clicked next task) is in-progress
-      const canNextStatuses = ['WRAP_UP', 'READY']
-      const canNext = this.statusCallConnected ||
-        canNextStatuses.includes(this.dialer.currentStatus)
+      if (this.hasCommunicationAndForcedCallNotDisposed) {
+        return false
+      }
 
-      return !this.wrapUpPaused && !this.loadingNext && canNext
+      if (this.isRedialClicked) {
+        return false
+      }
+
+      // should be able to next task if status is on warm up period
+      // and no manual skip (clicked next task) is in-progress
+      const canNextStatuses = ['WRAP_UP', 'READY']
+      const canNext = this.statusCallConnected || canNextStatuses.includes(this.dialer.currentStatus)
+
+      return !this.loadingNext && canNext
+    },
+
+    nextTooltip () {
+      if (this.hasCommunicationAndForcedCallNotDisposed) {
+        return 'Please select a Call Disposition'
+      }
+
+      return ''
     },
 
     canRedialLater () {
@@ -831,7 +877,22 @@ export default {
     },
 
     isEndSessionDisabled () {
-      return this.toggleEnd || this.wrapUpPaused
+      return this.toggleEnd ||
+        this.hasCommunicationAndForcedCallNotDisposed ||
+        this.loadingNext ||
+        this.isRedialClicked
+    },
+
+    endSessionTooltip () {
+      if (this.toggleEnd) {
+        return ''
+      }
+
+      if (this.hasCommunicationAndForcedCallNotDisposed) {
+        return 'Please select a Call Disposition'
+      }
+
+      return ''
     },
 
     endSessionButtonColor () {
@@ -900,6 +961,10 @@ export default {
       }
 
       return 'This contact has already been redialed once'
+    },
+
+    hasCommunicationAndForcedCallNotDisposed () {
+      return this.dialer?.communication?.id && this.isForcedCallDisposition && !this.isCallDisposed
     }
   },
 
@@ -1260,6 +1325,7 @@ export default {
     onToggleEnd () {
       this.togglePause = true
       this.toggleEnd = !this.toggleEnd
+      this.clearWarmUpCountDown()
       this.reRoute()
     },
 
@@ -1685,6 +1751,13 @@ export default {
       }
 
       this.processSession(false)
+    },
+
+    // skip warm-up period and start dialing right away
+    startDialing () {
+      this.clearWarmUpCountDown()
+      this.togglePause = false
+      this.onTimerIsOver()
     }
   },
 
