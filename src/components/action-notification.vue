@@ -757,12 +757,12 @@ export default {
     },
 
     async ignoreFishing () {
-      try {
-        if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
+      if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
+        try {
           await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { redirect_to_voicemail: true })
+        } catch (error) {
+          console.error('Failed to force terminate communication:', error)
         }
-      } catch (error) {
-        console.error('Failed to force terminate communication:', error)
       }
       
       this.$closeActionNotification('callFishing')
