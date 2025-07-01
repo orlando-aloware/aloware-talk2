@@ -764,7 +764,7 @@ export default {
           console.error('Failed to force terminate communication:', error)
         }
       }
-      
+
       this.$closeActionNotification('callFishing')
       console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
       this.closeCallNotifications(this.id, this.communicationId)
