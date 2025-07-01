@@ -86,6 +86,32 @@
           </b-button>
         </b-row>
       </div>
+      <div v-else-if="errorCode === HubspotMessageError.ERROR_ASSOCIATED_MODULE_IS_NOT_ENABLED">
+        <b-row v-if='objectType && objectId'>
+          <p>To fix this:</p>
+          <p>Click the button below to create an Aloware contact and link it to the current Salesforce object. Once linked, you'll be able to send messages through Aloware.</p>
+          <b-button
+            class="text-white"
+            size="sm"
+            variant="primary"
+            tabindex="0"
+            data-testid="integration-salesforce-force-create-aloware-contact-button"
+            @click="forceCreateAlowareContact"
+          >
+            <i
+              class="fa fa-sync-alt"
+              v-if="!isSyncing"
+            ></i>
+            <q-spinner-bars
+              v-if="isSyncing"
+              data-testid="integration-salesforce-sync-spinner"
+              color="white"
+            >
+            </q-spinner-bars>
+            {{ isSyncing ? 'Syncing...' : 'Sync with Aloware' }}
+          </b-button>
+        </b-row>
+      </div>
       <div v-else>
         <p>An unknown error has occurred.</p>
         <p>Please contact Aloware Support at
@@ -125,9 +151,22 @@ export default {
     },
     contactId () {
       return this.$route.query.contact_id ?? null
+    },
+    objectType () {
+      return this.$route.query.object_type ?? null
+    },
+    objectId () {
+      return this.$route.query.object_id ?? null
     }
   },
   methods: {
+    forceCreateAlowareContact () {
+      this.isSyncing = true
+      talk2Api.V1.contact.forceCreateAlowareContactViaSalesforce(this.objectId, this.objectType).then(response => {
+        this.isSyncing = false
+        window.location.href = response.data.uri
+      })
+    },
     syncSalesforce () {
       this.isSyncing = true
       talk2Api.V1.contact.syncSalesforce(this.contactId).then(response => {

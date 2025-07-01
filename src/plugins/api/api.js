@@ -191,6 +191,15 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}contact/${id}/sync-salesforce`)
       },
 
+      forceCreateAlowareContactViaSalesforce (id, type) {
+        return window.axios.post(`${suffixV1}integrations/salesforce/force-create-aloware-contact`, {
+          params: {
+            objectType: type,
+            recordId: id
+          }
+        })
+      },
+
       syncGuesty (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-guesty`)
       },
