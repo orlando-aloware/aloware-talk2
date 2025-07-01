@@ -9,15 +9,12 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
  * @param {object} state
  * @returns {array}
  */
-export function filterCalls (calls, state) {
+export function filterCalls (calls, state, rootState) {
   return calls.filter(call => {
     // ring group filter
-    const ringGroup = !state.filters.ringGroup
-      ? true
-      : call.ring_group_id === state.filters.ringGroup
-
-    // agent name filter
-    let agentName = true
+    if (state.filters.ringGroup && call.ring_group_id !== state.filters.ringGroup) {
+      return false
+    }
 
     if (state.filters.agent) {
       // skip this call if agent name filter is filled, but the call doesn't contain a user
@@ -25,13 +22,31 @@ export function filterCalls (calls, state) {
         return false
       }
 
-      const agent = state.users.find(agent => agent.id === call.user_id)
+      const agent = rootState.users.find(agent => agent.id === call.user_id)
 
       // checks if agent name contains the term searched
-      agentName = agent.name.toUpperCase().includes(state.filters.agent.toUpperCase())
+      if (!agent.name.toUpperCase().includes(state.filters.agent.toUpperCase())) {
+        return false
+      }
     }
 
-    return ringGroup && agentName
+    // team filter
+    if (state.filters.teamId) {
+      // skip this call if team filter is filled, but the call doesn't contain a user
+      if (!call.user_id) {
+        return false
+      }
+
+      const agent = rootState.users.find(agent => agent.id === call.user_id)
+
+      // checks if agent belongs to the selected team
+      const team = rootState?.teams?.find(team => team.id === state.filters.teamId)
+      if (!team || !team.users?.includes(agent.id)) {
+        return false
+      }
+    }
+
+    return true
   })
 }
 
