@@ -188,7 +188,7 @@ export default {
         }, 500)
       }).catch(error => {
         this.isSyncing = false
-        this.$generalNotification('Failed to sync contact with Salesforce. Please try again.', 'negative')
+        this.$generalNotification('Failed to sync contact with Salesforce. Please try again.', 'error')
         console.error('Error syncing Salesforce contact:', error)
       })
     }
