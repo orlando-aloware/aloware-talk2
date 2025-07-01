@@ -165,6 +165,10 @@ export default {
       talk2Api.V1.contact.forceCreateAlowareContactViaSalesforce(this.objectId, this.objectType).then(response => {
         this.isSyncing = false
         window.location.href = response.data.uri
+      }).catch(error => {
+        this.isSyncing = false
+        this.$generalNotification('Failed to create Aloware contact. Please try again.', 'error')
+        console.error('Error creating Aloware contact:', error)
       })
     },
     syncSalesforce () {
@@ -182,6 +186,10 @@ export default {
             console.log(err)
           })
         }, 500)
+      }).catch(error => {
+        this.isSyncing = false
+        this.$generalNotification('Failed to sync contact with Salesforce. Please try again.', 'negative')
+        console.error('Error syncing Salesforce contact:', error)
       })
     }
   }

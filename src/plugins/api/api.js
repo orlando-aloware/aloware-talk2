@@ -193,10 +193,8 @@ const talk2Api = {
 
       forceCreateAlowareContactViaSalesforce (id, type) {
         return window.axios.post(`${suffixV1}integrations/salesforce/force-create-aloware-contact`, {
-          params: {
-            objectType: type,
-            recordId: id
-          }
+          objectType: type,
+          recordId: id
         })
       },
 
