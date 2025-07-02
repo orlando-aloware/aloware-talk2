@@ -133,7 +133,8 @@ export default {
       'setActiveSort',
       'setCurrentSearch',
       'setIsInitialLoad',
-      'setIsLoadingMoreItems'
+      'setIsLoadingMoreItems',
+      'setContactsLastUsedLines'
     ]),
 
     getUnreadsProperties (communication) {
@@ -482,7 +483,26 @@ export default {
     },
 
     async updatedCommunicationListener (communication) {
+      this.updateContactLastUsedLine(communication)
       await this.processCommunication(communication)
+    },
+
+    updateContactLastUsedLine (communication) {
+      const { contact_id: contactId, ring_group_id: ringGroupId, campaign_id: campaignId } = communication
+      const isCommunicationInProgress = this.communicationInProgress(communication)
+
+      if (!contactId || !ringGroupId || !campaignId || !isCommunicationInProgress) {
+        return
+      }
+
+      // Update the last used line for the contact in the store
+      this.setContactsLastUsedLines({
+        inboxId: ringGroupId,
+        data: [{
+          contact_id: contactId,
+          last_line_used: campaignId
+        }]
+      })
     },
 
     updatedContactListener (contact) {

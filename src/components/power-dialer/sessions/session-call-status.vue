@@ -154,14 +154,31 @@
     <div class="t-menu-2 no-border w-100"
          :class="isMinimized ? 'd-none' : ''">
       <div class="d-flex align-items-center pt-3 px-3 pb-0 flex-wrap justify-content-between">
-        <div class="font-weight-bold flex-grow-1 session-call-status w-100"
-             style="max-width: 176px;">
-          <q-chip color="grey-50"
-                  class="p-0">
-            <div :class="`text-15 text-lowercase text-capitalize px-2`"
-                 v-html="statusDisplayText">
-            </div>
-          </q-chip>
+        <div class="d-flex align-items-center flex-wrap">
+          <div class="font-weight-bold flex-grow-1 session-call-status"
+               style="max-width: 176px;">
+            <q-chip color="grey-50"
+                    class="p-0">
+              <div :class="`text-15 text-lowercase text-capitalize px-2`"
+                   v-html="statusDisplayText">
+              </div>
+            </q-chip>
+          </div>
+          <q-btn ripple
+                 size="sm"
+                 color="success"
+                 v-if="showStartDialingButton"
+                 @click="startDialing">
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="bottom middle"
+                       self="center middle">
+              Skip Warm-Up and Start Dialing
+            </q-tooltip>
+            <span class="px-2">
+              <call-icon class="mr-1" color="#fff" style="margin-top: -2px"/>
+              Start Dialing
+            </span>
+          </q-btn>
         </div>
 
         <div class="w-100 justify-content-end d-flex align-items-center"
@@ -196,8 +213,8 @@
             no-caps
             left
             :auto-close="true"
-            :disable="!canRedialNow && !canRedialLater"
-            :color="canRedialNow || canRedialLater ? 'blue-7' : 'grey-8'">
+            :disable="redialDropdownDisabled"
+            :color="!redialDropdownDisabled ? 'blue-7' : 'grey-8'">
             <template v-slot:label>
               <refresh-icon class="mr-2"
                            color="white"/>
@@ -205,8 +222,8 @@
                 <q-tooltip content-class="bg-grey-light11"
                            anchor="bottom middle"
                            self="center middle"
-                           v-if="dialer.currentStatus === 'CALL_CONNECTED' && !canRedialNow && !canRedialLater">
-                  This contact has already been redialed once
+                           v-if="redialDropdownDisabled && redialDropdownTooltip">
+                  {{ redialDropdownTooltip }}
                 </q-tooltip>
                 Redial
               </div>
@@ -259,6 +276,12 @@
                  :color="canNextTask ? 'grey-4' : 'grey-8'"
                  :disabled="!canNextTask"
                  @click="onNextTask(false, true)">
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="bottom middle"
+                       self="center middle"
+                       v-if="!canNextTask && nextTooltip">
+              {{ nextTooltip }}
+            </q-tooltip>
             <play-bar-icon class="mr-1"
                          :color="canNextTask ? '#FF3B3B' : '#62666E'"
             />
@@ -403,6 +426,12 @@
                  :color="endSessionButtonColor"
                  :class="endSessionButtonClass"
                  @click="onToggleEnd">
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="bottom middle"
+                       self="center middle"
+                       v-if="isEndSessionDisabled && endSessionTooltip">
+              {{ endSessionTooltip }}
+            </q-tooltip>
 
             <end-call-icon class="mr-2"
                          color="#62666E"/>
@@ -452,6 +481,7 @@ import UnHoldIcon from 'components/icons/pause-icon-3'
 import RefreshIcon from 'components/icons/refresh-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
+import CallIcon from 'components/icons/call-icon'
 import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
@@ -488,7 +518,8 @@ export default {
     StopIcon,
     EndCallIcon,
     RecordIcon,
-    RefreshIcon
+    RefreshIcon,
+    CallIcon
   },
 
   mixins: [
@@ -751,13 +782,28 @@ export default {
     },
 
     canNextTask () {
-      // should be able to next task even if wrap-up is not paused and
-      // status is on warm up period and no manual skip (clicked next task) is in-progress
-      const canNextStatuses = ['WRAP_UP', 'READY']
-      const canNext = this.statusCallConnected ||
-        canNextStatuses.includes(this.dialer.currentStatus)
+      if (this.hasCommunicationAndForcedCallNotDisposed) {
+        return false
+      }
 
-      return !this.wrapUpPaused && !this.loadingNext && canNext
+      if (this.isRedialClicked) {
+        return false
+      }
+
+      // should be able to next task if status is on warm up period
+      // and no manual skip (clicked next task) is in-progress
+      const canNextStatuses = ['WRAP_UP', 'READY']
+      const canNext = this.statusCallConnected || canNextStatuses.includes(this.dialer.currentStatus)
+
+      return !this.loadingNext && canNext
+    },
+
+    nextTooltip () {
+      if (this.hasCommunicationAndForcedCallNotDisposed) {
+        return 'Please select a Call Disposition'
+      }
+
+      return ''
     },
 
     canRedialLater () {
@@ -831,7 +877,22 @@ export default {
     },
 
     isEndSessionDisabled () {
-      return this.toggleEnd || this.wrapUpPaused
+      return this.toggleEnd ||
+        this.hasCommunicationAndForcedCallNotDisposed ||
+        this.loadingNext ||
+        this.isRedialClicked
+    },
+
+    endSessionTooltip () {
+      if (this.toggleEnd) {
+        return ''
+      }
+
+      if (this.hasCommunicationAndForcedCallNotDisposed) {
+        return 'Please select a Call Disposition'
+      }
+
+      return ''
     },
 
     endSessionButtonColor () {
@@ -872,6 +933,38 @@ export default {
 
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
+    },
+
+    redialDropdownDisabled () {
+      if (this.isForcedCallDisposition && !this.isCallDisposed) {
+        return true
+      }
+
+      if (this.isForcedContactDisposition && !this.isContactDisposed) {
+        return true
+      }
+
+      return !this.canRedialNow && !this.canRedialLater
+    },
+
+    redialDropdownTooltip () {
+      if (!this.statusCallConnected) {
+        return
+      }
+
+      if (this.isForcedCallDisposition && !this.isCallDisposed) {
+        return 'Please select a Call Disposition'
+      }
+
+      if (this.isForcedContactDisposition && !this.isContactDisposed) {
+        return 'Please select a Contact Disposition'
+      }
+
+      return 'This contact has already been redialed once'
+    },
+
+    hasCommunicationAndForcedCallNotDisposed () {
+      return this.dialer?.communication?.id && this.isForcedCallDisposition && !this.isCallDisposed
     }
   },
 
@@ -1232,6 +1325,7 @@ export default {
     onToggleEnd () {
       this.togglePause = true
       this.toggleEnd = !this.toggleEnd
+      this.clearWarmUpCountDown()
       this.reRoute()
     },
 
@@ -1409,10 +1503,6 @@ export default {
 
         console.log(`%c Redial required, pushing to ${redialNow ? 'TOP' : 'BOTTOM'}`, 'background: yellow; color: #000;')
 
-        if (redialNow) {
-          this.$VueEvent.fire('clearCallDispositionStatus')
-        }
-
         this.activeTask.forcedRedial = true
         return
       }
@@ -1548,7 +1638,7 @@ export default {
       this.sessionPhoneExpansion = ''
     },
 
-    async onRedial (redial, forcedRedial = false) {
+    async onRedial (redialNow, forcedRedial = false) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
 
@@ -1559,7 +1649,7 @@ export default {
       })
 
       let task = null
-      if (redial) {
+      if (redialNow) {
         // get the current task
         task = this.activeTask
       } else {
@@ -1577,14 +1667,18 @@ export default {
       }
 
       this.redialedTask = this.$jsonClone(this.activeTask)
-      this.redialedTask.redialed_now = redial
+      this.redialedTask.redialed_now = redialNow
       this.verifyAgentOnCall = true
 
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('pauseWrapUp', true)
       }
 
-      this.redialTask(this.activeTask, redial, forcedRedial).then(() => {
+      if (redialNow) {
+        this.$VueEvent.fire('clearCallDispositionStatus')
+      }
+
+      this.redialTask(this.activeTask, redialNow, forcedRedial).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
@@ -1596,7 +1690,7 @@ export default {
             this.isRedialClicked = false
             // if it's redial now, we should skip wrap up
             this.wrapUp = false
-            this.skipWrapUp = redial
+            this.skipWrapUp = redialNow
             this.processSession()
           }, 1000)
 
@@ -1657,6 +1751,13 @@ export default {
       }
 
       this.processSession(false)
+    },
+
+    // skip warm-up period and start dialing right away
+    startDialing () {
+      this.clearWarmUpCountDown()
+      this.togglePause = false
+      this.onTimerIsOver()
     }
   },
 
