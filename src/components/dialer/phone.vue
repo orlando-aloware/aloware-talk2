@@ -280,10 +280,10 @@
                   <contact-integrations-link-icons :contact='contact' />
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
-                  <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+                  <span class="d-inline-flex">{{ leadNumberRaw | fixPhone }}</span>
                   <b-link class="copy-phone-number text-grey-100 d-inline-flex ml-1"
                           href="#"
-                          @click.prevent="copyPhoneNumber(dialer.communication.lead_number)">
+                          @click.prevent="copyPhoneNumber(leadNumberRaw)">
                     <copy-icon />
                   </b-link>
                 </q-item-label>
@@ -734,10 +734,10 @@
                   </q-item-label>
                   <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start"
                                 v-if="dialer.communication">
-                    <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+                    <span class="d-inline-flex">{{ leadNumberRaw | fixPhone }}</span>
                     <b-link href="#"
                             class="copy-phone-number text-grey-100 d-inline-flex ml-1"
-                            @click.prevent="copyPhoneNumber(dialer.communication.lead_number)">
+                            @click.prevent="copyPhoneNumber(leadNumberRaw)">
                       <i class="material-icons">content_copy</i>
                     </b-link>
                   </q-item-label>
