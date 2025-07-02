@@ -56,6 +56,14 @@ if (process.env.PROD) {
 let isQuiting = false
 let tray
 
+// Helper function to safely destroy tray
+function destroyTray () {
+  if (tray) {
+    tray.destroy()
+    tray = null
+  }
+}
+
 app.on('before-quit', () => {
   isQuiting = true
 })
@@ -138,9 +146,7 @@ function createWindow () {
     } else if (process.platform === 'win32' && !isQuiting) {
       // On Windows, when closing the window, quit the entire app
       isQuiting = true
-      if (tray) {
-        tray.destroy()
-      }
+      destroyTray()
       app.quit()
     }
   })
@@ -253,10 +259,12 @@ if (gotTheLock) {
 
 // Quit when all windows are closed.  Necessary for Windows.
 app.on('window-all-closed', () => {
-  if (tray) {
-    tray.destroy()
+  // On macOS, keep the app running even when all windows are closed
+  // unless we're explicitly quitting
+  if (process.platform !== 'darwin' || isQuiting) {
+    destroyTray()
+    app.quit()
   }
-  app.quit()
 })
 
 // remove so we can register each time as we run the app.
@@ -383,9 +391,7 @@ function setTray () {
         label: 'Quit',
         click: function () {
           isQuiting = true
-          if (tray) {
-            tray.destroy()
-          }
+          destroyTray()
           mainWindow.destroy()
           app.quit()
         }
@@ -471,9 +477,7 @@ ipcMain.on('restart_app', () => {
 
 ipcMain.on('quit_app', () => {
   isQuiting = true
-  if (tray) {
-    tray.destroy()
-  }
+  destroyTray()
   app.quit()
 })
 
