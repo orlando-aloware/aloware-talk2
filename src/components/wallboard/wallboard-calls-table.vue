@@ -545,7 +545,7 @@ export default {
             condition = this.getUserName(this.getUser(a.user_id)) > this.getUserName(this.getUser(b.user_id))
             break
           case 'id':
-            condition = a.id > b.id
+            condition = a.id < b.id
             break
         }
 
