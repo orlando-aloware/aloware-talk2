@@ -59,15 +59,15 @@ export default {
   },
 
   getLiveCalls: (state, getters, rootState) => {
-    return filterCalls(state.calls.live, rootState)
+    return filterCalls(state.calls.live, state, rootState)
   },
 
   getParkedCalls: (state, getters, rootState) => {
-    return filterCalls(state.calls.parked, rootState)
+    return filterCalls(state.calls.parked, state, rootState)
   },
 
   getQueuedCalls: (state, getters, rootState) => {
-    return filterCalls(state.calls.queued, rootState)
+    return filterCalls(state.calls.queued, state, rootState)
   },
 
   getSummary: (state) => {
