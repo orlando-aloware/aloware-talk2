@@ -414,7 +414,7 @@ import WhisperCommunicationButton from 'src/components/communication/whisper-com
 import EntityTags from 'components/generic-selectors/entity-tags'
 import UserDisplay from 'src/components/user-display.vue'
 import { COLUMNS } from 'src/constants/wallboard/calls-columns'
-import { isParkedCall } from 'src/plugins/helpers/functions'
+import { isLiveCall, isParkedCall } from 'src/plugins/helpers/functions'
 import {
   aclMixin,
   callDispositionMixin,
@@ -502,20 +502,12 @@ export default {
     paginatedCalls () {
       let from = this.pagination.perPage * (this.pagination.page - 1)
       let to = from + this.pagination.perPage
-      let calls = this.orderedCalls
 
-      // use reversed list if order is desc
-      if (this.sort.order === 'desc') {
-        calls.slice().reverse()
-      }
-
-      return calls.filter((call, index) => index >= from && index < to)
+      return this.orderedCalls.filter((call, index) => index >= from && index < to)
     },
 
     orderedCalls () {
-      let calls = this.calls
-
-      return calls.sort((a, b) => {
+      return [...this.calls].sort((a, b) => {
         let condition = null
 
         // use a different rule based on order field
@@ -539,7 +531,9 @@ export default {
             condition = a.created_at < b.created_at
             break
           case 'talk_time':
-            condition = a.talk_time > b.talk_time
+            const aTalkTime = this.isLiveCall(a) ? window.moment.utc().diff(window.moment.utc(a.created_at), 'seconds') : a.talk_time
+            const bTalkTime = this.isLiveCall(b) ? window.moment.utc().diff(window.moment.utc(b.created_at), 'seconds') : b.talk_time
+            condition = aTalkTime > bTalkTime
             break
           case 'lead_number':
             condition = (a.contact?.name || a.lead_number) > (b.contact?.name || b.lead_number)
@@ -549,6 +543,9 @@ export default {
             break
           case 'user':
             condition = this.getUserName(this.getUser(a.user_id)) > this.getUserName(this.getUser(b.user_id))
+            break
+          case 'id':
+            condition = a.id > b.id
             break
         }
 
@@ -565,6 +562,7 @@ export default {
 
   methods: {
     isParkedCall,
+    isLiveCall,
 
     onPaginated (pageData) {
       this.pagination = {
