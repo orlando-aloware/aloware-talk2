@@ -786,7 +786,15 @@ export default {
         return false
       }
 
+      if (this.hasCommunicationAndForcedContactNotDisposed) {
+        return false
+      }
+
       if (this.isRedialClicked) {
+        return false
+      }
+
+      if (this.dialer.currentStatus === 'MAKING_CALL') {
         return false
       }
 
@@ -801,6 +809,14 @@ export default {
     nextTooltip () {
       if (this.hasCommunicationAndForcedCallNotDisposed) {
         return 'Please select a Call Disposition'
+      }
+
+      if (this.hasCommunicationAndForcedContactNotDisposed) {
+        return 'Please select a Contact Disposition'
+      }
+
+      if (this.dialer.currentStatus === 'MAKING_CALL') {
+        return 'Please wait for call connection'
       }
 
       return ''
@@ -877,10 +893,14 @@ export default {
     },
 
     isEndSessionDisabled () {
+      const disabledStatuses = ['MAKING_CALL', 'CALL_CONNECTED']
+
       return this.toggleEnd ||
         this.hasCommunicationAndForcedCallNotDisposed ||
+        this.hasCommunicationAndForcedContactNotDisposed ||
         this.loadingNext ||
-        this.isRedialClicked
+        this.isRedialClicked ||
+        disabledStatuses.includes(this.dialer.currentStatus)
     },
 
     endSessionTooltip () {
@@ -890,6 +910,18 @@ export default {
 
       if (this.hasCommunicationAndForcedCallNotDisposed) {
         return 'Please select a Call Disposition'
+      }
+
+      if (this.hasCommunicationAndForcedContactNotDisposed) {
+        return 'Please select a Call Disposition'
+      }
+
+      if (this.dialer.currentStatus === 'MAKING_CALL') {
+        return 'Please wait for call connection'
+      }
+
+      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+        return 'Please finish in-progress call'
       }
 
       return ''
@@ -964,7 +996,11 @@ export default {
     },
 
     hasCommunicationAndForcedCallNotDisposed () {
-      return this.dialer?.communication?.id && this.isForcedCallDisposition && !this.isCallDisposed
+      return (this.dialer.currentStatus === 'CALL_CONNECTED' || this.dialer?.communication?.id) && this.isForcedCallDisposition && !this.isCallDisposed
+    },
+
+    hasCommunicationAndForcedContactNotDisposed () {
+      return (this.dialer.currentStatus === 'CALL_CONNECTED' || this.dialer?.communication?.id) && this.isForcedContactDisposition && !this.isContactDisposed
     }
   },
 
@@ -1005,7 +1041,8 @@ export default {
     ...mapActions('powerDialer', [
       'reQueuePowerDialerTask',
       'removeFirstInQueueTask',
-      'incrementRedialedTaskCount'
+      'incrementRedialedTaskCount',
+      'moveContactItems'
     ]),
 
     onDispositionsClick () {
@@ -1065,6 +1102,11 @@ export default {
     },
 
     startWarmUpCountDown (resetCountdownTimer = false) {
+      // reset next task loading flag
+      if (this.loadingNext) {
+        this.loadingNext = false
+      }
+
       if (this.countdownStarted || !this.isSessionRunning || this.reRouteModal) {
         return
       }
@@ -1103,11 +1145,6 @@ export default {
         // skip warm-up period if set, if task is being redialed, and if is in warm-up period
         if (this.sessionSettings.skip_redial_warmup_period && this.isRedialing && this.dialer.currentStatus !== 'WRAP_UP' && !this.wrapUp) {
           this.countdownTimer = 0
-        }
-
-        // reset next task loading flag
-        if (this.loadingNext) {
-          this.loadingNext = false
         }
 
         this.countdownTimer--
@@ -1496,6 +1533,10 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
+      // clearInterval(this.countdownInterval)
+      this.loadingNext = true
+      this.clearWarmUpCountDown()
+
       if (this.redialRequired) {
         // redial immediately if immediate redial is ON or no tasks left
         const redialNow = this.sessionSettings.force_immediate_redial || this.powerDialerTasks.in_queue.length === 0
@@ -1508,7 +1549,6 @@ export default {
       }
 
       let noWrapUp = false
-      this.loadingNext = true
 
       // when there is wrap up, skip wrap
       if (this.wrapUpSeconds !== -1) {
@@ -1546,12 +1586,17 @@ export default {
           return
         }
 
+        // move task to bottom
+        await this.moveContactItems({
+          id: this.selectedList.id,
+          params: {
+            contact_list_item_ids: [this.activeTask.contact_list_item_id],
+            direction: 2
+          }
+        })
+
         this.processRemoveFirstInQueueTask()
         this.processSession(noWrapUp)
-        // Add task to skipped list when users clicks on the Next button
-        if (!forceSkip && skipWrapUp && this.sessionPaused) {
-          this.powerDialerTasks.skipped.push(cloneDeep(this.taskToCall))
-        }
         return
       }
 
