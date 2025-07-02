@@ -160,6 +160,11 @@ export default {
     // if has redialed less than min_redials
     // and if the call disposition is not a successful call disposition
     redialRequired () {
+      // if no communication yet, don't force redial (warm-up)
+      if (!this.dialer.communication) {
+        return false
+      }
+
       const minRedials = this.sessionSettings?.min_redials
 
       // min_redials = 0 (redial disabled)

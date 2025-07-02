@@ -11,6 +11,10 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
  */
 export function filterCalls (calls, state, rootState) {
   return calls.filter(call => {
+    if (state.filters.campaignId && call.campaign_id !== state.filters.campaignId) {
+      return false
+    }
+
     // ring group filter
     if (state.filters.ringGroup && call.ring_group_id !== state.filters.ringGroup) {
       return false
