@@ -414,9 +414,13 @@ const talk2Api = {
        * Get the company association of the contact
        *
        * @param contactId
-       * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
+       * * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object}>>|null}
        */
       getContactCompanyAssociation (contactId) {
+        if (!contactId) {
+          return null
+        }
+
         return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
       },
 
