@@ -6,14 +6,34 @@
     <div class="wallboard__header__actions bordered-bottom">
       For {{ new Date() | fullShortDate }}
 
-      <line-and-ring-group-selector class="ml-2 ring-group-filter w-100"
-                           clearable
-                           split-by-queued
-                           :force-remove-missing-values="true"
-                           :generic-multiselect="false"
-                           :value="filters.lineRingGroup"
-                           @change="onFilterRingGroup">
-      </line-and-ring-group-selector>
+      <div class="d-flex align-items-center ml-2">
+        <line-selector class="mr-2 filter-selector"
+                       clearable
+                       specific-class="pb-0"
+                       hide-bottom-space
+                       :generic-multiselect="false"
+                       :generic-styling="true"
+                       :value="filters.campaignId"
+                       v-if="!isAgentsRoute"
+                       @change="onFilterLine">
+        </line-selector>
+
+        <ring-group-selector class="mr-2 filter-selector"
+                             clearable
+                             :generic-multiselect="false"
+                             :is-generic-selector-style="true"
+                             :value="filters.ringGroup"
+                             @change="onFilterRingGroup">
+        </ring-group-selector>
+
+        <team-selector class="mr-2 filter-selector"
+                       clearable
+                       :generic-multiselect="false"
+                       :is-generic-selector-style="true"
+                       :value="filters.teamId"
+                       @change="onFilterTeam">
+        </team-selector>
+      </div>
 
       <div class="flex-grow-1 text-right">
         <wallboard-view-mode-button class="ml-2"/>
@@ -23,7 +43,9 @@
 </template>
 
 <script>
-import LineAndRingGroupSelector from 'src/components/generic-selectors/line-and-ring-group-selector.vue'
+import LineSelector from 'src/components/generic-selectors/line-selector.vue'
+import RingGroupSelector from 'src/components/generic-selectors/ring-group-selector.vue'
+import TeamSelector from 'src/components/generic-selectors/team-selector.vue'
 import WallboardViewModeButton from 'src/components/wallboard/wallboard-view-mode-button.vue'
 import { mapActions, mapGetters, mapMutations } from 'vuex'
 
@@ -31,14 +53,20 @@ export default {
   name: 'wallboard-header',
 
   components: {
-    LineAndRingGroupSelector,
+    LineSelector,
+    RingGroupSelector,
+    TeamSelector,
     WallboardViewModeButton
   },
 
   computed: {
     ...mapGetters('wallboard', {
       filters: 'getFilters'
-    })
+    }),
+
+    isAgentsRoute () {
+      return this.$route.name === 'Wallboard Agents'
+    }
   },
 
   methods: {
@@ -50,35 +78,41 @@ export default {
       setFilter: 'SET_FILTER'
     }),
 
-    onFilterRingGroup (selectedValue) {
-      let ringGroup = (selectedValue && selectedValue.id) || null
-      let campaignId = null
-
-      const isLine = selectedValue && selectedValue.hasOwnProperty('ring_group_id')
-
-      if (isLine) {
-        ringGroup = null
-        campaignId = selectedValue.id
-      }
-
-      this.setFilter({
-        filter: 'ringGroup',
-        value: ringGroup
-      })
-
+    onFilterLine (selectedValue) {
       this.setFilter({
         filter: 'campaignId',
-        value: campaignId
+        value: selectedValue
       })
 
+      // automatically refresh summary when line changes
+      this.fetchSummary()
+    },
+
+    onFilterRingGroup (selectedValue) {
       this.setFilter({
-        filter: 'lineRingGroup',
+        filter: 'ringGroup',
         value: selectedValue
       })
 
       // automatically refresh summary when ring group changes
       this.fetchSummary()
+    },
+
+    onFilterTeam (selectedValue) {
+      this.setFilter({
+        filter: 'teamId',
+        value: selectedValue
+      })
+
+      // automatically refresh summary when team changes
+      this.fetchSummary()
     }
   }
 }
 </script>
+
+<style>
+.filter-selector .q-basic-selector {
+  width: 160px;
+}
+</style>

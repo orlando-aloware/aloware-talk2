@@ -46,7 +46,9 @@ export const DEFAULT_STATE = {
   ],
   callsEnabledColumns: [],
   filters: {
+    campaignId: null,
     ringGroup: null,
+    teamId: null,
     agent: null,
     agentStatus: 'all'
   },

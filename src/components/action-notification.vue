@@ -214,6 +214,7 @@ import {
 import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../constants/agent-status'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'action-notification',
@@ -755,7 +756,15 @@ export default {
       this.setShowPhone(true)
     },
 
-    ignoreFishing () {
+    async ignoreFishing () {
+      if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
+        try {
+          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
+        } catch (error) {
+          console.error('Failed to force terminate communication:', error)
+        }
+      }
+
       this.$closeActionNotification('callFishing')
       console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
       this.closeCallNotifications(this.id, this.communicationId)
