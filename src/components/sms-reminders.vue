@@ -22,7 +22,7 @@
             transition-show="jump-down"
             transition-hide="jump-up"
           >
-          <div class="d-flex" style="padding: 8px;">
+          <div class="d-flex line-selector-popup-wrapper">
             <line-selector
               width="255px"
               class="line-selector flex-grow-1"
