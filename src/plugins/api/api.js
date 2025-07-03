@@ -414,7 +414,7 @@ const talk2Api = {
        * Get the company association of the contact
        *
        * @param contactId
-       * * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object}>>|null}
+       * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object}>>|null}
        */
       getContactCompanyAssociation (contactId) {
         if (!contactId) {
