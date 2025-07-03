@@ -409,7 +409,7 @@ const talk2Api = {
          * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
          */
         getInboxSetupData () {
-          return window.axios.get(`${suffixV1}/integrations/hubspot/inbox`)
+          return window.axios.get(`${suffixV1}integrations/hubspot/inbox`)
         },
 
         /**
@@ -419,7 +419,7 @@ const talk2Api = {
          * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object>>}
          */
         connectInbox (params) {
-          return window.axios.post(`${suffixV1}/integrations/hubspot/inbox/connect`, params)
+          return window.axios.post(`${suffixV1}integrations/hubspot/inbox/connect`, params)
         },
 
         /**
