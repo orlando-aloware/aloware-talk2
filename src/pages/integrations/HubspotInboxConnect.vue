@@ -316,7 +316,6 @@ export default {
           window.location.href = decodeURIComponent(this.$route.query.redirectUrl)
         }
       } catch (error) {
-        console.log('err_res', error.response)
         this.$handleErrors(error.response)
       } finally {
         this.isConnecting = false
