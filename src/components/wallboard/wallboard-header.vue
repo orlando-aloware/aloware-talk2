@@ -10,6 +10,7 @@
         <line-selector class="mr-2 filter-selector"
                        clearable
                        specific-class="pb-0"
+                       hide-bottom-space
                        :generic-multiselect="false"
                        :generic-styling="true"
                        :value="filters.campaignId"

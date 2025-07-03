@@ -56,6 +56,14 @@ if (process.env.PROD) {
 let isQuiting = false
 let tray
 
+// Helper function to safely destroy tray
+function destroyTray () {
+  if (tray) {
+    tray.destroy()
+    tray = null
+  }
+}
+
 app.on('before-quit', () => {
   isQuiting = true
 })
@@ -129,10 +137,17 @@ function createWindow () {
   })
 
   mainWindow.on('close', (event) => {
-    if (!isQuiting) {
+    // On Windows, allow the window to close normally to quit the app
+    // On other platforms (macOS), hide the window to keep the app running
+    if (process.platform !== 'win32' && !isQuiting) {
       event.preventDefault()
       mainWindow.hide()
       event.returnValue = false
+    } else if (process.platform === 'win32' && !isQuiting) {
+      // On Windows, when closing the window, quit the entire app
+      isQuiting = true
+      destroyTray()
+      app.quit()
     }
   })
 
@@ -241,6 +256,16 @@ if (gotTheLock) {
 } else {
   app.quit()
 }
+
+// Quit when all windows are closed.  Necessary for Windows.
+app.on('window-all-closed', () => {
+  // On macOS, keep the app running even when all windows are closed
+  // unless we're explicitly quitting
+  if (process.platform !== 'darwin' || isQuiting) {
+    destroyTray()
+    app.quit()
+  }
+})
 
 // remove so we can register each time as we run the app.
 app.removeAsDefaultProtocolClient('alowaretalk')
@@ -366,6 +391,7 @@ function setTray () {
         label: 'Quit',
         click: function () {
           isQuiting = true
+          destroyTray()
           mainWindow.destroy()
           app.quit()
         }
@@ -451,6 +477,7 @@ ipcMain.on('restart_app', () => {
 
 ipcMain.on('quit_app', () => {
   isQuiting = true
+  destroyTray()
   app.quit()
 })
 
