@@ -13671,6 +13671,12 @@ h1.contact-list-name-label {
   .q-basic-selector {
     margin-bottom: 0px;
   }
+
+  .empty-state {
+    top: 50%;
+    transform: translateY(-50%);
+    max-height: 90px;
+  }
 }
 
 .chip-ellipsis {
