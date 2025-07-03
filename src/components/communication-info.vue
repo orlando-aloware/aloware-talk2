@@ -643,7 +643,8 @@
                                class="d-flex flex-row justify-content-center w-100"
                                data-testid="communication-info-sms-reminders"
                                :communicationId="communication.id"
-                               :campaignId="campaignId"
+                               :campaignId="getAppointmentCampaignId(communication)"
+                               :contactId="contact.id"
                                :appointmentDatetime="communication.engagement_data.appointment_datetime"
                                v-if="communication.type === CommunicationTypes.APPOINTMENT && campaignId">
                 </sms-reminders>
@@ -1323,6 +1324,10 @@ export default {
       }
 
       return false
+    },
+
+    getAppointmentCampaignId (communication) {
+      return communication.engagement_data?.appointment_campaign_id ?? this.campaignId
     }
   },
 
