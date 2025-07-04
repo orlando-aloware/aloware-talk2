@@ -2131,6 +2131,7 @@ export default {
       }
     }
   },
+
   beforeDestroy () {
     this.stopDialerWrapUpEvents()
     this.stopDialerEvents()
