@@ -2086,7 +2086,14 @@ export default {
         return null
       }
 
-      const contact = JSON.parse(customParams.Contact)
+      let contact
+      try {
+        contact = JSON.parse(customParams.Contact)
+      } catch (error) {
+        console.error('Failed to parse Contact JSON from customParameters:', error)
+        return null
+      }
+
       const communicationData = {
         id: parseInt(customParams.CommunicationId),
         is_call_waiting: customParams.CallWaiting,
