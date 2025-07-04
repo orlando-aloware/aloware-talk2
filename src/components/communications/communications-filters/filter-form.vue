@@ -608,7 +608,7 @@ export default {
     ...mapState(['isFirstLoad']),
 
     isAllComms () {
-      return [DEFAULT_COMMUNICATIONS_CHANNEL].includes(this.$route.params.channel)
+      return !this.$route.params.channel || [DEFAULT_COMMUNICATIONS_CHANNEL].includes(this.$route.params.channel)
     },
 
     dateRangeLabel () {
@@ -648,29 +648,29 @@ export default {
 
     isACallTypeChannel () {
       const nonSmsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'view', 'my-personal-line']
-      return nonSmsChannels.includes(this.$route.params.channel)
+      return !this.$route.params.channel || nonSmsChannels.includes(this.$route.params.channel)
     },
 
     isCallsOnlyChannel () {
       const callsChannels = [CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
 
-      return callsChannels.includes(this.$route.params.channel)
+      return !this.$route.params.channel || callsChannels.includes(this.$route.params.channel)
     },
 
     isCallsAndRecordingsChannel () {
       const allCallsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
 
       if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
-        return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)
+        return this.isInboxOrInboxViews || !this.$route.params.channel || allCallsChannels.includes(this.$route.params.channel)
       }
 
-      return allCallsChannels.includes(this.$route.params.channel)
+      return !this.$route.params.channel || allCallsChannels.includes(this.$route.params.channel)
     },
 
     isMessagesOnlyChannel () {
       const smsChannels = [MESSAGES_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
 
-      return smsChannels.includes(this.$route.params.channel)
+      return !this.$route.params.channel || smsChannels.includes(this.$route.params.channel)
     },
 
     tagsFilterLabel () {
@@ -682,7 +682,7 @@ export default {
     },
 
     isInboxOrInboxViews () {
-      return [DEFAULT_COMMUNICATIONS_ROUTE_NAME, 'Communications View', 'Communications View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel) || this.isFilterDialogForView
+      return ['Communications View', 'Communications View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel) || this.isFilterDialogForView
     },
 
     isLineSelectorDisabled () {
