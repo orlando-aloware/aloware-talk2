@@ -2113,7 +2113,7 @@ export default {
   },
 
   watch: {
-    'dialer.currentStatus': function(value) {
+    'dialer.currentStatus': function (value) {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
       }
