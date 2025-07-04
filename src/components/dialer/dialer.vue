@@ -433,7 +433,6 @@ export default {
       this.backToDial('Talk-Device.OnCancel')
       this.connection = null
       this.$closeActionNotification('incomingCall')
-
     })
 
     this.getDesktopToken()
@@ -940,7 +939,6 @@ export default {
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial('Talk-Connection.OnCancel')
         this.$closeActionNotification('incomingCall')
-
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
@@ -2056,14 +2054,6 @@ export default {
         clearTimeout(this.tokenRetryTimeout)
         this.tokenRetryTimeout = null
       }
-    }
-  },
-
-  watch: {
-    'dialer.currentStatus': function (value) {
-      if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
-        this.setDialerErrorDefault()
-      }
     },
 
     buildCommunicationFromCustomParameters () {
@@ -2086,25 +2076,26 @@ export default {
         return null
       }
 
+      const ringGroup = JSON.parse(customParams.RingGroup)
+      const contact = JSON.parse(customParams.Contact)
       const communicationData = {
         id: customParams.CommunicationId,
+        is_call_waiting: customParams.CallWaiting,
         contact: {
           id: customParams.ContactId,
-          name: customParams.ContactName || 'No Name',
-          phone_number: customParams.ContactPhoneNumber,
-          company_name: customParams.CompanyName || '',
-          user_id: customParams.UserId || null
+          name: customParams.ContactName,
+          phone_number: contact?.ContactPhoneNumber,
+          user_id: contact?.ContactUserId,
+          company_name: customParams?.CompanyName,
+          cnam_city: contact?.ContactCity,
+          cnam_state: contact?.ContactState,
+          cnam_country: contact?.ContactCountry
         },
-        ring_group_id: customParams.RingGroupId || null,
-        campaign_id: customParams.CampaignId || null,
-        is_call_waiting: customParams.IsCallWaiting,
-        lead_number: this.dialer.call.from,
-        campaign: customParams.CampaignName ? {
+        ring_group_id: ringGroup?.id,
+        campaign_id: customParams.CampaignId,
+        campaign: {
           name: customParams.CampaignName
-        } : null,
-        ring_group: customParams.RingGroupName ? {
-          name: customParams.RingGroupName
-        } : null
+        }
       }
 
       console.log('Successfully built communication data from customParameters:', communicationData)
