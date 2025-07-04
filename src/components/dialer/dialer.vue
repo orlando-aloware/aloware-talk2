@@ -68,8 +68,7 @@ export default {
       tokenRetryCount: 0,
       tokenRetryTimeout: null,
       maxTokenRetries: 3,
-      baseRetryDelay: 1000, // 1 second base delay
-      communicationCache: new Map()
+      baseRetryDelay: 1000 // 1 second base delay
     }
   },
 
@@ -83,8 +82,6 @@ export default {
     ...mapState('powerDialer', ['powerDialerTasks']),
 
     ...mapState(['isWidget', 'isSalesforceWidget']),
-
-    ...mapState(['notifications']),
 
     ...mapFields('powerDialer', [
       'activeTask',
@@ -324,24 +321,6 @@ export default {
       }
     }
 
-    this.dialerListeners.cacheCommunicationFromEvent = (communication) => {
-      const notificationCommId = { data: _.get(this.notifications, 'incomingCall.communication.id', null) }
-
-      // Smart Queue only
-      if (!this.isSmartQueueOnlyEnabled(communication) || notificationCommId.data !== null) {
-        return
-      }
-
-      if (communication && communication.id && this.dialer.communication?.id !== communication.id) {
-        console.log('Caching communication from event:', communication.id)
-        this.communicationCache.set(communication.id, communication)
-      }
-
-      if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING || (this.dialer.call && this.dialer.call.state === 'pending')) {
-        this.showCommunicationCache(communication)
-      }
-    }
-
     this.startDialerEvents()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -423,22 +402,19 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      let cachedCommunication = null
-      if (this.communicationCache.size > 0) {
-        [, cachedCommunication] = this.communicationCache.entries().next().value
-      }
+      const communicationData = this.buildCommunicationFromCustomParameters()
 
-      const contactId = this.dialer.call.customParameters?.ContactId
-      if (cachedCommunication && this.isSmartQueueOnlyEnabled(cachedCommunication) && contactId === cachedCommunication.contact_id) {
-        this.showCommunicationCache(cachedCommunication)
-
-        return
+      if (communicationData) {
+        this.$VueEvent.fire('new_in_app_call', communicationData)
+        this.processActionNotification(communicationData, 'call')
       }
 
       this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
-          this.$VueEvent.fire('new_in_app_call', res.data)
-          this.processActionNotification(res.data, 'call')
+          if (!communicationData) {
+            this.$VueEvent.fire('new_in_app_call', res.data)
+            this.processActionNotification(res.data, 'call')
+          }
           this.addNonOwnedLiveContact(res.data)
         }
       }).catch((err) => {
@@ -458,7 +434,6 @@ export default {
       this.connection = null
       this.$closeActionNotification('incomingCall')
 
-      this.communicationCache.clear()
     })
 
     this.getDesktopToken()
@@ -529,7 +504,6 @@ export default {
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
-      this.$VueEvent.listen('dialer_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
     },
 
     stopDialerEvents () {
@@ -563,20 +537,10 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
-      this.$VueEvent.stop('dialer_in_app_call', this.dialerListeners.cacheCommunicationFromEvent)
     },
 
     forceRefreshCommunication () {
       return this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
-    },
-
-    showCommunicationCache (cachedCommunication) {
-      this.$VueEvent.fire('new_in_app_call', cachedCommunication)
-      this.processActionNotification(cachedCommunication, 'call')
-      this.addNonOwnedLiveContact(cachedCommunication)
-      this.stopNotificationAudio()
-
-      this.communicationCache.clear()
     },
 
     getCommunication (sid, from, getCommunicationTry = 1, force = false) {
@@ -977,7 +941,6 @@ export default {
         this.backToDial('Talk-Connection.OnCancel')
         this.$closeActionNotification('incomingCall')
 
-        this.communicationCache.clear()
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
@@ -2093,15 +2056,6 @@ export default {
         clearTimeout(this.tokenRetryTimeout)
         this.tokenRetryTimeout = null
       }
-    },
-
-    isSmartQueueOnlyEnabled (communication) {
-      if (!communication || !communication.ring_group_id) {
-        return false
-      }
-
-      const ringGroup = this.ringGroups.find(rg => rg.id === communication.ring_group_id)
-      return ringGroup && ringGroup.should_queue && !ringGroup.fishing_mode
     }
   },
 
@@ -2110,6 +2064,51 @@ export default {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
       }
+    },
+
+    buildCommunicationFromCustomParameters () {
+      const customParams = this.dialer.call?.customParameters
+
+      console.log('Attempting to build communication from customParameters:', customParams)
+
+      if (!customParams || !this.dialer.call) {
+        return null
+      }
+
+      const requiredParams = ['ContactId', 'CommunicationId']
+      const missingParams = requiredParams.filter(param => {
+        console.log(param, customParams?.[param])
+        return !customParams[param]
+      })
+
+      if (missingParams.length > 0) {
+        console.log(`Missing required parameters in customParameters: ${missingParams.join(', ')}, falling back to API call`)
+        return null
+      }
+
+      const communicationData = {
+        id: customParams.CommunicationId,
+        contact: {
+          id: customParams.ContactId,
+          name: customParams.ContactName || 'No Name',
+          phone_number: customParams.ContactPhoneNumber,
+          company_name: customParams.CompanyName || '',
+          user_id: customParams.UserId || null
+        },
+        ring_group_id: customParams.RingGroupId || null,
+        campaign_id: customParams.CampaignId || null,
+        is_call_waiting: customParams.IsCallWaiting,
+        lead_number: this.dialer.call.from,
+        campaign: customParams.CampaignName ? {
+          name: customParams.CampaignName
+        } : null,
+        ring_group: customParams.RingGroupName ? {
+          name: customParams.RingGroupName
+        } : null
+      }
+
+      console.log('Successfully built communication data from customParameters:', communicationData)
+      return communicationData
     }
   },
 
@@ -2125,9 +2124,6 @@ export default {
 
     // Clear token retry timeout
     this.resetTokenRetryState()
-
-    // Clear communication cache
-    this.communicationCache.clear()
 
     // Destroy the Twilio device to avoid having multiple Twilio device instances.
     console.log('Destroying Twilio device')
