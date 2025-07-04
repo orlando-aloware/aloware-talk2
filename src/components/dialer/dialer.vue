@@ -419,8 +419,6 @@ export default {
       }
 
       const communicationData = this.buildCommunicationFromCustomParameters()
-      console.log('Agent status:', this.agentStatus, 'AgentStatus.RINGING:', AgentStatus.AGENT_STATUS_RINGING)
-
       this.notificationShownFromCustomParams = false
 
       if (communicationData) {
@@ -2094,7 +2092,6 @@ export default {
 
       const requiredParams = ['ContactId', 'CommunicationId', 'RingGroupId', 'CampaignId']
       const missingParams = requiredParams.filter(param => {
-        console.log(param, customParams?.[param])
         return !customParams[param]
       })
 
