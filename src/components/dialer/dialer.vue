@@ -117,20 +117,6 @@ export default {
     }
   },
 
-  watch: {
-    agentStatus (newStatus, oldStatus) {
-      if (newStatus === AgentStatus.AGENT_STATUS_RINGING &&
-          oldStatus !== AgentStatus.AGENT_STATUS_RINGING &&
-          this.pendingNotificationData &&
-          !this.notificationShownFromCustomParams) {
-        this.$VueEvent.fire('new_in_app_call', this.pendingNotificationData)
-        this.processActionNotification(this.pendingNotificationData, 'call')
-        this.notificationShownFromCustomParams = true
-        this.pendingNotificationData = null
-      }
-    }
-  },
-
   created () {
     this.dialerListeners.updateCommunication = (data) => {
       // check data matches dialer communication
@@ -2126,6 +2112,25 @@ export default {
     }
   },
 
+  watch: {
+    'dialer.currentStatus': function(value) {
+      if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
+        this.setDialerErrorDefault()
+      }
+    },
+
+    agentStatus (newStatus, oldStatus) {
+      if (newStatus === AgentStatus.AGENT_STATUS_RINGING &&
+        oldStatus !== AgentStatus.AGENT_STATUS_RINGING &&
+        this.pendingNotificationData &&
+        !this.notificationShownFromCustomParams) {
+        this.$VueEvent.fire('new_in_app_call', this.pendingNotificationData)
+        this.processActionNotification(this.pendingNotificationData, 'call')
+        this.notificationShownFromCustomParams = true
+        this.pendingNotificationData = null
+      }
+    }
+  },
   beforeDestroy () {
     this.stopDialerWrapUpEvents()
     this.stopDialerEvents()
