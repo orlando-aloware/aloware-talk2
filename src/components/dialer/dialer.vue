@@ -68,7 +68,9 @@ export default {
       tokenRetryCount: 0,
       tokenRetryTimeout: null,
       maxTokenRetries: 3,
-      baseRetryDelay: 1000 // 1 second base delay
+      baseRetryDelay: 1000, // 1 second base delay
+      pendingNotificationData: null,
+      notificationShownFromCustomParams: false
     }
   },
 
@@ -112,6 +114,20 @@ export default {
 
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
+    }
+  },
+
+  watch: {
+    agentStatus (newStatus, oldStatus) {
+      if (newStatus === AgentStatus.AGENT_STATUS_RINGING &&
+          oldStatus !== AgentStatus.AGENT_STATUS_RINGING &&
+          this.pendingNotificationData &&
+          !this.notificationShownFromCustomParams) {
+        this.$VueEvent.fire('new_in_app_call', this.pendingNotificationData)
+        this.processActionNotification(this.pendingNotificationData, 'call')
+        this.notificationShownFromCustomParams = true
+        this.pendingNotificationData = null
+      }
     }
   },
 
@@ -403,17 +419,26 @@ export default {
       }
 
       const communicationData = this.buildCommunicationFromCustomParameters()
+      console.log('Agent status:', this.agentStatus, 'AgentStatus.RINGING:', AgentStatus.AGENT_STATUS_RINGING)
+
+      this.notificationShownFromCustomParams = false
 
       if (communicationData) {
-        this.$VueEvent.fire('new_in_app_call', communicationData)
-        this.processActionNotification(communicationData, 'call')
+        if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+          this.$VueEvent.fire('new_in_app_call', communicationData)
+          this.processActionNotification(communicationData, 'call')
+          this.notificationShownFromCustomParams = true
+        } else {
+          this.pendingNotificationData = communicationData
+        }
       }
 
       this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
-          if (!communicationData) {
+          if (!this.notificationShownFromCustomParams) {
             this.$VueEvent.fire('new_in_app_call', res.data)
             this.processActionNotification(res.data, 'call')
+            this.pendingNotificationData = null
           }
           this.addNonOwnedLiveContact(res.data)
         }
@@ -1603,6 +1628,8 @@ export default {
       this.setShowIncomingCallNotification(false)
       this.setDialerAiAgentWhisper(false)
       this.setDialerAiAgentTakeover(false)
+      this.pendingNotificationData = null
+      this.notificationShownFromCustomParams = false
     },
 
     countCallDuration () {
