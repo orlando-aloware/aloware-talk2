@@ -68,7 +68,9 @@ export default {
       tokenRetryCount: 0,
       tokenRetryTimeout: null,
       maxTokenRetries: 3,
-      baseRetryDelay: 1000 // 1 second base delay
+      baseRetryDelay: 1000, // 1 second base delay
+      pendingNotificationData: null,
+      notificationShownFromCustomParams: false
     }
   },
 
@@ -402,10 +404,26 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
+      const communicationData = this.buildCommunicationFromCustomParameters()
+      this.notificationShownFromCustomParams = false
+
+      if (communicationData) {
+        if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+          this.$VueEvent.fire('new_in_app_call', communicationData)
+          this.processActionNotification(communicationData, 'call')
+          this.notificationShownFromCustomParams = true
+        } else {
+          this.pendingNotificationData = communicationData
+        }
+      }
+
       this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
-          this.$VueEvent.fire('new_in_app_call', res.data)
-          this.processActionNotification(res.data, 'call')
+          if (!this.notificationShownFromCustomParams) {
+            this.$VueEvent.fire('new_in_app_call', res.data)
+            this.processActionNotification(res.data, 'call')
+            this.pendingNotificationData = null
+          }
           this.addNonOwnedLiveContact(res.data)
         }
       }).catch((err) => {
@@ -1594,6 +1612,8 @@ export default {
       this.setShowIncomingCallNotification(false)
       this.setDialerAiAgentWhisper(false)
       this.setDialerAiAgentTakeover(false)
+      this.pendingNotificationData = null
+      this.notificationShownFromCustomParams = false
     },
 
     countCallDuration () {
@@ -2045,6 +2065,57 @@ export default {
         clearTimeout(this.tokenRetryTimeout)
         this.tokenRetryTimeout = null
       }
+    },
+
+    buildCommunicationFromCustomParameters () {
+      const customParams = this.dialer.call?.customParameters
+
+      console.log('Attempting to build communication from customParameters:', customParams)
+
+      if (!customParams || !this.dialer.call) {
+        return null
+      }
+
+      const requiredParams = ['ContactId', 'CommunicationId', 'RingGroupId', 'CampaignId', 'Contact']
+      const missingParams = requiredParams.filter(param => {
+        return !customParams[param]
+      })
+
+      if (missingParams.length > 0) {
+        console.log(`Missing required parameters in customParameters: ${missingParams.join(', ')}, falling back to API call`)
+        return null
+      }
+
+      let contact
+      try {
+        contact = JSON.parse(customParams.Contact)
+      } catch (error) {
+        console.error('Failed to parse Contact JSON from customParameters:', error)
+        return null
+      }
+
+      const communicationData = {
+        id: parseInt(customParams.CommunicationId) || null,
+        is_call_waiting: customParams.CallWaiting,
+        contact: {
+          id: parseInt(customParams.ContactId) || null,
+          name: customParams.ContactName,
+          phone_number: contact?.ContactPhoneNumber,
+          user_id: contact?.ContactUserId,
+          company_name: customParams?.CompanyName,
+          cnam_city: contact?.ContactCity,
+          cnam_state: contact?.ContactState,
+          cnam_country: contact?.ContactCountry
+        },
+        ring_group_id: parseInt(customParams.RingGroupId) || null,
+        campaign_id: parseInt(customParams.CampaignId) || null,
+        campaign: {
+          name: customParams.CampaignName
+        }
+      }
+
+      console.log('Successfully built communication data from customParameters:', communicationData)
+      return communicationData
     }
   },
 
@@ -2052,6 +2123,18 @@ export default {
     'dialer.currentStatus': function (value) {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
+      }
+    },
+
+    agentStatus (newStatus, oldStatus) {
+      if (newStatus === AgentStatus.AGENT_STATUS_RINGING &&
+        oldStatus !== AgentStatus.AGENT_STATUS_RINGING &&
+        this.pendingNotificationData &&
+        !this.notificationShownFromCustomParams) {
+        this.$VueEvent.fire('new_in_app_call', this.pendingNotificationData)
+        this.processActionNotification(this.pendingNotificationData, 'call')
+        this.notificationShownFromCustomParams = true
+        this.pendingNotificationData = null
       }
     }
   },
