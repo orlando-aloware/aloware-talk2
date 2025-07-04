@@ -25,7 +25,8 @@
                      placement="right"
                      boundary="window"
                      triggers="hover"
-                     target="teaminbox-datepicker-btn">
+                     target="teaminbox-datepicker-btn"
+                     v-if="!isMobile">
             Click to filter by date
           </b-tooltip>
         </q-btn>
@@ -35,6 +36,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import CalendarIcon from 'components/icons/calendar-icon.vue'
 import DateRangePicker from 'vue2-daterange-picker'
@@ -53,6 +55,7 @@ export default {
   },
 
   computed: {
+    ...mapState(['isMobile']),
     ...mapFields('TeamInbox', ['activeFilters']),
 
     dateHasChanges () {
@@ -123,7 +126,7 @@ export default {
         'Yesterday': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT))],
         'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Last 30 Days': [this.parseDatePicker(moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
-        'This Month So Far': [this.parseDatePicker(moment().tz(timezone).startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'This Month to Date': [this.parseDatePicker(moment().tz(timezone).startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Last Month': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT))],
         'All Time': [null, null]
       }
@@ -182,6 +185,12 @@ export default {
   .daterangepicker.opensright {
     left: initial;
     right: 0;
+
+    @media screen and (max-width: 784px) {
+      max-height: 350px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
 
     @media screen and (min-width: 785px) {
       left: -225px;

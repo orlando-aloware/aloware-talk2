@@ -40,11 +40,6 @@ export default {
   ],
 
   props: {
-    carrierName: {
-      required: true,
-      type: String
-    },
-
     campaignId: {
       type: Number,
       required: false
@@ -56,6 +51,11 @@ export default {
     },
 
     isAlwaysAskModeEnabled: {
+      default: true,
+      type: Boolean,
+      required: false
+    },
+    initBroadcast: {
       default: true,
       type: Boolean,
       required: false
@@ -108,7 +108,10 @@ export default {
     ...mapActions('auth', ['setAgentStatus']),
 
     initAuth () {
-      this.broadcastInit()
+      if (this.initBroadcast) {
+        this.broadcastInit()
+      }
+
       this.getUsers()
       this.getDispositionStatuses()
       this.getCallDispositions()

@@ -161,6 +161,22 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
       },
 
+      getLineIncomingNumber (contactId, lineId, fromTeamInbox = false) {
+        if (!contactId || !lineId) {
+          return null
+        }
+
+        const params = {}
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = fromTeamInbox
+        }
+
+        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {
+          params
+        })
+      },
+
       getIntegrationData (contactId, params) {
         if (!contactId) {
           return null
@@ -189,6 +205,13 @@ const talk2Api = {
 
       syncSalesforce (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-salesforce`)
+      },
+
+      forceCreateAlowareContactViaSalesforce (id, type) {
+        return window.axios.post(`${suffixV1}integrations/salesforce/force-create-aloware-contact`, {
+          objectType: type,
+          recordId: id
+        })
       },
 
       syncGuesty (id) {
@@ -398,9 +421,13 @@ const talk2Api = {
        * Get the company association of the contact
        *
        * @param contactId
-       * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
+       * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object}>>|null}
        */
       getContactCompanyAssociation (contactId) {
+        if (!contactId) {
+          return null
+        }
+
         return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
       },
 
@@ -489,8 +516,8 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}communication/${id}/force-terminate`)
       },
 
-      agentForceTerminate (id) {
-        return window.axios.post(`${suffixV1}agent/communication/${id}/terminate`)
+      async agentForceTerminate (id, params = {}) {
+        return window.axios.post(`${suffixV1}agent/communication/${id}/terminate`, params)
       },
 
       forceDequeue (id) {
@@ -1009,13 +1036,21 @@ const talk2Api = {
           return window.axios.get(`${suffixV2}inboxes`, data)
         },
 
-        unreadCount (inboxIds, contactIds = null) {
+        unreadCount (inboxIds, contactIds = null, filters) {
           const params = {
             inbox_ids: inboxIds
           }
 
           if (contactIds) {
             params.contact_ids = contactIds
+          }
+
+          if (filters?.from_date) {
+            params.from_date = filters.from_date
+          }
+
+          if (filters?.to_date) {
+            params.to_date = filters.to_date
           }
 
           return window.axios.post(`${suffixV2}inboxes/unread-count`, params)
