@@ -2065,7 +2065,7 @@ export default {
         return null
       }
 
-      const requiredParams = ['ContactId', 'CommunicationId']
+      const requiredParams = ['ContactId', 'CommunicationId', 'RingGroupId', 'CampaignId']
       const missingParams = requiredParams.filter(param => {
         console.log(param, customParams?.[param])
         return !customParams[param]
@@ -2076,13 +2076,12 @@ export default {
         return null
       }
 
-      const ringGroup = JSON.parse(customParams.RingGroup)
       const contact = JSON.parse(customParams.Contact)
       const communicationData = {
-        id: customParams.CommunicationId,
+        id: parseInt(customParams.CommunicationId),
         is_call_waiting: customParams.CallWaiting,
         contact: {
-          id: customParams.ContactId,
+          id: parseInt(customParams.ContactId),
           name: customParams.ContactName,
           phone_number: contact?.ContactPhoneNumber,
           user_id: contact?.ContactUserId,
@@ -2091,8 +2090,8 @@ export default {
           cnam_state: contact?.ContactState,
           cnam_country: contact?.ContactCountry
         },
-        ring_group_id: ringGroup?.id,
-        campaign_id: customParams.CampaignId,
+        ring_group_id: parseInt(customParams.RingGroupId),
+        campaign_id: parseInt(customParams.CampaignId),
         campaign: {
           name: customParams.CampaignName
         }
