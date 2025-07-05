@@ -77,7 +77,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany', 'profile']),
 
-    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
+    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups', 'campaigns']),
 
     ...mapState('auth', ['profile', 'authenticated']),
 
@@ -2076,7 +2076,7 @@ export default {
         return null
       }
 
-      const requiredParams = ['ContactId', 'CommunicationId', 'RingGroupId', 'CampaignId', 'Contact']
+      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId']
       const missingParams = requiredParams.filter(param => {
         return !customParams[param]
       })
@@ -2086,36 +2086,60 @@ export default {
         return null
       }
 
-      let contact
+      const campaignId = parseInt(customParams.CampaignId) || null
+      const campaign = this.getCampaign(campaignId)
+
+      let communicationData
+      let locationData
+
       try {
-        contact = JSON.parse(customParams.Contact)
+        communicationData = JSON.parse(customParams.CommunicationData)
+        locationData = JSON.parse(customParams.LocationData)
       } catch (error) {
-        console.error('Failed to parse Contact JSON from customParameters:', error)
+        console.error('Failed to parse JSON from customParameters:', error)
         return null
       }
 
-      const communicationData = {
-        id: parseInt(customParams.CommunicationId) || null,
-        is_call_waiting: customParams.CallWaiting,
+      if (!communicationData || !communicationData.Id) {
+        return null
+      }
+
+      const communication = {
+        id: parseInt(communicationData.Id) || null,
+        is_call_waiting: communicationData.CallWaiting,
         contact: {
           id: parseInt(customParams.ContactId) || null,
           name: customParams.ContactName,
-          phone_number: contact?.ContactPhoneNumber,
-          user_id: contact?.ContactUserId,
-          company_name: customParams?.CompanyName,
-          cnam_city: contact?.ContactCity,
-          cnam_state: contact?.ContactState,
-          cnam_country: contact?.ContactCountry
+          phone_number: this.dialer.call.from,
+          user_id: customParams?.ContactUserId,
+          company_name: customParams?.CompanyName
         },
-        ring_group_id: parseInt(customParams.RingGroupId) || null,
-        campaign_id: parseInt(customParams.CampaignId) || null,
+        city: locationData?.City,
+        state: locationData?.State,
+        country: locationData?.Country,
+        ring_group_id: parseInt(communicationData.RingGroupId) || null,
+        campaign_id: campaignId,
         campaign: {
-          name: customParams.CampaignName
+          name: campaign?.name
         }
       }
 
-      console.log('Successfully built communication data from customParameters:', communicationData)
-      return communicationData
+      console.log('Successfully built communication data from customParameters:', communication)
+      return communication
+    },
+
+    getCampaign (campaignId) {
+      if (!campaignId) {
+        return null
+      }
+
+      const found = this.campaigns.find(campaign => campaign.id === campaignId)
+
+      if (!found) {
+        return null
+      }
+
+      return found
     }
   },
 
