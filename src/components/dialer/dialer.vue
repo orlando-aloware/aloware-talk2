@@ -2090,18 +2090,27 @@ export default {
       const campaign = this.getCampaign(campaignId)
 
       let communicationData
-      let locationData
+      let locationData = null
 
       try {
         communicationData = JSON.parse(customParams.CommunicationData)
-        locationData = JSON.parse(customParams.LocationData)
       } catch (error) {
-        console.error('Failed to parse JSON from customParameters:', error)
+        console.error('Failed to parse CommunicationData JSON from customParameters:', error)
         return null
       }
 
       if (!communicationData || !communicationData.Id) {
+        console.error('CommunicationData is missing or invalid')
         return null
+      }
+
+      if (customParams.LocationData) {
+        try {
+          locationData = JSON.parse(customParams.LocationData)
+        } catch (error) {
+          console.warn('Failed to parse LocationData JSON from customParameters, continuing without location data:', error)
+          locationData = null
+        }
       }
 
       const communication = {
