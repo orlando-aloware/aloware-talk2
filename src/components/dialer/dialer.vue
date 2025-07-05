@@ -2142,6 +2142,10 @@ export default {
         return null
       }
 
+      if (!this.campaigns || !Array.isArray(this.campaigns)) {
+        return null
+      }
+
       const found = this.campaigns.find(campaign => campaign.id === campaignId)
 
       if (!found) {
