@@ -9,8 +9,8 @@
     <!-- Start Main Content-->
     <template v-if="!isLoading">
       <!-- Header with Logo -->
-      <div class="header">
-        <div class="header-content">
+      <div class="hubspot-inbox-header">
+        <div class="hubspot-inbox-header-content">
           <img
             src="/app-icons/menu/aloware-logo-original-inverse.svg"
             alt="Aloware Logo"
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Main Content -->
-      <div class="content-container q-pa-md d-flex flex-column">
+      <div class="hubspot-inbox-content-container q-pa-md d-flex flex-column">
         <template v-if="!setupError">
           <div class="text-center q-mb-md">
             <h1 class="text-h5 text-weight-medium q-my-none">Select a Line Number</h1>
@@ -28,13 +28,13 @@
           </div>
 
           <!-- Search Bar -->
-          <div class="search-container q-mb-sm">
+          <div class="hubspot-inbox-search-container q-mb-sm">
             <q-input
               v-model="searchQuery"
               placeholder="Search a specific line"
               outlined
               dense
-              class="search-input"
+              class="hubspot-inbox-search-input"
               bg-color="white"
               debounce="300"
             >
@@ -44,7 +44,7 @@
             </q-input>
           </div>
 
-          <div class="table-wrapper">
+          <div class="hubspot-inbox-table-wrapper">
             <datatable
               custom-class="numbers-table talk-table"
               sticky-headers
@@ -92,13 +92,13 @@
                       </div>
                     </template>
                     <template v-else-if="col.name === 'capabilities'">
-                      <div class="capabilities-container">
+                      <div class="hubspot-inbox-capabilities">
                         <div
                           v-for="(value, key) in row.capabilities"
                           :key="key"
                           :class="[
-                            'custom-chip',
-                            value ? 'chip-enabled' : 'chip-disabled'
+                            'hubspot-inbox-chip',
+                            value ? 'hubspot-inbox-chip-enabled' : 'hubspot-inbox-chip-disabled'
                           ]"
                         >
                           <q-tooltip
@@ -120,12 +120,12 @@
                     <template v-else>
                       <span
                         :class="[
-                          'ellipsis',
-                          'cell-text',
+                          'hubspot-inbox-ellipsis',
+                          'hubspot-inbox-cell-text',
                           {
                             'text-grey-6': !row.incoming_number,
-                            'disabled-text': !row.is_selectable,
-                            'selectable-text': row.is_selectable
+                            'hubspot-inbox-disabled-text': !row.is_selectable,
+                            'hubspot-inbox-selectable-text': row.is_selectable
                           }
                         ]"
                       >{{ col.field(row) }}</span>
@@ -149,7 +149,7 @@
               label="Connect with HubSpot"
               :disable="!selectedCampaign || isConnecting"
               :loading="isConnecting"
-              class="connect-btn"
+              class="hubspot-inbox-connect-btn"
               style="background: #FF7A59; color: white"
               no-caps
               unelevated
@@ -164,7 +164,7 @@
 
         <!-- Error State -->
         <template v-else>
-          <div class="error-container text-center">
+          <div class="hubspot-inbox-error-container text-center">
             <q-icon name="error" size="48px" color="negative" />
             <h2 class="text-h6 text-negative q-mt-md q-mb-xs">Aloware Connection Error</h2>
             <p class="text-body2 text-grey-6">Please contact your administrator</p>
@@ -369,8 +369,8 @@ export default {
 }
 </script>
 
-<style>
-.header {
+<style scoped>
+.hubspot-inbox-header {
   background-color: #15163f;
   height: 40px;
   display: flex;
@@ -380,14 +380,19 @@ export default {
   justify-content: center;
 }
 
-.aloware-logo {
-  height: 24px;
+.hubspot-inbox-header-content {
+  width: 100%;
+  max-width: 800px;
+  padding: 0 16px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
 }
 
-.content-container {
+.hubspot-inbox-content-container {
   padding: 16px;
   background-color: white;
-  height: calc(100vh - 40px); /* Subtract header height */
+  height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -395,27 +400,26 @@ export default {
   margin: 0 auto;
 }
 
-.search-container {
+.hubspot-inbox-search-container {
   width: 80%;
   margin: 0 auto 12px;
 }
 
-.search-input {
+.hubspot-inbox-search-input {
   width: 100%;
 }
 
-.search-input :deep(.q-field__control) {
+.hubspot-inbox-search-input :deep(.q-field__control) {
   border-radius: 4px;
   height: 36px;
 }
 
-.table-wrapper {
-  min-height: 0; /* Important for Firefox */
-  max-height: 60vh; /* More flexible height based on viewport */
+.hubspot-inbox-table-wrapper {
+  min-height: 0;
+  max-height: 60vh;
   margin-bottom: 12px;
 }
 
-/* Table styles */
 .numbers-table :deep(.q-table__container) {
   background-color: white;
   border-radius: 4px;
@@ -428,72 +432,95 @@ export default {
   overflow-x: hidden;
 }
 
-.numbers-table :deep(thead tr) {
-  background-color: #f5f7fa;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+/* Style for disabled rows */
+.numbers-table :deep(tr.disabled-row),
+tr.disabled-row {
+  background-color: #f5f5f5 !important;
 }
 
-.numbers-table :deep(th) {
-  font-weight: 500 !important;
-  font-size: 13px;
-  color: #333;
-  padding: 16px;
-  min-height: 60px;
-  cursor: default !important;
-  pointer-events: none !important;
+.numbers-table :deep(tr.selectable-row),
+tr.selectable-row {
+  background-color: white;
 }
 
-.numbers-table :deep(tr) {
-  min-height: 60px;
+.numbers-table :deep(tr.disabled-row td),
+tr.disabled-row td {
+  color: #999 !important;
+  opacity: 0.6 !important;
 }
 
-.numbers-table :deep(td) {
-  font-size: 13px;
-  padding: 16px;
-  height: 60px;
-  text-align: center;
-  vertical-align: middle;
+/* Only fade main text, not chips */
+.numbers-table :deep(tr.disabled-row .hubspot-inbox-cell-text),
+.numbers-table :deep(tr.disabled-row .hubspot-inbox-ellipsis),
+.numbers-table :deep(tr.disabled-row span),
+tr.disabled-row .hubspot-inbox-cell-text,
+tr.disabled-row .hubspot-inbox-ellipsis,
+tr.disabled-row span {
+  color: #999 !important;
+  opacity: 0.6 !important;
 }
 
-.numbers-table :deep(td .flex) {
-  min-height: 28px;
+/* Restore chip and icon color in disabled rows */
+.numbers-table :deep(tr.disabled-row .hubspot-inbox-chip),
+tr.disabled-row .hubspot-inbox-chip {
+  color: white !important;
+  opacity: 1 !important;
+}
+.numbers-table :deep(tr.disabled-row .hubspot-inbox-chip-disabled),
+tr.disabled-row .hubspot-inbox-chip-disabled {
+  background-color: #9e9e9e !important;
+  color: white !important;
+}
+.numbers-table :deep(tr.disabled-row .hubspot-inbox-chip-enabled),
+tr.disabled-row .hubspot-inbox-chip-enabled {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+.numbers-table :deep(tr.disabled-row .hubspot-inbox-chip q-icon),
+tr.disabled-row .hubspot-inbox-chip q-icon {
+  color: white !important;
+  opacity: 1 !important;
 }
 
-.connect-btn {
+.numbers-table :deep(tr.disabled-row:hover),
+tr.disabled-row:hover {
+  background-color: #f0f0f0 !important;
+  cursor: not-allowed;
+}
+
+.numbers-table :deep(tr.disabled-row) span,
+.numbers-table tr.disabled-row span {
+  color: #999 !important;
+  opacity: 0.6 !important;
+}
+
+.numbers-table :deep(tr.disabled-row) .hubspot-inbox-ellipsis,
+.numbers-table tr.disabled-row .hubspot-inbox-ellipsis {
+  color: #999 !important;
+  opacity: 0.6 !important;
+}
+
+.hubspot-inbox-connect-btn {
   min-width: 200px;
   font-weight: 500;
 }
 
-.connect-btn:not(:disabled):hover {
+.hubspot-inbox-connect-btn:not(:disabled):hover {
   background: #ff8f73 !important;
 }
 
-.connect-btn:disabled {
+.hubspot-inbox-connect-btn:disabled {
   opacity: 0.7;
 }
 
-/* Handle text overflow */
-.ellipsis {
+.hubspot-inbox-ellipsis {
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Add a container for the logo to match content width */
-.header-content {
-  width: 100%;
-  max-width: 800px;
-  padding: 0 16px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-}
-
-/* Add error container styles */
-.error-container {
+.hubspot-inbox-error-container {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -502,7 +529,7 @@ export default {
   padding: 15% 32px 32px;
 }
 
-.error-container p {
+.hubspot-inbox-error-container p {
   max-width: 400px;
   margin: 0 auto;
 }
@@ -525,7 +552,15 @@ export default {
   word-break: break-word;
 }
 
-.custom-chip {
+.hubspot-inbox-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.hubspot-inbox-chip {
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 10px;
@@ -539,89 +574,28 @@ export default {
   align-items: center;
 }
 
-.chip-enabled {
+.hubspot-inbox-chip-enabled {
   background-color: #4caf50;
 }
 
-.chip-disabled {
+.hubspot-inbox-chip-disabled {
   background-color: #9e9e9e;
 }
 
-/* Style for disabled rows */
-.numbers-table :deep(tr.disabled-row),
-tr.disabled-row {
-  background-color: #ffebee !important;
-  pointer-events: none !important;
-}
-
-/* Style for selectable rows */
-.numbers-table :deep(tr.selectable-row),
-tr.selectable-row {
-  background-color: white;
-}
-
-.numbers-table :deep(tr.disabled-row td),
-tr.disabled-row td {
-  color: #666 !important;
-  opacity: 0.4 !important;
-}
-
-.numbers-table :deep(tr.disabled-row td *),
-tr.disabled-row td * {
-  opacity: 0.4 !important;
-  color: #666 !important;
-}
-
-.numbers-table :deep(tr.disabled-row span),
-tr.disabled-row span {
-  opacity: 0.4 !important;
-  color: #666 !important;
-}
-
-.numbers-table :deep(tr.disabled-row:hover),
-tr.disabled-row:hover {
-  background-color: #ffebee !important;
-  cursor: not-allowed;
-}
-
-/* More aggressive targeting for disabled text */
-.numbers-table :deep(tr.disabled-row) span,
-.numbers-table tr.disabled-row span {
-  color: #666 !important;
-  opacity: 0.4 !important;
-}
-
-/* Force override any text color classes */
-.numbers-table :deep(tr.disabled-row) .ellipsis,
-.numbers-table tr.disabled-row .ellipsis {
-  color: #666 !important;
-  opacity: 0.4 !important;
-}
-
-/* Text styling classes */
-.cell-text {
+.hubspot-inbox-cell-text {
   display: block;
   text-align: center;
   width: 100%;
   margin: 0 auto;
 }
 
-.selectable-text {
+.hubspot-inbox-selectable-text {
   color: #333 !important;
   opacity: 1 !important;
 }
 
-.disabled-text {
-  color: #666 !important;
-  opacity: 0.4 !important;
-}
-
-/* Capabilities container */
-.capabilities-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px;
-  padding: 4px 0;
+.hubspot-inbox-disabled-text {
+  color: #999 !important;
+  opacity: 0.6 !important;
 }
 </style>
