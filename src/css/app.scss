@@ -8666,7 +8666,11 @@ span.mention {
     width: 8vw;
   }
 
-  .q-line-and-ring-group-selector {
+  .q-line-selector {
+    width: 8vw;
+  }
+
+  .q-ring-group-selector {
     width: 8vw;
   }
 
@@ -13683,6 +13687,12 @@ h1.contact-list-name-label {
 
   .q-basic-selector {
     margin-bottom: 0px;
+  }
+
+  .empty-state {
+    top: 50%;
+    transform: translateY(-50%);
+    max-height: 90px;
   }
 }
 

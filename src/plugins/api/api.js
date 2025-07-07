@@ -161,6 +161,22 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
       },
 
+      getLineIncomingNumber (contactId, lineId, fromTeamInbox = false) {
+        if (!contactId || !lineId) {
+          return null
+        }
+
+        const params = {}
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = fromTeamInbox
+        }
+
+        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {
+          params
+        })
+      },
+
       getIntegrationData (contactId, params) {
         if (!contactId) {
           return null
@@ -189,6 +205,13 @@ const talk2Api = {
 
       syncSalesforce (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-salesforce`)
+      },
+
+      forceCreateAlowareContactViaSalesforce (id, type) {
+        return window.axios.post(`${suffixV1}integrations/salesforce/force-create-aloware-contact`, {
+          objectType: type,
+          recordId: id
+        })
       },
 
       syncGuesty (id) {
@@ -400,6 +423,10 @@ const talk2Api = {
          * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
          */
         getContactCompanyAssociation (contactId) {
+          if (!contactId) {
+            return null
+          }
+
           return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
         },
 
@@ -518,8 +545,8 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}communication/${id}/force-terminate`)
       },
 
-      agentForceTerminate (id) {
-        return window.axios.post(`${suffixV1}agent/communication/${id}/terminate`)
+      async agentForceTerminate (id, params = {}) {
+        return window.axios.post(`${suffixV1}agent/communication/${id}/terminate`, params)
       },
 
       forceDequeue (id) {

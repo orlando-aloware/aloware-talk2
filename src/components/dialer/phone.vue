@@ -108,6 +108,12 @@
         </q-btn>
       </div>
     </div>
+    <div
+      v-if="lineInboxName && !isCallCompleted"
+      class="d-flex justify-center text-grey-82 text-xxs mt-n2 bg-blue-80"
+    >
+      Inbox: {{ lineInboxName }}
+    </div>
     <div class="bg-dark d-flex align-items-center justify-content-center h-100 flex-grow-1 overflow-hidden"
          v-if="loadingPhone">
       <q-spinner-bars color="white"
@@ -280,10 +286,10 @@
                   <contact-integrations-link-icons :contact='contact' />
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
-                  <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+                  <span class="d-inline-flex">{{ leadNumberRaw | fixPhone }}</span>
                   <b-link class="copy-phone-number text-grey-100 d-inline-flex ml-1"
                           href="#"
-                          @click.prevent="copyPhoneNumber(dialer.communication.lead_number)">
+                          @click.prevent="copyPhoneNumber(leadNumberRaw)">
                     <copy-icon />
                   </b-link>
                 </q-item-label>
@@ -734,10 +740,10 @@
                   </q-item-label>
                   <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start"
                                 v-if="dialer.communication">
-                    <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+                    <span class="d-inline-flex">{{ leadNumberRaw | fixPhone }}</span>
                     <b-link href="#"
                             class="copy-phone-number text-grey-100 d-inline-flex ml-1"
-                            @click.prevent="copyPhoneNumber(dialer.communication.lead_number)">
+                            @click.prevent="copyPhoneNumber(leadNumberRaw)">
                       <i class="material-icons">content_copy</i>
                     </b-link>
                   </q-item-label>
@@ -1980,6 +1986,12 @@ export default {
 
     isContactReadOnly () {
       return Boolean(this.contact?.is_read_only) || false
+    },
+
+    lineInboxName () {
+      const line = this.campaigns.find(campaign => campaign.id === this.dialer.communication?.campaign_id)
+      const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = line || {}
+      return ringGroup?.name || personalInbox?.name
     }
   },
 

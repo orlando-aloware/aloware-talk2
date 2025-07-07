@@ -160,6 +160,11 @@ export default {
     // if has redialed less than min_redials
     // and if the call disposition is not a successful call disposition
     redialRequired () {
+      // if no communication yet, don't force redial (warm-up)
+      if (!this.dialer.communication) {
+        return false
+      }
+
       const minRedials = this.sessionSettings?.min_redials
 
       // min_redials = 0 (redial disabled)
@@ -190,6 +195,18 @@ export default {
     // If task is being redialed, either by forced redials or manual redial
     isRedialing () {
       return this.redialedTasksCount[this.activeTask?.id] > 0
+    },
+
+    showStartDialingButton () {
+      if (!this.dialer || this.dialer.currentStatus !== 'READY') {
+        return false
+      }
+
+      if (this.timerIsOver || !this.isSessionRunning || this.reRouteModal) {
+        return false
+      }
+
+      return !this.wrapUp && !this.togglePause && !this.sessionPaused && this.countdownTimer > 0
     }
   },
 

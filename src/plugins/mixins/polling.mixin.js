@@ -26,11 +26,14 @@ export default {
         // update agent_status of every user
 
         for (const user of result.data) {
-          this.UPDATE_USER_STATUS(user)
+          // wrap with timeout to avoid blocking the main thread
+          setTimeout(() => {
+            this.UPDATE_USER_STATUS(user)
 
-          if (this.profile.company_id === user.company_id) {
-            this.$VueEvent.fire('agent_status_updated', user)
-          }
+            if (this.profile.company_id === user.company_id) {
+              this.$VueEvent.fire('agent_status_updated', user)
+            }
+          })
         }
       })
     }

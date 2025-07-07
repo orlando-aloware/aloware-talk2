@@ -10,7 +10,7 @@
         <div class="overview__body__card__container__body__value">
           <q-skeleton type="text"
                       animation="fade"
-                      height="26px"
+                      height="33px"
                       width="100px"
                       v-if="loading" />
           <counter-up :startVal="countUp.startVal"

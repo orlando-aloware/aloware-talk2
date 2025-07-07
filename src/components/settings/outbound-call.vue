@@ -57,6 +57,7 @@
                            :multiple="false"
                            :use-chips="false"
                            :use-input="true"
+                           :hide-bottom-space="true"
                            :generic-styling="false"
                            :generic-multiselect="false"
                            :disable="outboundLineSettingsDisabled"
