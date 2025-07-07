@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray, dialog } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeTheme, shell, Tray } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import { Registry } from 'rage-edit'
@@ -55,6 +55,14 @@ if (process.env.PROD) {
 // for windows
 let isQuiting = false
 let tray
+
+// Helper function to safely destroy tray
+function destroyTray () {
+  if (tray) {
+    tray.destroy()
+    tray = null
+  }
+}
 
 app.on('before-quit', () => {
   isQuiting = true
@@ -129,16 +137,49 @@ function createWindow () {
   })
 
   mainWindow.on('close', (event) => {
-    if (!isQuiting) {
+    // On Windows, allow the window to close normally to quit the app
+    // On other platforms (macOS), hide the window to keep the app running
+    if (process.platform !== 'win32' && !isQuiting) {
       event.preventDefault()
       mainWindow.hide()
       event.returnValue = false
+    } else if (process.platform === 'win32' && !isQuiting) {
+      // On Windows, when closing the window, quit the entire app
+      isQuiting = true
+      destroyTray()
+      app.quit()
     }
   })
 
-  mainWindow.webContents.on('new-window', function (event, url) {
-    event.preventDefault()
-    shell.openExternal(url)
+  // Handle all new window requests
+  // This replaces the deprecated 'new-window' event for Electron 22+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    // Parse the URL to determine if it should open internally or externally
+    try {
+      const parsedUrl = new URL(url)
+
+      // Check if it's an internal app route (file:// protocol or localhost)
+      const isInternalRoute = parsedUrl.protocol === 'file:' ||
+        parsedUrl.hostname === 'localhost' ||
+        parsedUrl.hostname === '127.0.0.1'
+
+      // Check if it's a widget route or internal navigation
+      const isWidgetNavigation = url.includes('?widget=true') ||
+        url.includes('&widget=true')
+
+      // Allow internal windows for app navigation
+      if (isInternalRoute || isWidgetNavigation) {
+        return { action: 'allow' }
+      }
+
+      // Open all external URLs (CRM links, etc.) in the user's default browser
+      shell.openExternal(url)
+      return { action: 'deny' }
+    } catch (e) {
+      // If URL parsing fails, open externally as a safe default
+      shell.openExternal(url)
+      return { action: 'deny' }
+    }
   })
 }
 
@@ -215,6 +256,16 @@ if (gotTheLock) {
 } else {
   app.quit()
 }
+
+// Quit when all windows are closed.  Necessary for Windows.
+app.on('window-all-closed', () => {
+  // On macOS, keep the app running even when all windows are closed
+  // unless we're explicitly quitting
+  if (process.platform !== 'darwin' || isQuiting) {
+    destroyTray()
+    app.quit()
+  }
+})
 
 // remove so we can register each time as we run the app.
 app.removeAsDefaultProtocolClient('alowaretalk')
@@ -340,6 +391,7 @@ function setTray () {
         label: 'Quit',
         click: function () {
           isQuiting = true
+          destroyTray()
           mainWindow.destroy()
           app.quit()
         }
@@ -425,6 +477,7 @@ ipcMain.on('restart_app', () => {
 
 ipcMain.on('quit_app', () => {
   isQuiting = true
+  destroyTray()
   app.quit()
 })
 

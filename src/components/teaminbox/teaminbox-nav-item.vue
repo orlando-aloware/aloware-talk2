@@ -3,7 +3,7 @@
        :id="`teaminbox-nav-item-${_uid}`"
        :class="['teaminbox-nav-item', { 'teaminbox-nav-item--active': isActive }]"
        @click="$emit('click', value)">
-    <div class="teaminbox-nav-item__content d-flex align-items-center">
+    <div class="teaminbox-nav-item__content d-flex align-items-center no-select">
       <span class="d-flex align-items-center mr-1">
         <inbox-icon width="18"
                     height="18" />

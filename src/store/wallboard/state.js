@@ -48,10 +48,10 @@ export default function () {
     callsEnabledColumns: [],
     filters: {
       ringGroup: null,
-      lineRingGroup: null,
       campaignId: null,
       agent: null,
-      agentStatus: 'all'
+      agentStatus: 'all',
+      teamId: null
     },
     isLiveCallsLoading: false,
     isOverviewDetailed: false,

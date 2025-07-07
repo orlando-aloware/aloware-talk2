@@ -399,7 +399,7 @@ export default {
         // This ensures Vue's reactivity system detects the change
         this.integrationData = {
           ...this.integrationData,
-          associated_company: response.data.associated_company
+          associated_company: response?.data?.associated_company
         }
         this.forceRerenderHubspotOneComponent()
       } catch (error) {
