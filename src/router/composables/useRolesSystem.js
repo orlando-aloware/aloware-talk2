@@ -1,23 +1,7 @@
-import { isProductionEnvironment } from 'src/shared/composables/useEnvironmentComposable'
-
-const focusedPowerDialerUserIds = isProductionEnvironment
-  ? [
-    69563,
-    47424,
-    88706,
-    53437,
-    92429,
-    47770
-  ]
-  : [76035]
-
-const focusedPowerDialerCompanyIds = isProductionEnvironment
-  ? []
-  : []
-
 export const allowedRoutes = {
-  focusedPowerDialer: [
+  talkLite: [
     'Power Dialer',
+    'Team Inboxes',
     'Stats',
     'Settings'
   ],
@@ -40,11 +24,6 @@ export const allowedRoutes = {
 }
 
 export const setRouterType = (authModule) => {
-  // TODO - MOVE TO BACKEND FLAG IF PoC IS SUCCESSFUL
-
-  if (focusedPowerDialerUserIds.includes(authModule.state.profile.id) || focusedPowerDialerCompanyIds.includes(authModule.state.profile.company_id)) {
-    authModule.commit('SET_FOCUSED_POWER_DIALER', true)
-  } else {
-    authModule.commit('SET_FOCUSED_POWER_DIALER', false)
-  }
+  const enableTalkLite = authModule.state.profile?.enable_talk_lite || false
+  authModule.commit('SET_FOCUSED_POWER_DIALER', enableTalkLite)
 }
