@@ -23,7 +23,7 @@ export const allowedRoutes = {
   ]
 }
 
-export const setRouterType = (authModule) => {
-  const enableTalkLite = authModule.state.profile?.enable_talk_lite || false
-  authModule.commit('SET_FOCUSED_POWER_DIALER', enableTalkLite)
+export const setRouterType = ({ commit, state }) => {
+  const enableTalkLite = state.profile?.enable_talk_lite || false
+  commit('SET_FOCUSED_POWER_DIALER', enableTalkLite)
 }
