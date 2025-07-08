@@ -189,7 +189,11 @@ export default {
     getDialerLastCommunication () {
       const communication = localStorage.getItem('dialer_last_communication')
       if (communication) {
-        return JSON.parse(communication)
+        try {
+          return JSON.parse(communication)
+        } catch (err) {
+          return null
+        }
       }
     }
   },
