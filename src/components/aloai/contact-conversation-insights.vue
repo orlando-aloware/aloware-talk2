@@ -490,7 +490,7 @@ export default {
       let renderer = new marked.Renderer()
       renderer.link = function (href, title, text) {
         var link = marked.Renderer.prototype.link.apply(this, arguments)
-        return link.replace('<a', "<a target='_blank'")
+        return link.replace('<a', '<a target=\'_blank\'')
       }
 
       // Use the custom renderer with marked

@@ -52,14 +52,8 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from 'vuex'
-import {
-  contactMixin,
-  contactV2AttributesMixin,
-  aclMixin,
-  visibilityMixin,
-  selectorMixin
-} from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapState } from 'vuex'
+import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, visibilityMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
@@ -279,14 +273,14 @@ export default {
 
     getIncomingNumber () {
       this.isBusy = true
-      
+
       let apiCall
       if (this.teamInbox) {
         apiCall = talk2TeamInboxApi.contact.getIncomingNumber(this.contact.id, this.selectedLine.id)
       } else {
         apiCall = talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id)
       }
-      
+
       return apiCall.then(response => {
         this.incomingNumber = response.data
       }).finally(() => {

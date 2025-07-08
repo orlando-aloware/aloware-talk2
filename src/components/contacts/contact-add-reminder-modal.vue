@@ -24,13 +24,13 @@
                     label-for="input-2">
         <predefined-time-selector v-model="reminder.time"
                                   data-testid="contact-add-reminder-modal-predefined-time-selector"
-                                  @select="onTimeSelected"/>
+                                  @select="onTimeSelected" />
       </b-form-group>
 
       <b-form-group id="input-group-2"
                     label="Timezone"
                     label-for="input-2">
-        <timezone-selector data-testid="contact-add-reminder-modal-timezone-selector" @select="timezoneSelected"/>
+        <timezone-selector data-testid="contact-add-reminder-modal-timezone-selector" @select="timezoneSelected" />
       </b-form-group>
 
       <b-form-group id="input-group-2"
@@ -42,7 +42,7 @@
                          max-rows="8"
                          no-auto-shrink
                          data-testid="contact-add-reminder-modal-notes-textarea"
-                         v-model="reminder.note"/>
+                         v-model="reminder.note" />
       </b-form-group>
     </b-form>
     <template slot="modal-footer">
@@ -60,7 +60,7 @@
                 data-testid="contact-add-reminder-modal-submit-button"
                 @click="onSubmit">
         <q-spinner-bars color="white"
-                        v-if="isAdding"/>
+                        v-if="isAdding" />
         {{ isAdding ? 'Adding Reminder...' : 'Add Reminder' }}
       </b-button>
     </template>

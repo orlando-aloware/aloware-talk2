@@ -1,11 +1,11 @@
 <template>
   <div class="teaminbox-tab">
     <TeamInboxTabHeader :collapse-target="collapseTarget"
-                       :search="search"
-                       @search="search = $event" />
+                        :search="search"
+                        @search="search = $event" />
 
     <TeamInboxChannelToggle @channel="onChannel"
-                            @date-change="onFilterChange"/>
+                            @date-change="onFilterChange" />
 
     <TeamInboxFilters @filter-change="onFilterChange"
                       @sort-change="onSortChange" />
@@ -742,7 +742,7 @@ export default {
       return (this.checkCommunicationMatchesSearch(this.search, communication) &&
           this.checkCommunicationMatchesInboxFilters(this.activeFilters, communication, false) &&
           !(sortAsc && this.hasMoreItems)) ||
-          this.communicationInProgress(communication)
+        this.communicationInProgress(communication)
     },
 
     communicationInProgress (communication) {

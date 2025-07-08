@@ -35,7 +35,7 @@
       <template #overlay>
         <div class="text-center" data-testid="communication-fetching-communication">
           <q-spinner-bars color="primary"
-                          size="2em"/>
+                          size="2em" />
           <p>Fetching Communication...</p>
         </div>
       </template>

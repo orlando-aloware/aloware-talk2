@@ -624,9 +624,9 @@ export default {
         // with the communication's contact id
         // else, set the contact.
         if ((routeTitle &&
-          this.activeTask &&
-          routeTitle === 'Power Dialer Sessions' &&
-          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+            this.activeTask &&
+            routeTitle === 'Power Dialer Sessions' &&
+            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
@@ -984,9 +984,9 @@ export default {
       // only start wrap up timer if there is a communication
       if (this.dialer.communication) {
         const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
-                                  this.hasParkedAndInprogressCall ||
-                                  this.hasCallInProgressNotParked) &&
-                                  !(this.parkFromAnotherTab || this.hungFromAnotherTab)
+            this.hasParkedAndInprogressCall ||
+            this.hasCallInProgressNotParked) &&
+          !(this.parkFromAnotherTab || this.hungFromAnotherTab)
 
         if (shouldStartWrapUp) {
           this.startWrapUpTimer()
