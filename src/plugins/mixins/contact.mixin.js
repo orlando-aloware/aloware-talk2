@@ -1111,7 +1111,11 @@ export default {
       if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
         this.setLineIncomingNumberLoading(true)
 
-        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
+        const apiCall = this.teamInbox
+          ? talk2TeamInboxApi.contact.getIncomingNumber(this.contact.id, this.selectedCampaign.id)
+          : talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id)
+
+        apiCall.then(response => {
           this.setLineIncomingNumber(response.data)
         }).finally(() => {
           this.setLineIncomingNumberLoading(false)
