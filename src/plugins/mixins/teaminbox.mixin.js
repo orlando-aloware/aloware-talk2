@@ -177,10 +177,10 @@ export default {
       // Transform filters to API parameters
       const apiFilters = {}
 
-      if (filters.from_date && filters.to_date) {
+      if (filters.from_date) {
         apiFilters.from_date = filters.from_date
         // Only send to_date for custom date ranges to prevent timezone cutoff issues
-        if (filters.date_range === 'custom') {
+        if (filters.to_date && filters.date_range === 'custom') {
           apiFilters.to_date = filters.to_date
         }
       }
