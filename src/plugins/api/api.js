@@ -1049,7 +1049,8 @@ const talk2Api = {
             params.from_date = filters.from_date
           }
 
-          if (filters?.to_date) {
+          // Only send to_date for custom date ranges to prevent timezone cutoff issues
+          if (filters?.to_date && filters?.date_range === 'custom') {
             params.to_date = filters.to_date
           }
 
