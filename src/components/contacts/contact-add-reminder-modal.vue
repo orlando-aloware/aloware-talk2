@@ -70,6 +70,7 @@
 <script>
 import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import PredefinedTimeSelector from 'components/predefined-time-selector'
 import DateSelector from 'components/date-selector'
@@ -78,12 +79,7 @@ import TimezoneSelector from 'components/timezone-selector'
 export default {
   name: 'contact-add-reminder-modal',
   components: { TimezoneSelector, DateSelector, PredefinedTimeSelector },
-  props: {
-    fromTeamInbox: {
-      type: Boolean,
-      default: false
-    }
-  },
+  mixins: [teamInboxPropsMixin],
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', ['isAddReminderOpen']),
@@ -122,7 +118,7 @@ export default {
     onSubmit (event) {
       event.preventDefault()
       this.isAdding = true
-      const apiCall = this.fromTeamInbox
+      const apiCall = this.teamInbox
         ? talk2TeamInboxApi.calendar.createEvent(this.contact.id, this.formatParameters())
         : talk2Api.V1.contact.addEngagement(this.contact.id, this.formatParameters())
 

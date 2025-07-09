@@ -349,20 +349,16 @@ export default {
   props: {
     campaignId: {
       required: true
-    },
-    fromTeamInbox: {
-      type: Boolean,
-      default: false
     }
   },
 
   mixins: [
     aclMixin,
     timezoneCheckMixin,
+    teamInboxPropsMixin,
     integrationMixin,
     contactMixin,
-    userMixin,
-    teamInboxPropsMixin
+    userMixin
   ],
 
   components: {

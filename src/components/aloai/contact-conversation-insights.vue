@@ -360,6 +360,7 @@ import { QSpinnerBars } from 'quasar'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
 export default {
@@ -370,16 +371,14 @@ export default {
     QSpinnerBars
   },
 
+  mixins: [teamInboxPropsMixin],
+
   props: {
     contact: {
       type: Object,
       required: true
     },
     isReadOnly: {
-      type: Boolean,
-      default: false
-    },
-    fromTeamInbox: {
       type: Boolean,
       default: false
     }
@@ -625,7 +624,7 @@ export default {
         type: CommunicationTypes.NOTE
       }
 
-      const apiCall = this.fromTeamInbox
+      const apiCall = this.teamInbox
         ? talk2TeamInboxApi.calendar.createEvent(this.contact.id, message)
         : talk2Api.V1.contact.addEngagement(this.contact.id, message)
 
