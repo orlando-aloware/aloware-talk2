@@ -18,8 +18,9 @@
                             data-testid="item-ignore-call-icon"
                             v-if="isShowIgnoreCallIcon" />
           <q-tooltip anchor="top middle"
-                     self="center middle">
-            {{ isShowIgnoreCallIcon ? 'Ignore' : 'Decline' }}
+                     self="center middle"
+                     v-if="!isShowIgnoreCallIcon || tooltipMessage">
+            {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
           </q-tooltip>
           <!-- only show reject button if -->
           <cancel-call-icon data-testid="item-cancel-call-icon" v-if="isShowCancelCallIcon" />
@@ -198,6 +199,14 @@ export default {
       const isIncomingCall = !this.isCallFishingMode && this.isIncomingLiveCall
 
       return isCallFishing || isIncomingCall
+    },
+
+    tooltipMessage () {
+      if (!this.communication || (this.isPersonalInbox && !this.communication.campaign?.call_waiting_ring_group_id)) {
+        return ''
+      }
+
+      return this.isPersonalInbox ? 'Reject' : 'Ignore'
     }
   }
 }

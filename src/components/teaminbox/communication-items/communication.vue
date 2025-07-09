@@ -61,6 +61,7 @@ import LastCommunicationDate from './last-communication-date.vue'
 import PhoneNumber from './phone-number.vue'
 import { avatarMixin, liveCallsMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import LiveCallControls from 'components/shared/live-call-controls'
+import { mapState } from 'vuex'
 
 export default {
   mixins: [
@@ -178,6 +179,8 @@ export default {
   },
 
   computed: {
+    ...mapState(['campaigns']),
+
     communication () {
       return {
         id: this.communicationId,
@@ -187,8 +190,17 @@ export default {
         ring_group_id: this.teamInboxId,
         current_status2: this.currentStatus,
         disposition_status2: this.dispositionStatus,
-        last_call_source: this.lastCallSource
+        last_call_source: this.lastCallSource,
+        campaign: {
+          call_waiting_ring_group_id: this.campaign ? this.campaign.call_waiting_ring_group_id : this.getCampaign(this.campaignId)?.call_waiting_ring_group_id
+        }
       }
+    }
+  },
+
+  methods: {
+    getCampaign (campaignId) {
+      return this.campaigns.find(campaign => campaign.id === campaignId)
     }
   }
 }
