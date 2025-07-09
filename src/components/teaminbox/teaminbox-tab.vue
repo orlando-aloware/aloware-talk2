@@ -329,10 +329,7 @@ export default {
     },
 
     async getUnreadCount (ringGroupId, contactId) {
-      const response = await talk2TeamInboxApi.inboxes.unreadCount({
-        inbox_ids: [ringGroupId],
-        contact_ids: [contactId]
-      })
+      const response = await talk2TeamInboxApi.inboxes.unreadCount([ringGroupId], [contactId])
       return response.data.find(item => item.ring_group_id === ringGroupId && item.contact_id === contactId)?.unread_count || 0
     },
 

@@ -73,14 +73,31 @@ export default {
     }
   },
 
-  // InboxController endpoints (already implemented)
+  // InboxController endpoints - MATCHING DEVELOP'S PATTERN
   inboxes: {
-    list (params = {}, config = {}) {
-      return window.axios.get(`${suffixV3}team-inbox/inboxes`, { params, ...config })
+    async get (data) {
+      return window.axios.get(`${suffixV3}team-inbox/inboxes`, data)
     },
 
-    unreadCount (params = {}, config = {}) {
-      return window.axios.post(`${suffixV3}team-inbox/inboxes/unread-count`, params, config)
+    unreadCount (inboxIds, contactIds = null, filters = {}) {
+      const params = {
+        inbox_ids: inboxIds
+      }
+
+      if (contactIds) {
+        params.contact_ids = contactIds
+      }
+
+      if (filters?.from_date) {
+        params.from_date = filters.from_date
+      }
+
+      // Only send to_date for custom date ranges to prevent timezone cutoff issues
+      if (filters?.to_date && filters?.date_range === 'custom') {
+        params.to_date = filters.to_date
+      }
+
+      return window.axios.post(`${suffixV3}team-inbox/inboxes/unread-count`, params)
     }
   }
 }

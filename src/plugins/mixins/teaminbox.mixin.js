@@ -56,11 +56,12 @@ export default {
         const nextPage = 1
         const perPage = 50
 
-        const response = await talk2TeamInboxApi.inboxes.list({
-          page: nextPage,
-          per_page: perPage,
-          ...(search ? { search } : {})
-        }, {
+        const response = await talk2TeamInboxApi.inboxes.get({
+          params: {
+            page: nextPage,
+            per_page: perPage,
+            ...(search ? { search } : {})
+          },
           signal: this.abortController.signal
         })
 
@@ -95,11 +96,12 @@ export default {
 
         const perPage = 50
         const nextPage = this.currentInboxesPage + 1
-        const response = await talk2TeamInboxApi.inboxes.list({
-          page: nextPage,
-          per_page: perPage,
-          ...(search ? { search } : {})
-        }, {
+        const response = await talk2TeamInboxApi.inboxes.get({
+          params: {
+            page: nextPage,
+            per_page: perPage,
+            ...(search ? { search } : {})
+          },
           signal: this.abortController.signal
         })
 
@@ -234,8 +236,10 @@ export default {
     },
 
     async checkInboxAccess (inboxId) {
-      const response = await talk2TeamInboxApi.inboxes.list({
-        inbox_ids: [inboxId]
+      const response = await talk2TeamInboxApi.inboxes.get({
+        params: {
+          inbox_ids: [inboxId]
+        }
       })
 
       const inboxes = response?.data?.data || []
@@ -256,12 +260,7 @@ export default {
       const filters = this.$store.state.TeamInbox.activeFilters || {}
 
       try {
-        const { data: newData } = await talk2TeamInboxApi.inboxes.unreadCount({
-          inbox_ids: inboxIds,
-          ...(contactIds && { contact_ids: contactIds }),
-          ...(filters?.from_date && { from_date: filters.from_date }),
-          ...(filters?.to_date && { to_date: filters.to_date })
-        })
+        const { data: newData } = await talk2TeamInboxApi.inboxes.unreadCount(inboxIds, contactIds, filters)
         data = newData
 
         switch (data.length) {

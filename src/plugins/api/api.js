@@ -4,7 +4,6 @@ import _ from 'lodash'
 import qs from 'qs'
 import * as AloAi from 'src/constants/aloai'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
-import talk2TeamInboxApi from './teamInboxApi'
 
 const exportCommunications = async (contactId) => {
   return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
@@ -789,20 +788,13 @@ const talk2Api = {
 
         delete params.timezone
 
-        return window.axios.get(`/api/v2/contacts`, {
-          params,
-          paramsSerializer: qs.stringify,
-          cancelToken: cancelTokenSource
-        })
+        return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokenSource })
       },
 
       counts (params, cancelTokenSource) {
         delete params.timezone
 
-        return window.axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, {
-          params,
-          paramsSerializer: qs.stringify
-        })
+        return window.axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
       },
 
       inboxCounts (params) {
@@ -1054,15 +1046,6 @@ const talk2Api = {
         return window.axios.put(`${suffixV2}companies/${companyId}/features/${feature}`)
       }
     }
-  },
-
-  // Team Inbox endpoints
-  getInboxes (params = {}) {
-    return talk2TeamInboxApi.inboxes.list(params)
-  },
-
-  getInboxesUnreadCount (params = {}) {
-    return talk2TeamInboxApi.inboxes.unreadCount(params)
   }
 }
 
