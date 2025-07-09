@@ -202,7 +202,7 @@ export default {
     },
 
     tooltipMessage () {
-      if (!this.communication || (this.isPersonalInbox && !this.communication.campaign?.call_waiting_ring_group_id)) {
+      if (!this.communication || !this.communication.campaign) {
         return ''
       }
 
