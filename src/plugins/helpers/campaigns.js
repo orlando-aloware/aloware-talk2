@@ -76,7 +76,7 @@ export const getCampaigns = function (context) {
   return getCampaignsData(context, {
     setAction: 'setCampaigns',
     setLoadingAction: 'setCampaignsIsLoading',
-    loadingFlag: 'campaignsIsLoading'
+    loadingFlag: 'loadingCampaigns'
   })
 }
 
