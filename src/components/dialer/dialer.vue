@@ -2163,15 +2163,6 @@ export default {
       }
     },
 
-    'dialer.communication': function (communication) {
-      if (communication) {
-        localStorage.setItem('dialer_last_communication', JSON.stringify({
-          id: communication.id,
-          call_disposition_id: communication.call_disposition_id
-        }))
-      }
-    },
-
     agentStatus (newStatus, oldStatus) {
       if (newStatus === AgentStatus.AGENT_STATUS_RINGING &&
         oldStatus !== AgentStatus.AGENT_STATUS_RINGING &&
