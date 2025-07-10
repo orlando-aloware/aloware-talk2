@@ -2,6 +2,8 @@
  * Campaigns helper functions
  */
 
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
+
 /**
  * Generic function to fetch campaign data
  * @param {Object} context - Vue component context with access to Vuex actions
@@ -74,8 +76,49 @@ export const getCampaigns = function (context) {
   return getCampaignsData(context, {
     setAction: 'setCampaigns',
     setLoadingAction: 'setCampaignsIsLoading',
-    loadingFlag: 'campaignsIsLoading,'
+    loadingFlag: 'loadingCampaigns'
   })
+}
+
+/**
+ * Fetches team inbox campaign data
+ * @param {Object} context - Vue component context with access to Vuex actions
+ * @returns {Promise} - Promise that resolves when team inbox campaigns are loaded
+ */
+export const getTeamInboxCampaigns = function (context) {
+  if (!context.hasPermissionTo('list campaign')) {
+    return Promise.resolve()
+  }
+
+  context.loadingTeamInboxCampaigns = true
+  if (typeof context.setCampaignsIsLoading === 'function') {
+    context.setCampaignsIsLoading(true)
+  }
+
+  // Use Team Inbox V3 API - no from_team_inbox flag needed
+  return talk2TeamInboxApi.campaigns.index({
+    is_lite: true
+  })
+    .then((res) => {
+      if (typeof context.setTeamInboxCampaigns === 'function') {
+        context.setTeamInboxCampaigns(res.data)
+      }
+      context.loadingTeamInboxCampaigns = false
+      if (typeof context.setCampaignsIsLoading === 'function') {
+        context.setCampaignsIsLoading(false)
+      }
+
+      return Promise.resolve()
+    })
+    .catch((err) => {
+      console.log(err)
+      context.loadingTeamInboxCampaigns = false
+      if (typeof context.setCampaignsIsLoading === 'function') {
+        context.setCampaignsIsLoading(false)
+      }
+
+      return Promise.reject()
+    })
 }
 
 /**

@@ -43,8 +43,8 @@
         </q-item>
       </template>
       <template v-if="selectedLine && Object.keys(selectedLine).length > 0" v-slot:selected>
-        <div class="selected-option-container">
-          <span class="selected-option">{{ getSelectedLineLabel() }}</span>
+        <div class="selected-option-container"
+             v-html="getSelectedLineLabel()">
         </div>
       </template>
     </q-select>
@@ -52,14 +52,10 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
-import {
-  contactMixin,
-  contactV2AttributesMixin,
-  aclMixin,
-  visibilityMixin,
-  selectorMixin
-} from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapState } from 'vuex'
+import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, visibilityMixin } from 'src/plugins/mixins'
+import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
 
 export default {
@@ -106,7 +102,9 @@ export default {
      * Returns the active campaigns
      */
     activeCampaigns () {
-      return this.campaigns.filter(campaign => this.activeInboxCampaignIds?.includes(campaign.id) || campaign.ivr_id)
+      const allIvrCampaigns = this.campaigns.filter(campaign => campaign.ivr_id)
+      const availableInboxCampaigns = this.campaigns.filter(campaign => this.activeInboxCampaignIds?.includes(campaign.id))
+      return [...availableInboxCampaigns, ...allIvrCampaigns]
     },
 
     selectedCampaign () {
@@ -191,6 +189,7 @@ export default {
       isBusy: false,
       selectedLine: null,
       lineOptions: this.formattedLineOptions,
+      incomingNumber: null,
       isFocused: false,
       selectWidth: 0,
       canEmail: false
@@ -202,10 +201,16 @@ export default {
 
     if (this.contact && this.contact.id) {
       this.lineOptions = this.formattedLineOptions
+      this.setIncomingNumber()
     }
   },
 
   methods: {
+    ...mapActions('contacts', [
+      'setLineIncomingNumberLoading',
+      'setLineIncomingNumber'
+    ]),
+
     onShowMenu () {
       this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
     },
@@ -242,6 +247,7 @@ export default {
 
     onInput (value) {
       this.$el.querySelector('.inline-select .q-field__input').blur()
+      this.getIncomingNumber()
       this.$emit('change', value)
     },
 
@@ -262,11 +268,39 @@ export default {
       if (!this.selectedLine && Object.keys(this.selectedLine).length < 1) {
         return 'Select line...'
       }
-      return this.selectedLine.name
+      const title = this.incomingNumber ? this.$options.filters.fixPhone(this.incomingNumber.phone_number) : ''
+      const titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
+      return `<span class="selected-option">${this.selectedLine.name}</span> ${titleText}`
+    },
+
+    getIncomingNumber () {
+      this.isBusy = true
+
+      let apiCall
+      if (this.teamInbox) {
+        apiCall = talk2TeamInboxApi.contact.getIncomingNumber(this.contact.id, this.selectedLine.id)
+      } else {
+        apiCall = talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id)
+      }
+
+      return apiCall.then(response => {
+        this.incomingNumber = response.data
+      }).finally(() => {
+        this.isBusy = false
+      })
     },
 
     setDefaultLine () {
       this.selectedLine = this.selectedCampaign
+      if (this.selectedLine && this.contact.id) {
+        this.getIncomingNumber()
+      }
+    },
+
+    setIncomingNumber () {
+      this.selectedLine = this.selectedCampaign
+      this.incomingNumber = this.lineIncomingNumber
+      this.showPlaceholder()
     },
 
     updateMessageComposer () {
@@ -287,6 +321,28 @@ export default {
       }
 
       this.canEmail = this.selectedCampaign.email_intake && this.selectedCampaign.email_intake_route_id
+    },
+
+    /**
+     * Override updateLineIncomingNumber from contactMixin to use our selectedCampaign
+     */
+    updateLineIncomingNumber () {
+      if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
+        this.setLineIncomingNumberLoading(true)
+
+        let apiCall
+        if (this.teamInbox) {
+          apiCall = talk2TeamInboxApi.contact.getIncomingNumber(this.contact.id, this.selectedCampaign.id)
+        } else {
+          apiCall = talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id)
+        }
+
+        apiCall.then(response => {
+          this.setLineIncomingNumber(response.data)
+        }).finally(() => {
+          this.setLineIncomingNumberLoading(false)
+        })
+      }
     }
   },
 
@@ -304,6 +360,25 @@ export default {
       if (value && this.contact && this.contact.id) {
         this.setDefaultLine()
         this.showPlaceholder()
+      }
+    },
+    'campaignsToUse': {
+      handler: function (newCampaigns) {
+        if (newCampaigns?.length > 0 && this.campaignId && this.contact?.id) {
+          if (!this.selectedLine) {
+            this.setDefaultLine()
+          }
+        }
+      },
+      immediate: true
+    },
+    lineIncomingNumberLoading (value) {
+      this.isBusy = value
+    },
+    lineIncomingNumber: {
+      deep: true,
+      handler: function (value) {
+        this.setIncomingNumber()
       }
     }
   }

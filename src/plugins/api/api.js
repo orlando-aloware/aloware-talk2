@@ -5,14 +5,8 @@ import qs from 'qs'
 import * as AloAi from 'src/constants/aloai'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
-const exportCommunications = async (contactId, fromTeamInbox) => {
-  const params = {}
-
-  if (fromTeamInbox) {
-    params.from_team_inbox = fromTeamInbox
-  }
-
-  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`, { params })
+const exportCommunications = async (contactId) => {
+  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
 }
 
 const talk2Api = {
@@ -56,20 +50,12 @@ const talk2Api = {
         return window.axios.put(`${suffixV1}contact/${id}`, params)
       },
 
-      getPhoneNumbers (id, fromTeamInbox = false) {
+      getPhoneNumbers (id) {
         if (!id) {
           return Promise.reject(new Error('Failed to get phone numbers, missing contact id!'))
         }
 
-        const params = {}
-
-        if (fromTeamInbox) {
-          params.from_team_inbox = fromTeamInbox
-        }
-
-        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`, {
-          params
-        })
+        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`)
       },
 
       getRingGroups (id) {
@@ -144,14 +130,9 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}contact/${id}/send-email`, params)
       },
 
-      addEngagement (id, params, teamInboxId) {
+      addEngagement (id, params) {
         if (!id) {
           return null
-        }
-
-        if (teamInboxId) {
-          params.from_team_inbox = true
-          params.ring_group_id = teamInboxId
         }
 
         return window.axios.post(`${suffixV1}calendar/events/contact/${id}/create`, params)
@@ -159,6 +140,14 @@ const talk2Api = {
 
       updateEngagement (contactId, eventId, params) {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
+      },
+
+      getLineIncomingNumber (contactId, lineId) {
+        if (!contactId || !lineId) {
+          return null
+        }
+
+        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
       },
 
       getIntegrationData (contactId, params) {
@@ -189,6 +178,13 @@ const talk2Api = {
 
       syncSalesforce (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-salesforce`)
+      },
+
+      forceCreateAlowareContactViaSalesforce (id, type) {
+        return window.axios.post(`${suffixV1}integrations/salesforce/force-create-aloware-contact`, {
+          objectType: type,
+          recordId: id
+        })
       },
 
       syncGuesty (id) {
@@ -398,9 +394,13 @@ const talk2Api = {
        * Get the company association of the contact
        *
        * @param contactId
-       * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
+       * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object}>>|null}
        */
       getContactCompanyAssociation (contactId) {
+        if (!contactId) {
+          return null
+        }
+
         return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
       },
 
@@ -489,8 +489,8 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}communication/${id}/force-terminate`)
       },
 
-      agentForceTerminate (id) {
-        return window.axios.post(`${suffixV1}agent/communication/${id}/terminate`)
+      async agentForceTerminate (id, params = {}) {
+        return window.axios.post(`${suffixV1}agent/communication/${id}/terminate`, params)
       },
 
       forceDequeue (id) {
@@ -1002,25 +1002,8 @@ const talk2Api = {
         delete (filterId) {
           return window.axios.delete(`${suffixV2}filters/${filterId}`)
         }
-      },
-
-      inboxes: {
-        async get (data) {
-          return window.axios.get(`${suffixV2}inboxes`, data)
-        },
-
-        unreadCount (inboxIds, contactIds = null) {
-          const params = {
-            inbox_ids: inboxIds
-          }
-
-          if (contactIds) {
-            params.contact_ids = contactIds
-          }
-
-          return window.axios.post(`${suffixV2}inboxes/unread-count`, params)
-        }
       }
+      // Team Inbox methods moved to teamInboxApi.js
     },
 
     users: {

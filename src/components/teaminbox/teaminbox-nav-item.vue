@@ -3,7 +3,7 @@
        :id="`teaminbox-nav-item-${_uid}`"
        :class="['teaminbox-nav-item', { 'teaminbox-nav-item--active': isActive }]"
        @click="$emit('click', value)">
-    <div class="teaminbox-nav-item__content d-flex align-items-center">
+    <div class="teaminbox-nav-item__content d-flex align-items-center no-select">
       <span class="d-flex align-items-center mr-1">
         <inbox-icon width="18"
                     height="18" />
@@ -30,8 +30,9 @@
         :placement="isMobile ? 'bottom' : 'right'"
         :target="`teaminbox-nav-item-${_uid}`"
         boundary="window"
-        :delay="500">
-        {{ label }} - {{ unreadCount }} unread communications
+        :delay="500"
+        v-if="tooltipText">
+        {{ tooltipText }}
     </b-tooltip>
   </div>
 </template>
@@ -73,7 +74,29 @@ export default {
   },
 
   computed: {
-    ...mapState(['isMobile'])
+    ...mapState(['isMobile']),
+
+    tooltipText () {
+      if (this.isMobile) {
+        return ''
+      }
+
+      if (this.label?.length <= 19 && this.unreadCount <= 99) {
+        return ''
+      }
+
+      let text = ''
+
+      if (this.label?.length > 19) {
+        text = this.label
+      }
+
+      if (this.unreadCount > 99) {
+        text += `${text ? ' -' : ''} ${this.unreadCount} unread communications`
+      }
+
+      return text
+    }
   }
 }
 </script>

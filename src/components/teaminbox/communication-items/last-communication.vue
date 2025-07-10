@@ -6,7 +6,7 @@
                    width="22px"
                    data-testid="inbox-tasks-item-component"
                    :is="iconComponent"
-                   :class="['disposition-icon', `disposition-icon--${iconComponent}`, isLiveCallItem && 'live-call-pulse']">
+                   :class="['flex-shrink-0 disposition-icon', `disposition-icon--${iconComponent}`, isLiveCallItem && 'live-call-pulse']">
         </component>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text last-communication__label"
@@ -15,9 +15,14 @@
             {{ communicationLabel }}
           </div>
 
+          <div class="truncated-text"
+               v-else-if="isMention"
+               v-html="parsedMention">
+          </div>
+
           <div :class="['truncated-text', appointmentReminderTextClass]"
-               v-else
-               v-html="parsedBody">
+               v-else>
+            {{ body }}
           </div>
         </div>
       </div>
@@ -110,10 +115,12 @@ export default {
       return this.type === CommunicationTypes.SMS && this.body.length > 0
     },
 
-    parsedBody () {
+    isMention () {
       return this.type === CommunicationTypes.NOTE
-        ? this.parseMentionToView(this.body)
-        : this.body
+    },
+
+    parsedMention () {
+      return this.parseMentionToView(this.body)
     },
 
     iconComponent () {
@@ -125,7 +132,7 @@ export default {
 
 <style scoped lang="scss">
 .last-communication {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
 
   &__label {

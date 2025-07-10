@@ -43,7 +43,7 @@
                 <i class="material-icons" data-testid="contact-info-copy-phone-number-icon">content_copy</i>
               </b-link>
 
-              <br/>
+              <br />
 
               <b-badge class="badge-phone-info mr-1"
                        :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
@@ -90,7 +90,7 @@
                   data-testid="contact-info-edit-button"
                   :disabled="isReadOnly"
                   @click="onOpenEditForm">
-          <pencil-o-icon/>
+          <pencil-o-icon />
         </b-button>
         <q-menu content-class="mx-height-300"
                 no-focus
@@ -117,7 +117,7 @@
           Call
         </q-tooltip>
         <call-icon width="14"
-                   height="14"/>
+                   height="14" />
         <q-popup-proxy v-model="showLineSelectorPopup"
                        no-parent-event>
           <div class="d-flex line-selector-wrapper">
@@ -169,7 +169,7 @@
         <q-spinner-bars class="mr-1"
                         color="blue"
                         data-testid="contact-info-block-spinner"
-                        v-if="isProcessingBlock"/>
+                        v-if="isProcessingBlock" />
       </b-button>
 
       <b-button variant="light"
@@ -187,7 +187,7 @@
         <q-spinner-bars class="mr-1"
                         color="blue"
                         data-testid="contact-info-unblock-spinner"
-                        v-if="isProcessingBlock"/>
+                        v-if="isProcessingBlock" />
         <i class="fa fa-lock-open"
            data-testid="contact-info-unblock-icon"
            v-if="!isProcessingBlock">
@@ -211,7 +211,7 @@
                    content-class="fs-12">
           Add appointment
         </q-tooltip>
-        <calendar-icon/>
+        <calendar-icon />
       </b-button>
       <b-button variant="light"
                 size="sm"
@@ -239,7 +239,7 @@
                    content-class="fs-12">
           Add to power dialer
         </q-tooltip>
-        <add-call-icon/>
+        <add-call-icon />
       </b-button>
       <b-button variant="light"
                 size="sm"
@@ -253,7 +253,7 @@
                    content-class="fs-12">
           {{ hasPowerDialerListsText }}
         </q-tooltip>
-        <call-remove-icon/>
+        <call-remove-icon />
       </b-button>
       <b-button variant="light"
                 size="sm"
@@ -267,11 +267,32 @@
                    content-class="fs-12">
           Merge
         </q-tooltip>
-        <merge-contact-icon/>
+        <merge-contact-icon />
+      </b-button>
+      <b-button variant="light"
+                size="sm"
+                class="custom-action-button my-1"
+                data-testid="contact-info-export-button"
+                :disabled="isExportingCommunications || isReadOnly"
+                v-if="isAdmin"
+                @click="handleExportCommunications">
+        <q-tooltip anchor="top middle"
+                   data-testid="contact-info-export-tooltip"
+                   self="center middle"
+                   content-class="fs-12">
+          Export communications
+        </q-tooltip>
+        <i class="fa fa-arrow-up-from-bracket" v-if="!isExportingCommunications"></i>
+        <q-spinner-bars v-if="isExportingCommunications"
+                        class="mr-1"
+                        color="blue"
+                        size="14px" />
       </b-button>
     </div>
-    <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"></appointment-form-modal>
-    <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
+    <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"
+                            :from-team-inbox="fromTeamInbox"></appointment-form-modal>
+    <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"
+                                :from-team-inbox="fromTeamInbox"></contact-add-reminder-modal>
     <power-dialer-add-modal :params="addPowerDialerParams"
                             data-testid="contact-info-power-dialer-add-modal"
                             :redirect="false"
@@ -281,7 +302,7 @@
                                             data-testid="contact-remove-from-lists-confirmation"
                                             @close="onCloseContactRemoveFromListsConfirmation"
                                             @confirm="onConfirmContactRemoveFromListsConfirmation"
-                                            @error="onErrorContactRemoveFromLists"/>
+                                            @error="onErrorContactRemoveFromLists" />
     <merge-contact-modal data-testid="contact-info-merge-contact-modal"
                          :contact="contact"
                          v-if="isMergeContactOpen">
@@ -305,9 +326,17 @@ import ContactAddReminderModal from 'src/components/contacts/contact-add-reminde
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
 import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
-import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin, userMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  contactMixin,
+  integrationMixin,
+  teamInboxPropsMixin,
+  timezoneCheckMixin,
+  userMixin
+} from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
@@ -326,6 +355,7 @@ export default {
   mixins: [
     aclMixin,
     timezoneCheckMixin,
+    teamInboxPropsMixin,
     integrationMixin,
     contactMixin,
     userMixin
@@ -369,6 +399,8 @@ export default {
       'contactPhoneNumbers',
       'changingSelectedContact'
     ]),
+
+    ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
     lineSelectorWidth () {
       return this.$q.screen.width <= 1366 ? '200px' : '220px'
@@ -431,7 +463,8 @@ export default {
       selectedLine: null,
       showLineSelectorPopup: false,
       LRN_NOT_PERFORMED,
-      contactLastLineUsedId: null
+      contactLastLineUsedId: null,
+      isExportingCommunications: false
     }
   },
 
@@ -594,6 +627,24 @@ export default {
 
     onLineChange (line) {
       this.selectedLine = line
+    },
+
+    async handleExportCommunications () {
+      this.isExportingCommunications = true
+
+      try {
+        if (this.teamInbox) {
+          await talk2TeamInboxApi.contact.exportCommunications(this.contact.id)
+        } else {
+          await talk2Api.V2.contacts.exportCommunications(this.contact.id)
+        }
+        this.$generalNotification('Contact communications export request has been successfully submitted and is queued for processing.')
+      } catch (error) {
+        console.log(error)
+        this.$generalNotification('Unable to process export request! Please try again later.', 'error')
+      } finally {
+        this.isExportingCommunications = false
+      }
     }
   }
 }

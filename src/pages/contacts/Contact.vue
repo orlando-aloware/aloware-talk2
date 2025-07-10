@@ -10,12 +10,12 @@
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{
-             'contact-activity--closed': detailsOpen || contactListSidebarOpen,
+             'contact-activity--closed': isContactDetailsOpened || contactListSidebarOpen,
              'inbox-activity-container-wrapper': teamInboxId
            }"
            v-if="isShowContactActivities">
         <contact-activities ref="contactActivities"
-                            :class="{ 'contact-activity--closed': detailsOpen }"
+                            :class="{ 'contact-activity--closed': !isContactDetailsOpened }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
@@ -47,7 +47,7 @@
         </contact-activities>
       </div>
       <div class="contact-details-container"
-           :class="{ 'contact-details--opened': !isContactDetailsCollapsed, 'hidden': isContactDetailsCollapsed && !isMobile }"
+           :class="{ 'contact-details--opened': isContactDetailsOpened, 'hidden': !isContactDetailsOpened && !isMobile }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
@@ -184,6 +184,14 @@ export default {
 
     isMediumScreen () {
       return this.$q.screen.width >= MIN_TABLET_WIDTH && this.$q.screen.width <= MAX_TABLET_WIDTH
+    },
+
+    isContactDetailsOpened () {
+      if (this.isMobile) {
+        return this.mobileDetailsOpen
+      }
+
+      return !this.isContactDetailsCollapsed
     }
   },
 
@@ -192,7 +200,7 @@ export default {
       title: 'Contact',
       totalContacts: 0,
       drawer: false,
-      detailsOpen: false,
+      mobileDetailsOpen: false,
       contactListSidebarOpen: false,
       leaving: false,
       contactComponentListeners: {},
@@ -242,7 +250,11 @@ export default {
     },
 
     toggleDetails () {
-      this.detailsOpen = !this.detailsOpen
+      if (this.isMobile) {
+        this.mobileDetailsOpen = !this.mobileDetailsOpen
+        return
+      }
+
       this.isContactDetailsCollapsed = !this.isContactDetailsCollapsed
     }
   },

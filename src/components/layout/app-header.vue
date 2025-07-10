@@ -484,7 +484,14 @@ export default {
         return
       }
 
-      if (['Settings Tab', TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) || this.isCommsPageFromTeamInbox) {
+      if ([TEAMINBOXES_MENU_ITEMS_TITLE].includes(this.$route.name) || this.isCommsPageFromTeamInbox) {
+        this.$router.push({
+          name: 'Team Inboxes'
+        })
+        return
+      }
+
+      if (['Settings Tab', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
         this.$router.back()
         return
       }
