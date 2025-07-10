@@ -1635,6 +1635,11 @@ export default {
         return null
       }
 
+      // First check if communication has embedded campaign object
+      if (this.communication?.campaign) {
+        return this.communication.campaign
+      }
+
       const communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
       if (!communicationIncomingNumber) {
         return null
