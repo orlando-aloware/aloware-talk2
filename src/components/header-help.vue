@@ -54,7 +54,7 @@
                  size="sm"
                  v-close-popup
                  @click="showLinesTutorial">
-            LINES TUTORIAL
+            LINE MANAGEMENT TUTORIAL
           </q-btn>
         </q-list>
       </q-btn-dropdown>
