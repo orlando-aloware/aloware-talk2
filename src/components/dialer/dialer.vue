@@ -86,6 +86,8 @@ export default {
 
     ...mapState(['isWidget', 'isSalesforceWidget']),
 
+    ...mapState('TeamInbox', ['activeInboxId']),
+
     ...mapFields('powerDialer', [
       'activeTask',
       'sessionPaused',
@@ -204,7 +206,7 @@ export default {
     }
 
     this.dialerListeners.makeCall = (data) => {
-      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId, false, false, data.isFromDialer)
     }
 
     this.dialerListeners.transferCall = (data) => {
@@ -757,9 +759,39 @@ export default {
       })
     },
 
-    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null, isCallWaiting = false, shouldAnswer = false) {
-      console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
+    shouldIncludeRingGroupId (isFromDialer, outboundCampaign) {
+      if (isFromDialer) {
+        // Call is made directly from dialer, so we don't need to include the ring group id
+        return false
+      }
 
+      if (!this.activeInboxId) {
+        // No active inbox, so we don't need to include the ring group id
+        return false
+      }
+
+      const campaign = ['number', 'string'].includes(typeof outboundCampaign)
+        ? this.campaigns.find(campaign => campaign.id === outboundCampaign)
+        : outboundCampaign
+
+      if (!campaign?.ivr_id) {
+        // Campaign is not an IVR campaign, so we don't need to include the ring group id
+        return false
+      }
+
+      return true
+    },
+
+    async makeCall (
+      currentNumber,
+      outboundCampaignId,
+      contactName = '',
+      companyName = '',
+      contactId = null,
+      isCallWaiting = false,
+      shouldAnswer = false,
+      isFromDialer = false
+    ) {
       if (!this.dialer.isReady) {
         console.log('Dialer is not ready', currentNumber, outboundCampaignId)
         return
@@ -831,6 +863,12 @@ export default {
 
       if (this.isOnPowerDialerSessionRoute) {
         params['AnswerInPD'] = true
+      }
+
+      if (this.shouldIncludeRingGroupId(isFromDialer, outboundCampaignId)) {
+        // RingGroupId is used to identify the current inbox
+        // when making a call from an IVR line
+        params['RingGroupId'] = this.activeInboxId.toString()
       }
 
       console.log(' %c Making a call to: ', 'background: #000; color: #fff000;', params)
