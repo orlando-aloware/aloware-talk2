@@ -5,7 +5,7 @@
          v-if="attachment">
     <span class="q-input-composer text-white handle-whitespace">
       {{ text }}
-      <span class="text-weight-bold">{{optoutText }}</span>
+      <span class="text-weight-bold">{{ optoutText }}</span>
     </span>
   </div>
 </template>
