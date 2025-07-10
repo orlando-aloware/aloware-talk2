@@ -106,6 +106,7 @@ import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT } from 'src/constants/roles'
+import { CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR } from 'src/constants/campaign-call-router-behaviors'
 
 export default {
   name: 'line-selector',
@@ -326,13 +327,19 @@ export default {
               campaign.has_team_membership_access ||
               campaign.has_direct_watching_access ||
               campaign.has_team_watching_access ||
-              campaign.ivr_id
+              campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_DEAD_END ||
+              campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_IVR
           })
         }
 
         return !this.preSelectedTeamInboxLineId
           ? activeCampaigns
-          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id) || campaign.ivr_id)
+          : activeCampaigns.filter(
+            campaign =>
+              this.activeInboxCampaignIds.includes(campaign.id) ||
+              campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_DEAD_END ||
+              campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_IVR
+          )
       }
 
       return []

@@ -111,7 +111,7 @@ export default {
           // Dead End Campaigns
           campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_DEAD_END ||
           // IVR Campaigns
-          (campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_IVR && campaign.ivr_id)
+          campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_IVR
         )
     },
 
