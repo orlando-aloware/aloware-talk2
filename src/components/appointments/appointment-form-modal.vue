@@ -13,16 +13,16 @@
             @submit.prevent="onSubmit"
             @reset="resetForm">
       <b-form-row data-testid="appointment-form-row">
-          <b-col sm="12">
-            <b-form-group label="Title">
-              <b-form-input
-                type="text"
-                placeholder="Add title"
-                data-testid="appointment-text-input"
-                v-model="appointment.text">
-              </b-form-input>
-            </b-form-group>
-          </b-col>
+        <b-col sm="12">
+          <b-form-group label="Title">
+            <b-form-input
+              type="text"
+              placeholder="Add title"
+              data-testid="appointment-text-input"
+              v-model="appointment.text">
+            </b-form-input>
+          </b-form-group>
+        </b-col>
 
         <b-col sm="12">
           <b-form-group id="input-group-1"
@@ -33,7 +33,7 @@
                            :no-clear-button="true"
                            v-model="appointment.date"
                            data-testid="appointment-date-selector"
-                           @dateSelected="dateSelected"/>
+                           @dateSelected="dateSelected" />
           </b-form-group>
         </b-col>
         <b-col md="12"
@@ -43,7 +43,7 @@
                         label-for="input-2">
             <predefined-time-selector v-model="appointment.time"
                                       data-testid="appointment-time-selector"
-                                      @select="timeSelected"/>
+                                      @select="timeSelected" />
           </b-form-group>
         </b-col>
         <b-col md="12"
@@ -53,7 +53,7 @@
                         label-for="input-2">
             <predefined-time-duration-selector v-model="appointment.duration"
                                                data-testid="appointment-duration-selector"
-                                               @select="durationSelected"/>
+                                               @select="durationSelected" />
           </b-form-group>
         </b-col>
         <b-col>
@@ -63,7 +63,7 @@
                         label-for="input-2">
             <timezone-selector v-model="contact.timezone"
                                data-testid="appointment-timezone-selector"
-                               @select="timezoneSelected"/>
+                               @select="timezoneSelected" />
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -75,7 +75,7 @@
                              max-rows="8"
                              no-auto-shrink
                              data-testid="appointment-body-input"
-                             v-model="appointment.body"/>
+                             v-model="appointment.body" />
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -106,7 +106,7 @@
                                    preselect-first
                                    v-model="appointment.smsReminder.campaign_id"
                                    data-testid="appointment-sms-reminder-line-selector"
-                                   @select="lineSelected"/>
+                                   @select="lineSelected" />
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -114,7 +114,7 @@
                         label-for="input-2">
             <predefined-time-selector v-model="appointment.smsReminder.time"
                                       data-testid="appointment-sms-reminder-time-selector"
-                                      @select="smsReminderTimeSelected"/>
+                                      @select="smsReminderTimeSelected" />
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -122,7 +122,7 @@
                         label-for="input-2">
             <number-of-days-selector v-model="appointment.smsReminder.frequencies"
                                      data-testid="appointment-sms-reminder-frequency-selector"
-                                     @select="smsReminderFrequencySelected"/>
+                                     @select="smsReminderFrequencySelected" />
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -143,7 +143,7 @@
                              max-rows="8"
                              no-auto-shrink
                              data-testid="appointment-sms-reminder-body-text-area"
-                             v-model="appointment.smsReminder.body"/>
+                             v-model="appointment.smsReminder.body" />
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -164,7 +164,7 @@
                 data-testid="appointment-form-submit-button"
                 @click="onSubmit">
         <q-spinner-bars color="white"
-                        v-if="isSaving"/>
+                        v-if="isSaving" />
         {{ isSaving ? 'Adding Event...' : 'Add Event' }}
       </b-button>
     </template>
@@ -179,6 +179,8 @@ import ContactLineSelector from 'components/contact-line-selector'
 import PredefinedTimeSelector from 'components/predefined-time-selector'
 import NumberOfDaysSelector from 'components/number-of-days-selector'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 import DateSelector from 'components/date-selector'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
@@ -192,6 +194,7 @@ export default {
     TimezoneSelector,
     PredefinedTimeDurationSelector
   },
+  mixins: [teamInboxPropsMixin],
   props: {
     id: {
       type: Number,
@@ -287,24 +290,30 @@ export default {
     },
     onSubmit () {
       this.isSaving = true
-      talk2Api.V1.contact[(this.id ? 'updateEngagement' : 'addEngagement')](this.contact.id, this.getParams())
-        .then(() => {
-          this.$generalNotification(`Event has been ${(this.id ? 'updated.' : 'added.')}`)
-          this.onHidden()
-        }).catch(error => {
-          console.log(error)
+      const apiCall = this.teamInbox
+        ? (this.id
+          ? talk2TeamInboxApi.calendar.updateEvent(this.contact.id, this.id, this.getParams())
+          : talk2TeamInboxApi.calendar.createEvent(this.contact.id, this.getParams()))
+        : talk2Api.V1.contact[(this.id ? 'updateEngagement' : 'addEngagement')](this.contact.id, this.getParams())
 
-          const separator = '<br>- '
-          const errorMessage = `Error while ${(this.id ? 'adding' : 'updating')} event.`
-          const validationErrors = error.response.data?.errors
-            ? `${separator}${Object.values(error.response.data.errors).join(separator)}`
-            : ''
+      apiCall.then(() => {
+        this.$generalNotification(`Event has been ${(this.id ? 'updated.' : 'added.')}`)
+        this.onHidden()
+      }).catch(error => {
+        console.log(error)
 
-          this.$generalNotification(`${errorMessage}${validationErrors}`, 'error', 5000, true)
-        }).finally(() => {
-          this.isSaving = false
-        })
+        const separator = '<br>- '
+        const errorMessage = `Error while ${(this.id ? 'adding' : 'updating')} event.`
+        const validationErrors = error.response.data?.errors
+          ? `${separator}${Object.values(error.response.data.errors).join(separator)}`
+          : ''
+
+        this.$generalNotification(`${errorMessage}${validationErrors}`, 'error', 5000, true)
+      }).finally(() => {
+        this.isSaving = false
+      })
     },
+
     getParams () {
       const params = {
         date: this.appointment.date,

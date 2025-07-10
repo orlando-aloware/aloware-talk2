@@ -5,11 +5,12 @@ import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { agentMixin, notificationMixin } from 'src/plugins/mixins/index'
+import { agentMixin, notificationMixin, userMixin } from 'src/plugins/mixins/index'
 export default {
   mixins: [
     agentMixin,
-    notificationMixin
+    notificationMixin,
+    userMixin
   ],
 
   data () {
@@ -221,6 +222,10 @@ export default {
       }
 
       return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
+    },
+
+    isPersonalInbox () {
+      return this.communication.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled
     }
   },
 

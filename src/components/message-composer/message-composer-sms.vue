@@ -350,6 +350,8 @@ export default {
       'isShortenedUrlRemembered'
     ]),
 
+    ...mapState('TeamInbox', ['activeInboxId']),
+
     ...mapGetters('auth', ['profile']),
 
     ...mapState('cache', ['currentCompany']),
@@ -555,7 +557,7 @@ export default {
     },
 
     formatMessage () {
-      return {
+      const data = {
         body: this.messageComposer.sms.body,
         contact_id: this.contact.id,
         campaign_id: this.selectedLine.id,
@@ -563,6 +565,14 @@ export default {
         attachments: this.messageComposer.sms.attachments.map(attachment => attachment.uuid),
         gif: this.messageComposer.sms.gif_url
       }
+
+      if (this.activeInboxId && this.selectedLine?.ivr_id) {
+        // Ring Group ID is used to identify the current inbox
+        // when sending a message from an IVR line
+        data.ring_group_id = this.activeInboxId
+      }
+
+      return data
     },
 
     messageSentFormatMessage () {

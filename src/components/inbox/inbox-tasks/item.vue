@@ -64,8 +64,14 @@
 
           <div class="truncated-text"
                :class="[appointmentReminderTextClass, hasUnreadsClass]"
-               v-if="contact.last_communication.body !== null"
+               v-if="contact.last_communication.body !== null && isMention"
                v-html="parsedBody">
+          </div>
+
+          <div class="truncated-text"
+               :class="[appointmentReminderTextClass, hasUnreadsClass]"
+               v-else-if="contact.last_communication.body !== null">
+            {{ contact.last_communication.body  }}
           </div>
 
         </div>
@@ -378,12 +384,12 @@ export default {
       return this.totalUnreads && !this.isParkedCall && !this.isConnectedCall ? 'text-black' : ''
     },
 
-    parsedBody () {
-      if (this.contact.last_communication.type === CommunicationTypes.NOTE) {
-        return this.parseMentionToView(this.contact.last_communication.body)
-      }
+    isMention () {
+      return this.contact.last_communication.type === CommunicationTypes.NOTE
+    },
 
-      return this.contact.last_communication.body
+    parsedMention () {
+      return this.parseMentionToView(this.contact.last_communication.body)
     }
   },
 

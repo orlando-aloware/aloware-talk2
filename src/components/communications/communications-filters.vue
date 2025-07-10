@@ -47,7 +47,7 @@ import CompactBtn from 'src/components/compact-btn'
 import FilterDialog from 'components/communications/communications-filters/filter-dialog'
 import CreateFilterDialog from 'components/communications/communications-filters/create-filter-dialog'
 
-import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL } from 'src/router/routes'
 import { aclMixin, communicationsMixin } from 'src/plugins/mixins'
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 
@@ -86,9 +86,8 @@ export default {
       if (this.activeChannel?.type) {
         return this.activeChannel?.type
       }
-      return DEFAULT_COMMUNICATIONS_CHANNEL === this.$route.params.channel
-        ? 'all'
-        : 'call'
+
+      return 'all'
     },
     answerStatus () {
       if (this.activeChannel?.answerStatus) {

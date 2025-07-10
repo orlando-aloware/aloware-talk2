@@ -15,9 +15,14 @@
             {{ communicationLabel }}
           </div>
 
+          <div class="truncated-text"
+               v-else-if="isMention"
+               v-html="parsedMention">
+          </div>
+
           <div :class="['truncated-text', appointmentReminderTextClass]"
-               v-else
-               v-html="parsedBody">
+               v-else>
+            {{ body }}
           </div>
         </div>
       </div>
@@ -110,10 +115,12 @@ export default {
       return this.type === CommunicationTypes.SMS && this.body.length > 0
     },
 
-    parsedBody () {
+    isMention () {
       return this.type === CommunicationTypes.NOTE
-        ? this.parseMentionToView(this.body)
-        : this.body
+    },
+
+    parsedMention () {
+      return this.parseMentionToView(this.body)
     },
 
     iconComponent () {
