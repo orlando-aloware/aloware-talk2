@@ -43,6 +43,8 @@
 
     <tutorial-video-button v-if="!isMobile" />
 
+    <team-inbox-lines-tutorial-button />
+
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
@@ -159,6 +161,7 @@ import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
 import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import TeamInboxLinesTutorialButton from 'components/teaminbox/teaminbox-lines-tutorial-button.vue'
 
 export default {
   name: 'app-header',
@@ -193,7 +196,8 @@ export default {
     InboxToggleFilters,
     InformationCircleIcon,
     TutorialVideoButton,
-    MemoryMonitor
+    MemoryMonitor,
+    TeamInboxLinesTutorialButton
   },
 
   props: {
