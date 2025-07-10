@@ -50,7 +50,7 @@ export default {
     this.$VueEvent.listen('teaminbox-tutorial-video-closed', this.makeVisibleHandler)
   },
 
-  unmounted () {
+  beforeDestroy () {
     this.$VueEvent.stop('teaminbox-tutorial-video-closed', this.makeVisibleHandler)
   },
 
