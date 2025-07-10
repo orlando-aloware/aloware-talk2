@@ -301,7 +301,14 @@ export default {
         this.onHidden()
       }).catch(error => {
         console.log(error)
-        this.$generalNotification(`Error while ${(this.id ? 'adding' : 'updating')} event.`, 'error')
+
+        const separator = '<br>- '
+        const errorMessage = `Error while ${(this.id ? 'adding' : 'updating')} event.`
+        const validationErrors = error.response.data?.errors
+          ? `${separator}${Object.values(error.response.data.errors).join(separator)}`
+          : ''
+
+        this.$generalNotification(`${errorMessage}${validationErrors}`, 'error', 5000, true)
       }).finally(() => {
         this.isSaving = false
       })
