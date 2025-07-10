@@ -1,5 +1,6 @@
 import { mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 
 const integrations = [
   {
@@ -75,9 +76,11 @@ export default {
       }
 
       if (fromTeamInbox) {
-        params.from_team_inbox = fromTeamInbox
+        // Use Team Inbox V3 API
+        return talk2TeamInboxApi.contact.getIntegrationData(contact.id, params)
       }
 
+      // Use regular V1 API
       return talk2Api.V1.contact.getIntegrationData(contact.id, {
         params
       })

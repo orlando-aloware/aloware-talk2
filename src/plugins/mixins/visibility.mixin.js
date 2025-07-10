@@ -253,7 +253,7 @@ export default {
     },
 
     checkCommunicationMatchesInboxFilters (filter, communication) {
-      if (filter.unread_only !== undefined &&
+      if (filter.unread_only === true &&
         communication.inbox_unread_count === 0) {
         return false
       }
