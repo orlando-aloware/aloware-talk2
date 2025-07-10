@@ -108,7 +108,7 @@
             <ignore-call-icon v-if="id === 'callFishing'"/>
             <q-tooltip anchor="top middle"
                        self="center middle">
-              {{ id === 'incomingCall' ? 'Decline' : 'Ignore' }}
+              {{ id === 'incomingCall' ? 'Decline' : tooltipMessage }}
             </q-tooltip>
           </q-btn>
           <q-btn class="height-32"
@@ -133,8 +133,9 @@
                  @click="ignoreFishing">
             <ignore-call-icon/>
             <q-tooltip anchor="top middle"
-                       self="center middle">
-              Ignore
+                       self="center middle"
+                       v-if="tooltipMessage">
+              {{ tooltipMessage }}
             </q-tooltip>
           </q-btn>
 
@@ -573,6 +574,13 @@ export default {
 
     shouldShowFishingActions () {
       return this.id === 'callFishing' && this.dialer && this.isAgentOrDialerOnCall
+    },
+
+    tooltipMessage () {
+      if (!this.communication) {
+        return ''
+      }
+      return this.isPersonalInbox ? 'Reject' : 'Ignore'
     }
   },
 
