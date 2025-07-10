@@ -312,8 +312,9 @@ const setAgentStatus = ({ commit }, agentStatus) => {
   commit('SET_AGENT_STATUS', agentStatus)
 }
 
-const setProfile = ({ commit }, user) => {
+const setProfile = ({ commit, state }, user) => {
   commit('SET_PROFILE', user)
+  setRouterType({ commit, state })
 }
 
 export default {
