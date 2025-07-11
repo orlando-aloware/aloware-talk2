@@ -335,6 +335,11 @@ export default {
         }
       }
 
+      // Add ring_group_id when in Team Inbox context
+      if (this.teamInbox && this.teamInboxId) {
+        params.ring_group_id = this.teamInboxId
+      }
+
       return params
     },
     resetForm () {

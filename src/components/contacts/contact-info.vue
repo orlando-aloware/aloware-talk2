@@ -290,7 +290,8 @@
       </b-button>
     </div>
     <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"
-                            :from-team-inbox="fromTeamInbox"></appointment-form-modal>
+                            :from-team-inbox="fromTeamInbox"
+                            :team-inbox-id="teamInboxId"></appointment-form-modal>
     <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"
                                 :from-team-inbox="fromTeamInbox"></contact-add-reminder-modal>
     <power-dialer-add-modal :params="addPowerDialerParams"

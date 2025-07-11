@@ -100,13 +100,20 @@ export default {
       this.setMessageComposerNoteBody(value)
     },
     formatMessage () {
-      return {
+      const message = {
         time: null,
         date: null,
         timezone: this.profile.timezone,
         body: this.parseMentionToMarkup(this.messageComposer.note.body),
         type: 10
       }
+
+      // Add ring_group_id when in Team Inbox context
+      if (this.teamInbox && this.teamInboxId) {
+        message.ring_group_id = this.teamInboxId
+      }
+
+      return message
     },
     onAdd () {
       this.isAdding = true

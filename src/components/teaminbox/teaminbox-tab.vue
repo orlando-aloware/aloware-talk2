@@ -457,6 +457,11 @@ export default {
     },
 
     async processCommunication (communication, isNew = false) {
+      // Add access control check
+      if (!this.userHasAccessToRingGroup(communication.ring_group_id)) {
+        return
+      }
+
       const dateRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/
       const dateMatch = communication.created_at.match(dateRegex)
 

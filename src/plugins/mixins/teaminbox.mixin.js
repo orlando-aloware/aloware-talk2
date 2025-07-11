@@ -295,6 +295,21 @@ export default {
 
     getInboxUnreadCount (inboxId) {
       return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
+    },
+
+    /**
+     * Check if current user has access to a specific ring group (Team Inbox)
+     * @param {Number} ringGroupId - The ring group ID to check
+     * @returns {Boolean} true if user has access, false otherwise
+     */
+    userHasAccessToRingGroup (ringGroupId) {
+      if (!ringGroupId) {
+        return false
+      }
+
+      // Check in the inboxes list (already fetched Team Inboxes)
+      // The inboxes array contains ONLY the Team Inboxes the current user has access to
+      return this.inboxes.some(inbox => inbox.id === ringGroupId)
     }
   }
 }
