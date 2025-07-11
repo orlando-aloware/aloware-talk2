@@ -31,7 +31,7 @@
                       @keyup.enter="onSave" />
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="!disableFilterType">
         <label class="form-label">Filter Type</label>
         <q-select color="primary"
                   option-value="value"
@@ -89,6 +89,10 @@ export default {
     value: {
       type: Object,
       default: () => ({})
+    },
+    disableFilterType: {
+      type: Boolean,
+      default: false
     }
   },
 

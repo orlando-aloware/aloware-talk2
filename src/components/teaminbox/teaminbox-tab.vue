@@ -35,6 +35,7 @@
     <!-- Create Filter Dialog -->
     <TeamInboxCreateFilterDialog ref="teamInboxCreateFilterDialog"
                                  :value="newFilterModel"
+                                 :disable-filter-type="!isAdmin"
                                  data-testid="teaminbox-tab-create-filter-dialog"
                                  @onCancel="onCancelCreateFilter" />
   </div>
@@ -47,7 +48,7 @@ import TeamInboxTabHeader from './teaminbox-tab-header.vue'
 import TeamInboxDropdownFilters from './teaminbox-dropdown-filters.vue'
 import TeamInboxFilterDialog from './teaminbox-filters/filter-dialog.vue'
 import TeamInboxCreateFilterDialog from './teaminbox-filters/create-filter-dialog.vue'
-import { TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
+import { aclMixin, TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
 import { getQueryString } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
@@ -70,7 +71,8 @@ export default {
 
   mixins: [
     TeamInboxMixin,
-    visibilityMixin
+    visibilityMixin,
+    aclMixin
   ],
 
   props: {
