@@ -333,12 +333,6 @@ export default {
     onShow () {
       this.selectedFilters = { ...this.activeFilters }
     }
-  },
-
-  watch: {
-    isOpen () {
-      console.log(this.isOpen)
-    }
   }
 }
 </script>

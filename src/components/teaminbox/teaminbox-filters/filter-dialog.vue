@@ -232,10 +232,7 @@ export default {
       if (this.isUpdatingFilter) {
         return 'Saving changes..'
       }
-      // const userScope = (this.selectedFilter?.scope === 'user' || +!this.selectedFilter?.is_on_company)
-      // if (this.selectedFilter && userScope && this.filterHasChanges) {
-      //   return 'Apply & Save'
-      // }
+
       return 'Apply'
     },
     isNonViewCreateModeUnchanged () {
@@ -291,18 +288,6 @@ export default {
       } else {
         this.filter = { ...this.activeFilters }
       }
-
-      // this.personalFilters = []
-      // this.companyFilters = []
-      // this.filterFields = Object.keys(this.defaultFilter)
-      // if (this.selectedFilter) {
-      //   this.filter = { ...this.selectedFilter.filter }
-      // } else if (this.appliedFilter) {
-      //   this.filter = { ...this.appliedFilter.filter }
-      // } else {
-      //   // this.filter = _.pick(this.value, this.filterFields)
-      // }
-      // this.clonedFilter = { ...this.filter }
     },
     onShown () {
       // Modal is shown - filter should already be properly initialized
@@ -312,14 +297,6 @@ export default {
     },
     onApply () {
       this.reset = false
-
-      // if (this.selectedFilter) {
-      //   const filter = { ...this.selectedFilter }
-      //   filter.filter = { ...this.filter }
-      //   this.selectedFilter = filter
-      //   this.appliedFilter = filter
-      //   this.clonedFilter = filter.filter
-      // }
 
       this.activeFilters = { ...this.filter }
       this.$emit('applyFilter', this.filter)
@@ -401,15 +378,6 @@ export default {
       for (const prop in this.selectedFilter.filter) {
         this.filter[prop] = this.selectedFilter.filter[prop]
       }
-
-      // this.filter = {
-      //   ...this.filter,
-      //   untagged_only: +this.filter.untagged_only,
-      //   first_time_only: +this.filter.first_time_only,
-      //   exclude_automated_communications: +this.filter.exclude_automated_communications,
-      //   my_contact: this.filter.my_contact,
-      //   has_unread: this.filter.unread_only
-      // }
     },
     getFilterItemClass (item) {
       const selectedFilterClass = this.selectedFilter?.id === item.id
