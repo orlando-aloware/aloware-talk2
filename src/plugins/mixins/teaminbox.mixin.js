@@ -217,8 +217,8 @@ export default {
         }
       }
 
-      if (filters.direction) {
-        apiFilters.direction = filters.direction
+      if (filters.directions) {
+        apiFilters.directions = filters.directions
       }
 
       if (filters.my_contact) {
