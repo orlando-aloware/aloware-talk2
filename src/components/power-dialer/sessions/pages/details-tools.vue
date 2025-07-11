@@ -52,7 +52,7 @@
     <contact-activity-counts class="mb-2"
                              :summary="communicationsSummary.summaries"/>
     <contact-lines class="mb-2"/>
-    <contact-ring-groups class="mb-2" />
+    <contact-ring-groups v-if="!hasCompanyTeamInboxEnabled" class="mb-2" />
     <contact-broadcast class="mb-2" />
   </q-card>
 </template>
@@ -74,7 +74,8 @@ import EntityTags from 'components/generic-selectors/entity-tags'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import {
   aclMixin,
-  contactMixin
+  contactMixin,
+  userMixin
 } from 'src/plugins/mixins'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
@@ -99,7 +100,8 @@ export default {
 
   mixins: [
     aclMixin,
-    contactMixin
+    contactMixin,
+    userMixin
   ],
 
   data () {
@@ -117,7 +119,8 @@ export default {
       'contact'
     ]),
 
-    ...mapState(['isTrialBannerVisible'])
+    ...mapState(['isTrialBannerVisible']),
+    ...mapState('cache', ['currentCompany'])
   },
 
   methods: {
