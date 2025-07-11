@@ -259,6 +259,11 @@ export default {
     width: {
       type: String,
       default: undefined
+    },
+
+    showAllLines: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -318,6 +323,10 @@ export default {
       if (this.campaignsAlphabeticalOrder.length) {
         const activeCampaigns = _.clone(this.campaignsAlphabeticalOrder)
           .filter(campaign => campaign.active === true)
+
+        if (this.showAllLines) {
+          return activeCampaigns
+        }
 
         if (this.shouldLimitAgentLinesVisibility) {
           // Only show lines that the agent has access to
@@ -383,7 +392,7 @@ export default {
     },
 
     noResultsText () {
-      return !this.preSelectedTeamInboxLineId
+      return !this.preSelectedTeamInboxLineId || this.showAllLines
         ? 'No results'
         : 'No lines found in this inbox'
     }
@@ -501,6 +510,10 @@ export default {
 
     activeCampaignsAlphabeticalOrder (value) {
       this.options = value
+    },
+
+    options (value) {
+      this.$emit('update:lineCount', value.length)
     }
   }
 }
