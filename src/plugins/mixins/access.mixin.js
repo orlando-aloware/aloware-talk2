@@ -1,6 +1,7 @@
 import { mapActions, mapState, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import { getCookie, setCookie } from 'src/plugins/helpers/functions'
+import { isInteger } from 'lodash'
 
 export default {
   data () {
@@ -29,11 +30,34 @@ export default {
 
     ...mapActions('auth', ['logout']),
 
+    getCompanyIdFromUrl () {
+      const urlParams = new URLSearchParams(window.location.search)
+      const companyId = urlParams.get('company_id')
+      return companyId ? parseInt(companyId) : null
+    },
+
     getAccesses (firstLoad = false) {
       this.isLoadingAccesses = true
       talk2Api.V1.users.getCompanyAccesses()
         .then(res => {
           this.setAccesses(res.data)
+
+          // Check if URL contains company_id parameter
+          const urlCompanyId = this.getCompanyIdFromUrl()
+          if (isInteger(urlCompanyId)) {
+            // if zero then use the first available company
+            if (urlCompanyId === 0 && this.accesses.length > 0) {
+              this.companyLogin(this.accesses[0])
+              return
+            }
+
+            // define company id if accessed
+            const urlCompanyAccess = this.accesses.find(access => access.company_id === urlCompanyId)
+            if (urlCompanyAccess) {
+              this.companyLogin(urlCompanyAccess)
+              return
+            }
+          }
 
           if (this.accesses.length > 1) {
             this.loginWithSavedCompany(firstLoad)
