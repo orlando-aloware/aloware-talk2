@@ -600,8 +600,8 @@ export default {
         }
 
         const isAddOrIntroduceOperation = communication.is_introduce ||
-          communication.last_call_source === 'SOURCE_ADD_USER' ||
-          communication.last_call_source === 'SOURCE_ADD_RG'
+          communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER ||
+          communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG
 
         if (isCallNotInProgressOrIncoming && this.communicationId === communication.id && !isAddOrIntroduceOperation) {
           this.processRemoveFromNotification(communication)
