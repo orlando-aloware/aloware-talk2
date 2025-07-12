@@ -599,8 +599,11 @@ export default {
           this.removeFromCallFishingQueue(communication.id)
         }
 
-        // close the notification
-        if (isCallNotInProgressOrIncoming && this.communicationId === communication.id) {
+        const isAddOrIntroduceOperation = communication.is_introduce ||
+          communication.last_call_source === 'SOURCE_ADD_USER' ||
+          communication.last_call_source === 'SOURCE_ADD_RG'
+
+        if (isCallNotInProgressOrIncoming && this.communicationId === communication.id && !isAddOrIntroduceOperation) {
           this.processRemoveFromNotification(communication)
         }
       }
