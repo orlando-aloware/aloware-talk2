@@ -216,6 +216,7 @@ import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../constants/agent-status'
 import talk2Api from 'src/plugins/api/api'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'action-notification',
@@ -599,9 +600,11 @@ export default {
           this.removeFromCallFishingQueue(communication.id)
         }
 
-        const isAddOrIntroduceOperation = communication.is_introduce ||
+        const isAddOrIntroduceOperation = (communication.is_introduce ||
           communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER ||
-          communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG
+          communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG) &&
+          communication.legc_uuid &&
+          [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
 
         if (isCallNotInProgressOrIncoming && this.communicationId === communication.id && !isAddOrIntroduceOperation) {
           this.processRemoveFromNotification(communication)
