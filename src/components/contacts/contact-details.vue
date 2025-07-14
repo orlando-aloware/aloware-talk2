@@ -16,7 +16,7 @@
       <div class="details-component-container h-100"
            ref="detailsComponentContainer">
         <template v-if="!saveBarOnly">
-          <contact-info data-testid="contact-details-info" :campaign-id="campaignId" :from-team-inbox="fromTeamInbox" />
+          <contact-info data-testid="contact-details-info" :campaign-id="campaignId" :from-team-inbox="fromTeamInbox" :team-inbox-id="teamInboxId" />
           <contact-sequence class="w-100"
                             data-testid="contact-details-sequence"
                             :contact="contact"

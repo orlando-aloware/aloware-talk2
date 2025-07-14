@@ -128,7 +128,7 @@ export default {
         this.setDialerCommunication(data)
 
         const communication = this.dialer?.communication
-        const isGreetingNew = communication?.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+        const isGreetingNew = communication?.legc_uuid && [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
         const user = communication?.added_user
 
         if (user && !isGreetingNew) {
@@ -615,7 +615,7 @@ export default {
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
-        const isGreetingNew = communication.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+        const isGreetingNew = communication.legc_uuid && [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
         const user = communication.added_user
 
         if (user && !isGreetingNew) {

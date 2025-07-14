@@ -40,7 +40,19 @@
                            content-class="fs-12">
                   Copy
                 </q-tooltip>
-                <i class="material-icons" data-testid="contact-info-copy-phone-number-icon">content_copy</i>
+                <i class="material-icons" data-testid="contact-info-copy-phone-number-icon" style="font-size: 11px;">content_copy</i>
+              </b-link>
+
+              <b-link href="#"
+                      class="copy-phone-number ml-1"
+                      data-testid="contact-info-redirect-link"
+                      @click.prevent="navigateToContact">
+                <q-tooltip anchor="top middle"
+                           self="center middle"
+                           content-class="fs-12">
+                  View Contact Details
+                </q-tooltip>
+                <i class="material-icons" data-testid="contact-info-redirect-icon">open_in_new</i>
               </b-link>
 
               <br />
@@ -290,7 +302,8 @@
       </b-button>
     </div>
     <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"
-                            :from-team-inbox="fromTeamInbox"></appointment-form-modal>
+                            :from-team-inbox="fromTeamInbox"
+                            :team-inbox-id="teamInboxId"></appointment-form-modal>
     <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"
                                 :from-team-inbox="fromTeamInbox"></contact-add-reminder-modal>
     <power-dialer-add-modal :params="addPowerDialerParams"
@@ -498,6 +511,12 @@ export default {
     copyPhoneNumber (phoneNumber) {
       this.$copyToClipboard(phoneNumber)
       this.$generalNotification('Phone number copied to clipboard.')
+    },
+
+    navigateToContact () {
+      if (this.contact?.id) {
+        this.$router.push(`/contacts/${this.contact.id}`)
+      }
     },
 
     getPhoneObject () {
