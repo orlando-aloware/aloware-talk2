@@ -119,6 +119,25 @@
               Next Bot
             </q-tooltip>
           </b-button>
+          <!-- Re-enroll bot button when only 1 bot -->
+          <b-button
+            v-if="!isEnrolledToMultipleBots && displayedBot?.direction === AloAi.DIRECTION_OUTBOUND"
+            @click="openReEnrollmentConfirmation"
+            href="#"
+            variant="outline-success"
+            size="sm"
+            class="mr-1"
+            data-testid="re-enroll-single-bot-contact-button"
+            :disabled="isReadOnly || busyReEnrollBotId === displayedBot?.id"
+          >
+            <i class="fa fa-redo"/> <span v-if="busyReEnrollBotId === displayedBot?.id">Re-enrolling...</span><span v-else>Re-enroll</span>
+            <q-tooltip
+              anchor="top middle"
+              self="center middle"
+            >
+              Re-enroll contact to this agent
+            </q-tooltip>
+          </b-button>
           <!-- Disenroll bot button when only 1 bot -->
           <b-button
             v-if="!isEnrolledToMultipleBots"
@@ -129,22 +148,53 @@
             data-testid="disenroll-single-bot-contact-button"
             :disabled="isReadOnly"
           >
-            <i class="fa fa-trash"/> Disenroll from agent
+            <i class="fa fa-trash"/> Disenroll
+            <q-tooltip
+              anchor="top middle"
+              self="center middle"
+            >
+              Remove contact from this agent
+            </q-tooltip>
           </b-button>
         </div>
 
+        <!-- Re-enroll bot button when multiple bots -->
+        <b-button
+          v-if="isEnrolledToMultipleBots && displayedBot?.direction === AloAi.DIRECTION_OUTBOUND"
+          @click="openReEnrollmentConfirmation"
+          class="mt-3"
+          variant="outline-success"
+          size="sm"
+          block
+          data-testid="re-enroll-contact-button"
+          :disabled="isReadOnly || busyReEnrollBotId === displayedBot?.id"
+        >
+          <i class="fa fa-redo"/> <span v-if="busyReEnrollBotId === displayedBot?.id">Re-enrolling...</span><span v-else>Re-enroll</span>
+          <q-tooltip
+            anchor="top middle"
+            self="center middle"
+          >
+            Re-enroll contact to this agent
+          </q-tooltip>
+        </b-button>
         <!-- Disenroll bot button when multiple bots -->
         <b-button
           v-if="isEnrolledToMultipleBots"
           @click="openDisenrollmentConfirmation"
-          class="mt-3"
+          class="mt-2"
           variant="outline-danger"
           size="sm"
           block
           data-testid="disenroll-contact-button"
           :disabled="isReadOnly"
         >
-          <i class="fa fa-trash"/> Disenroll from agent
+          <i class="fa fa-trash"/> Disenroll
+          <q-tooltip
+            anchor="top middle"
+            self="center middle"
+          >
+            Remove contact from this agent
+          </q-tooltip>
         </b-button>
       </b-card-text>
 
@@ -202,6 +252,34 @@
         </div>
       </div>
     </confirm-dialog>
+
+    <confirm-dialog
+      id="contact-re-enroll-to-bot"
+      title="Re-enroll Contact to AloAi Agent"
+      @close="closeReEnrollmentConfirmation"
+    >
+      <div slot="content">
+        <p v-html="confirmReEnrollmentMessage"/>
+      </div>
+      <div slot="footer">
+        <div class="d-flex w-100">
+          <div class="flex-grow-1"/>
+          <button class="btn btn-sm btn-outline-dark mr-2"
+                  :disabled="isBusy"
+                  @click="closeReEnrollmentConfirmation">
+            Cancel
+          </button>
+          <button class="btn btn-sm btn-warning"
+                  :disabled="isBusy"
+                  @click="reEnrollContact">
+            <span v-if="isBusy">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            Yes, I'm sure
+          </button>
+        </div>
+      </div>
+    </confirm-dialog>
   </b-overlay>
 </template>
 
@@ -239,6 +317,7 @@ export default {
       botEnrollments: [],
       activeBotIndex: 0,
       isBusy: false,
+      busyReEnrollBotId: null,
       AloAi
     }
   },
@@ -286,6 +365,16 @@ export default {
       }
 
       return `Are you sure you want to disenroll <b>${name}</b> from <b>${this.displayedBot?.name}</b>?`
+    },
+    confirmReEnrollmentMessage () {
+      let name = this.contact.first_name || 'No Name'
+
+      // Add safety check for empty enrollments
+      if (!this.hasBotEnrollments || !this.displayedBot) {
+        return `Are you sure you want to re-enroll <b>${name}</b> to this agent?`
+      }
+
+      return `Are you sure you want to re-enroll <b>${name}</b> to <b>${this.displayedBot?.name}</b>?`
     }
   },
 
@@ -361,6 +450,12 @@ export default {
     closeDisenrollmentConfirmation () {
       this.$bvModal.hide('contact-disenroll-from-bot')
     },
+    openReEnrollmentConfirmation () {
+      this.$bvModal.show('contact-re-enroll-to-bot')
+    },
+    closeReEnrollmentConfirmation () {
+      this.$bvModal.hide('contact-re-enroll-to-bot')
+    },
     getEnrollmentTypeText (botId, type = null) {
       // Add safety check for null/undefined type
       if (!type) {
@@ -428,6 +523,61 @@ export default {
 
           this.$generalNotification(errorMsg, 'error')
           console.error('[disenrollContact] error', error)
+        })
+    },
+    reEnrollContact () {
+      // Add safety check for empty enrollments
+      if (!this.hasBotEnrollments || !this.displayedBot) {
+        this.closeReEnrollmentConfirmation()
+        return
+      }
+
+      const currentEnrollment = this.botEnrollments[this.activeBotIndex]
+      if (!currentEnrollment) {
+        this.closeReEnrollmentConfirmation()
+        return
+      }
+
+      this.busyReEnrollBotId = this.displayedBot.id
+      this.isBusy = true
+
+      // Construct enrollment data
+      const enrollmentData = {
+        contact_ids: [this.contact.id],
+        prevent_duplicates: true,
+        multiple_phone_numbers: false,
+        allow_international_phone_numbers: false
+      }
+
+      talk2Api.V2.aloAiBot
+        .enrollContacts(this.displayedBot.id, enrollmentData)
+        .then(() => {
+          this.$generalNotification(
+            `Contact successfully re-enrolled to AloAi Agent: ${this.displayedBot.name}.`
+          )
+
+          this.closeReEnrollmentConfirmation()
+          this.busyReEnrollBotId = null
+
+          // Make it busy, refreshing the bots will turn it off
+          this.isBusy = true
+          // Give our api some time to process the re-enrollment
+          setTimeout(() => {
+            this.refreshBots()
+          }, 2000)
+        })
+        .catch((error) => {
+          let errorMsg = `Error while re-enrolling contact to AloAi Agent: ${this.displayedBot.name}.`
+          if (error?.response?.data?.message) {
+            errorMsg = error.response.data.message
+          }
+
+          this.$generalNotification(errorMsg, 'error')
+          console.error('[reEnrollContact] error', error)
+          this.busyReEnrollBotId = null
+        })
+        .finally(() => {
+          this.isBusy = false
         })
     },
     async fetchBots () {
