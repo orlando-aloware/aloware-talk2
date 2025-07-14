@@ -14,11 +14,12 @@
                     class="filter-dropdown mw-100"
                     toggle-class="mw-100"
                     menu-class="shadow-sm"
-                    boundary="window">
+                    boundary="window"
+                    @show="onShow">
           <template #button-content>
-            <div id="teaminbox-filters-placeholder" class="ellipse d-flex align-items-center">
+            <div id="teaminbox-filters-placeholder" class="d-flex align-items-center">
               <i class="fa fa-chevron-down fs-8 mr-1"></i>
-              <div>
+              <div class="overflow-hidden ellipse">
                 <span>Filter by</span>
                 <span class="text-sm text-grey-90">
                   {{ activeFiltersPlaceholder }}
@@ -57,14 +58,9 @@
               <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
                                :value="option.value"
                                :key="option.value"
-                               v-model="selectedFilters.types"
-                               v-for="option in typeOptions">
+                               v-model="selectedFilters.channels"
+                               v-for="option in channelOptions">
                 {{ option.label }}
-              </b-form-checkbox>
-              <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
-                               :value="true"
-                               v-model="selectedFilters.mention">
-                Mentions
               </b-form-checkbox>
             </div>
             <div class="filter-group no-select">
@@ -145,7 +141,7 @@ import moment from 'moment'
 import CompactBtn from 'components/compact-btn'
 
 export default {
-  name: 'TeamInboxFilterSort',
+  name: 'TeamInboxDropdownFilters',
 
   components: {
     SortUpIcon,
@@ -185,8 +181,8 @@ export default {
 
     activeFiltersText () {
       const filters = []
-      if (this.activeFilters.types.length) {
-        const selectedOptions = this.typeOptions.filter((option) => this.activeFilters.types.includes(option.value))
+      if (this.activeFilters.channels?.length) {
+        const selectedOptions = this.channelOptions.filter((option) => this.activeFilters.channels.includes(option.value))
         filters.push(...selectedOptions.map((option) => option.label))
       }
       if (this.activeFilters.mention) {
@@ -235,7 +231,7 @@ export default {
     },
 
     hasFilterChanges () {
-      const props = ['types', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention']
+      const props = ['channels', 'directions', 'my_contact', 'unread_only', 'task_status']
 
       for (const key of props) {
         if (!isEqual(this.selectedFilters[key], this.activeFilters[key])) {
@@ -249,9 +245,11 @@ export default {
 
   data () {
     return {
-      typeOptions: [
+      isOpen: false,
+      channelOptions: [
         { label: 'Calls', value: CommunicationTypes.CALL_TYPE },
-        { label: 'Messages', value: CommunicationTypes.SMS_TYPE }
+        { label: 'Messages', value: CommunicationTypes.SMS_TYPE },
+        { label: 'Mentions', value: 'mentions' }
       ],
       directionOptions: [
         { label: 'Inbound', value: 'inbound' },
@@ -330,6 +328,10 @@ export default {
       this.selectedFilters = { ...DEFAULT_FILTERS }
 
       this.onFilterChange()
+    },
+
+    onShow () {
+      this.selectedFilters = { ...this.activeFilters }
     }
   }
 }
