@@ -99,6 +99,7 @@
             <compact-btn class="mr-2 btn-outline-primary"
                          :disabled="!filterHasChanges"
                          data-testid="teaminbox-filter-dialog-reset-compact-btn"
+                         v-if="!selectedFilter"
                          @clicked="resetFilter">
               Reset
             </compact-btn>
@@ -300,6 +301,7 @@ export default {
 
       this.activeFilters = { ...this.filter }
       this.$emit('applyFilter', this.filter)
+
       this.hideModal()
     },
     onSaveNewFilter () {

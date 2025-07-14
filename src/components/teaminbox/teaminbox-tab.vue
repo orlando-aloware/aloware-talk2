@@ -55,6 +55,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import { debounce } from 'lodash'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
@@ -116,7 +117,9 @@ export default {
       'isInitialLoad'
     ]),
 
-    ...mapState(['isMobile'])
+    ...mapState(['isMobile']),
+
+    ...mapFields('TeamInbox', ['activeFilters'])
   },
 
   created () {
@@ -128,6 +131,9 @@ export default {
     this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
     this.$VueEvent.listen('contact_updated', this.updatedContactListener)
     this.$VueEvent.listen('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
+
+    // Apply URL query parameters to filters if they exist
+    this.applyUrlQueryParams()
   },
 
   beforeDestroy () {
@@ -144,7 +150,6 @@ export default {
 
   methods: {
     ...mapActions('TeamInbox', [
-      'setActiveFilters',
       'setActiveSort',
       'setCurrentSearch',
       'setIsInitialLoad',
@@ -168,6 +173,9 @@ export default {
 
     onApplyFilter () {
       this.onFilterChange()
+
+      // Update URL query parameters based on applied filters
+      this.updateUrlQueryParams(this.activeFilters)
     },
 
     getUnreadsProperties (communication) {
@@ -239,6 +247,9 @@ export default {
     onDropdownFilterChange () {
       this.$refs.teamInboxFilterDialog.clearSelectedFilter()
       this.onFilterChange()
+
+      // Update URL query parameters based on applied filters
+      this.updateUrlQueryParams(this.activeFilters)
     },
 
     onFilterChange () {
@@ -798,6 +809,131 @@ export default {
       }
 
       return this.ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
+    },
+
+    updateUrlQueryParams (filter) {
+      const query = { ...this.$route.query }
+
+      // Clear existing filter-related query parameters
+      const filterParams = [
+        'channels', 'campaigns', 'directions', 'my_contact', 'unread_only',
+        'task_status', 'mention', 'date_range', 'from_date', 'to_date'
+      ]
+
+      filterParams.forEach(param => {
+        delete query[param]
+      })
+
+      // Add non-default filter values to query parameters
+      if (filter.channels && filter.channels.length > 0) {
+        query.channels = filter.channels.join(',')
+      }
+
+      if (filter.campaigns && filter.campaigns.length > 0) {
+        query.campaigns = filter.campaigns.join(',')
+      }
+
+      if (filter.directions && filter.directions.length > 0) {
+        query.directions = filter.directions.join(',')
+      }
+
+      if (filter.my_contact) {
+        query.my_contact = 'true'
+      }
+
+      if (filter.unread_only) {
+        query.unread_only = 'true'
+      }
+
+      if (filter.task_status && filter.task_status.length > 0) {
+        query.task_status = filter.task_status.join(',')
+      }
+
+      if (filter.mention) {
+        query.mention = 'true'
+      }
+
+      if (filter.date_range && filter.date_range !== 'Last 30 Days') {
+        query.date_range = filter.date_range
+      }
+
+      if (filter.date_range === 'custom') {
+        if (filter.from_date) {
+          query.from_date = filter.from_date
+        }
+
+        if (filter.to_date) {
+          query.to_date = filter.to_date
+        }
+      }
+
+      // Update the URL with the new query parameters
+      this.$router.replace({ query }).catch(() => {
+        // Handle navigation errors silently
+      })
+    },
+
+    applyUrlQueryParams () {
+      const query = this.$route.query
+
+      if (!query || Object.keys(query).length === 0) {
+        return
+      }
+
+      // Check if there are any filter-related query parameters
+      const filterParams = ['channels', 'campaigns', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention', 'date_range', 'from_date', 'to_date']
+      const hasFilterParams = Object.keys(query).some(key => filterParams.includes(key))
+
+      if (!hasFilterParams) {
+        return
+      }
+
+      // Create a new filter object based on current active filters
+      const newFilters = { ...this.activeFilters }
+
+      // Apply query parameters to the filter
+      if (query.channels) {
+        newFilters.channels = query.channels.split(',')
+      }
+
+      if (query.campaigns) {
+        newFilters.campaigns = query.campaigns.split(',').map(id => parseInt(id))
+      }
+
+      if (query.directions) {
+        newFilters.directions = query.directions.split(',')
+      }
+
+      if (query.my_contact === 'true') {
+        newFilters.my_contact = true
+      }
+
+      if (query.unread_only === 'true') {
+        newFilters.unread_only = true
+      }
+
+      if (query.task_status) {
+        newFilters.task_status = query.task_status.split(',')
+      }
+
+      if (query.mention === 'true') {
+        newFilters.mention = true
+      }
+
+      if (query.date_range) {
+        newFilters.date_range = query.date_range
+      }
+
+      if (query.from_date && query.date_range === 'custom') {
+        newFilters.from_date = query.from_date
+      }
+
+      if (query.to_date && query.date_range === 'custom') {
+        newFilters.to_date = query.to_date
+      }
+
+      // Update active filters
+      this.activeFilters = newFilters
     }
   },
 
@@ -843,6 +979,13 @@ export default {
     search (search) {
       this.setCurrentSearch(search)
       this.fetchItems(this.activeInboxId, search || null, this.activeFilters, this.activeSort)
+    },
+
+    '$route.query' (newQuery, oldQuery) {
+      // Only apply URL query params if the query actually changed
+      if (JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
+        this.applyUrlQueryParams()
+      }
     },
 
     items: {
