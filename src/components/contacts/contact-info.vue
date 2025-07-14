@@ -16,14 +16,27 @@
       <div class="d-flex justify-content-between relative-position w-100">
         <div class="w-100 d-grid">
           <div class="mt-1 mb-0 d-flex align-items-center overflow-hidden">
-            <div class="contact-name-wrapper flex-grow-1 min-w-0 overflow-hidden">
-              <q-tooltip anchor="top middle"
-                         data-testid="contact-info-name-tooltip"
-                         self="center middle"
-                         content-class="fs-12">
-                {{ contactName }}
-              </q-tooltip>
-              <h2 class="contact-name pb-1 text-truncate">{{ contactName }}</h2>
+            <div class="contact-name pb-1 d-flex align-items-center flex-grow-1 min-w-0 overflow-hidden">
+              <div class="contact-name-wrapper flex-grow-1 min-w-0 overflow-hidden">
+                <q-tooltip anchor="top middle"
+                           data-testid="contact-info-name-tooltip"
+                           self="center middle"
+                           content-class="fs-12">
+                  {{ contactName }}
+                </q-tooltip>
+                <h2 class="text-truncate">{{ contactName }}</h2>
+              </div>
+              <b-link href="#"
+                      class="contact-redirect-link ml-1 flex-shrink-0"
+                      data-testid="contact-info-redirect-link"
+                      @click.prevent="navigateToContact">
+                <q-tooltip anchor="top middle"
+                           self="center middle"
+                           content-class="fs-12">
+                  View Contact Details
+                </q-tooltip>
+                <i class="material-icons" data-testid="contact-info-redirect-icon" style="font-size: max(17px, 1em);">open_in_new</i>
+              </b-link>
             </div>
             <contact-integrations-link-icons class="ml-2 flex-shrink-0 mr-4" :contact='contact' />
           </div>
@@ -40,19 +53,7 @@
                            content-class="fs-12">
                   Copy
                 </q-tooltip>
-                <i class="material-icons" data-testid="contact-info-copy-phone-number-icon" style="font-size: 11px;">content_copy</i>
-              </b-link>
-
-              <b-link href="#"
-                      class="copy-phone-number ml-1"
-                      data-testid="contact-info-redirect-link"
-                      @click.prevent="navigateToContact">
-                <q-tooltip anchor="top middle"
-                           self="center middle"
-                           content-class="fs-12">
-                  View Contact Details
-                </q-tooltip>
-                <i class="material-icons" data-testid="contact-info-redirect-icon">open_in_new</i>
+                <i class="material-icons copy-phone-number" data-testid="contact-info-copy-phone-number-icon">content_copy</i>
               </b-link>
 
               <br />
