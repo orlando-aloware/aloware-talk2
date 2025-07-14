@@ -1,5 +1,7 @@
 <template>
-  <div></div>
+  <div>
+    <microphone-permission-modal ref="microphonePermissionModal" />
+  </div>
 </template>
 
 <script>
@@ -26,9 +28,14 @@ import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
+import MicrophonePermissionModal from './microphone-permission-modal.vue'
 
 export default {
   name: 'dialer',
+
+  components: {
+    MicrophonePermissionModal
+  },
 
   mixins: [
     aclMixin,
@@ -792,6 +799,13 @@ export default {
       shouldAnswer = false,
       isFromDialer = false
     ) {
+      // Check microphone permission after device is ready
+      const hasMicrophoneAccess = await this.checkMicrophonePermission()
+      if (!hasMicrophoneAccess) {
+        console.log('Microphone is not allowed by the user')
+        return
+      }
+
       if (!this.dialer.isReady) {
         console.log('Dialer is not ready', currentNumber, outboundCampaignId)
         return
@@ -2195,6 +2209,49 @@ export default {
       }
 
       return found
+    },
+
+    async checkMicrophonePermission () {
+      try {
+        // Check if the browser supports getUserMedia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          this.showMicrophonePermissionModal('Your browser does not support microphone access. Please use a modern browser like Chrome, Firefox, Safari, or Edge.')
+          return false
+        }
+
+        // Check current permission status
+        const permissionStatus = await navigator.permissions.query({ name: 'microphone' })
+        if (permissionStatus.state === 'denied') {
+          this.showMicrophonePermissionModal('Microphone access is blocked. Please enable microphone permissions in your browser settings to use the dialer.')
+          return false
+        }
+
+        // Try to get microphone access to trigger permission request if needed
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        // Stop the stream immediately to avoid keeping the microphone active
+        stream.getTracks().forEach(track => track.stop())
+        return true
+      } catch (error) {
+        console.error('[checkMicrophonePermission] error:', error)
+        let message = 'Unable to access microphone. '
+        if (error.name === 'NotAllowedError') {
+          message += 'Microphone access was denied. Please allow microphone permissions in your browser settings.'
+        } else if (error.name === 'NotFoundError') {
+          message += 'No microphone found. Please connect a microphone and try again.'
+        } else if (error.name === 'NotReadableError') {
+          message += 'Microphone is already in use by another application. Please close other applications using the microphone and try again.'
+        } else if (error.name === 'OverconstrainedError') {
+          message += 'Microphone does not meet the required constraints. Please try a different microphone.'
+        } else {
+          message += 'Please check your microphone settings and try again.'
+        }
+        this.showMicrophonePermissionModal(message)
+        return false
+      }
+    },
+
+    showMicrophonePermissionModal (message) {
+      this.$refs.microphonePermissionModal.show(message)
     }
   },
 
