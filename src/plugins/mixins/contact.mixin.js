@@ -758,6 +758,11 @@ export default {
 
       const params = {}
 
+      // Add inbox_id when in Team Inbox context
+      if (this.teamInbox && this.teamInboxId) {
+        params.inbox_id = this.teamInboxId
+      }
+
       // Use Team Inbox API when in Team Inbox context
       const requestParams = {
         page: this.communicationsPage,
