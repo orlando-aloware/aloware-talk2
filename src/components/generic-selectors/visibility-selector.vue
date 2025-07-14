@@ -49,9 +49,12 @@
 import * as ContactAccessTypes from 'src/constants/contact-access-types'
 import * as CommunicationAccessTypes from 'src/constants/communication-access-types'
 import { mapGetters } from 'vuex'
+import userMixin from 'src/plugins/mixins/user.mixin'
 
 export default {
   name: 'visibility-selector',
+
+  mixins: [userMixin],
 
   props: {
     value: {
@@ -88,10 +91,6 @@ export default {
     ...mapGetters({
       currentCompany: 'cache/currentCompany'
     }),
-
-    hasCompanyTeamInboxEnabled () {
-      return this.currentCompany?.team_inbox_enabled === true
-    },
 
     contactAccessTypeOptions () {
       const options = [
