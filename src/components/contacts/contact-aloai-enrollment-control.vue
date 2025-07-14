@@ -67,7 +67,7 @@
             size="sm"
             class="mr-1"
             data-testid="refresh-sequence-info-button"
-            @click="refreshBots"
+            @click="refreshBots(true)"
           >
             <i class="fa fa-sync-alt"/>
             <q-tooltip
@@ -119,15 +119,16 @@
               Next Bot
             </q-tooltip>
           </b-button>
-          <!-- Re-enroll bot button when only 1 bot -->
+          <!-- Re-enroll bot button -->
           <b-button
-            v-if="!isEnrolledToMultipleBots && displayedBot?.direction === AloAi.DIRECTION_OUTBOUND"
+            v-if="displayedBot?.direction === AloAi.DIRECTION_OUTBOUND"
             @click="openReEnrollmentConfirmation"
             href="#"
             variant="outline-success"
             size="sm"
-            class="mr-1"
-            data-testid="re-enroll-single-bot-contact-button"
+            :class="isEnrolledToMultipleBots ? 'mt-3 btn-with-icon-spacing' : 'mr-1 btn-with-icon-spacing'"
+            :block="isEnrolledToMultipleBots"
+            data-testid="re-enroll-contact-button"
             :disabled="isReadOnly || busyReEnrollBotId === displayedBot?.id"
           >
             <i class="fa fa-redo"/> <span v-if="busyReEnrollBotId === displayedBot?.id">Re-enrolling...</span><span v-else>Re-enroll</span>
@@ -138,14 +139,15 @@
               Re-enroll contact to this agent
             </q-tooltip>
           </b-button>
-          <!-- Disenroll bot button when only 1 bot -->
+          <!-- Disenroll bot button -->
           <b-button
-            v-if="!isEnrolledToMultipleBots"
             @click="openDisenrollmentConfirmation"
             href="#"
             variant="outline-danger"
             size="sm"
-            data-testid="disenroll-single-bot-contact-button"
+            :class="isEnrolledToMultipleBots ? 'mt-2 btn-with-icon-spacing' : 'btn-with-icon-spacing'"
+            :block="isEnrolledToMultipleBots"
+            data-testid="disenroll-contact-button"
             :disabled="isReadOnly"
           >
             <i class="fa fa-trash"/> Disenroll
@@ -157,45 +159,6 @@
             </q-tooltip>
           </b-button>
         </div>
-
-        <!-- Re-enroll bot button when multiple bots -->
-        <b-button
-          v-if="isEnrolledToMultipleBots && displayedBot?.direction === AloAi.DIRECTION_OUTBOUND"
-          @click="openReEnrollmentConfirmation"
-          class="mt-3"
-          variant="outline-success"
-          size="sm"
-          block
-          data-testid="re-enroll-contact-button"
-          :disabled="isReadOnly || busyReEnrollBotId === displayedBot?.id"
-        >
-          <i class="fa fa-redo"/> <span v-if="busyReEnrollBotId === displayedBot?.id">Re-enrolling...</span><span v-else>Re-enroll</span>
-          <q-tooltip
-            anchor="top middle"
-            self="center middle"
-          >
-            Re-enroll contact to this agent
-          </q-tooltip>
-        </b-button>
-        <!-- Disenroll bot button when multiple bots -->
-        <b-button
-          v-if="isEnrolledToMultipleBots"
-          @click="openDisenrollmentConfirmation"
-          class="mt-2"
-          variant="outline-danger"
-          size="sm"
-          block
-          data-testid="disenroll-contact-button"
-          :disabled="isReadOnly"
-        >
-          <i class="fa fa-trash"/> Disenroll
-          <q-tooltip
-            anchor="top middle"
-            self="center middle"
-          >
-            Remove contact from this agent
-          </q-tooltip>
-        </b-button>
       </b-card-text>
 
       <div id="enroll-control-popover">
@@ -379,7 +342,7 @@ export default {
   },
 
   mounted () {
-    this.refreshBots()
+    this.refreshBots(false)
   },
 
   methods: {
@@ -388,16 +351,16 @@ export default {
       this.isBusy = true
       // Give our queue some time to process the enrollment
       setTimeout(() => {
-        this.refreshBots()
+        this.refreshBots(true)
         // Select the newly enrolled bot
         this.activeBotIndex = 0
       }, 2000)
     },
-    refreshBots () {
+    refreshBots (force = false) {
       this.isBusy = true
       const previousActiveBotIndex = this.activeBotIndex
 
-      this.fetchBots()
+      this.fetchBots(force)
         .then((bots) => {
           this.bots = bots
           this.fetchContactBotEnrollments()
@@ -512,7 +475,7 @@ export default {
           this.isBusy = true
           // Give our api some time to process the disenrollment
           setTimeout(() => {
-            this.refreshBots()
+            this.refreshBots(true)
           }, 2000)
         })
         .catch((error) => {
@@ -563,7 +526,7 @@ export default {
           this.isBusy = true
           // Give our api some time to process the re-enrollment
           setTimeout(() => {
-            this.refreshBots()
+            this.refreshBots(true)
           }, 2000)
         })
         .catch((error) => {
@@ -580,9 +543,9 @@ export default {
           this.isBusy = false
         })
     },
-    async fetchBots () {
+    async fetchBots (force = false) {
       try {
-        if (this.bots.length > 0) {
+        if (!force && this.bots.length > 0) {
           return this.bots
         }
         const { data } = await talk2Api.V2.aloAiBot.getBots()
@@ -623,6 +586,12 @@ export default {
     path {
       fill: #1976d3;
     }
+  }
+}
+
+.btn-with-icon-spacing {
+  i {
+    margin-right: 4px;
   }
 }
 </style>
