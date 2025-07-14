@@ -1086,9 +1086,12 @@ export default {
         this.conditionForShowPoweredByAloAiBox &&
         (this.showAudio(this.communication) || this.communication.has_voicemail) &&
         (
-          // Either transcription is not enabled, or usage has exceeded limits
+          // Either transcription is not enabled, or usage has exceeded limits with restrictions
           !this.currentCompany?.transcription_settings?.call_transcription_enabled ||
-          this.currentCompany?.used_transcription_min >= this.currentCompany?.plan?.included_transcription_min
+          (
+            this.currentCompany?.used_transcription_min >= this.currentCompany?.plan?.included_transcription_min &&
+            this.currentCompany?.transcription_settings?.overusage_restriction_enabled
+          )
         )
       )
     }
