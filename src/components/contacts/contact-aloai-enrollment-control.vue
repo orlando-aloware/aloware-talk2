@@ -538,8 +538,6 @@ export default {
           this.$generalNotification(errorMsg, 'error')
           console.error('[reEnrollContact] error', error)
           this.busyReEnrollBotId = null
-        })
-        .finally(() => {
           this.isBusy = false
         })
     },
