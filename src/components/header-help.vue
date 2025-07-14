@@ -48,6 +48,14 @@
                  @click="watchTeamInboxEmptyVideo">
             SHOW VIDEO
           </q-btn>
+          <q-btn color="primary"
+                 v-if="shouldShowLinesTutorial"
+                 class="full-width text-caption mt-1"
+                 size="sm"
+                 v-close-popup
+                 @click="showLinesTutorial">
+            LINE MANAGEMENT TUTORIAL
+          </q-btn>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
@@ -55,11 +63,17 @@
 </template>
 
 <script>
+import UserMixin from 'src/plugins/mixins/user.mixin'
 import * as Roles from 'src/constants/roles'
 import { mapGetters, mapState } from 'vuex'
 import VueCookies from 'vue-cookies'
+import { CID_AND_LINES_DEMO } from 'src/plugins/helpers/navattic'
 
 export default {
+  mixins: [
+    UserMixin
+  ],
+
   data () {
     return {
       env: null,
@@ -101,6 +115,10 @@ export default {
       return this.$route.path.startsWith('/team-inboxes') &&
         this.isTeamInboxesLoaded &&
         !this.hasTeamInboxes
+    },
+
+    shouldShowLinesTutorial () {
+      return this.shouldShowTeamInboxTutorial && this.hasCompanyTeamInboxLineManagementEnhancements
     }
   },
 
@@ -131,6 +149,10 @@ export default {
       cookies.remove(`team-inbox-empty-state-${this.profile?.id}`)
 
       this.$store.state.TeamInbox.teamInboxEmptyStateVideoComponent.openModal()
+    },
+
+    showLinesTutorial () {
+      this.$navattic.openPopup(CID_AND_LINES_DEMO)
     }
   },
 

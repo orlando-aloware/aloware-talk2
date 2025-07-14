@@ -142,6 +142,7 @@ export default {
         this.$cookies.set(this.parsedCookieName, 'viewed', '3650d') // Set cookie to expire in 10 years
       }
       this.setIsIntroVideoVisible(null)
+      this.$emit('close')
     },
 
     openModal () {

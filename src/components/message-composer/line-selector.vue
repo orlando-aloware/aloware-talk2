@@ -102,7 +102,9 @@ export default {
      * Returns the active campaigns
      */
     activeCampaigns () {
-      return this.campaigns.filter(campaign => this.activeInboxCampaignIds?.includes(campaign.id) || campaign.ivr_id)
+      const allIvrCampaigns = this.campaigns.filter(campaign => campaign.ivr_id)
+      const availableInboxCampaigns = this.campaigns.filter(campaign => this.activeInboxCampaignIds?.includes(campaign.id))
+      return [...availableInboxCampaigns, ...allIvrCampaigns]
     },
 
     selectedCampaign () {

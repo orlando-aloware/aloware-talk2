@@ -70,7 +70,7 @@
                       data-testid="filter-form-quick-access-form-row">
             <b-col sm="12"
                    md="6"
-                   v-if="isACallTypeChannel">
+                   v-if="isACallTypeChannel || isAllComms">
               <b-form-group class="form-label"
                             label="Ring Groups">
                 <ring-group-selector :force-remove-missing-values="true"
@@ -85,7 +85,7 @@
 
             <b-col sm="12"
                    md="6"
-                   v-if="isACallTypeChannel">
+                   v-if="isACallTypeChannel || isAllComms">
               <b-form-group class="form-label"
                             label="Teams">
                 <team-selector :force-remove-missing-values="true"
@@ -100,7 +100,7 @@
 
             <b-col sm="12"
                    md="6"
-                   v-if="isACallTypeChannel">
+                   v-if="isACallTypeChannel || isAllComms">
               <b-form-group class="form-label"
                             label="Contact Lists">
                 <contact-list-selector :force-remove-missing-values="true"
@@ -148,7 +148,7 @@
             </b-col>
             <b-col sm="12"
                    md="4"
-                   v-if="isCallsOnlyChannel">
+                   v-if="isCallsOnlyChannel || isAllComms">
               <b-form-group class="form-label"
                             label="Answer Status">
                 <answer-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -161,7 +161,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel || isAllComms">
               <b-form-group class="form-label"
                             label="Talk Time">
                 <talk-time-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -174,7 +174,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel || isAllComms">
               <b-form-group class="form-label"
                             label="Transfer Type">
                 <transfer-type-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -187,7 +187,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel || isAllComms">
               <b-form-group class="form-label"
                             label="Callback Status">
                 <callback-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -239,7 +239,7 @@
             </b-col>
             <b-col md="6"
                    sm="12"
-                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews) && isCallsAndRecordingsChannel">
+                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews) && (isCallsAndRecordingsChannel || isAllComms)">
               <b-form-group class="form-label"
                             label="Call Disposition">
                 <call-disposition-selector :multiple="true"
@@ -250,7 +250,7 @@
             </b-col>
           </b-form-row>
           <b-form-row data-testid="filter-form-properties-form-row"
-                      v-if="isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews">
+                      v-if="isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews || isAllComms">
             <b-col md="6"
                    sm="12">
               <b-form-group>
@@ -418,7 +418,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isACallTypeChannel || isMessagesOnlyChannel">
+                   v-if="isACallTypeChannel || isMessagesOnlyChannel || isAllComms">
               <b-form-group class="form-label">
                 <template v-slot:label>
                   <span data-testid="filter-form-communication-owners-row">Users</span>
@@ -488,7 +488,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="((isCompanyPartOfNewInboxFilters(profile.company_id)) || isMessagesOnlyChannel) && !isFilterDialogForView">
+                   v-if="((isCompanyPartOfNewInboxFilters(profile.company_id)) || isMessagesOnlyChannel || isAllComms) && !isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Broadcasts">
                 <broadcast-selector :multiple="true"
@@ -608,7 +608,7 @@ export default {
     ...mapState(['isFirstLoad']),
 
     isAllComms () {
-      return [DEFAULT_COMMUNICATIONS_CHANNEL].includes(this.$route.params.channel)
+      return !this.$route.params.channel || [DEFAULT_COMMUNICATIONS_CHANNEL].includes(this.$route.params.channel)
     },
 
     dateRangeLabel () {
@@ -647,18 +647,18 @@ export default {
     },
 
     isACallTypeChannel () {
-      const nonSmsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'view', 'my-personal-line']
+      const nonSmsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL, 'view', 'my-personal-line']
       return nonSmsChannels.includes(this.$route.params.channel)
     },
 
     isCallsOnlyChannel () {
-      const callsChannels = [CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
+      const callsChannels = [CALLS_CHANNEL, 'my-personal-line']
 
       return callsChannels.includes(this.$route.params.channel)
     },
 
     isCallsAndRecordingsChannel () {
-      const allCallsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
+      const allCallsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, 'my-personal-line']
 
       if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
         return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)
@@ -668,7 +668,7 @@ export default {
     },
 
     isMessagesOnlyChannel () {
-      const smsChannels = [MESSAGES_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
+      const smsChannels = [MESSAGES_CHANNEL, 'my-personal-line']
 
       return smsChannels.includes(this.$route.params.channel)
     },
@@ -682,7 +682,7 @@ export default {
     },
 
     isInboxOrInboxViews () {
-      return [DEFAULT_COMMUNICATIONS_ROUTE_NAME, 'Communications View', 'Communications View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel) || this.isFilterDialogForView
+      return ['Communications View', 'Communications View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel) || this.isFilterDialogForView
     },
 
     isLineSelectorDisabled () {

@@ -1,37 +1,6 @@
 <template>
   <div class="sms-reminders-wrapper border-0 p-0 w-100">
     <div class="w-100">
-      <div class="w-100"
-           v-if="showLineSelector">
-        <label class="form-control-label mb-1">
-          Send from
-        </label>
-        <q-select ref="smsReminders"
-                  class="p-1 q-basic-selector w-100"
-                  use-input
-                  emit-value
-                  map-options
-                  clearable
-                  dense
-                  input-debounce="0"
-                  option-value="id"
-                  option-label="name"
-                  v-model="selectedId"
-                  data-testid="sms-reminders-selector"
-                  :options="options"
-                  @filter="filterFn"
-                  @focus="onFocus"
-                  @blur="onBlur"
-                  @input="onInput">
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="no-results text-grey" data-testid="sms-reminders-item-section">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-      </div>
       <div class="pb-2">
         <q-btn no-caps
                unelevated
@@ -40,26 +9,72 @@
                class="btn-filter-wrapper"
                :loading="loading"
                :disable="loading"
-               v-if="recentShowSendSmsReminderButton"
                data-testid="send-sms-reminder-button"
-               @click="sendDefaultSmsReminder">
+               @click="onClickSendSmsReminder">
           <div class="mx-2 px-1 text-nowrap">
             Send SMS Reminder
           </div>
+          <q-popup-proxy
+            v-model="showLineSelectorPopup"
+            no-parent-event
+            self="top end"
+            anchor="bottom right"
+            transition-show="jump-down"
+            transition-hide="jump-up"
+          >
+          <div class="d-flex line-selector-popup-wrapper">
+            <line-selector
+              width="255px"
+              class="line-selector flex-grow-1"
+              prepend="Send SMS From:"
+              check-blocked-messaging
+              hide-bottom-space
+              :show-all-lines="!activeInboxId"
+              :line-count.sync="lineCount"
+              :pre-selected-team-inbox-line-id="selectedLineId || campaignId"
+              :generic-multiselect="false"
+              :use-only-actives="true"
+              @change="onLineChange"
+            />
+            <q-btn
+              round
+              no-caps
+              unelevated
+              icon="send"
+              size="md"
+              class="ml-1"
+              color="primary"
+              :loading="loading"
+              :disable="loading || !selectedId"
+              data-testid="send-sms-reminder-button"
+              @click="createSmsReminder"
+            >
+            <q-tooltip
+              anchor="top middle"
+              self="center middle"
+              content-class="fs-12"
+            >
+              Send Reminder
+            </q-tooltip>
+            </q-btn>
+          </div>
+          </q-popup-proxy>
         </q-btn>
       </div>
     </div>
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
-import { selectorMixin } from 'src/plugins/mixins'
+import { mapGetters, mapState } from 'vuex'
+import LineSelector from 'components/generic-selectors/line-selector'
 
 export default {
   name: 'sms-reminders',
-  mixins: [
-    selectorMixin
-  ],
+
+  components: {
+    LineSelector
+  },
+
   props: {
     communicationId: {
       required: true
@@ -70,10 +85,9 @@ export default {
       required: true
     },
 
-    showLineSelector: {
-      type: Boolean,
-      required: false,
-      default: false
+    contactId: {
+      type: Number,
+      required: true
     },
 
     appointmentDatetime: {
@@ -84,86 +98,84 @@ export default {
   data () {
     return {
       loading: false,
-      selectedId: this.campaignId,
-      recentShowSendSmsReminderButton: false,
-      options: [],
-      reference: 'smsReminders',
-      fullOptionsProperty: 'campaigns'
+      selectedId: null,
+      showLineSelectorPopup: false,
+      lineCount: 0
     }
   },
 
   computed: {
-    ...mapState(['campaigns'])
-  },
-
-  mounted () {
-    this.options = this.campaigns
-    this.selectedCampaign = this.campaigns.find(campaign => campaign.id === this.campaignId)
-    this.showSendSmsReminderButton()
+    ...mapState(['campaigns']),
+    ...mapState('TeamInbox', ['activeInboxId']),
+    ...mapGetters('contacts', ['selectedLineId'])
   },
 
   methods: {
-    showSendSmsReminderButton () {
-      // const appointmentDate = this.$moment(new Date(this.appointmentDatetime)).tz('UTC')
-      this.recentShowSendSmsReminderButton = true // appointmentDate.isAfter()
-      return this.recentShowSendSmsReminderButton
+    checkShouldForceSendSmsReminder () {
+      setTimeout(() => {
+        if (this.showLineSelectorPopup && this.lineCount === 0) {
+          // If the line popup should be shown but no lines are available,
+          // force the creation of the SMS reminder with the line selected in the appointment
+          // (even if the line is not available in the current inbox)
+          // 1ms delay to ensure the lineCount sync is complete
+          this.showLineSelectorPopup = false
+          this.createSmsReminder()
+        }
+      }, 1)
     },
 
-    sendDefaultSmsReminder () {
-      if (!this.selectedId) {
-        this.$generalNotification('Please select a line where to send from.', 'error')
+    onClickSendSmsReminder () {
+      if (!this.campaignId) {
+        // Show line selector popup if no line is selected
+        this.showLineSelectorPopup = !this.showLineSelectorPopup
+        return this.checkShouldForceSendSmsReminder()
       }
 
-      if (this.selectedId) {
-        this.loading = true
-        this.$axios
-          .post(`/api/v1/communications/${this.communicationId}/send-sms-reminder`, {
-            campaign_id: this.selectedId
-          })
-          .then(res => {
-            this.loading = false
-            switch (res.status) {
-              case 200:
-                this.$generalNotification('SMS reminder is sent.')
-                break
-              default:
-                this.$generalNotification(res.data.message, 'error')
-            }
-          })
-          .catch(err => {
-            console.log(err)
-            this.loading = false
-            this.$generalNotification('Something went wrong.', 'error')
-          })
+      if (this.selectedLineId !== this.campaignId) {
+        // Show line selector popup if the selected line in the message composer
+        // is different from the one selected in the appointment
+        this.showLineSelectorPopup = !this.showLineSelectorPopup
+        return this.checkShouldForceSendSmsReminder()
       }
+
+      this.createSmsReminder()
     },
-    filterFn (val, update) {
-      if (this.selectedId && val === this.selectedId) {
-        update(() => {
-          this.options = this.campaigns.filter(campaign => campaign.id === this.selectedId)
-        })
-        return
-      }
 
-      if (val === '') {
-        update(() => {
-          this.options = this.campaigns
-        })
-        return
-      }
+    createSmsReminder () {
+      const campaignId = this.selectedId || this.campaignId
 
-      update(() => {
-        const needle = val.toLowerCase()
-        this.options = this.campaigns.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
-      })
+      this.loading = true
+      this.showLineSelectorPopup = false
+
+      this.$axios
+        .post(`/api/v1/communications/${this.communicationId}/send-sms-reminder`, {
+          campaign_id: campaignId
+        })
+        .then(res => {
+          if (res.status === 200) {
+            return this.$generalNotification('SMS reminder is sent.')
+          }
+          this.$generalNotification(res.data.message, 'error')
+        })
+        .catch(err => {
+          console.log(err)
+          this.$generalNotification('Something went wrong.', 'error')
+        })
+        .finally(() => {
+          this.loading = false
+        })
+    },
+
+    onLineChange (lineId) {
+      this.selectedId = lineId
     }
   },
+
   watch: {
-    campaignId (value) {
-      this.selectedCampaign = this.campaigns.find(campaign => campaign.id === value)
-    },
-    selectedId (val) {
-      this.showInputPlaceholder()
+    showLineSelectorPopup (value) {
+      if (!value) {
+        this.selectedId = null
+      }
     }
   }
 }

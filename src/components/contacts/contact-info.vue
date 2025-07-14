@@ -120,7 +120,7 @@
                    height="14" />
         <q-popup-proxy v-model="showLineSelectorPopup"
                        no-parent-event>
-          <div class="d-flex line-selector-wrapper">
+          <div class="d-flex line-selector-popup-wrapper">
             <line-selector
               class="line-selector flex-grow-1"
               prepend="From:"
@@ -649,9 +649,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.line-selector-wrapper {
-  padding: 8px;
-}
-</style>

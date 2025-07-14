@@ -643,7 +643,8 @@
                                class="d-flex flex-row justify-content-center w-100"
                                data-testid="communication-info-sms-reminders"
                                :communicationId="communication.id"
-                               :campaignId="campaignId"
+                               :campaignId="getAppointmentCampaignId(communication)"
+                               :contactId="contact.id"
                                :appointmentDatetime="communication.engagement_data.appointment_datetime"
                                v-if="communication.type === CommunicationTypes.APPOINTMENT && campaignId">
                 </sms-reminders>
@@ -1086,12 +1087,9 @@ export default {
         this.conditionForShowPoweredByAloAiBox &&
         (this.showAudio(this.communication) || this.communication.has_voicemail) &&
         (
-          // Either transcription is not enabled, or usage has exceeded limits with restrictions
+          // Either transcription is not enabled, or usage has exceeded limits
           !this.currentCompany?.transcription_settings?.call_transcription_enabled ||
-          (
-            this.currentCompany?.used_transcription_min >= this.currentCompany?.plan?.included_transcription_min &&
-            this.currentCompany?.transcription_settings?.overusage_restriction_enabled
-          )
+          this.currentCompany?.used_transcription_min >= this.currentCompany?.plan?.included_transcription_min
         )
       )
     }
@@ -1323,6 +1321,10 @@ export default {
       }
 
       return false
+    },
+
+    getAppointmentCampaignId (communication) {
+      return communication.engagement_data?.appointment_campaign_id ?? this.campaignId
     }
   },
 

@@ -19,7 +19,24 @@ export default {
       'isLoadingMoreItems',
       'abortController',
       'unreadCountLoaded'
-    ])
+    ]),
+
+    ...mapState(['currentTimezone']),
+
+    dateRanges () {
+      const timezone = this.currentTimezone
+      const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+
+      return {
+        'Today': [this.$moment.tz(timezone).startOf('day').format(DATE_FORMAT), this.$moment.tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Yesterday': [this.$moment.tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT), this.$moment.tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT)],
+        'Last 7 Days': [this.$moment.tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT), this.$moment.tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last 30 Days': [this.$moment.tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT), this.$moment.tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'This Month So Far': [this.$moment.tz(timezone).startOf('month').format(DATE_FORMAT), this.$moment.tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last Month': [this.$moment.tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), this.$moment.tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
+        'All Time': [null, null]
+      }
+    }
   },
 
   methods: {
@@ -178,9 +195,11 @@ export default {
       const apiFilters = {}
 
       if (filters.from_date) {
-        apiFilters.from_date = filters.from_date
+        const isCustomDateRange = filters.date_range === 'custom'
+
+        apiFilters.from_date = isCustomDateRange ? filters.from_date : this.dateRanges[filters.date_range][0]
         // Only send to_date for custom date ranges to prevent timezone cutoff issues
-        if (filters.to_date && filters.date_range === 'custom') {
+        if (filters.to_date && isCustomDateRange) {
           apiFilters.to_date = filters.to_date
         }
       }
@@ -190,8 +209,12 @@ export default {
         apiFilters.unread_only = true
       }
 
-      if (filters.types?.length) {
-        apiFilters.types = filters.types
+      if (filters.channels?.length) {
+        apiFilters.types = filters.channels.filter(channel => channel !== 'mentions')
+
+        if (filters.channels.includes('mentions')) {
+          apiFilters.has_mention = true
+        }
       }
 
       if (filters.directions) {
@@ -202,12 +225,12 @@ export default {
         apiFilters.my_contact = true
       }
 
-      if (filters?.task_status.length) {
+      if (filters.task_status?.length) {
         apiFilters.task_status = filters.task_status
       }
 
-      if (filters.mention) {
-        apiFilters.has_mention = true
+      if (filters.campaigns) {
+        apiFilters.campaign_ids = filters.campaigns
       }
 
       // Map sort keys to API parameters

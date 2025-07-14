@@ -5,10 +5,10 @@
                         @search="search = $event" />
 
     <TeamInboxChannelToggle @channel="onChannel"
-                            @date-change="onFilterChange" />
+                            @open-filter="onOpenFilter"/>
 
-    <TeamInboxFilters @filter-change="onFilterChange"
-                      @sort-change="onSortChange" />
+    <TeamInboxDropdownFilters @filter-change="onDropdownFilterChange"
+                              @sort-change="onSortChange" />
 
     <!-- Items List -->
     <div class="items-list blue-scroll"
@@ -25,6 +25,19 @@
         @refresh="onRefreshCommunications"
       />
     </div>
+
+    <!-- Filter Dialog -->
+    <TeamInboxFilterDialog ref="teamInboxFilterDialog"
+                           data-testid="teaminbox-tab-filter-dialog"
+                           @createNewFilter="onCreateNewFilter"
+                           @applyFilter="onApplyFilter" />
+
+    <!-- Create Filter Dialog -->
+    <TeamInboxCreateFilterDialog ref="teamInboxCreateFilterDialog"
+                                 :value="newFilterModel"
+                                 :disable-filter-type="!isAdmin"
+                                 data-testid="teaminbox-tab-create-filter-dialog"
+                                 @onCancel="onCancelCreateFilter" />
   </div>
 </template>
 
@@ -32,8 +45,10 @@
 import CommunicationList from 'src/components/teaminbox/communication-items/communication-list.vue'
 import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
 import TeamInboxTabHeader from './teaminbox-tab-header.vue'
-import TeamInboxFilters from './teaminbox-filters.vue'
-import { TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
+import TeamInboxDropdownFilters from './teaminbox-dropdown-filters.vue'
+import TeamInboxFilterDialog from './teaminbox-filters/filter-dialog.vue'
+import TeamInboxCreateFilterDialog from './teaminbox-filters/create-filter-dialog.vue'
+import { aclMixin, TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
 import { getQueryString } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
@@ -49,12 +64,15 @@ export default {
     CommunicationList,
     TeamInboxChannelToggle,
     TeamInboxTabHeader,
-    TeamInboxFilters
+    TeamInboxDropdownFilters,
+    TeamInboxFilterDialog,
+    TeamInboxCreateFilterDialog
   },
 
   mixins: [
     TeamInboxMixin,
-    visibilityMixin
+    visibilityMixin,
+    aclMixin
   ],
 
   props: {
@@ -77,7 +95,8 @@ export default {
       CommunicationTypes,
       filterOption: 'All',
       sortOption: 'Newest',
-      loadError: false
+      loadError: false,
+      newFilterModel: {}
     }
   },
 
@@ -97,11 +116,7 @@ export default {
       'isInitialLoad'
     ]),
 
-    ...mapState(['isMobile']),
-
-    filteredItems () {
-      return this.items.filter(item => !item.hidden)
-    }
+    ...mapState(['isMobile'])
   },
 
   created () {
@@ -136,6 +151,24 @@ export default {
       'setIsLoadingMoreItems',
       'setContactsLastUsedLines'
     ]),
+
+    onOpenFilter () {
+      this.$refs.teamInboxFilterDialog.showModal()
+    },
+
+    onCreateNewFilter (filter) {
+      this.$refs.teamInboxFilterDialog.hideModal()
+      this.newFilterModel = filter
+      this.$refs.teamInboxCreateFilterDialog.showModal()
+    },
+
+    onCancelCreateFilter () {
+      this.$refs.teamInboxFilterDialog.showModal()
+    },
+
+    onApplyFilter () {
+      this.onFilterChange()
+    },
 
     getUnreadsProperties (communication) {
       if (this.viewMode === UNTHREADED) {
@@ -200,7 +233,27 @@ export default {
         return
       }
 
-      this.resetItems()
+      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
+    },
+
+    onDropdownFilterChange () {
+      this.$refs.teamInboxFilterDialog.clearSelectedFilter()
+      this.onFilterChange()
+    },
+
+    onFilterChange () {
+      if (!this.activeInboxId) {
+        return
+      }
+
+      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
+    },
+
+    onSortChange () {
+      if (!this.activeInboxId) {
+        return
+      }
+
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
     },
 
@@ -530,14 +583,6 @@ export default {
     onRefreshCommunications () {
       this.loadError = false
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
-    },
-
-    onFilterChange (filters) {
-      this.fetchItems(this.activeInboxId, this.search || null, filters, this.activeSort)
-    },
-
-    onSortChange (sort) {
-      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, sort)
     },
 
     // Count distinct contact groups in the current data
