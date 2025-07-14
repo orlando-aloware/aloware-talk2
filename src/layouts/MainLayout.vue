@@ -302,6 +302,8 @@ import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import store from 'src/store'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
+import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'MyLayout',
@@ -909,8 +911,15 @@ export default {
 
       // if disposition status is not in-progress
       // or current status is not queued / ring all, close call notification
-      if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
-        !INCOMING_STATUSES.includes(communication.current_status2)) {
+      // But don't close if this is an add/introduce operation
+      const isAddOrIntroduceOperation = (communication.is_introduce ||
+        communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER ||
+        communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG) &&
+        communication.legc_uuid &&
+        [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
+
+      if ((communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
+        !INCOMING_STATUSES.includes(communication.current_status2)) && !isAddOrIntroduceOperation) {
         console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
       }
