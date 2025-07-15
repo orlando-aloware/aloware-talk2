@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    v-model="showModal"
+    v-model="isOpen"
     persistent
     :maximized="false"
     :full-width="false"
@@ -8,7 +8,7 @@
   >
     <q-card class="microphone-permission-modal">
       <q-card-section class="text-center">
-        <div class="text-h6 font-weight-bold">Giving Microphone Access to Aloware Talk</div>
+        <div class="text-h6 font-weight-bold">Giving Microphone Access to {{ whiteLabelName }}</div>
       </q-card-section>
 
       <q-card-section class="text-center">
@@ -19,7 +19,7 @@
           </div>
           <img src="/images/mic-step-2.png" alt="Step 2: Allow microphone access" class="step-2-image mw-100" />
         </div>
-        <p>In order to make or receive calls you need to make sure that you have granted microphone access to Aloware Talk.</p>
+        <p>In order to make or receive calls you need to make sure that you have granted microphone access to {{ whiteLabelName }}.</p>
         <p>To do so please <strong>click the icon in your browser's address bar and toggle on the microphone access.</strong></p>
       </q-card-section>
 
@@ -42,22 +42,25 @@
 </template>
 
 <script>
+import { whiteLabelMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'MicrophonePermissionModal',
+  mixins: [whiteLabelMixin],
 
   data () {
     return {
-      showModal: false
+      isOpen: false
     }
   },
 
   methods: {
-    show (message = null) {
-      this.showModal = true
+    show () {
+      this.isOpen = true
     },
 
     closeModal () {
-      this.showModal = false
+      this.isOpen = false
     },
 
     refreshPage () {
@@ -78,7 +81,7 @@ export default {
   }
 
   .step-2-image {
-    max-width: 360px;
+    width: 330px;
   }
 }
 </style>
