@@ -48,7 +48,6 @@
 
 import * as ContactAccessTypes from 'src/constants/contact-access-types'
 import * as CommunicationAccessTypes from 'src/constants/communication-access-types'
-import { mapGetters } from 'vuex'
 import userMixin from 'src/plugins/mixins/user.mixin'
 
 export default {
@@ -88,22 +87,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters({
-      currentCompany: 'cache/currentCompany'
-    }),
-
     contactAccessTypeOptions () {
       const options = [
-        {
-          value: ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY,
-          label: 'Owned Only',
-          description: 'Can only see self-owned contacts.'
-        },
-        {
-          value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP,
-          label: 'Owned & Ring Group',
-          description: 'Can only see self-owned contacts and unassigned contacts in the ring groups that this user belongs to.'
-        },
         {
           value: ContactAccessTypes.CONTACTS_ACCESS_EVERYONE,
           label: 'Everyone',
@@ -115,11 +100,25 @@ export default {
           description: this.hasCompanyTeamInboxEnabled
             ? 'Can only see contacts owned by users in any teams that this user belongs to.'
             : 'Can only see contacts owned by users in any ring groups that this user belongs to.'
+        },
+        {
+          value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP,
+          label: this.hasCompanyTeamInboxEnabled && this.value === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP
+            ? 'Owned & Ring Group (DEPRECATED)'
+            : 'Owned & Ring Group',
+          description: this.hasCompanyTeamInboxEnabled && this.value === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP
+            ? 'This option is deprecated for team inbox users. Please pick any other option.'
+            : 'Can only see self-owned contacts and unassigned contacts in the ring groups that this user belongs to.'
+        },
+        {
+          value: ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY,
+          label: 'Owned Only',
+          description: 'Can only see self-owned contacts.'
         }
       ]
 
-      // Filter out "Ring Group Only" option for Team Inbox enabled accounts
-      if (this.hasCompanyTeamInboxEnabled) {
+      // For Team Inbox enabled companies: hide "Owned & Ring Group" option ONLY if it's not currently selected
+      if (this.hasCompanyTeamInboxEnabled && this.value !== ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
         return options.filter(opt => opt.value !== ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP)
       }
 
