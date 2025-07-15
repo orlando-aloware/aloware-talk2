@@ -2215,14 +2215,16 @@ export default {
       try {
         // Check if the browser supports getUserMedia
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          this.showMicrophonePermissionModal('Your browser does not support microphone access. Please use a modern browser like Chrome, Firefox, Safari, or Edge.')
+          console.error('[checkMicrophonePermission] microphone not supported')
+          this.showMicrophonePermissionModal()
           return false
         }
 
         // Check current permission status
         const permissionStatus = await navigator.permissions.query({ name: 'microphone' })
         if (permissionStatus.state === 'denied') {
-          this.showMicrophonePermissionModal('Microphone access is blocked. Please enable microphone permissions in your browser settings to use the dialer.')
+          console.error('[checkMicrophonePermission] microphone access denied')
+          this.showMicrophonePermissionModal()
           return false
         }
 
@@ -2233,25 +2235,13 @@ export default {
         return true
       } catch (error) {
         console.error('[checkMicrophonePermission] error:', error)
-        let message = 'Unable to access microphone. '
-        if (error.name === 'NotAllowedError') {
-          message += 'Microphone access was denied. Please allow microphone permissions in your browser settings.'
-        } else if (error.name === 'NotFoundError') {
-          message += 'No microphone found. Please connect a microphone and try again.'
-        } else if (error.name === 'NotReadableError') {
-          message += 'Microphone is already in use by another application. Please close other applications using the microphone and try again.'
-        } else if (error.name === 'OverconstrainedError') {
-          message += 'Microphone does not meet the required constraints. Please try a different microphone.'
-        } else {
-          message += 'Please check your microphone settings and try again.'
-        }
-        this.showMicrophonePermissionModal(message)
+        this.showMicrophonePermissionModal()
         return false
       }
     },
 
-    showMicrophonePermissionModal (message) {
-      this.$refs.microphonePermissionModal.show(message)
+    showMicrophonePermissionModal () {
+      this.$refs.microphonePermissionModal.show()
     }
   },
 
