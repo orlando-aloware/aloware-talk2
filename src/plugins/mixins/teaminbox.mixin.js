@@ -230,7 +230,7 @@ export default {
       }
 
       if (filters.campaigns) {
-        apiFilters.campaign_ids = filters.campaigns
+        apiFilters.campaigns = filters.campaigns
       }
 
       // Map sort keys to API parameters

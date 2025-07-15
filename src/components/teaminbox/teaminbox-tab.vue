@@ -112,7 +112,6 @@ export default {
       'activeInbox',
       'viewMode',
       'showRefreshCommunicationsButton',
-      'activeFilters',
       'activeSort',
       'currentSearch',
       'isInitialLoad'
