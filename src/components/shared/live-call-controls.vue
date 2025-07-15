@@ -21,6 +21,9 @@
                      self="center middle"
                      v-if="!isShowIgnoreCallIcon || tooltipMessage">
             {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
+                     self="center middle"
+                     v-if="!isShowIgnoreCallIcon || tooltipMessage">
+            {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
           </q-tooltip>
           <!-- only show reject button if -->
           <cancel-call-icon data-testid="item-cancel-call-icon" v-if="isShowCancelCallIcon" />
@@ -202,7 +205,7 @@ export default {
     },
 
     tooltipMessage () {
-      if (!this.communication || (this.isPersonalInbox && !this.communication.campaign?.call_waiting_ring_group_id)) {
+      if (!this.communication || !this.communication.campaign) {
         return ''
       }
 

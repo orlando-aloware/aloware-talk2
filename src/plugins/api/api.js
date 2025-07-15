@@ -1003,7 +1003,6 @@ const talk2Api = {
           return window.axios.delete(`${suffixV2}filters/${filterId}`)
         }
       }
-      // Team Inbox methods moved to teamInboxApi.js
     },
 
     users: {
