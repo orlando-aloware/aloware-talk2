@@ -21,9 +21,6 @@
                      self="center middle"
                      v-if="!isShowIgnoreCallIcon || tooltipMessage">
             {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
-                     self="center middle"
-                     v-if="!isShowIgnoreCallIcon || tooltipMessage">
-            {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
           </q-tooltip>
           <!-- only show reject button if -->
           <cancel-call-icon data-testid="item-cancel-call-icon" v-if="isShowCancelCallIcon" />
