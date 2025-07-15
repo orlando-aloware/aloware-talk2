@@ -98,7 +98,8 @@ export default {
       filterOption: 'All',
       sortOption: 'Newest',
       loadError: false,
-      newFilterModel: {}
+      newFilterModel: {},
+      filterParams: ['channels', 'campaigns', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention', 'date_range', 'from_date', 'to_date']
     }
   },
 
@@ -820,12 +821,7 @@ export default {
       const query = { ...this.$route.query }
 
       // Clear existing filter-related query parameters
-      const filterParams = [
-        'channels', 'campaigns', 'directions', 'my_contact', 'unread_only',
-        'task_status', 'mention', 'date_range', 'from_date', 'to_date'
-      ]
-
-      filterParams.forEach(param => {
+      this.filterParams.forEach(param => {
         delete query[param]
       })
 
@@ -886,9 +882,7 @@ export default {
       }
 
       // Check if there are any filter-related query parameters
-      const filterParams = ['channels', 'campaigns', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention', 'date_range', 'from_date', 'to_date']
-      const hasFilterParams = Object.keys(query).some(key => filterParams.includes(key))
-
+      const hasFilterParams = Object.keys(query).some(key => this.filterParams.includes(key))
       if (!hasFilterParams) {
         return
       }
