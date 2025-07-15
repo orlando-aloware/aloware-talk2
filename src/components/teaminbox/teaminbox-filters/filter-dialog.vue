@@ -9,8 +9,7 @@
            data-testid="teaminbox-filter-dialog-modal"
            v-model="isOpen"
            @hidden="onHidden"
-           @show="onShow"
-           @shown="onShown">
+           @show="onShow">
     <div class="modal-body-wrapper d-flex">
       <div class="left-column-wrapper">
         <span class="filter-type-description">Team Inbox Filters</span>
@@ -100,6 +99,12 @@
                          :disabled="!filterHasChanges"
                          data-testid="teaminbox-filter-dialog-reset-compact-btn"
                          @clicked="resetFilter">
+              <q-tooltip anchor="top middle"
+                         self="center middle"
+                         content-class="dark-tooltip"
+                         :offset="[24, 24]">
+                <span>After clicking the <strong>Reset</strong> button, please make sure to click <strong>Apply</strong> to confirm the changes.</span>
+              </q-tooltip>
               Reset
             </compact-btn>
             <compact-btn class="mr-2 btn-primary"
@@ -210,14 +215,22 @@ export default {
         return false
       }
 
-      let hasChanges = false
+      if (this.selectedFilter) {
+        for (const field of this.filterFields) {
+          if (JSON.stringify(this.filter[field]) !== JSON.stringify(this.selectedFilter.filter[field])) {
+            return true
+          }
+        }
+        return false
+      }
+
       for (const field of this.filterFields) {
         if (JSON.stringify(this.filter[field]) !== JSON.stringify(this.defaultFilter[field])) {
-          hasChanges = true
+          return true
         }
       }
 
-      return hasChanges
+      return false
     },
     toggleApplyButtonEnabled () {
       if (this.isUpdatingFilter) {
@@ -277,20 +290,19 @@ export default {
       this.hideModal()
     },
     onShow () {
-      if (this.selectedFilter) {
-        return
-      }
-
       // If we have a pending save-as-new filter (from canceling create dialog), restore it
       if (this.pendingSaveAsNewFilter) {
         this.filter = { ...this.pendingSaveAsNewFilter }
         this.pendingSaveAsNewFilter = null
-      } else {
-        this.filter = { ...this.activeFilters }
+        return
       }
-    },
-    onShown () {
-      // Modal is shown - filter should already be properly initialized
+
+      if (this.selectedFilter) {
+        this.filter = { ...this.selectedFilter.filter }
+        return
+      }
+
+      this.filter = { ...this.activeFilters }
     },
     resetFilter () {
       this.filter = { ...this.defaultFilter }
@@ -300,6 +312,7 @@ export default {
 
       this.activeFilters = { ...this.filter }
       this.$emit('applyFilter', this.filter)
+
       this.hideModal()
     },
     onSaveNewFilter () {
@@ -355,6 +368,8 @@ export default {
         if (this.selectedFilter && this.selectedFilter.id === filter.id) {
           this.selectedFilter = null
         }
+
+        this.resetFilter()
 
         if (filter.scope === 'user') {
           this.savedFilters = {

@@ -180,7 +180,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import LineSelector from 'components/generic-selectors/line-selector'
@@ -224,7 +224,7 @@ export default {
     ...mapState('auth', ['profile']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
-    ...mapState(['campaigns', 'currentTimezone', 'isFirstLoad']),
+    ...mapState(['campaigns', 'currentTimezone']),
     ...mapState('TeamInbox', ['activeInboxId']),
 
     dateRangeLabel () {
@@ -267,8 +267,6 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setIsFirstLoad']),
-
     onFilterChange (value, field) {
       this.$emit('filterChange', { value, field })
     },
@@ -391,11 +389,10 @@ export default {
   },
 
   mounted () {
-    if (this.isFirstLoad) {
-      this.setIsFirstLoad(false)
-
-      this.dateRange.startDate = this.ranges['Last 30 Days'][0]
-      this.dateRange.endDate = this.ranges['Last 30 Days'][1]
+    if (this.filter.date_range && !['All Time', 'custom'].includes(this.filter.date_range)) {
+      const dateRange = this.ranges[this.filter.date_range] ?? this.ranges['Last 30 Days']
+      this.dateRange.startDate = dateRange[0]
+      this.dateRange.endDate = dateRange[1]
     } else {
       this.dateRange.startDate = this.filter.from_date
       this.dateRange.endDate = this.filter.to_date
