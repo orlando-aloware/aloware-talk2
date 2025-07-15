@@ -4,7 +4,6 @@
 
 <script>
 import _ from 'lodash'
-import { CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR } from 'src/constants/campaign-call-router-behaviors'
 import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
