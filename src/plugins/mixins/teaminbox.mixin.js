@@ -196,8 +196,13 @@ export default {
 
       if (filters.from_date) {
         const isCustomDateRange = filters.date_range === 'custom'
+        if (isCustomDateRange) {
+          apiFilters.from_date = filters.from_date
+        } else {
+          const dateRange = this.dateRanges[filters.date_range] ?? this.dateRanges['Last 30 Days']
+          apiFilters.from_date = dateRange[0]
+        }
 
-        apiFilters.from_date = isCustomDateRange ? filters.from_date : this.dateRanges[filters.date_range][0]
         // Only send to_date for custom date ranges to prevent timezone cutoff issues
         if (filters.to_date && isCustomDateRange) {
           apiFilters.to_date = filters.to_date
