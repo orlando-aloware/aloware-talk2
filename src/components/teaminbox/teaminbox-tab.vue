@@ -37,7 +37,8 @@
                                  :value="newFilterModel"
                                  :disable-filter-type="!isAdmin"
                                  data-testid="teaminbox-tab-create-filter-dialog"
-                                 @onCancel="onCancelCreateFilter" />
+                                 @onCancel="onCancelCreateFilter"
+                                 @onFilterCreated="onFilterCreated" />
   </div>
 </template>
 
@@ -119,7 +120,7 @@ export default {
 
     ...mapState(['isMobile']),
 
-    ...mapFields('TeamInbox', ['activeFilters'])
+    ...mapFields('TeamInbox', ['activeFilters', 'selectedFilter'])
   },
 
   created () {
@@ -168,6 +169,11 @@ export default {
     },
 
     onCancelCreateFilter () {
+      this.$refs.teamInboxFilterDialog.showModal()
+    },
+
+    onFilterCreated (newFilter) {
+      this.selectedFilter = newFilter
       this.$refs.teamInboxFilterDialog.showModal()
     },
 
@@ -924,12 +930,16 @@ export default {
         newFilters.date_range = query.date_range
       }
 
-      if (query.from_date && query.date_range === 'custom') {
-        newFilters.from_date = query.from_date
-      }
-
-      if (query.to_date && query.date_range === 'custom') {
-        newFilters.to_date = query.to_date
+      if (query.date_range === 'custom') {
+        if (query.from_date) {
+          newFilters.from_date = query.from_date
+        }
+        if (query.to_date) {
+          newFilters.to_date = query.to_date
+        }
+      } else if (query.date_range === 'All Time') {
+        newFilters.from_date = null
+        newFilters.to_date = null
       }
 
       // Update active filters
