@@ -4,6 +4,7 @@
 
 <script>
 import _ from 'lodash'
+import { CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR } from 'src/constants/campaign-call-router-behaviors'
 import talk2Api from 'src/plugins/api/api'
 import teamInboxApi from 'src/plugins/api/teamInboxApi'
 import { mapActions, mapState } from 'vuex'
@@ -944,23 +945,25 @@ export default {
         return
       }
 
-      this.connection.on(WebrtcEvents.CONNECTION_WARNING, (warningName, warningData) => {
-        console.log(WebrtcEvents.CONNECTION_WARNING, warningName, warningData)
-        // add warning to list
-        if (this.warnings.indexOf(warningName) === -1) {
-          this.warnings.push(warningName)
-        }
+      if (![7113].includes(this.currentCompany?.id)) {
+        this.connection.on(WebrtcEvents.CONNECTION_WARNING, (warningName, warningData) => {
+          console.log(WebrtcEvents.CONNECTION_WARNING, warningName, warningData)
+          // add warning to list
+          if (this.warnings.indexOf(warningName) === -1) {
+            this.warnings.push(warningName)
+          }
 
-        this.setWarnings(this.warnings)
-        this.saveCallIssue(warningName, warningData)
-      })
+          this.setWarnings(this.warnings)
+          this.saveCallIssue(warningName, warningData)
+        })
 
-      this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
-        console.log(WebrtcEvents.CONNECTION_WARNING_CLEARED, warningName)
-        // remove warning from list
-        this.warnings = this.warnings.filter(value => value !== warningName)
-        this.setWarnings(this.warnings)
-      })
+        this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
+          console.log(WebrtcEvents.CONNECTION_WARNING_CLEARED, warningName)
+          // remove warning from list
+          this.warnings = this.warnings.filter(value => value !== warningName)
+          this.setWarnings(this.warnings)
+        })
+      }
 
       this.connection.on(WebrtcEvents.CONNECTION_ACCEPT, (call) => { // On accept call
         console.log('Successfully connected call', call)
