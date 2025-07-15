@@ -389,8 +389,14 @@ export default {
   },
 
   mounted () {
-    this.dateRange.startDate = this.filter.from_date
-    this.dateRange.endDate = this.filter.to_date
+    if (this.filter.date_range && !['All Time', 'custom'].includes(this.filter.date_range)) {
+      const dateRange = this.ranges[this.filter.date_range] ?? this.ranges['Last 30 Days']
+      this.dateRange.startDate = dateRange[0]
+      this.dateRange.endDate = dateRange[1]
+    } else {
+      this.dateRange.startDate = this.filter.from_date
+      this.dateRange.endDate = this.filter.to_date
+    }
 
     this.rangePicker = this.$refs.picker
     this.fTaskStatusOptions = [ ...this.taskStatusOptions ]
