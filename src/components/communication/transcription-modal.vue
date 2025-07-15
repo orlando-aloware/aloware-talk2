@@ -723,7 +723,6 @@ export default {
       sentiment_analysis: [],
       talk_time_analysis: [],
       messages: [],
-      highlights_summary: [],
       summary_engine: null,
       summary_prompt: null,
       feedback: null,
@@ -802,9 +801,6 @@ export default {
     },
 
     formattedMessages () {
-      if (!Array.isArray(this.messages)) {
-        return []
-      }
       return this.messages.map(message => ({
         ...message,
         classes: this.getMessageClasses(message.speaker),
@@ -815,9 +811,6 @@ export default {
     },
 
     sentimentSummaryText () {
-      if (!Array.isArray(this.sentiment_analysis)) {
-        return []
-      }
       return this.sentiment_analysis.map(sentiment => this.calculateOverAllSentimentBySpeaker(sentiment))
     },
 
@@ -839,13 +832,7 @@ export default {
       // Fetch communication transcription.
       window.axios.get(`/api/v1/transcription/communication/${this.communication.id}`)
         .then(res => {
-          // Handle null, empty array, or invalid response
-          if (res.data === null || (Array.isArray(res.data) && res.data.length === 0) || typeof res.data !== 'object') {
-            console.warn('Transcription API returned null, empty array, or invalid data:', res.data)
-            this.setSmartTranscriptionData({}) // Pass empty object to initialize with defaults
-          } else {
-            this.setSmartTranscriptionData(res.data)
-          }
+          this.setSmartTranscriptionData(res.data)
           this.isLoading = false
         }).catch(err => {
           console.log('Couldn\'t fetch transcription information.', err)
@@ -880,16 +867,16 @@ export default {
      */
     setSmartTranscriptionData (data) {
       // Sort the speakers to always get AGENT first.
-      this.speakers = Array.isArray(data.speakers) ? data.speakers.sort() : []
-      this.iab_categories = Array.isArray(data.iab_categories) ? data.iab_categories : []
-      this.highlights = Array.isArray(data.highlights) ? data.highlights : []
-      this.highlights_summary = Array.isArray(data.auto_highlights_summary) ? data.auto_highlights_summary : []
-      this.entities = Array.isArray(data.entities) ? data.entities : []
-      this.entity_types = Array.isArray(data.entity_types) ? data.entity_types : []
-      this.custom_keywords = Array.isArray(data.custom_keywords) ? data.custom_keywords : []
-      this.messages = Array.isArray(data.messages) ? data.messages : []
-      this.sentiment_analysis = Array.isArray(data.sentiment_analysis_summary) ? data.sentiment_analysis_summary : []
-      this.talk_time_analysis = Array.isArray(data.talk_time_analysis) ? data.talk_time_analysis : []
+      this.speakers = data.speakers?.sort()
+      this.iab_categories = data.iab_categories
+      this.highlights = data.highlights
+      this.highlights_summary = data.auto_highlights_summary
+      this.entities = data.entities
+      this.entity_types = data.entity_types
+      this.custom_keywords = data.custom_keywords
+      this.messages = data.messages
+      this.sentiment_analysis = data.sentiment_analysis_summary
+      this.talk_time_analysis = data.talk_time_analysis
       this.summary_engine = data.summary_engine
       this.summary_prompt = data.summary_prompt
       this.feedback = data.feedback
@@ -906,9 +893,6 @@ export default {
      * @returns {string}
      */
     circleText (speaker, messageText) {
-      if (!Array.isArray(this.highlights_summary)) {
-        return messageText
-      }
       this.highlights_summary.forEach(function (highlightSummary) {
         if (speaker === highlightSummary.speaker) {
           let backupMessageText = messageText
