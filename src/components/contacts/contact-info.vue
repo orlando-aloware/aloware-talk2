@@ -26,18 +26,18 @@
                 </q-tooltip>
                 <h2 class="text-truncate">{{ contactName }}</h2>
               </div>
-              <b-link href="#"
-                      class="contact-redirect-link ml-1 flex-shrink-0"
-                      data-testid="contact-info-redirect-link"
-                      @click.prevent="navigateToContact">
-                <q-tooltip anchor="top middle"
-                           self="center middle"
-                           content-class="fs-12">
-                  View Contact Details
-                </q-tooltip>
-                <i class="material-icons" data-testid="contact-info-redirect-icon" style="font-size: max(17px, 1em);">open_in_new</i>
-              </b-link>
             </div>
+            <b-link href="#"
+                    class="contact-redirect-link ml-1 flex-shrink-0"
+                    data-testid="contact-info-redirect-link"
+                    @click.prevent="navigateToContact">
+              <q-tooltip anchor="top middle"
+                         self="center middle"
+                         content-class="fs-12">
+                View Contact Details
+              </q-tooltip>
+              <i class="material-icons" data-testid="contact-info-redirect-icon" style="font-size: max(17px, 1em);">open_in_new</i>
+            </b-link>
             <contact-integrations-link-icons class="ml-2 flex-shrink-0 mr-4" :contact='contact' />
           </div>
           <p class="contact-phone">
