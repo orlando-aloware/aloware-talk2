@@ -389,6 +389,12 @@ export default {
   align-items: center;
 }
 
+.aloware-logo {
+  height: 26px;
+  width: auto;
+  max-width: 124px;
+}
+
 .hubspot-inbox-content-container {
   padding: 16px;
   background-color: white;
