@@ -124,25 +124,21 @@ export default {
         })
         .listen('.user.in-app.communication.new_call', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.new_call', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.communication.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags && event.communication && event.communication.contact) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            console.log('.user.in-app.communication.new_call - event.communication', event.communication)
-            this.$VueEvent.fire('new_in_app_call', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          console.log('.user.in-app.communication.new_call - event.communication', event.communication)
+          this.$VueEvent.fire('new_in_app_call', event.communication)
         })
         .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.incoming_number.high_sms_volume', event)
@@ -153,87 +149,71 @@ export default {
         })
         .listen('.user.in-app.communication.answered_call', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.answered_call', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.communication.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags && event.communication && event.communication.contact) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            this.$VueEvent.fire('answered_in_app_call', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('answered_in_app_call', event.communication)
         })
         .listen('.user.in-app.communication.new_sms', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.new_sms', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.communication.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags && event.communication && event.communication.contact) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            this.$VueEvent.fire('new_in_app_sms', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_in_app_sms', event.communication)
         })
         .listen('.user.in-app.communication.new_voicemail', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.new_voicemail', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags && event.communication && event.communication.contact) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            this.$VueEvent.fire('new_in_app_voicemail', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_in_app_voicemail', event.communication)
         })
         .listen('.user.in-app.communication.new_fax', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.new_fax', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.communication.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags && event.communication && event.communication.contact) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            this.$VueEvent.fire('new_in_app_fax', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_in_app_fax', event.communication)
         })
         .listen('.user.desktop.contact.contact_assigned', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.contact.contact_assigned', event)
@@ -266,109 +246,89 @@ export default {
         })
         .listen('.user.desktop.communication.new_call', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.new_call', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            console.log('.user.desktop.communication.new_call - event.communication', event.communication)
-            this.$VueEvent.fire('new_desktop_call', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          console.log('.user.desktop.communication.new_call - event.communication', event.communication)
+          this.$VueEvent.fire('new_desktop_call', event.communication)
         })
         .listen('.user.desktop.communication.answered_call', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.answered_call', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            this.$VueEvent.fire('new_answered_call', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_answered_call', event.communication)
         })
         .listen('.user.desktop.communication.new_sms', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.new_sms', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            this.$VueEvent.fire('new_desktop_sms', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_desktop_sms', event.communication)
         })
         .listen('.user.desktop.communication.new_voicemail', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.new_voicemail', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            this.$VueEvent.fire('new_desktop_voicemail', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_desktop_voicemail', event.communication)
         })
         .listen('.user.desktop.communication.new_fax', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.communication.new_fax', event)
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-            if (event.tags) {
-              event.communication.tags = event.tags
-              event.communication.tag_ids = event.tags.map((a) => a.id)
-            }
-            if (event.contact) {
-              event.communication.contact = event.contact
-            }
-            if (event.contact_tags) {
-              event.communication.contact.tags = event.contact_tags
-            }
-            if (event.owner) {
-              event.communication.owner = event.owner
-            }
-            this.$VueEvent.fire('new_desktop_fax', event.communication)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.tags.map((a) => a.id)
           }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_desktop_fax', event.communication)
         })
         .listen('.user.logout', (event) => {
           this.dispatchToMemoryMonitor('.user.logout', event)
@@ -390,10 +350,11 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-          }
+          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          // if (campaign) {
+          //   event.communication.campaign = campaign
+          // }
           this.$VueEvent.fire('new_communication', event.communication)
         })
         .listen('.communication.updated', (event) => {
@@ -412,10 +373,11 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-          }
+          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          // if (campaign) {
+          //   event.communication.campaign = campaign
+          // }
           this.$VueEvent.fire('update_communication', event.communication)
         })
 
@@ -525,10 +487,11 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-          }
+          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          // if (campaign) {
+          //   event.communication.campaign = campaign
+          // }
           this.$VueEvent.fire('new_communication', event.communication)
         })
         .listen('.communication.updated', (event) => {
@@ -547,10 +510,11 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-          }
+          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+          // const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          // if (campaign) {
+          //   event.communication.campaign = campaign
+          // }
           this.$VueEvent.fire('update_communication', event.communication)
         })
         .listen('.communication.deleted', (event) => {

@@ -780,7 +780,7 @@ export default {
       }
 
       this.$closeActionNotification('callFishing')
-      console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
+      // console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
@@ -796,7 +796,7 @@ export default {
             (this.queue && !this.queue.length))
         )
       ) {
-        console.log('[Action 2] Communication when event closeCallNotifications : ', this.communication)
+        // console.log('[Action 2] Communication when event closeCallNotifications : ', this.communication)
         this.closeCallNotifications(this.id, this.communicationId, true)
       }
 
