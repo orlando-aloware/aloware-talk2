@@ -1,29 +1,29 @@
+import _ from 'lodash'
+import * as DefaultCachePaths from 'src/constants/default-cache'
 import Vue from 'vue'
 import Vuex from 'vuex'
-import _ from 'lodash'
-import * as Default from '../constants/default'
-import * as ActionNotificationsDefault from '../constants/action-notifications-default'
-import createPersistedState from 'vuex-persistedstate'
 import { getField, updateField } from 'vuex-map-fields'
+import createPersistedState from 'vuex-persistedstate'
+import * as ActionNotificationsDefault from '../constants/action-notifications-default'
+import * as Default from '../constants/default'
+import API from '../plugins/api/api'
+import * as storage from '../plugins/helpers/storage'
+import accountRegistration from './account-registration'
 import auth from './auth'
+import broadcast from './broadcast'
 import cache from './cache'
 import carrierFee from './carrier-fee'
 import communications from './communications'
 import contacts from './contacts'
 import inbox from './inbox'
-import TeamInbox from './teaminbox'
-import stats from './stats'
-import powerDialer from './power-dialer'
-import transcriptions from './transcriptions'
-import settings from './settings'
-import broadcast from './broadcast'
-import wallboard from './wallboard'
-import tagsModule from './tags'
-import accountRegistration from './account-registration'
 import listsModule from './lists'
-import API from '../plugins/api/api'
-import * as storage from '../plugins/helpers/storage'
-import * as DefaultCachePaths from 'src/constants/default-cache'
+import powerDialer from './power-dialer'
+import settings from './settings'
+import stats from './stats'
+import tagsModule from './tags'
+import TeamInbox from './teaminbox'
+import transcriptions from './transcriptions'
+import wallboard from './wallboard'
 
 Vue.use(Vuex)
 
@@ -421,6 +421,7 @@ export default function (/* { ssrContext } */) {
       },
 
       setDialerParkedCall ({ commit }, communication) {
+        console.log('setDialerParkedCall - communication', communication)
         commit('SET_DIALER_PARKED_CALL', communication)
       },
 
