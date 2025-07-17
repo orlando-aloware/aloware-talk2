@@ -389,7 +389,6 @@ export default {
       if (!queue ||
         (queue && queue.length === 0)) {
         this.dialerCallFishingInterval = setInterval(() => {
-          console.log('showCallFishingDataInPhone - interval')
           if (!document.getElementById(type)) {
             this.setDialerCallFishing(data)
             clearInterval(this.dialerCallFishingInterval)

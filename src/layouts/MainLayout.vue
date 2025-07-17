@@ -3011,7 +3011,6 @@ export default {
       if (val) {
         this.$options.appFooterCounter = 0
         this.$options.appFooterInterval = setInterval(() => {
-          console.log('appFooterInterval - interval')
           if (this.$refs.appFooter !== undefined) {
             const dialerNotInprogressCallStatuses = [
               'TOKEN_GENERATED',
