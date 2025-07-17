@@ -1419,7 +1419,7 @@
           <!--CALL DISPOSITION-->
           <q-card-section
             class="pt-0 pb-0"
-            v-if="isCallAndHaveCallDisposition"
+            v-if="isCall && haveCallDispositions"
             data-testid="comm-details-call-disposition-card"
           >
             <b-form-row data-testid="comm-details-call-disposition-row">
@@ -1436,7 +1436,7 @@
                 cols="7"
                 data-testid="comm-details-call-disposition-col"
               >
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center h-100">
                   <call-disposition-selector
                     data-testid="comm-details-disposition-selector"
                     :communication="communication"
@@ -1444,19 +1444,48 @@
                 </div>
               </b-col>
             </b-form-row>
+          </q-card-section>
+
+          <!--HUBSPOT CALL TYPE-->
+          <q-card-section
+            class="pt-0 pb-0"
+            v-if="isCall && currentCompany.hubspot_integration_enabled"
+            data-testid="comm-details-hubpsot-call-type-card"
+          >
             <b-form-row
-              v-if="currentCompany.hubspot_integration_enabled"
-              data-testid="comm-details-call-disposition-row"
+              data-testid="comm-details-hubpsot-call-type-row"
             >
               <b-col class="pl-0 pr-0">
                 <q-item-label class="mt-3 custom-item-label">HubSpot Call Type: </q-item-label>
               </b-col>
               <b-col cols="7">
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center h-100">
                   <hubspot-activity-type-selector
-                    data-testid="comm-details-call-disposition-hubspot"
+                    data-testid="comm-details-hubpsot-call-type"
                     :communication="communication"
                   ></hubspot-activity-type-selector>
+                </div>
+              </b-col>
+            </b-form-row>
+          </q-card-section>
+
+          <!--CSAT SCORE TYPE-->
+          <q-card-section
+            class="pt-0 pb-0"
+            v-if="isCall && communication.direction === CommunicationDirections.INBOUND"
+            data-testid="comm-details-csat-score-card"
+          >
+            <b-form-row
+              data-testid="comm-details-csat-score-row"
+            >
+              <b-col class="pl-0 pr-0">
+                <q-item-label class="custom-item-label">CSAT score: </q-item-label>
+              </b-col>
+              <b-col cols="7">
+                <div class="d-flex align-items-center h-100">
+                  <csat-score data-testid="comm-details-csat-score"
+                              :row="communication">
+                  </csat-score>
                 </div>
               </b-col>
             </b-form-row>
@@ -1540,11 +1569,13 @@ import * as CommunicationDirections from '../constants/communication-direction'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
+import CsatScore from 'components/communications/communications-table/csat-score.vue'
 
 export default {
   name: 'communication-details',
 
   components: {
+    CsatScore,
     NetworkLogsDisplay,
     HubspotActivityTypeSelector,
     PencilOIcon,
@@ -1711,12 +1742,15 @@ export default {
         this.communication.attachments.length > 0
     },
 
-    isCallAndHaveCallDisposition () {
+    isCall () {
       return this.communication.type === CommunicationTypes.CALL &&
         this.currentCompany &&
-        this.callDispositions &&
-        this.callDispositions.length > 0 &&
         !this.dialerMode
+    },
+
+    haveCallDispositions () {
+      return this.callDispositions &&
+        this.callDispositions.length > 0
     },
 
     hasCustomFields () {
