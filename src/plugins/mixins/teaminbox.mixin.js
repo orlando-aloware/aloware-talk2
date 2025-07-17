@@ -194,7 +194,7 @@ export default {
       // Transform filters to API parameters
       const apiFilters = {}
 
-      const applyFromAndToDates = ['Yesterday', 'custom'].includes(filters.date_range)
+      const applyFromAndToDates = ['Yesterday', 'Last Month', 'custom'].includes(filters.date_range)
 
       if (filters.from_date) {
         if (applyFromAndToDates) {
