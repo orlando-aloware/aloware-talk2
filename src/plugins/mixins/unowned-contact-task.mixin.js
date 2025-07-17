@@ -1,8 +1,8 @@
 // import dialer state in the component when using this mixin
+import { get } from 'lodash'
+import { CURRENT_STATUS_HOLD_NEW, CURRENT_STATUS_INPROGRESS_NEW } from 'src/constants/communication-current-status'
 import { CONTACTS_ACCESS_OWNED_ONLY } from 'src/constants/contact-access-types'
 import { mapActions, mapState } from 'vuex'
-import { CURRENT_STATUS_HOLD_NEW, CURRENT_STATUS_INPROGRESS_NEW } from 'src/constants/communication-current-status'
-import { get } from 'lodash'
 
 export default {
   data () {
@@ -53,6 +53,7 @@ export default {
     },
     updateUnownedContactLastCommunicationStatus (userId = null) {
       this.unownedContact.interval = setInterval(() => {
+        console.log('updateUnownedContactLastCommunicationStatus - interval')
         if (this.dialer.contact) {
           const commUserId = get(this.dialer, 'communication.user_id', userId)
           this.updateLiveContactLastCommProperties({

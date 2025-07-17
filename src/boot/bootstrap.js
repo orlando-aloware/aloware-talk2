@@ -653,6 +653,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
 
     window.actionNotificationUnqueuedIntervals[settings.type] = setInterval(() => {
+      console.log('bootstrap.js - actionNotificationUnqueuedIntervals')
       // we have to make sure there's no notification (by settings type) currently showing
       if (!document.getElementById(settings.type)) {
         this.$store.commit('SET_NOTIFICATIONS', data)
@@ -683,6 +684,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   clearInterval(window.actionNotificationQueuedIntervals?.[settings.type])
 
   window.actionNotificationQueuedIntervals[settings.type] = setInterval(() => {
+    console.log('bootstrap.js - actionNotificationQueuedIntervals')
     queue = this.$store.state.notifications?.[settings.type]?.queue?.find(queue => queue.communicationId === settings.communicationId)
 
     // if call is not queued in our call fishing notification queue,
