@@ -35,12 +35,12 @@ export default {
     this.init()
   },
   beforeDestroy () {
-    clearInterval(this.getDateTimePassedInterval)
+    // clearInterval(this.getDateTimePassedInterval)
   },
   methods: {
     init () {
       this.getDateTimePassed()
-      this.getDateTimePassedInterval = setInterval(this.getDateTimePassed, this.updateInterval)
+      // this.getDateTimePassedInterval = setInterval(this.getDateTimePassed, this.updateInterval)
       this.relativeDateTime = this.$options.filters.fixRelativeDatetimeFormat(this.fromTime, 'dddd, MMMM D, YYYY h:mm A z', this.$store)
     },
     getDateTimePassed () {
