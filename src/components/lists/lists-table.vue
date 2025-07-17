@@ -389,6 +389,7 @@
         ref="enrollContactsToAloAiModal"
         :params="attachedParams()"
         :contact-list="list"
+        :all-contacts="true"
         :total-contacts-count="list?.no_of_contacts"
         :multiple-phone-numbers="true" />
 
@@ -417,42 +418,42 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import SearchInput from 'src/components/search-input'
-import ListsRenameForm from 'src/components/lists/lists-rename-form'
 import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
-import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
-import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
-import AssignContactsModal from 'src/components/assign-contacts-modal'
-import MoveDialog from 'src/components/move-dialog'
 import CreateListModal from 'components/create-list-modal.vue'
-import RelativeTime from 'src/components/relative-time.vue'
-import PencilIcon from 'components/icons/pencil-icon.vue'
-import PencilOIcon from 'components/icons/pencil-o-icon.vue'
+import AddSequenceIcon from 'components/icons/add-sequence-icon'
+import AddUserIcon from 'components/icons/add-user-icon'
+import CsvIcon from 'components/icons/csv-icon.vue'
+import DeleteRedIcon from 'components/icons/delete-red-icon'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
-import PinIcon from 'components/icons/pin-icon.vue'
+import EllipseIcon from 'components/icons/ellipse-icon'
 import EyeIcon from 'components/icons/eye-icon.vue'
 import EyeOffIcon from 'components/icons/eye-off-icon'
-import AddSequenceIcon from 'components/icons/add-sequence-icon'
-import MoveIcon from 'components/icons/move-icon.vue'
-import PlusIcon from 'components/icons/plus-icon.vue'
-import CsvIcon from 'components/icons/csv-icon.vue'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
+import MoveIcon from 'components/icons/move-icon.vue'
+import PencilIcon from 'components/icons/pencil-icon.vue'
+import PencilOIcon from 'components/icons/pencil-o-icon.vue'
+import PinIcon from 'components/icons/pin-icon.vue'
+import PlusIcon from 'components/icons/plus-icon.vue'
+import SlashIcon from 'components/icons/slash-icon'
+import SwitchIcon from 'components/icons/switch-icon'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
+import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
+import AssignContactsModal from 'src/components/assign-contacts-modal'
+import Datatable from 'src/components/datatable.vue'
+import ImportContactsModal from 'src/components/import-contacts-modal.vue'
+import ListsRenameForm from 'src/components/lists/lists-rename-form'
+import MoveDialog from 'src/components/move-dialog'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
+import RelativeTime from 'src/components/relative-time.vue'
+import SearchInput from 'src/components/search-input'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { COLUMNS, columnsByViewportConfig, COLUMN_NAMES } from 'src/constants/lists/home-columns'
+import { COLUMN_NAMES, COLUMNS, columnsByViewportConfig } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
-import ListsFoldersManagement from './lists-folders-management'
-import SlashIcon from 'components/icons/slash-icon'
-import AddUserIcon from 'components/icons/add-user-icon'
-import SwitchIcon from 'components/icons/switch-icon'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import ChangeListOwnerModal from './change-list-owner-modal.vue'
-import EllipseIcon from 'components/icons/ellipse-icon'
-import DeleteRedIcon from 'components/icons/delete-red-icon'
-import InformationCircleIcon from 'components/icons/information-circle-icon'
-import ImportContactsModal from 'src/components/import-contacts-modal.vue'
-import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
-import Datatable from 'src/components/datatable.vue'
+import ListsFoldersManagement from './lists-folders-management'
 
 export default {
   name: 'ListsTable',

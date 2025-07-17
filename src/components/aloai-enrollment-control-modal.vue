@@ -12,15 +12,23 @@
           class="text-center mb-2">
         AloAi Agent Enrollment
       </h1>
+      <p class="text-center mb-2" v-if="contactList?.name">
+        Contacts from list <strong>{{contactList?.name}}</strong>
+      </p>
       <div class="text-center">
-        <template v-if="contactsCount === 1">
-          Select the agent you want to use to initiate a conversation with this contact.
-        </template>
-        <template v-else>
-          Select the agent that you want to enroll your <strong>
-            {{params?.selected_all ? contactsCount : `~${contactsCount}`}} contacts
-          </strong>.
-        </template>
+        <div v-if="allContacts">
+          Select the agent you want to use to initiate a conversation with all contacts in the list.
+        </div>
+        <div v-else>
+          <template v-if="contactsCount === 1">
+            Select the agent you want to use to initiate a conversation with this contact.
+          </template>
+          <template v-if="contactsCount > 1">
+            Select the agent that you want to enroll your <strong>
+              {{params?.selected_all ? contactsCount : `~${contactsCount}`}} contacts
+            </strong>.
+          </template>
+        </div>
       </div>
 
       <!-- AloAi Agent Type selector -->
@@ -111,12 +119,12 @@
 </template>
 
 <script>
-import talk2Api from 'src/plugins/api/api'
-import { mapGetters } from 'vuex'
+import { isEmpty } from 'lodash'
 import Search from 'src/components/search.vue'
 import * as AloAi from 'src/constants/aloai'
+import talk2Api from 'src/plugins/api/api'
 import aloaiMixin from 'src/plugins/mixins/aloai.mixin'
-import { isEmpty } from 'lodash'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'aloai-enrollment-control-modal',
@@ -133,6 +141,10 @@ export default {
     contactList: {
       type: Object,
       default: null
+    },
+    allContacts: {
+      type: Boolean,
+      default: false
     },
     checkedCount: {
       type: Number,
