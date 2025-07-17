@@ -51,6 +51,7 @@
             class="form-label is-invalid"
           >
             <line-selector v-model.trim="$v.user.default_outbound_campaign_id.$model"
+                           apply-visibility-limits
                            :class="[$v.user['default_outbound_campaign_id'].$invalid ? 'is-invalid' : '']"
                            :hasError="$v.user['default_outbound_campaign_id'].$invalid"
                            :state="validateState('default_outbound_campaign_id')"
@@ -61,9 +62,15 @@
                            :generic-styling="false"
                            :generic-multiselect="false"
                            :disable="outboundLineSettingsDisabled"
-                           @change="(eventPayload) => onUpdateFields(eventPayload, 'default_outbound_campaign_id')">
+                           @change="(eventPayload) => onUpdateFields(eventPayload, 'default_outbound_campaign_id')"
+                           @invalid-line-selection="onInvalidLineSelection">
             </line-selector>
-            <b-form-invalid-feedback v-if="!$v.user.default_outbound_campaign_id.required">Please select an outbound line.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="invalidLineSelected">
+              Line '{{ invalidLineSelected.name }}' is no longer available. Please select a different line.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback v-else-if="!$v.user.default_outbound_campaign_id.required">
+              Please select an outbound line.
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -196,7 +203,8 @@ export default {
         { text: 'Never Record', value: 3 }
       ],
       accountLevelOutboundCampaign: null,
-      SettingsMap
+      SettingsMap,
+      invalidLineSelected: null
     }
   },
 
@@ -271,6 +279,10 @@ export default {
     },
 
     onUpdateFields (value, prop) {
+      if (prop === 'default_outbound_campaign_id') {
+        this.invalidLineSelected = null
+      }
+
       this.user[prop] = value
       this.updateChangedUserProperties({
         name: prop,
@@ -296,6 +308,10 @@ export default {
       if (this.currentCompany && this.currentCompany.force_outbound_line) {
         this.accountLevelOutboundCampaign = this.campaigns?.find(campaign => campaign.id === this.currentCompany.default_outbound_campaign_id)
       }
+    },
+
+    onInvalidLineSelection (campaign) {
+      this.invalidLineSelected = campaign
     }
   },
 

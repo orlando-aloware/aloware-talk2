@@ -241,7 +241,7 @@ export default {
       default: false
     },
 
-    isDialer: {
+    applyVisibilityLimits: {
       type: Boolean,
       default: false
     },
@@ -386,7 +386,7 @@ export default {
     },
 
     shouldLimitAgentLinesVisibility () {
-      return this.isDialer &&
+      return this.applyVisibilityLimits &&
         this.hasRole(COMPANY_AGENT) &&
         this.hasCompanyTeamInboxLineManagementEnhancements
     },
@@ -420,6 +420,8 @@ export default {
       const line = this.activeCampaignsAlphabeticalOrder.find(campaign => campaign.id === this.preSelectedTeamInboxLineId)
       line && this.selectOption(line)
     }
+
+    this.checkUnavailableLine(this.value)
   },
 
   methods: {
@@ -468,6 +470,20 @@ export default {
       if (input) {
         input.style.display = 'block'
       }
+    },
+
+    checkUnavailableLine (lineId) {
+      if (
+        lineId !== null &&
+        this.shouldLimitAgentLinesVisibility &&
+        !this.campaignsIsLoading &&
+        !this.options.find(({ id }) => id === lineId)
+      ) {
+        // If the selected campaign (forced v-model) is not in the options,
+        // emit a change event to clear the value and emit an invalid-line event
+        this.$emit('change', null)
+        this.$emit('invalid-line-selection', this.campaigns.find(({ id }) => id === lineId))
+      }
     }
   },
 
@@ -490,8 +506,10 @@ export default {
       }
 
       // return the incoming number of the selected campaign
-      const found = this.campaigns.find(campaign => campaign.id === val)
-      this.$emit('selectedNumber', found ? found.incoming_number : '')
+      const campaign = this.campaigns.find(campaign => campaign.id === val)
+      this.$emit('selectedNumber', campaign ? campaign.incoming_number : '')
+
+      this.checkUnavailableLine(val)
     },
 
     campaignsIsLoading (val) {
@@ -500,8 +518,8 @@ export default {
         return
       }
 
+      this.options = this.activeCampaignsAlphabeticalOrder
       this.selectedId = this.value
-      this.options = this.campaignsAlphabeticalOrder
 
       if (typeof this.$refs.lineSelect !== 'undefined') {
         this.$refs.lineSelect.refresh()
