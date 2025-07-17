@@ -39,7 +39,9 @@
                    @clicked="onClickFilterButton">
         <b-tooltip custom-class="talk-table__tooltip"
                    placement="bottom"
-                   target="teaminbox-channel-toggle-filter-btn">
+                   triggers="hover"
+                   target="teaminbox-channel-toggle-filter-btn"
+                   v-if="!isMobile">
           Open filters
         </b-tooltip>
         <filter-icon color="#62666E"
@@ -74,6 +76,7 @@ export default {
     ...mapState('TeamInbox', [
       'viewMode'
     ]),
+    ...mapState(['isMobile']),
 
     options () {
       return [
