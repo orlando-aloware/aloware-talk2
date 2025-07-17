@@ -75,16 +75,16 @@ export default {
     },
 
     prepareTopMenuFix (newRoute = false) {
-      this.timeInterval = setInterval(() => {
-        let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
-        let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
-
-        if (intercomIframeHeight !== this.intercomBannerHeight || newRoute) {
-          this.fixTopMenu(intercomIframeHeight)
-        }
-
-        this.intercomBannerHeight = intercomIframeHeight
-      }, 1 * 1000)
+      // this.timeInterval = setInterval(() => {
+      //   let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
+      //   let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
+      //
+      //   if (intercomIframeHeight !== this.intercomBannerHeight || newRoute) {
+      //     this.fixTopMenu(intercomIframeHeight)
+      //   }
+      //
+      //   this.intercomBannerHeight = intercomIframeHeight
+      // }, 1 * 1000)
     },
 
     fixTopMenu () {
