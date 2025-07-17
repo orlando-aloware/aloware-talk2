@@ -861,14 +861,17 @@ export default function (/* { ssrContext } */) {
       },
 
       setParkedCalls ({ commit }, communications) {
+        console.log('setParkedCalls - communications', communications)
         commit('SET_PARKED_CALLS', communications)
       },
 
       addParkedCall ({ commit }, communication) {
+        console.log('addParkedCall - communication', communication)
         commit('ADD_PARKED_CALL', communication)
       },
 
       removeParkedCall ({ commit }, communicationId) {
+        console.log('removeParkedCall - communicationId', communicationId)
         commit('REMOVE_PARKED_CALL', communicationId)
       },
 
