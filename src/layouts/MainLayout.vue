@@ -1271,6 +1271,10 @@ export default {
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
       }
 
+      if (this.currentCompany?.id === 7113) {
+        return
+      }
+
       if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {
         return
       }
