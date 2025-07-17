@@ -49,7 +49,7 @@
 
         <shared-login-menu v-if="!isElectron" />
 
-        <memory-monitor v-if="currentCompany?.id !== 7113" />
+        <memory-monitor />
 
         <header-help v-if="!isTrial" />
 
@@ -230,8 +230,6 @@ export default {
       'authenticated',
       'profile'
     ]),
-
-    ...mapState('cache', ['currentCompany']),
 
     ...mapState('contacts', [
       'selectedList',
