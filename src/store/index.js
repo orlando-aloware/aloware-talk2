@@ -421,7 +421,6 @@ export default function (/* { ssrContext } */) {
       },
 
       setDialerParkedCall ({ commit }, communication) {
-        console.log('setDialerParkedCall - communication', communication)
         commit('SET_DIALER_PARKED_CALL', communication)
       },
 
@@ -861,17 +860,14 @@ export default function (/* { ssrContext } */) {
       },
 
       setParkedCalls ({ commit }, communications) {
-        console.log('setParkedCalls - communications', communications)
         commit('SET_PARKED_CALLS', communications)
       },
 
       addParkedCall ({ commit }, communication) {
-        console.log('addParkedCall - communication', communication)
         commit('ADD_PARKED_CALL', communication)
       },
 
       removeParkedCall ({ commit }, communicationId) {
-        console.log('removeParkedCall - communicationId', communicationId)
         commit('REMOVE_PARKED_CALL', communicationId)
       },
 
@@ -1737,6 +1733,10 @@ export default function (/* { ssrContext } */) {
       },
 
       REMOVE_PARKED_CALL (state, communicationId) {
+        if (state.parkedCalls.length === 0) {
+          return
+        }
+
         const found = state.parkedCalls.find(parkedCall => parkedCall.id === communicationId)
 
         if (!found) {
