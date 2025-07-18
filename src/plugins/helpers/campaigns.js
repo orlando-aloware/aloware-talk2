@@ -2,6 +2,7 @@
  * Campaigns helper functions
  */
 
+import { CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR } from 'src/constants/campaign-call-router-behaviors'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 
 /**
@@ -130,4 +131,31 @@ export const setCampaignsIsLoading = function (context, value) {
   if (typeof context.setCampaignsIsLoading === 'function') {
     context.setCampaignsIsLoading(value)
   }
+}
+
+/**
+ * Callback function to check if a campaign is available for an agent
+ *
+ * @param {Object} campaign - Campaign object
+ * @param {Object} user - User object
+ * @returns {Boolean} - True if the campaign is available for the agent, false otherwise
+ */
+export function agentAvailableCampaignsCallback (campaign, userId) {
+  return campaign.user_id === userId ||
+    campaign.has_direct_ring_group_access ||
+    campaign.has_team_membership_access ||
+    campaign.has_direct_watching_access ||
+    campaign.has_team_watching_access ||
+    isIvrOrDeadEndCampaign(campaign)
+}
+
+/**
+ * Checks if a campaign is an IVR or dead end campaign
+ *
+ * @param {Object} campaign - Campaign object
+ * @returns {Boolean} - True if the campaign is an IVR or dead end campaign, false otherwise
+ */
+export function isIvrOrDeadEndCampaign (campaign) {
+  return [CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR]
+    .includes(campaign.call_router_behavior)
 }
