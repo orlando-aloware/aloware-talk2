@@ -82,7 +82,8 @@
                                    :summary="communicationsSummary.summaries" />
           <contact-lines data-testid="contact-details-lines"
                          :is-read-only="isReadOnly" />
-          <contact-ring-groups data-testid="contact-details-ring-groups"
+          <contact-ring-groups v-if="!hasCompanyTeamInboxEnabled"
+                               data-testid="contact-details-ring-groups"
                                :is-read-only="isReadOnly" />
           <contact-broadcast data-testid="contact-details-broadcast" />
         </template>

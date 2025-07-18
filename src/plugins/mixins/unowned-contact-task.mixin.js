@@ -1,8 +1,8 @@
 // import dialer state in the component when using this mixin
+import { get } from 'lodash'
+import { CURRENT_STATUS_HOLD_NEW, CURRENT_STATUS_INPROGRESS_NEW } from 'src/constants/communication-current-status'
 import { CONTACTS_ACCESS_OWNED_ONLY } from 'src/constants/contact-access-types'
 import { mapActions, mapState } from 'vuex'
-import { CURRENT_STATUS_HOLD_NEW, CURRENT_STATUS_INPROGRESS_NEW } from 'src/constants/communication-current-status'
-import { get } from 'lodash'
 
 export default {
   data () {
@@ -90,11 +90,6 @@ export default {
         liveContactData.liveContactFound &&
         !liveContactData.parkedCallFound) {
         this.removeLiveContact(liveContactData.contact.id)
-      }
-    },
-    removeUnownedParkedCall (communication) {
-      if (this.isNotOwned(communication.contact.user_id)) {
-        this.removeParkedCall(communication)
       }
     },
     isNotOwned (userId) {

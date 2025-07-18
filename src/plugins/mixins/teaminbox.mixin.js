@@ -194,14 +194,19 @@ export default {
       // Transform filters to API parameters
       const apiFilters = {}
 
-      if (filters.from_date) {
-        const isCustomDateRange = filters.date_range === 'custom'
+      const applyFromAndToDates = ['Yesterday', 'Last Month', 'custom'].includes(filters.date_range)
 
-        apiFilters.from_date = isCustomDateRange ? filters.from_date : this.dateRanges[filters.date_range][0]
-        // Only send to_date for custom date ranges to prevent timezone cutoff issues
-        if (filters.to_date && isCustomDateRange) {
-          apiFilters.to_date = filters.to_date
+      if (filters.from_date) {
+        if (applyFromAndToDates) {
+          apiFilters.from_date = filters.from_date
+        } else {
+          const dateRange = this.dateRanges[filters.date_range] ?? this.dateRanges['Last 30 Days']
+          apiFilters.from_date = dateRange[0]
         }
+      }
+
+      if (filters.to_date && applyFromAndToDates) {
+        apiFilters.to_date = filters.to_date
       }
 
       // Map filter keys to API parameters
@@ -230,7 +235,7 @@ export default {
       }
 
       if (filters.campaigns) {
-        apiFilters.campaign_ids = filters.campaigns
+        apiFilters.campaigns = filters.campaigns
       }
 
       // Map sort keys to API parameters

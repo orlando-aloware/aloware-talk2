@@ -125,43 +125,43 @@
 </template>
 
 <script>
-import _ from 'lodash'
-import { Platform } from 'quasar'
-import { mapActions, mapGetters, mapState } from 'vuex'
-import {
-  aclMixin,
-  avatarMixin,
-  goBackMixin,
-  contactsListFiltersMixin,
-  userMixin,
-  kycMixin,
-  communicationsMixin
-} from 'src/plugins/mixins'
-import DialerForm from 'components/dialer/dialer-form'
-import ActiveCall from 'components/dialer/active-call'
-import Profile from 'components/profile'
-import Phone from 'components/dialer/phone'
-import CompactBtn from 'components/compact-btn'
-import ContactListNavigation from 'components/contacts/contact-list-navigation'
-import ContactAppHeader from 'components/contacts/contact-app-header'
-import ParkedCall from 'components/dialer/parked-call'
-import InboxListNavigation from 'components/inbox/inbox-list-navigation'
-import InboxChannelNavigation from 'components/inbox/inbox-channel-navigation'
-import RefreshIcon from 'components/icons/refresh-icon'
-import SharedLoginMenu from 'components/shared-login-menu'
 import BackButton from 'components/back-button'
+import CompactBtn from 'components/compact-btn'
+import ContactAppHeader from 'components/contacts/contact-app-header'
+import ContactListNavigation from 'components/contacts/contact-list-navigation'
+import ActiveCall from 'components/dialer/active-call'
+import DialerForm from 'components/dialer/dialer-form'
+import ParkedCall from 'components/dialer/parked-call'
+import Phone from 'components/dialer/phone'
 import HeaderHelp from 'components/header-help'
-import MemoryMonitor from 'components/MemoryMonitor'
-import InboxToggleFilters from 'components/inbox/inbox-toggle-filters'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+import RefreshIcon from 'components/icons/refresh-icon'
+import InboxChannelNavigation from 'components/inbox/inbox-channel-navigation'
+import InboxListNavigation from 'components/inbox/inbox-list-navigation'
+import InboxToggleFilters from 'components/inbox/inbox-toggle-filters'
+import MemoryMonitor from 'components/MemoryMonitor'
+import Profile from 'components/profile'
+import SharedLoginMenu from 'components/shared-login-menu'
+import TutorialVideoButton from 'components/tutorial-video-button'
+import _ from 'lodash'
+import { Platform } from 'quasar'
 import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
-import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import TeamInboxLinesTutorialButton from 'components/teaminbox/teaminbox-lines-tutorial-button.vue'
+import {
+  aclMixin,
+  avatarMixin,
+  communicationsMixin,
+  contactsListFiltersMixin,
+  goBackMixin,
+  kycMixin,
+  userMixin
+} from 'src/plugins/mixins'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'app-header',

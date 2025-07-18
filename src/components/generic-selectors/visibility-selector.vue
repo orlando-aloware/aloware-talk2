@@ -33,7 +33,7 @@
         <q-item v-bind="scope.itemProps"
                 v-on="scope.itemEvents">
           <q-item-section>
-            <q-item-label v-html="scope.opt.label"/>
+            <q-item-label v-html="scope.opt.label" />
             <q-item-label caption>
               <div class="break-all">{{ scope.opt.description }}</div>
             </q-item-label>
@@ -48,9 +48,12 @@
 
 import * as ContactAccessTypes from 'src/constants/contact-access-types'
 import * as CommunicationAccessTypes from 'src/constants/communication-access-types'
+import userMixin from 'src/plugins/mixins/user.mixin'
 
 export default {
   name: 'visibility-selector',
+
+  mixins: [userMixin],
 
   props: {
     value: {
@@ -84,6 +87,44 @@ export default {
   },
 
   computed: {
+    contactAccessTypeOptions () {
+      const options = [
+        {
+          value: ContactAccessTypes.CONTACTS_ACCESS_EVERYONE,
+          label: 'Everyone',
+          description: 'Can see all contacts in the company.'
+        },
+        {
+          value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP_USERS,
+          label: this.hasCompanyTeamInboxEnabled ? 'Team Owned Only' : 'Ring Group Users Only',
+          description: this.hasCompanyTeamInboxEnabled
+            ? 'Can only see contacts owned by users in any teams that this user belongs to.'
+            : 'Can only see contacts owned by users in any ring groups that this user belongs to.'
+        },
+        {
+          value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP,
+          label: this.hasCompanyTeamInboxEnabled && this.value === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP
+            ? 'Owned & Ring Group (DEPRECATED)'
+            : 'Owned & Ring Group',
+          description: this.hasCompanyTeamInboxEnabled && this.value === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP
+            ? 'This option is deprecated for team inbox users. Please pick any other option.'
+            : 'Can only see self-owned contacts and unassigned contacts in the ring groups that this user belongs to.'
+        },
+        {
+          value: ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY,
+          label: 'Owned Only',
+          description: 'Can only see self-owned contacts.'
+        }
+      ]
+
+      // For Team Inbox enabled companies: hide "Owned & Ring Group" option ONLY if it's not currently selected
+      if (this.hasCompanyTeamInboxEnabled && this.value !== ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
+        return options.filter(opt => opt.value !== ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP)
+      }
+
+      return options
+    },
+
     optionsArray () {
       return this.isContactAccessType ? this.contactAccessTypeOptions : this.communicationAccessTypeOptions
     },
@@ -104,28 +145,6 @@ export default {
   data () {
     return {
       model: this.value,
-      contactAccessTypeOptions: [
-        {
-          value: ContactAccessTypes.CONTACTS_ACCESS_EVERYONE,
-          label: 'Everything',
-          description: 'Can see all contacts.'
-        },
-        {
-          value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP_USERS,
-          label: 'Ring Group Users Only',
-          description: 'Can only see contacts owned by users in any ring groups that this user belongs to.'
-        },
-        {
-          value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP,
-          label: 'Ring Group Only',
-          description: 'Can only see owned contacts and contacts that have interacted with the ring groups that this user belongs to.'
-        },
-        {
-          value: ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY,
-          label: 'Owned Only',
-          description: 'Can only see their own contacts.'
-        }
-      ],
       communicationAccessTypeOptions: [
         {
           value: CommunicationAccessTypes.COMMUNICATIONS_ACCESS_ALL,
@@ -160,16 +179,20 @@ export default {
       this.selectWidth = this.$refs.visibiltySelector.$el.offsetWidth
     }
   },
-  mounted () {
-    this.options = this.optionsArray
-  },
   watch: {
     value () {
       this.model = this.value
     },
 
-    model (val) {
+    model () {
       this.$emit('select', this.model)
+    },
+
+    optionsArray: {
+      handler (newOptions) {
+        this.options = newOptions
+      },
+      immediate: true
     }
   }
 }

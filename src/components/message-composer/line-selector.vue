@@ -57,6 +57,7 @@ import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, visibi
 import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
+import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'line-selector',
@@ -102,9 +103,13 @@ export default {
      * Returns the active campaigns
      */
     activeCampaigns () {
-      const allIvrCampaigns = this.campaigns.filter(campaign => campaign.ivr_id)
-      const availableInboxCampaigns = this.campaigns.filter(campaign => this.activeInboxCampaignIds?.includes(campaign.id))
-      return [...availableInboxCampaigns, ...allIvrCampaigns]
+      return this
+        .campaigns
+        .filter(campaign =>
+          // Active Inbox Campaigns
+          this.activeInboxCampaignIds?.includes(campaign.id) ||
+          isIvrOrDeadEndCampaign(campaign)
+        )
     },
 
     selectedCampaign () {

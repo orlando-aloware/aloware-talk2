@@ -29,6 +29,7 @@ import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
 import MicrophonePermissionModal from './microphone-permission-modal.vue'
+import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'dialer',
@@ -781,8 +782,8 @@ export default {
         ? this.campaigns.find(campaign => campaign.id === outboundCampaign)
         : outboundCampaign
 
-      if (!campaign?.ivr_id) {
-        // Campaign is not an IVR campaign, so we don't need to include the ring group id
+      if (!isIvrOrDeadEndCampaign(campaign)) {
+        // Campaign is not an IVR or Dead End campaign, so we don't need to include the ring group id
         return false
       }
 
@@ -957,23 +958,25 @@ export default {
         return
       }
 
-      this.connection.on(WebrtcEvents.CONNECTION_WARNING, (warningName, warningData) => {
-        console.log(WebrtcEvents.CONNECTION_WARNING, warningName, warningData)
-        // add warning to list
-        if (this.warnings.indexOf(warningName) === -1) {
-          this.warnings.push(warningName)
-        }
+      if (![7113].includes(this.currentCompany?.id)) {
+        this.connection.on(WebrtcEvents.CONNECTION_WARNING, (warningName, warningData) => {
+          console.log(WebrtcEvents.CONNECTION_WARNING, warningName, warningData)
+          // add warning to list
+          if (this.warnings.indexOf(warningName) === -1) {
+            this.warnings.push(warningName)
+          }
 
-        this.setWarnings(this.warnings)
-        this.saveCallIssue(warningName, warningData)
-      })
+          this.setWarnings(this.warnings)
+          this.saveCallIssue(warningName, warningData)
+        })
 
-      this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
-        console.log(WebrtcEvents.CONNECTION_WARNING_CLEARED, warningName)
-        // remove warning from list
-        this.warnings = this.warnings.filter(value => value !== warningName)
-        this.setWarnings(this.warnings)
-      })
+        this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
+          console.log(WebrtcEvents.CONNECTION_WARNING_CLEARED, warningName)
+          // remove warning from list
+          this.warnings = this.warnings.filter(value => value !== warningName)
+          this.setWarnings(this.warnings)
+        })
+      }
 
       this.connection.on(WebrtcEvents.CONNECTION_ACCEPT, (call) => { // On accept call
         console.log('Successfully connected call', call)

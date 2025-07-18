@@ -151,7 +151,7 @@ export default {
 
   mounted () {
     this.selectedFilters = { ...this.activeFilters }
-    this.initializeFiltersAndSort()
+    this.initializeSort()
   },
 
   computed: {
@@ -296,10 +296,6 @@ export default {
       this.setActiveSort(this.sorts[option])
       this.$emit('sort-change', this.sorts[option])
       this.updateUrlParams('sort', option)
-    },
-
-    initializeFiltersAndSort () {
-      this.initializeSort()
     },
 
     initializeSort () {

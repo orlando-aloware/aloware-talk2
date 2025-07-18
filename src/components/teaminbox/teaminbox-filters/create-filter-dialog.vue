@@ -8,6 +8,7 @@
            hide-footer
            data-testid="teaminbox-create-filter-dialog-modal"
            v-model="isOpen"
+           @shown="onShown"
            @hidden="onHidden">
     <div class="modal-body-wrapper">
       <div class="d-flex justify-content-between mb-3">
@@ -22,7 +23,7 @@
       <div class="form-group">
         <label for="filter-name" class="form-label">Filter Name</label>
         <b-form-input id="filter-name"
-                      ref="filterName"
+                      ref="filterNameInput"
                       size="md"
                       type="text"
                       placeholder="Name"
@@ -130,6 +131,9 @@ export default {
       this.hideModal()
       this.$emit('onCancel')
     },
+    onShown () {
+      this.$refs.filterNameInput.focus()
+    },
     onHidden () {
       this.resetForm()
     },
@@ -161,6 +165,7 @@ export default {
         this.$VueEvent.fire('teaminbox_filter_created', newFilter)
         this.$generalNotification('Filter created successfully', 'success')
         this.hideModal()
+        this.$emit('onFilterCreated', newFilter)
       } catch (error) {
         const { message } = extractErrorMessage(error)
         this.$generalNotification(message, 'error')

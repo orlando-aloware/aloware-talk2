@@ -23,7 +23,7 @@
                   :popper-opts="{ positionFixed: true }"
                   variant="light"
                   data-testid="filter-list-items-dropdown"
-                  v-if="isAdmin && !isRenaming">
+                  v-if="shouldShowFilterActions(filter)">
         <template #button-content>
           <i class="fa fa-ellipsis-h"></i>
         </template>
@@ -127,6 +127,11 @@ export default {
         this.isRenaming = false
         evt.target.value = this.selectedFilter.name
       }
+    },
+
+    shouldShowFilterActions (filter) {
+      console.log('filter', filter)
+      return (!filter.is_on_company || this.isAdmin) && !this.isRenaming
     }
   },
 

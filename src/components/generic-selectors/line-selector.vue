@@ -106,6 +106,7 @@ import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT } from 'src/constants/roles'
+import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'line-selector',
@@ -240,7 +241,7 @@ export default {
       default: false
     },
 
-    isDialer: {
+    applyVisibilityLimits: {
       type: Boolean,
       default: false
     },
@@ -329,19 +330,18 @@ export default {
 
         if (this.shouldLimitAgentLinesVisibility) {
           // Only show lines that the agent has access to
-          return activeCampaigns.filter(campaign => {
-            return campaign.user_id === this.profile.id ||
-              campaign.has_direct_ring_group_access ||
-              campaign.has_team_membership_access ||
-              campaign.has_direct_watching_access ||
-              campaign.has_team_watching_access ||
-              campaign.ivr_id
-          })
+          return activeCampaigns.filter(
+            campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
+          )
         }
 
         return !this.preSelectedTeamInboxLineId
           ? activeCampaigns
-          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id) || campaign.ivr_id)
+          : activeCampaigns.filter(
+            campaign =>
+              this.activeInboxCampaignIds.includes(campaign.id) ||
+              isIvrOrDeadEndCampaign(campaign)
+          )
       }
 
       return []
@@ -379,7 +379,7 @@ export default {
     },
 
     shouldLimitAgentLinesVisibility () {
-      return this.isDialer &&
+      return this.applyVisibilityLimits &&
         this.hasRole(COMPANY_AGENT) &&
         this.hasCompanyTeamInboxLineManagementEnhancements
     },
@@ -413,6 +413,8 @@ export default {
       const line = this.activeCampaignsAlphabeticalOrder.find(campaign => campaign.id === this.preSelectedTeamInboxLineId)
       line && this.selectOption(line)
     }
+
+    this.checkUnavailableLine(this.value)
   },
 
   methods: {
@@ -461,6 +463,20 @@ export default {
       if (input) {
         input.style.display = 'block'
       }
+    },
+
+    checkUnavailableLine (lineId) {
+      if (
+        lineId !== null &&
+        this.shouldLimitAgentLinesVisibility &&
+        !this.campaignsIsLoading &&
+        !this.options.find(({ id }) => id === lineId)
+      ) {
+        // If the selected campaign (forced v-model) is not in the options,
+        // emit a change event to clear the value and emit an invalid-line event
+        this.$emit('change', null)
+        this.$emit('invalid-line-selection', this.campaigns.find(({ id }) => id === lineId))
+      }
     }
   },
 
@@ -483,8 +499,10 @@ export default {
       }
 
       // return the incoming number of the selected campaign
-      const found = this.campaigns.find(campaign => campaign.id === val)
-      this.$emit('selectedNumber', found ? found.incoming_number : '')
+      const campaign = this.campaigns.find(campaign => campaign.id === val)
+      this.$emit('selectedNumber', campaign ? campaign.incoming_number : '')
+
+      this.checkUnavailableLine(val)
     },
 
     campaignsIsLoading (val) {
@@ -493,8 +511,8 @@ export default {
         return
       }
 
+      this.options = this.activeCampaignsAlphabeticalOrder
       this.selectedId = this.value
-      this.options = this.campaignsAlphabeticalOrder
 
       if (typeof this.$refs.lineSelect !== 'undefined') {
         this.$refs.lineSelect.refresh()
