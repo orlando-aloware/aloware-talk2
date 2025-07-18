@@ -883,16 +883,6 @@ export default {
       this.feedback = data.feedback || null
       this.upvote_active = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
       this.downvote_active = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
-
-      // Map custom_summary to call_summary for component compatibility
-      if (data.custom_summary) {
-        this.communication.call_summary = data.custom_summary
-      }
-
-      // Map summary_status to call_summary_status for component compatibility
-      if (data.summary_status !== undefined) {
-        this.communication.call_summary_status = data.summary_status
-      }
     },
 
     /**
