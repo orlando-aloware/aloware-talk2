@@ -137,10 +137,14 @@ export const setCampaignsIsLoading = function (context, value) {
  * Callback function to check if a campaign is available for an agent
  *
  * @param {Object} campaign - Campaign object
- * @param {Object} user - User object
+ * @param {Number} userId - User ID
  * @returns {Boolean} - True if the campaign is available for the agent, false otherwise
  */
 export function agentAvailableCampaignsCallback (campaign, userId) {
+  if (!campaign || !userId) {
+    return false
+  }
+
   return campaign.user_id === userId ||
     campaign.has_direct_ring_group_access ||
     campaign.has_team_membership_access ||
