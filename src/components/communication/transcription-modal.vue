@@ -723,6 +723,7 @@ export default {
       sentiment_analysis: [],
       talk_time_analysis: [],
       messages: [],
+      highlights_summary: [],
       summary_engine: null,
       summary_prompt: null,
       feedback: null,
@@ -867,21 +868,31 @@ export default {
      */
     setSmartTranscriptionData (data) {
       // Sort the speakers to always get AGENT first.
-      this.speakers = data.speakers?.sort()
-      this.iab_categories = data.iab_categories
-      this.highlights = data.highlights
-      this.highlights_summary = data.auto_highlights_summary
-      this.entities = data.entities
-      this.entity_types = data.entity_types
-      this.custom_keywords = data.custom_keywords
-      this.messages = data.messages
-      this.sentiment_analysis = data.sentiment_analysis_summary
-      this.talk_time_analysis = data.talk_time_analysis
-      this.summary_engine = data.summary_engine
-      this.summary_prompt = data.summary_prompt
-      this.feedback = data.feedback
+      this.speakers = data.speakers?.sort() || []
+      this.iab_categories = data.iab_categories || []
+      this.highlights = data.highlights || {}
+      this.highlights_summary = data.auto_highlights_summary || []
+      this.entities = data.entities || {}
+      this.entity_types = data.entity_types || []
+      this.custom_keywords = data.custom_keywords || {}
+      this.messages = data.messages || []
+      this.sentiment_analysis = data.sentiment_analysis_summary || []
+      this.talk_time_analysis = data.talk_time_analysis || {}
+      this.summary_engine = data.summary_engine || null
+      this.summary_prompt = data.summary_prompt || null
+      this.feedback = data.feedback || null
       this.upvote_active = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
       this.downvote_active = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
+
+      // Map custom_summary to call_summary for component compatibility
+      if (data.custom_summary) {
+        this.communication.call_summary = data.custom_summary
+      }
+
+      // Map summary_status to call_summary_status for component compatibility
+      if (data.summary_status !== undefined) {
+        this.communication.call_summary_status = data.summary_status
+      }
     },
 
     /**
