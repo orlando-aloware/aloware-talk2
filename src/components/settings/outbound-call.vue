@@ -42,6 +42,14 @@
         </b-col>
       </b-form-row>
 
+      <b-form-row v-if="showInvalidCompanyDefaultLineAlert" class="mt-n4">
+        <b-col sm="12">
+          <p class="form-helper-text text-danger">
+            The company default line is no longer available. Please select a different line.
+          </p>
+        </b-col>
+      </b-form-row>
+
       <b-form-row :id="`${SettingsMap.default_outbound_campaign_id.hash_keyword}-container`"
                   v-if="showOutboundLineSelector">
         <b-col sm="12"
@@ -172,6 +180,8 @@ import {
   OUTBOUND_CALLING_MODE_SELECTOR_USER_SELECT_MANUALLY,
   OUTBOUND_CALLING_MODE_SELECTOR_USER_ALWAYS_ASK
 } from 'src/constants/user-outbound-calling-modes'
+import { COMPANY_AGENT } from 'src/constants/roles'
+import { agentAvailableCampaignsCallback } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'outbound-call',
@@ -258,6 +268,28 @@ export default {
       }
 
       return this.accountLevelOutboundCampaign?.name
+    },
+
+    availableAgentCampaigns () {
+      if (this.hasRole(COMPANY_AGENT)) {
+        return this.campaigns.filter(
+          campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
+        )
+      }
+
+      return this.campaigns
+    },
+
+    showInvalidCompanyDefaultLineAlert () {
+      if (this.user.outbound_calling_selector !== OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT) {
+        return false
+      }
+
+      if (!this.hasRole(COMPANY_AGENT)) {
+        return false
+      }
+
+      return !this.availableAgentCampaigns.find(campaign => campaign.id === this.currentCompany?.default_outbound_campaign_id)
     }
   },
 

@@ -106,7 +106,7 @@ import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT } from 'src/constants/roles'
-import { CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR } from 'src/constants/campaign-call-router-behaviors'
+import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'line-selector',
@@ -330,15 +330,9 @@ export default {
 
         if (this.shouldLimitAgentLinesVisibility) {
           // Only show lines that the agent has access to
-          return activeCampaigns.filter(campaign => {
-            return campaign.user_id === this.profile.id ||
-              campaign.has_direct_ring_group_access ||
-              campaign.has_team_membership_access ||
-              campaign.has_direct_watching_access ||
-              campaign.has_team_watching_access ||
-              campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_DEAD_END ||
-              campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_IVR
-          })
+          return activeCampaigns.filter(
+            campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
+          )
         }
 
         return !this.preSelectedTeamInboxLineId
@@ -346,8 +340,7 @@ export default {
           : activeCampaigns.filter(
             campaign =>
               this.activeInboxCampaignIds.includes(campaign.id) ||
-              campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_DEAD_END ||
-              campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_IVR
+              isIvrOrDeadEndCampaign(campaign)
           )
       }
 
