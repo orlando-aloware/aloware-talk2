@@ -814,7 +814,19 @@ export default {
         return false
       }
 
+      if (this.activeFilters.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
+        return false
+      }
+
       return this.ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
+    },
+
+    communicationContactOwnedByCurrentUser (communication) {
+      if (!communication.contact?.user_id) {
+        return false
+      }
+
+      return communication.contact.user_id === this.profile.id
     },
 
     updateUrlQueryParams (filter) {
