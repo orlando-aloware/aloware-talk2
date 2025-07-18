@@ -73,7 +73,7 @@
                            @change="(eventPayload) => onUpdateFields(eventPayload, 'default_outbound_campaign_id')"
                            @invalid-line-selection="onInvalidLineSelection">
             </line-selector>
-            <b-form-invalid-feedback v-if="invalidLineSelected">
+            <b-form-invalid-feedback v-if="showInvalidLineSelectedError">
               Line '{{ invalidLineSelected.name }}' is no longer available. Please select a different line.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback v-else-if="!$v.user.default_outbound_campaign_id.required">
@@ -290,6 +290,10 @@ export default {
       }
 
       return !this.availableAgentCampaigns.find(campaign => campaign.id === this.currentCompany?.default_outbound_campaign_id)
+    },
+
+    showInvalidLineSelectedError () {
+      return this.invalidLineSelected?.name
     }
   },
 
