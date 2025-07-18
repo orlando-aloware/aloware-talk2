@@ -117,6 +117,14 @@ export default {
         }
       }
 
+      // Default case with special handling for xPro plans
+      if (this.currentCompany?.plan?.use_case === 'xPro') {
+        return {
+          title: `You currently have unlimited minutes included in your AloAi Voice Analytics plan. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
+          message: ``
+        }
+      }
+
       return {
         title: `You currently have ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
         message: `Need more minutes to keep up with your growing needs? Upgrade your plan now for additional minutes and enhanced features.`
