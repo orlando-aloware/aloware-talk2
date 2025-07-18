@@ -57,7 +57,7 @@ import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, visibi
 import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
-import { CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR } from 'src/constants/campaign-call-router-behaviors'
+import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'line-selector',
@@ -108,10 +108,7 @@ export default {
         .filter(campaign =>
           // Active Inbox Campaigns
           this.activeInboxCampaignIds?.includes(campaign.id) ||
-          // Dead End Campaigns
-          campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_DEAD_END ||
-          // IVR Campaigns
-          campaign.call_router_behavior === CALL_ROUTER_BEHAVIOR_MODE_IVR
+          isIvrOrDeadEndCampaign(campaign)
         )
     },
 

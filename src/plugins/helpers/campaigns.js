@@ -157,5 +157,5 @@ export function agentAvailableCampaignsCallback (campaign, userId) {
  */
 export function isIvrOrDeadEndCampaign (campaign) {
   return [CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR]
-    .includes(campaign.call_router_behavior)
+    .includes(campaign?.call_router_behavior)
 }
