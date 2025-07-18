@@ -193,6 +193,7 @@
                color="primary"
                class="open-contact-details-btn d-flex align-items-center justify-content-center px-2"
                v-b-tooltip.hover="{customClass: 'tooltip-dark'}"
+               v-if="!isPowerDialer"
                :title="isContactDetailsCollapsed ? 'Show contact details' : 'Hide contact details'"
                @click="$emit('toggleDetails')">
           <phone-card-icon width="21" height="21" color="#62666E"/>
@@ -306,9 +307,8 @@ export default {
       return [ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(this.contact?.task_status) && this.isContactStatusControlEnabled
     },
 
-    inPowerDialerPage () {
-      const previousPage = this.$route?.query?.previousPage
-      return previousPage === 'Power Dialer'
+    isPowerDialer () {
+      return this.$route?.name === 'Power Dialer'
     },
 
     markAllAsReadTooltip () {
