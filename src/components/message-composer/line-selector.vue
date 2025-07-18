@@ -53,11 +53,11 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, visibilityMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, userMixin, visibilityMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
-import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
+import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'line-selector',
@@ -67,7 +67,8 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    selectorMixin
+    selectorMixin,
+    userMixin
   ],
 
   props: {
@@ -96,7 +97,20 @@ export default {
      * Returns the appropriate campaigns array based on whether we're in team inbox mode
      */
     campaignsToUse () {
-      return this.teamInbox ? this.activeCampaigns : this.campaigns
+      if (this.teamInbox) {
+        // Active Team Inbox Campaigns
+        return this.activeCampaigns
+      }
+
+      if (this.hasCompanyTeamInboxLineManagementEnhancements) {
+        // Visible Campaigns (line management enhancements)
+        return this.campaigns.filter(
+          campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
+        )
+      }
+
+      // All Campaigns (no limitations)
+      return this.campaigns
     },
 
     /**
