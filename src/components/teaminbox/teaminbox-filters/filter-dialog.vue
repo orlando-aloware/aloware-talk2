@@ -371,7 +371,7 @@ export default {
 
         this.resetFilter()
 
-        if (filter.scope === 'user') {
+        if (!filter.is_on_company) {
           this.savedFilters = {
             user: this.savedFilters.user.filter(item => item.id !== filter.id),
             company: this.savedFilters.company
