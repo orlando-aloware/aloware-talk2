@@ -4,7 +4,6 @@
 
 <script>
 import _ from 'lodash'
-import { CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR } from 'src/constants/campaign-call-router-behaviors'
 import talk2Api from 'src/plugins/api/api'
 import teamInboxApi from 'src/plugins/api/teamInboxApi'
 import { mapActions, mapState } from 'vuex'
@@ -27,6 +26,7 @@ import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
+import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'dialer',
@@ -775,7 +775,7 @@ export default {
         ? this.campaigns.find(campaign => campaign.id === outboundCampaign)
         : outboundCampaign
 
-      if (![CALL_ROUTER_BEHAVIOR_MODE_DEAD_END, CALL_ROUTER_BEHAVIOR_MODE_IVR].includes(campaign?.call_router_behavior)) {
+      if (!isIvrOrDeadEndCampaign(campaign)) {
         // Campaign is not an IVR or Dead End campaign, so we don't need to include the ring group id
         return false
       }
