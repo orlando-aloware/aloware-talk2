@@ -1,315 +1,228 @@
 <template>
-  <b-card class="border-0 contact-info-wrapper" data-testid="contact-info-wrapper">
-    <b-media class="min-w-0">
-      <template #aside>
-        <q-item-section avatar>
-          <avatar class="contact-avatar"
-                  width="40"
-                  height="40"
-                  data-testid="contact-info-avatar"
-                  :color-module-id="contact.id"
-                  :name="contact.name">
-          </avatar>
-        </q-item-section>
-      </template>
+  <b-card class="border-0 contact-info-wrapper alw-contact-info" data-testid="contact-info-wrapper">
+    <contact-info-header
+      :active-integrations="activeIntegrations"
+      :contact="contact"
+      :is-read-only="isReadOnly"
+      :team-inbox="teamInbox"
+    />
 
-      <div class="d-flex justify-content-between relative-position w-100">
-        <div class="w-100 d-grid">
-          <div class="mt-1 mb-0 d-flex align-items-center overflow-hidden">
-            <div class="contact-name pb-1 d-flex align-items-center flex-grow-1 min-w-0 overflow-hidden">
-              <div class="contact-name-wrapper flex-grow-1 min-w-0 overflow-hidden">
-                <q-tooltip anchor="top middle"
-                           data-testid="contact-info-name-tooltip"
-                           self="center middle"
-                           content-class="fs-12">
-                  {{ contactName }}
-                </q-tooltip>
-                <h2 class="text-truncate">{{ contactName }}</h2>
-              </div>
-            </div>
-            <b-link href="#"
-                    class="contact-redirect-link ml-1 flex-shrink-0"
-                    data-testid="contact-info-redirect-link"
-                    @click.prevent="navigateToContact">
-              <q-tooltip anchor="top middle"
-                         self="center middle"
-                         content-class="fs-12">
-                View Contact Details
-              </q-tooltip>
-              <i class="material-icons" data-testid="contact-info-redirect-icon" style="font-size: max(17px, 1em);">open_in_new</i>
-            </b-link>
-            <contact-integrations-link-icons class="ml-2 flex-shrink-0 mr-4" :contact='contact' />
-          </div>
-          <p class="contact-phone">
-            <span v-if="contact.phone_number !== '0' && contact.phone_number !== null">
-              <span class="contact-primary-phone">{{ contact.phone_number | fixPhone }}</span>
+    <div class="alw-contact-info-phone-section">
+      <contact-info-badges :contact="contact" :phone="phone" />
+      <contact-info-phone :contact="contact" />
+    </div>
 
-              <b-link href="#"
-                      class="copy-phone-number ml-1"
-                      data-testid="contact-info-copy-phone-number-link"
-                      @click.prevent="copyPhoneNumber(contact.phone_number)">
-                <q-tooltip anchor="top middle"
-                           self="center middle"
-                           content-class="fs-12">
-                  Copy
-                </q-tooltip>
-                <i class="material-icons copy-phone-number" data-testid="contact-info-copy-phone-number-icon">content_copy</i>
-              </b-link>
+    <!-- Multiple integrations go on their own line after phone -->
+    <contact-info-integrations
+      v-if="activeIntegrations.length > 1"
+      :integrations="activeIntegrations"
+      class="alw-contact-info-integrations-row"
+    />
 
-              <br />
+    <!-- Time section -->
+    <contact-info-time
+      :timezone="contact.timezone"
+      class="alw-contact-info-time-section"
+    />
 
-              <b-badge class="badge-phone-info mr-1"
-                       :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
-                       data-testid="contact-info-lrn-type-badge"
-                       v-if="phone && $options.filters.validLrnType(phone.lrn_type)"
-                       :href="$options.filters.getUrlToLrnInfo(phone.lrn_type)">
-                <q-tooltip v-if="phone.lrn_type === LRN_NOT_PERFORMED">
-                  This contact exceeds the 1000-contact limit included in trial.
-                </q-tooltip>
-                {{ phone.lrn_type | fixLrnType }}
-              </b-badge>
+    <!-- Other info section -->
+    <div class="alw-contact-info-details">
+    </div>
 
-               <b-badge variant="danger"
-                        class="badge-phone-info mr-1"
-                        data-testid="contact-info-invalid-number-badge"
-                        v-if="phone && phone.is_invalid">
-                Invalid Number
-              </b-badge>
-
-               <b-badge variant="danger"
-                        class="badge-phone-info mr-1"
-                        data-testid="contact-info-dnc-badge"
-                        v-if="contact.is_dnc">
-                DNC
-              </b-badge>
-            </span>
-            <span v-else>
-              Phone number unavailable
-            </span>
-          </p>
-          <div class="flex mb-4">
-            <span class="material-icons" data-testid="contact-info-schedule-span">
-                schedule
-            </span>
-            <digital-clock class="ml-2"
-                           data-testid="contact-info-digital-clock"
-                           :timezone="contact.timezone">
-            </digital-clock>
-          </div>
-        </div>
-        <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
-                  size="sm"
-                  variant="light"
-                  data-testid="contact-info-edit-button"
-                  :disabled="isReadOnly"
-                  @click="onOpenEditForm">
-          <pencil-o-icon />
-        </b-button>
-        <q-menu content-class="mx-height-300"
-                no-focus
-                no-parent-event
-                :offset="[300, -122]"
-                data-testid="contact-info-edit-form-menu"
-                v-model="showEditForm">
-          <div class="row no-wrap q-pa-md">
-            <contact-name-form data-testid="contact-info-name-form" @close="onCloseEditForm"></contact-name-form>
-          </div>
-        </q-menu>
-      </div>
-    </b-media>
+    <!-- Action buttons section -->
     <div class="d-inline-flex flex-wrap contact-action-button">
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
+      <b-button class="custom-action-button my-1"
                 data-testid="contact-info-call-button"
+                size="sm"
+                variant="light"
                 @click="onCallClick">
         <q-tooltip anchor="top middle"
+                   content-class="fs-12"
                    data-testid="contact-info-call-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
+                   self="center middle">
           Call
         </q-tooltip>
-        <call-icon width="14"
-                   height="14" />
+        <call-icon height="14"
+                   width="14" />
         <q-popup-proxy v-model="showLineSelectorPopup"
                        no-parent-event>
           <div class="d-flex line-selector-popup-wrapper">
             <line-selector
-              class="line-selector flex-grow-1"
-              prepend="From:"
-              check-blocked-messaging
-              hide-bottom-space
-              :width="lineSelectorWidth"
               :generic-multiselect="false"
-              :use-only-actives="true"
               :pre-selected-team-inbox-line-id="contactLastLineUsedId"
+              :use-only-actives="true"
+              :width="lineSelectorWidth"
+              check-blocked-messaging
+              class="line-selector flex-grow-1"
+              hide-bottom-space
+              prepend="From:"
               @change="onLineChange"
               @initiateCall="forceInitiateCall"
             >
             </line-selector>
             <q-btn
-              icon="img:app-icons/dialer/call_btn.svg"
-              size="32px"
-              class="icon-btn auto-size height-32 ml-1 mt-1"
+              :disable="!selectedLine"
+              :ripple="true"
               align="right"
+              class="icon-btn auto-size height-32 ml-1 mt-1"
+              flat
+              icon="img:app-icons/dialer/call_btn.svg"
               padding="none"
               rounded
-              flat
-              :ripple="true"
-              :disable="!selectedLine"
+              size="32px"
               @click="callContact">
             </q-btn>
           </div>
         </q-popup-proxy>
       </b-button>
 
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
+      <b-button v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
                 :disabled="isProcessingBlock || isReadOnly"
-                v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
+                class="custom-action-button my-1"
                 data-testid="contact-info-block-button"
+                size="sm"
+                variant="light"
                 @click="blockContact">
         <q-tooltip anchor="top middle"
-                   self="center middle"
-                   content-class="fs-12">
+                   content-class="fs-12"
+                   self="center middle">
           Block
         </q-tooltip>
-        <i class="fa fa-lock"
-           data-testid="contact-info-block-icon"
-           v-if="!isProcessingBlock">
+        <i v-if="!isProcessingBlock"
+           class="fa fa-lock"
+           data-testid="contact-info-block-icon">
         </i>
-        <q-spinner-bars class="mr-1"
+        <q-spinner-bars v-if="isProcessingBlock"
+                        class="mr-1"
                         color="blue"
-                        data-testid="contact-info-block-spinner"
-                        v-if="isProcessingBlock" />
+                        data-testid="contact-info-block-spinner" />
       </b-button>
 
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
+      <b-button v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
                 :disabled="isProcessingBlock || isReadOnly"
-                v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
+                class="custom-action-button my-1"
                 data-testid="contact-info-unblock-button"
+                size="sm"
+                variant="light"
                 @click="unBlockContact">
         <q-tooltip anchor="top middle"
-                   self="center middle"
-                   content-class="fs-12">
+                   content-class="fs-12"
+                   self="center middle">
           Unblock
         </q-tooltip>
-        <q-spinner-bars class="mr-1"
+        <q-spinner-bars v-if="isProcessingBlock"
+                        class="mr-1"
                         color="blue"
-                        data-testid="contact-info-unblock-spinner"
-                        v-if="isProcessingBlock" />
-        <i class="fa fa-lock-open"
-           data-testid="contact-info-unblock-icon"
-           v-if="!isProcessingBlock">
+                        data-testid="contact-info-unblock-spinner" />
+        <i v-if="!isProcessingBlock"
+           class="fa fa-lock-open"
+           data-testid="contact-info-unblock-icon">
         </i>
       </b-button>
 
-      <contact-dnc-actions class="mr-2 my-1"
-                           data-testid="contact-info-dnc-actions"
-                           :contact="contact"
-                           :disabled="isReadOnly"></contact-dnc-actions>
+      <contact-dnc-actions :contact="contact"
+                           :disabled="isReadOnly"
+                           class="mr-2 my-1"
+                           data-testid="contact-info-dnc-actions"></contact-dnc-actions>
 
-      <b-button variant="light"
-                size="sm"
+      <b-button :disabled="contact.is_dnc || isReadOnly"
                 class="custom-action-button my-1"
-                :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-appointment-button"
+                size="sm"
+                variant="light"
                 @click="addAppointmentOpen(true)">
         <q-tooltip anchor="top middle"
+                   content-class="fs-12"
                    data-testid="contact-info-add-appointment-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
+                   self="center middle">
           Add appointment
         </q-tooltip>
         <calendar-icon />
       </b-button>
-      <b-button variant="light"
-                size="sm"
+      <b-button :disabled="contact.is_dnc || isReadOnly"
                 class="custom-action-button my-1"
-                :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-reminder-button"
+                size="sm"
+                variant="light"
                 @click="addReminderOpen(true)">
         <q-tooltip anchor="top middle"
+                   content-class="fs-12"
                    data-testid="contact-info-add-reminder-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
+                   self="center middle">
           Add reminder
         </q-tooltip>
         <timer-icon></timer-icon>
       </b-button>
-      <b-button variant="light"
-                size="sm"
+      <b-button :disabled="isReadOnly"
                 class="custom-action-button my-1"
                 data-testid="contact-info-add-power-dialer-button"
-                :disabled="isReadOnly"
+                size="sm"
+                variant="light"
                 @click="openPowerDialerModal">
         <q-tooltip anchor="top middle"
+                   content-class="fs-12"
                    data-testid="contact-info-add-power-dialer-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
+                   self="center middle">
           Add to power dialer
         </q-tooltip>
         <add-call-icon />
       </b-button>
-      <b-button variant="light"
-                size="sm"
+      <b-button :disabled="isRemovingFromPowerDialerLists || !hasPowerDialerLists || isReadOnly"
                 class="custom-action-button my-1"
                 data-testid="contact-info-remove-power-dialer-button"
-                :disabled="isRemovingFromPowerDialerLists || !hasPowerDialerLists || isReadOnly"
+                size="sm"
+                variant="light"
                 @click="removeContactFromPowerDialerLists">
         <q-tooltip anchor="top middle"
+                   content-class="fs-12"
                    data-testid="contact-info-remove-power-dialer-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
+                   self="center middle">
           {{ hasPowerDialerListsText }}
         </q-tooltip>
         <call-remove-icon />
       </b-button>
-      <b-button variant="light"
-                size="sm"
+      <b-button v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled && !isReadOnly"
                 class="custom-action-button my-1"
                 data-testid="contact-info-merge-button"
-                v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled && !isReadOnly"
+                size="sm"
+                variant="light"
                 @click="openMergeContactModal">
         <q-tooltip anchor="top middle"
+                   content-class="fs-12"
                    data-testid="contact-info-merge-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
+                   self="center middle">
           Merge
         </q-tooltip>
         <merge-contact-icon />
       </b-button>
-      <b-button variant="light"
-                size="sm"
+      <b-button v-if="isAdmin"
+                :disabled="isExportingCommunications || isReadOnly"
                 class="custom-action-button my-1"
                 data-testid="contact-info-export-button"
-                :disabled="isExportingCommunications || isReadOnly"
-                v-if="isAdmin"
+                size="sm"
+                variant="light"
                 @click="handleExportCommunications">
         <q-tooltip anchor="top middle"
+                   content-class="fs-12"
                    data-testid="contact-info-export-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
+                   self="center middle">
           Export communications
         </q-tooltip>
-        <i class="fa fa-arrow-up-from-bracket" v-if="!isExportingCommunications"></i>
+        <i v-if="!isExportingCommunications" class="fa fa-arrow-up-from-bracket"></i>
         <q-spinner-bars v-if="isExportingCommunications"
                         class="mr-1"
                         color="blue"
                         size="14px" />
       </b-button>
     </div>
-    <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"
-                            :from-team-inbox="fromTeamInbox"
-                            :team-inbox-id="teamInboxId"></appointment-form-modal>
-    <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"
-                                :from-team-inbox="fromTeamInbox"></contact-add-reminder-modal>
+    <appointment-form-modal :contact="contact" :from-team-inbox="fromTeamInbox"
+                            :team-inbox-id="teamInboxId"
+                            data-testid="contact-info-appointment-form-modal"></appointment-form-modal>
+    <contact-add-reminder-modal :from-team-inbox="fromTeamInbox"
+                                data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
     <power-dialer-add-modal :params="addPowerDialerParams"
-                            data-testid="contact-info-power-dialer-add-modal"
                             :redirect="false"
+                            data-testid="contact-info-power-dialer-add-modal"
                             @saved="onSavedPowerDialer">
     </power-dialer-add-modal>
     <contact-remove-from-lists-confirmation :contact="contact"
@@ -317,23 +230,20 @@
                                             @close="onCloseContactRemoveFromListsConfirmation"
                                             @confirm="onConfirmContactRemoveFromListsConfirmation"
                                             @error="onErrorContactRemoveFromLists" />
-    <merge-contact-modal data-testid="contact-info-merge-contact-modal"
+    <merge-contact-modal v-if="isMergeContactOpen"
                          :contact="contact"
-                         v-if="isMergeContactOpen">
+                         data-testid="contact-info-merge-contact-modal">
     </merge-contact-modal>
   </b-card>
 </template>
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import ContactNameForm from 'src/components/forms/contact-name-form'
-import Avatar from 'src/components/teaminbox/communication-items/avatar.vue'
 import TimerIcon from 'src/components/icons/timer-icon'
 import CalendarIcon from 'src/components/icons/calendar-icon'
 import CallIcon from 'src/components/icons/call-icon'
 import AddCallIcon from 'src/components/icons/add-call-icon'
 import CallRemoveIcon from 'src/components/icons/call-remove-icon'
-import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import MergeContactIcon from 'src/components/icons/merge-contact-icon'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
@@ -348,13 +258,16 @@ import {
   timezoneCheckMixin,
   userMixin
 } from 'src/plugins/mixins'
-import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
-import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
+import { LRN_NOT_PERFORMED } from 'src/constants/lrn-types'
+import ContactInfoHeader from './contact-info/contact-info-header.vue'
+import ContactInfoIntegrations from './contact-info/contact-info-integrations.vue'
+import ContactInfoPhone from './contact-info/contact-info-phone.vue'
+import ContactInfoBadges from './contact-info/contact-info-badges.vue'
+import ContactInfoTime from './contact-info/contact-info-time.vue'
 import LineSelector from 'components/generic-selectors/line-selector'
 
 export default {
@@ -376,23 +289,23 @@ export default {
   ],
 
   components: {
-    ContactIntegrationsLinkIcons,
+    ContactInfoHeader,
+    ContactInfoIntegrations,
+    ContactInfoPhone,
+    ContactInfoBadges,
+    ContactInfoTime,
     ContactDncActions,
-    DigitalClock,
     ContactAddReminderModal,
     AppointmentFormModal,
     PowerDialerAddModal,
     ContactRemoveFromListsConfirmation,
     MergeContactModal,
-    PencilOIcon,
     AddCallIcon,
     CallRemoveIcon,
     CallIcon,
     CalendarIcon,
     TimerIcon,
     MergeContactIcon,
-    Avatar,
-    ContactNameForm,
     LineSelector
   },
 
@@ -409,23 +322,11 @@ export default {
 
     ...mapGetters('contacts', [
       'contact',
-      'isContactNameEditOpen',
-      'contactPhoneNumbers',
-      'changingSelectedContact'
+      'contactPhoneNumbers'
     ]),
-
-    ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
     lineSelectorWidth () {
       return this.$q.screen.width <= 1366 ? '200px' : '220px'
-    },
-
-    contactName () {
-      if (this.contact) {
-        return this.contact.name || 'No Name'
-      }
-
-      return 'No Name'
     },
 
     phone () {
@@ -464,15 +365,34 @@ export default {
 
     isFromTeamInbox () {
       return !!this.activeInboxId
+    },
+
+    // Get active integrations with their data
+    activeIntegrations () {
+      if (!this.contact?.integration_data) return []
+
+      const INTEGRATIONS = [
+        { name: 'hubspot', label: 'HubSpot' },
+        { name: 'zoho', label: 'Zoho' },
+        { name: 'salesforce', label: 'Salesforce' },
+        { name: 'pipedrive', label: 'Pipedrive' }
+      ]
+
+      return INTEGRATIONS
+        .filter(integration => {
+          const link = this.contact.integration_data[integration.name]?.link
+          return link && link !== '#'
+        })
+        .map(integration => ({
+          ...integration,
+          link: this.contact.integration_data[integration.name].link
+        }))
     }
   },
 
   data () {
     return {
-      showEditForm: false,
-      isProcessingDNC: false,
       isProcessingBlock: false,
-      isVideoConferenceLinkSending: false,
       isRemovingFromPowerDialerLists: false,
       selectedLine: null,
       showLineSelectorPopup: false,
@@ -484,7 +404,6 @@ export default {
 
   methods: {
     ...mapActions('contacts', [
-      'setContactNameEditOpen',
       'addAppointmentOpen',
       'addReminderOpen',
       'addPowerDialerOpen',
@@ -499,29 +418,6 @@ export default {
 
     openMergeContactModal () {
       this.addMergeContactOpen(true)
-    },
-
-    onOpenEditForm () {
-      this.showEditForm = true
-    },
-
-    onCloseEditForm () {
-      this.showEditForm = false
-    },
-
-    copyPhoneNumber (phoneNumber) {
-      this.$copyToClipboard(phoneNumber)
-      this.$generalNotification('Phone number copied to clipboard.')
-    },
-
-    navigateToContact () {
-      if (this.contact?.id) {
-        this.$router.push(`/contacts/${this.contact.id}`)
-      }
-    },
-
-    getPhoneObject () {
-      return this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
     },
 
     initiateCall () {
@@ -669,3 +565,41 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import 'src/css/breakpoints.scss';
+
+.alw-contact-info {
+  // Override bootstrap card padding for custom layout
+  ::v-deep .card-body {
+    padding: 16px;
+  }
+
+  // Remove Quasar item section padding if present
+  ::v-deep .q-item__section--side {
+    padding-right: 0;
+  }
+
+  // Smooth transitions for all elements within contact-info
+  &,
+  & * {
+    transition: all 0.3s ease;
+  }
+}
+
+// Component spacing hierarchy - all margins defined here for clarity
+
+.alw-contact-info-phone-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; // Badges left, phone right
+}
+
+.alw-contact-info-time-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px; // → Space before details section
+}
+
+</style>
