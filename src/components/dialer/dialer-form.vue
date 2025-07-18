@@ -31,7 +31,6 @@
             <line-selector class="line-selector"
                            prepend="From:"
                            specificClass="dialer-line-selector"
-                           :apply-visibility-limits="true"
                            :disable="lineSelectorDisabled"
                            :generic-multiselect="false"
                            :is-loading="isLoadingLastUsedCallLine"
@@ -101,7 +100,6 @@
             <line-selector class="line-selector"
                            prepend="From:"
                            check-blocked-messaging
-                           :apply-visibility-limits="true"
                            :generic-multiselect="false"
                            :use-only-actives="true"
                            v-model="campaignId"

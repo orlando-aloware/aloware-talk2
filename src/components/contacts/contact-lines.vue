@@ -42,6 +42,10 @@ export default {
 
   methods: {
     submitLines (lines) {
+      if (!lines) {
+        return
+      }
+
       talk2Api.V1.contact.storeLines(this.contact.id, {
         campaign_ids: lines
       }).then(() => {

@@ -59,7 +59,6 @@
             class="form-label is-invalid"
           >
             <line-selector v-model.trim="$v.user.default_outbound_campaign_id.$model"
-                           apply-visibility-limits
                            :class="[$v.user['default_outbound_campaign_id'].$invalid ? 'is-invalid' : '']"
                            :hasError="$v.user['default_outbound_campaign_id'].$invalid"
                            :state="validateState('default_outbound_campaign_id')"

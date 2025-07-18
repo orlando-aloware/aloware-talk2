@@ -241,11 +241,6 @@ export default {
       default: false
     },
 
-    applyVisibilityLimits: {
-      type: Boolean,
-      default: false
-    },
-
     preSelectedTeamInboxLineId: {
       type: Number,
       default: null
@@ -379,8 +374,7 @@ export default {
     },
 
     shouldLimitAgentLinesVisibility () {
-      return this.applyVisibilityLimits &&
-        this.hasRole(COMPANY_AGENT) &&
+      return this.hasRole(COMPANY_AGENT) &&
         this.hasCompanyTeamInboxLineManagementEnhancements
     },
 
