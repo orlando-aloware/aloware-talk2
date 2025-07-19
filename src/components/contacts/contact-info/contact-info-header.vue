@@ -13,6 +13,7 @@
         <contact-info-edit-contact
           :is-read-only="isReadOnly"
         />
+        <!-- Only show "View Contact Details" button when inside team inbox -->
         <contact-info-open-contact v-if="teamInbox" :contact="contact" />
       </div>
     </div>
