@@ -91,8 +91,8 @@ export default {
       const options = [
         {
           value: ContactAccessTypes.CONTACTS_ACCESS_EVERYONE,
-          label: 'Everyone',
-          description: 'Can see all contacts in the company.'
+          label: 'Everything',
+          description: 'Can see all contacts.'
         },
         {
           value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP_USERS,
@@ -104,16 +104,16 @@ export default {
         {
           value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP,
           label: this.hasCompanyTeamInboxEnabled && this.value === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP
-            ? 'Owned & Ring Group (DEPRECATED)'
-            : 'Owned & Ring Group',
+            ? 'Ring Group & Owned Only (DEPRECATED)'
+            : 'Ring Group & Owned Only',
           description: this.hasCompanyTeamInboxEnabled && this.value === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP
             ? 'This option is deprecated for team inbox users. Please pick any other option.'
-            : 'Can only see self-owned contacts and unassigned contacts in the ring groups that this user belongs to.'
+            : 'Can only see owned contacts and contacts that have interacted with the ring groups that this user belongs to.'
         },
         {
           value: ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY,
           label: 'Owned Only',
-          description: 'Can only see self-owned contacts.'
+          description: 'Can only see their own contacts.'
         }
       ]
 
