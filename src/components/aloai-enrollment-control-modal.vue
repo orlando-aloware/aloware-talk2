@@ -334,6 +334,7 @@ export default {
         this.selectedBotId = null
         this.selectedBotType = AloAi.ALL
         this.busyBotId = null
+        this.expandedDescriptions = {}
       }, 300)
     },
     onShown () {
