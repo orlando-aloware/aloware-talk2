@@ -75,7 +75,7 @@
 
             <!-- Bot Description -->
             <p class="text-muted small mb-2" v-if="bot.description">
-              {{ bot.description.slice(0, 200) }}{{ bot.description.length > 50 ? '...' : '' }}
+              {{ bot.description?.slice(0, 200) }}{{ bot.description?.length > 50 ? '...' : '' }}
             </p>
 
             <div class="d-flex justify-content-between align-items-center">
