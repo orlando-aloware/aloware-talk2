@@ -125,6 +125,8 @@ export default {
     state.loadingTeamInboxCampaigns = loading
   },
   RESET (state) {
+    state.activeInboxId = null
+    state.activeInbox = {}
     state.inboxes = []
     state.isLoadingInboxes = false
     state.inboxesUnreadCount = []
