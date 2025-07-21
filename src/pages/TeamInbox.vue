@@ -230,6 +230,15 @@ export default {
     this.$VueEvent.stop('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
   },
 
+  beforeRouteLeave (to, from, next) {
+    // Clean up activeInboxId when leaving Team Inbox to non-Team Inbox routes
+    // Check if the destination route is not a Team Inbox route by checking the path
+    if (!to.path.startsWith('/team-inboxes')) {
+      this.reset()
+    }
+    next()
+  },
+
   destroyed () {
     this.reset()
   }
