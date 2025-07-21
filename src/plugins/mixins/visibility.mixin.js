@@ -294,6 +294,11 @@ export default {
         return true
       }
 
+      // users should always be able to see their own sent messages
+      if (communication.user_id === this.profile.id) {
+        return true
+      }
+
       // checks if accessible_campaigns is available and then looks for communication campaign_id in that array
       if (this.profile.accessible_campaigns &&
         this.profile.line_access_limit &&
