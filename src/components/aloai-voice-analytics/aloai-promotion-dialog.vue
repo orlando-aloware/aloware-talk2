@@ -110,9 +110,17 @@ export default {
         }
       }
 
+      // Default case with special handling for xPro plans
+      if (this.currentCompany?.plan?.use_case === 'xPro') {
+        return {
+          title: `You currently have unlimited minutes included in your AloAi Voice Analytics plan. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
+          message: ``
+        }
+      }
+
       if (this.usedMinutes >= this.includedMinutes) {
         return {
-          title: `You've used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don't worry! You can easily purchase additional transcription minutes by reaching out to our CSM team, you can upgrade your plan to include more minutes and unlock additional features.`,
+          title: `You've used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don't worry! You can easily purchase additional transcription minutes by reaching out to our CSM team. You can upgrade your plan to include more minutes and unlock additional features.`,
           message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
         }
       }
