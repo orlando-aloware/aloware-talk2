@@ -16037,10 +16037,9 @@ hr {
 }
 
 .ai-info-box {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 125px;
+  right: 5px;
   width: 400px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
