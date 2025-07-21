@@ -31,6 +31,7 @@
             <line-selector class="line-selector"
                            prepend="From:"
                            specificClass="dialer-line-selector"
+                           is-dialer
                            :disable="lineSelectorDisabled"
                            :generic-multiselect="false"
                            :is-loading="isLoadingLastUsedCallLine"

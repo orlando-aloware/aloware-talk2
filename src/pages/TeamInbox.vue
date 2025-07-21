@@ -29,6 +29,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { mapFields } from 'vuex-map-fields'
 import { debounce } from 'lodash'
+import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'TeamInbox',
@@ -123,7 +124,9 @@ export default {
 
   methods: {
     ...mapActions('TeamInbox', [
-      'reset'
+      'reset',
+      'setTeamInboxCampaigns',
+      'setCampaignsIsLoading'
     ]),
 
     onItemSelected (routeData) {
@@ -222,7 +225,8 @@ export default {
     }
   },
 
-  created () {
+  async created () {
+    await getTeamInboxCampaigns(this)
     this.$VueEvent.listen('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
   },
 

@@ -86,40 +86,42 @@ export const getCampaigns = function (context) {
  * @param {Object} context - Vue component context with access to Vuex actions
  * @returns {Promise} - Promise that resolves when team inbox campaigns are loaded
  */
-export const getTeamInboxCampaigns = function (context) {
-  if (!context.hasPermissionTo('list campaign')) {
-    return Promise.resolve()
-  }
+export const getTeamInboxCampaigns = async function (context) {
+  return new Promise((resolve, reject) => {
+    if (!context.hasPermissionTo('list campaign')) {
+      return resolve()
+    }
 
-  context.loadingTeamInboxCampaigns = true
-  if (typeof context.setCampaignsIsLoading === 'function') {
-    context.setCampaignsIsLoading(true)
-  }
+    context.loadingTeamInboxCampaigns = true
+    if (typeof context.setCampaignsIsLoading === 'function') {
+      context.setCampaignsIsLoading(true)
+    }
 
-  // Use Team Inbox V3 API - no from_team_inbox flag needed
-  return talk2TeamInboxApi.campaigns.index({
-    is_lite: true
+    // Use Team Inbox V3 API - no from_team_inbox flag needed
+    return talk2TeamInboxApi.campaigns.index({
+      is_lite: true
+    })
+      .then((res) => {
+        if (typeof context.setTeamInboxCampaigns === 'function') {
+          context.setTeamInboxCampaigns(res.data)
+        }
+        context.loadingTeamInboxCampaigns = false
+        if (typeof context.setCampaignsIsLoading === 'function') {
+          context.setCampaignsIsLoading(false)
+        }
+
+        return resolve()
+      })
+      .catch((err) => {
+        console.log(err)
+        context.loadingTeamInboxCampaigns = false
+        if (typeof context.setCampaignsIsLoading === 'function') {
+          context.setCampaignsIsLoading(false)
+        }
+
+        return reject()
+      })
   })
-    .then((res) => {
-      if (typeof context.setTeamInboxCampaigns === 'function') {
-        context.setTeamInboxCampaigns(res.data)
-      }
-      context.loadingTeamInboxCampaigns = false
-      if (typeof context.setCampaignsIsLoading === 'function') {
-        context.setCampaignsIsLoading(false)
-      }
-
-      return Promise.resolve()
-    })
-    .catch((err) => {
-      console.log(err)
-      context.loadingTeamInboxCampaigns = false
-      if (typeof context.setCampaignsIsLoading === 'function') {
-        context.setCampaignsIsLoading(false)
-      }
-
-      return Promise.reject()
-    })
 }
 
 /**

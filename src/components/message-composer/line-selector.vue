@@ -91,7 +91,7 @@ export default {
     ...mapGetters('contacts', ['contact']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
     ...mapState(['campaigns']),
-    ...mapState('TeamInbox', ['activeInbox']),
+    ...mapState('TeamInbox', ['activeInbox', 'teamInboxCampaigns']),
 
     /**
      * Returns the appropriate campaigns array based on whether we're in team inbox mode
@@ -118,7 +118,7 @@ export default {
      */
     activeCampaigns () {
       return this
-        .campaigns
+        .teamInboxCampaigns
         .filter(campaign =>
           // Active Inbox Campaigns
           this.activeInboxCampaignIds?.includes(campaign.id) ||

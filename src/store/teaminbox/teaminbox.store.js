@@ -49,6 +49,8 @@ export default function () {
     unreadCountLoaded: false,
     teamInboxTutorialComponent: null,
     teamInboxEmptyStateVideoComponent: null,
-    contactsLastUsedLines: new Map()
+    contactsLastUsedLines: new Map(),
+    loadingTeamInboxCampaigns: false,
+    teamInboxCampaigns: []
   }
 }
