@@ -219,9 +219,7 @@ export default {
         return false
       }
 
-      const props = ['types', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention']
-
-      for (const key of props) {
+      for (const key of this.dropdownFilterFields) {
         if (!isEqual(this.selectedFilters[key], DEFAULT_FILTERS[key])) {
           return false
         }
@@ -231,9 +229,7 @@ export default {
     },
 
     hasFilterChanges () {
-      const props = ['channels', 'directions', 'my_contact', 'unread_only', 'task_status']
-
-      for (const key of props) {
+      for (const key of this.dropdownFilterFields) {
         if (!isEqual(this.selectedFilters[key], this.activeFilters[key])) {
           return true
         }
@@ -264,7 +260,8 @@ export default {
         Newest: {},
         Oldest: { order: 'asc' }
       },
-      selectedFilters: {}
+      selectedFilters: {},
+      dropdownFilterFields: ['channels', 'directions', 'my_contact', 'unread_only', 'task_status']
     }
   },
 
