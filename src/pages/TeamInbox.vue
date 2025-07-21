@@ -232,8 +232,8 @@ export default {
 
   beforeRouteLeave (to, from, next) {
     // Clean up activeInboxId when leaving Team Inbox to non-Team Inbox routes
-    // Use the isInbox meta property to properly identify Team Inbox routes
-    if (!to.meta?.isInbox) {
+    // Check if the destination route is not a Team Inbox route by checking the path
+    if (!to.path.startsWith('/team-inboxes')) {
       this.reset()
     }
     next()
