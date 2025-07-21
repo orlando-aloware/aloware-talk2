@@ -107,5 +107,11 @@ export default {
         commit('SET_CONTACTS_LAST_USED_LINE', { inboxId, contactId, lastLineUsed })
       }
     }
+  },
+  setTeamInboxCampaigns: ({ commit }, data) => {
+    commit('SET_TEAM_INBOX_CAMPAIGNS', data)
+  },
+  setCampaignsIsLoading: ({ commit }, loading) => {
+    commit('SET_LOADING_TEAM_INBOX_CAMPAIGNS', loading)
   }
 }

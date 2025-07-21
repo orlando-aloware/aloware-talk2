@@ -241,11 +241,6 @@ export default {
       default: false
     },
 
-    applyVisibilityLimits: {
-      type: Boolean,
-      default: false
-    },
-
     preSelectedTeamInboxLineId: {
       type: Number,
       default: null
@@ -262,6 +257,11 @@ export default {
     },
 
     showAllLines: {
+      type: Boolean,
+      default: false
+    },
+
+    isDialer: {
       type: Boolean,
       default: false
     }
@@ -281,7 +281,7 @@ export default {
     ...mapState(['campaigns', 'campaignsIsLoading']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['profile']),
-    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox']),
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox', 'activeInboxId', 'teamInboxCampaigns']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
 
     placeholder () {
@@ -302,49 +302,53 @@ export default {
     },
 
     campaignsAlphabeticalOrder () {
-      if (this.campaigns) {
-        let campaigns = _.clone(this.campaigns).sort((a, b) => {
-          const textA = a.name.toUpperCase()
-          const textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
-        })
+      const campaigns = this.activeInboxId && !this.isDialer
+        ? this.teamInboxCampaigns
+        : this.campaigns
 
-        if (this.useOnlyActives) {
-          campaigns = campaigns.filter(campaign => campaign.active === true)
-        }
-
-        return campaigns
+      if (!campaigns) {
+        return []
       }
 
-      return []
+      const orderedCampaigns = _.clone(campaigns).sort((a, b) => {
+        const textA = a.name.toUpperCase()
+        const textB = b.name.toUpperCase()
+        return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+      })
+
+      if (this.useOnlyActives) {
+        return orderedCampaigns.filter(campaign => campaign.active === true)
+      }
+
+      return orderedCampaigns
     },
 
     activeCampaignsAlphabeticalOrder () {
-      if (this.campaignsAlphabeticalOrder.length) {
-        const activeCampaigns = _.clone(this.campaignsAlphabeticalOrder)
-          .filter(campaign => campaign.active === true)
-
-        if (this.showAllLines) {
-          return activeCampaigns
-        }
-
-        if (this.shouldLimitAgentLinesVisibility) {
-          // Only show lines that the agent has access to
-          return activeCampaigns.filter(
-            campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
-          )
-        }
-
-        return !this.preSelectedTeamInboxLineId
-          ? activeCampaigns
-          : activeCampaigns.filter(
-            campaign =>
-              this.activeInboxCampaignIds.includes(campaign.id) ||
-              isIvrOrDeadEndCampaign(campaign)
-          )
+      if (!this.campaignsAlphabeticalOrder.length) {
+        return []
       }
 
-      return []
+      const activeCampaigns = _.clone(this.campaignsAlphabeticalOrder)
+        .filter(campaign => campaign.active === true)
+
+      if (this.showAllLines) {
+        return activeCampaigns
+      }
+
+      if (this.shouldLimitAgentLinesVisibility) {
+        // Only show lines that the agent has access to
+        return activeCampaigns.filter(
+          campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
+        )
+      }
+
+      return !this.preSelectedTeamInboxLineId
+        ? activeCampaigns
+        : activeCampaigns.filter(
+          campaign =>
+            this.activeInboxCampaignIds.includes(campaign.id) ||
+              isIvrOrDeadEndCampaign(campaign)
+        )
     },
 
     pausedCampaignsAlphabeticalOrder () {
@@ -370,7 +374,11 @@ export default {
     },
 
     selectedLine () {
-      return this.campaigns.find(campaign => campaign.id === this.selectedId)
+      const campaigns = this.activeInboxId && !this.isDialer
+        ? this.teamInboxCampaigns
+        : this.campaigns
+
+      return campaigns.find(campaign => campaign.id === this.selectedId)
     },
 
     lineInboxName () {
@@ -379,8 +387,7 @@ export default {
     },
 
     shouldLimitAgentLinesVisibility () {
-      return this.applyVisibilityLimits &&
-        this.hasRole(COMPANY_AGENT) &&
+      return this.hasRole(COMPANY_AGENT) &&
         this.hasCompanyTeamInboxLineManagementEnhancements
     },
 
