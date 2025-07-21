@@ -119,6 +119,8 @@ export default {
     state.contactsLastUsedLines.set(`${inboxId}-${contactId}`, lastLineUsed)
   },
   RESET (state) {
+    state.activeInboxId = null
+    state.activeInbox = {}
     state.inboxes = []
     state.isLoadingInboxes = false
     state.inboxesUnreadCount = []

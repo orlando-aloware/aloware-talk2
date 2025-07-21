@@ -299,6 +299,15 @@ export default {
         return true
       }
 
+      // when team inbox is enabled at company level but not viewing from team inbox context,
+      // ensure communications are filtered by ring group access
+      if (!teamInbox && this.hasCompanyTeamInboxEnabled && communication.ring_group_id) {
+        // only show communications from ring groups the user has access to
+        if (!this.profile.ring_group_ids || !this.profile.ring_group_ids.includes(communication.ring_group_id)) {
+          return false
+        }
+      }
+
       // checks if accessible_campaigns is available and then looks for communication campaign_id in that array
       if (this.profile.accessible_campaigns &&
         this.profile.line_access_limit &&
