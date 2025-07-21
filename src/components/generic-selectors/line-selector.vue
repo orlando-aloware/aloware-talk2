@@ -374,7 +374,11 @@ export default {
     },
 
     selectedLine () {
-      return this.campaigns.find(campaign => campaign.id === this.selectedId)
+      const campaigns = this.activeInboxId && !this.isDialer
+        ? this.teamInboxCampaigns
+        : this.campaigns
+
+      return campaigns.find(campaign => campaign.id === this.selectedId)
     },
 
     lineInboxName () {
