@@ -58,6 +58,7 @@ import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
 import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
+import { COMPANY_AGENT } from 'src/constants/roles'
 
 export default {
   name: 'line-selector',
@@ -102,7 +103,7 @@ export default {
         return this.activeCampaigns
       }
 
-      if (this.hasCompanyTeamInboxLineManagementEnhancements) {
+      if (this.shouldLimitAgentLinesVisibility) {
         // Visible Campaigns (line management enhancements)
         return this.campaigns.filter(
           campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
@@ -200,6 +201,11 @@ export default {
       }
 
       return []
+    },
+
+    shouldLimitAgentLinesVisibility () {
+      return this.hasRole(COMPANY_AGENT) &&
+        this.hasCompanyTeamInboxLineManagementEnhancements
     }
   },
 
