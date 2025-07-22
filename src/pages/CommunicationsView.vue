@@ -111,6 +111,11 @@ export default {
           // TODO: make this at route level please! :D
           const routeChannel = this.$route.params?.channel ?? DEFAULT_COMMUNICATIONS_CHANNEL // default fallback
           channel = this.navListItems.find(item => item.value === routeChannel)
+
+          if (!channel && routeChannel !== DEFAULT_COMMUNICATIONS_CHANNEL) {
+            this.$router.push({ name: DEFAULT_COMMUNICATIONS_ROUTE_NAME })
+            return
+          }
         }
 
         this.setActiveChannel(channel)
