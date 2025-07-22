@@ -160,7 +160,7 @@ import {
   kycMixin,
   userMixin
 } from 'src/plugins/mixins'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import { DEFAULT_COMMUNICATIONS_ROUTE_NAME, COMMUNICATIONS_CHANNELS_ROUTE_NAME, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
@@ -356,7 +356,7 @@ export default {
     },
 
     isCommunicationsPage () {
-      return this.$route.name === COMMUNICATIONS_CHANNELS_ROUTE_NAME
+      return [DEFAULT_COMMUNICATIONS_ROUTE_NAME, COMMUNICATIONS_CHANNELS_ROUTE_NAME].includes(this.$route.name)
     },
 
     isTeamInboxPage () {
