@@ -112,6 +112,8 @@ export default {
           const routeChannel = this.$route.params?.channel ?? DEFAULT_COMMUNICATIONS_CHANNEL // default fallback
           channel = this.navListItems.find(item => item.value === routeChannel)
 
+          // If channel is not found, redirect to default communications route
+
           if (!channel && routeChannel !== DEFAULT_COMMUNICATIONS_CHANNEL) {
             this.$router.push({ name: DEFAULT_COMMUNICATIONS_ROUTE_NAME })
             return
