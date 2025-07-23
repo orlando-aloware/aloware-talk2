@@ -51,6 +51,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import 'src/css/quasar.variables.scss';
+
 .q-btn.alw-contact-phone-btn {
   padding: 0 8px;
   color: inherit;
@@ -62,7 +64,7 @@ export default {
     }
 
     .alw-contact-phone-copy-icon {
-      color: rgba(0, 0, 0, 0.7);
+      color: darken($primary, 10%);
     }
   }
 }
@@ -83,10 +85,11 @@ export default {
 }
 
 .alw-contact-phone-copy-icon {
-  color: rgba(0, 0, 0, 0.54);
+  color: $primary;
   transition: color 0.3s ease;
-  margin-left: 8px;
+  margin-left: 6px;
   font-size: inherit;
+  padding-bottom: 1px;
 }
 
 .alw-contact-phone-unavailable {

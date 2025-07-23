@@ -29,10 +29,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import 'src/css/breakpoints.scss';
+@import 'src/css/breakpoints';
 
 .integration-icon {
-  height: calc(2.4em - 8px);
+  height: 24px;
   width: auto;
   object-fit: contain;
   display: block;
