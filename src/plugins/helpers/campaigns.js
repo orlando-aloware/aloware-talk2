@@ -152,6 +152,8 @@ export function agentAvailableCampaignsCallback (campaign, userId) {
     campaign.has_team_membership_access ||
     campaign.has_direct_watching_access ||
     campaign.has_team_watching_access ||
+    campaign.has_personal_inbox_watching_access ||
+    campaign.has_personal_inbox_team_watching_access ||
     isIvrOrDeadEndCampaign(campaign)
 }
 
