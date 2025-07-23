@@ -273,7 +273,8 @@ export default {
       options: [],
       reference: 'lineSelect',
       emitChange: true,
-      fullOptionsProperty: 'activeCampaignsAlphabeticalOrder'
+      fullOptionsProperty: 'activeCampaignsAlphabeticalOrder',
+      isInitializing: true
     }
   },
 
@@ -422,6 +423,11 @@ export default {
     }
 
     this.checkUnavailableLine(this.value)
+
+    // Mark initialization as complete
+    this.$nextTick(() => {
+      this.isInitializing = false
+    })
   },
 
   methods: {
@@ -493,11 +499,14 @@ export default {
         return
       }
 
-      this.selectedId = value
+      // Only update selectedId if not initializing to prevent false change events
+      if (!this.isInitializing) {
+        this.selectedId = value
+      }
     },
 
     selectedId (val) {
-      if (this.selectedId !== this.value) {
+      if (this.selectedId !== this.value && !this.isInitializing) {
         this.$emit('change', val)
       }
 
@@ -509,7 +518,10 @@ export default {
       const campaign = this.campaigns.find(campaign => campaign.id === val)
       this.$emit('selectedNumber', campaign ? campaign.incoming_number : '')
 
-      this.checkUnavailableLine(val)
+      // Only check unavailable line if not initializing
+      if (!this.isInitializing) {
+        this.checkUnavailableLine(val)
+      }
     },
 
     campaignsIsLoading (val) {
@@ -519,7 +531,11 @@ export default {
       }
 
       this.options = this.activeCampaignsAlphabeticalOrder
-      this.selectedId = this.value
+
+      // Only set selectedId if not initializing to prevent false change events
+      if (!this.isInitializing) {
+        this.selectedId = this.value
+      }
 
       if (typeof this.$refs.lineSelect !== 'undefined') {
         this.$refs.lineSelect.refresh()
