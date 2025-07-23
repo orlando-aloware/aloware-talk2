@@ -2,18 +2,13 @@
   <div class="alw-contact-info-header">
     <div class="alw-contact-info-header-main">
       <contact-info-avatar :contact="contact" />
-      <contact-info-name :contact="contact" />
+      <contact-info-name-editable :contact="contact" :is-read-only="isReadOnly" />
       <div class="alw-contact-info-actions-group">
-        <!-- Single integration goes inline with actions -->
         <contact-info-integrations
-          v-if="activeIntegrations.length === 1"
+          v-if="activeIntegrations.length > 0"
           :integrations="activeIntegrations"
           inline
         />
-        <contact-info-edit-contact
-          :is-read-only="isReadOnly"
-        />
-        <!-- Only show "View Contact Details" button when inside team inbox -->
         <contact-info-open-contact v-if="teamInbox" :contact="contact" />
       </div>
     </div>
@@ -22,17 +17,15 @@
 
 <script>
 import ContactInfoAvatar from './header/contact-info-avatar.vue'
-import ContactInfoName from './header/contact-info-name.vue'
-import ContactInfoEditContact from './header/contact-info-edit-contact.vue'
+import ContactInfoNameEditable from './header/contact-info-name-editable.vue'
 import ContactInfoOpenContact from './header/contact-info-open-contact.vue'
-import ContactInfoIntegrations from './contact-info-integrations.vue'
+import ContactInfoIntegrations from './header/integrations/contact-info-integrations.vue'
 
 export default {
   name: 'contact-info-header',
   components: {
     ContactInfoAvatar,
-    ContactInfoName,
-    ContactInfoEditContact,
+    ContactInfoNameEditable,
     ContactInfoOpenContact,
     ContactInfoIntegrations
   },
@@ -67,7 +60,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 4px;
   flex-wrap: nowrap;
   min-width: 0;
 

@@ -28,8 +28,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import { LRN_NOT_PERFORMED } from 'src/constants/lrn-types'
+import { mapState } from 'vuex'
 
 export default {
   name: 'contact-info-badges',
@@ -79,11 +79,11 @@ export default {
   display: flex;
   gap: 4px;
   align-items: center;
+  flex-wrap: wrap;
 
-  // Ensure badges align properly
   .badge-phone-info {
-    margin: 0; // Remove any default margins
-    line-height: 1; // Normalize line-height
+    margin: 0;
+    line-height: 1;
   }
 }
 </style>

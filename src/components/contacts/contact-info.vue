@@ -7,30 +7,18 @@
       :team-inbox="teamInbox"
     />
 
-    <div class="alw-contact-info-phone-section">
-      <contact-info-badges :contact="contact" :phone="phone" />
+    <div class="alw-contact-info-section">
       <contact-info-phone :contact="contact" />
+      <contact-info-time
+        :timezone="contact.timezone"
+        class="alw-contact-info-time-section"
+      />
+
     </div>
 
-    <!-- Multiple integrations go on their own line after phone -->
-    <contact-info-integrations
-      v-if="activeIntegrations.length > 1"
-      :integrations="activeIntegrations"
-      class="alw-contact-info-integrations-row"
-    />
+    <contact-info-badges class="mt-1" :contact="contact" :phone="phone" />
 
-    <!-- Time section -->
-    <contact-info-time
-      :timezone="contact.timezone"
-      class="alw-contact-info-time-section"
-    />
-
-    <!-- Other info section -->
-    <div class="alw-contact-info-details">
-    </div>
-
-    <!-- Action buttons section -->
-    <div class="d-inline-flex flex-wrap contact-action-button">
+    <div class="d-inline-flex flex-wrap contact-action-button mt-1">
       <b-button class="custom-action-button my-1"
                 data-testid="contact-info-call-button"
                 size="sm"
@@ -264,7 +252,6 @@ import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { LRN_NOT_PERFORMED } from 'src/constants/lrn-types'
 import ContactInfoHeader from './contact-info/contact-info-header.vue'
-import ContactInfoIntegrations from './contact-info/contact-info-integrations.vue'
 import ContactInfoPhone from './contact-info/contact-info-phone.vue'
 import ContactInfoBadges from './contact-info/contact-info-badges.vue'
 import ContactInfoTime from './contact-info/contact-info-time.vue'
@@ -290,7 +277,6 @@ export default {
 
   components: {
     ContactInfoHeader,
-    ContactInfoIntegrations,
     ContactInfoPhone,
     ContactInfoBadges,
     ContactInfoTime,
@@ -367,7 +353,6 @@ export default {
       return !!this.activeInboxId
     },
 
-    // Get active integrations with their data
     activeIntegrations () {
       if (!this.contact?.integration_data) return []
 
@@ -587,19 +572,15 @@ export default {
   }
 }
 
-// Component spacing hierarchy - all margins defined here for clarity
-
-.alw-contact-info-phone-section {
+.alw-contact-info-section {
   display: flex;
   align-items: center;
-  justify-content: space-between; // Badges left, phone right
+  justify-content: space-between;
 }
 
 .alw-contact-info-time-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px; // → Space before details section
+  padding-right: 10px; // Align with "goto" icon
+  padding-bottom: 1px;
 }
 
 </style>

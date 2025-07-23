@@ -56,13 +56,9 @@ export default {
 .integration-link-btn {
   &.integration-link-btn--rectangular {
     border-radius: 20px;
-    padding: 0 8px;
+    padding: 0 10px;
     box-sizing: border-box;
-    width: auto;
-    min-width: auto;
-
-    min-height: 2.4em;
-    height: 2.4em;
+    min-height: 40px;
   }
 }
 </style>
