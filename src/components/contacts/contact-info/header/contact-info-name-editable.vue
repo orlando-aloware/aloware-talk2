@@ -38,13 +38,13 @@
 
     <q-menu
       v-model="showEditForm"
-      :offset="[10, 0]"
-      anchor="top left"
+      :offset="[0, -50]"
+      anchor="top middle"
       content-class="mx-height-300"
       data-testid="contact-info-edit-form-menu"
       no-focus
       no-parent-event
-      self="top right"
+      self="top middle"
     >
       <div class="row no-wrap q-pa-md">
         <contact-name-form
@@ -124,6 +124,11 @@ export default {
   height: 40px;
   min-height: 40px;
   justify-content: flex-start;
+
+  ::v-deep .q-btn__wrapper {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
 
   &:hover {
     .alw-contact-name {
