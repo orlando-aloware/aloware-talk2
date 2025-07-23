@@ -14066,6 +14066,19 @@ stylus@0.54.8:
     semver "^6.3.0"
     source-map "^0.7.3"
 
+"stylus@git+https://github.com/aloware/stylus.git":
+  version "0.54.8"
+  resolved "git+https://github.com/aloware/stylus.git#224194fded9d75b2910cafd09d70a03f6c7a00f3"
+  dependencies:
+    css-parse "~2.0.0"
+    debug "~3.1.0"
+    glob "^7.1.6"
+    mkdirp "~1.0.4"
+    safer-buffer "^2.1.2"
+    sax "~1.2.4"
+    semver "^6.3.0"
+    source-map "^0.7.3"
+
 sumchecker@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/sumchecker/-/sumchecker-3.0.1.tgz#6377e996795abb0b6d348e9b3e1dfb24345a8e42"
