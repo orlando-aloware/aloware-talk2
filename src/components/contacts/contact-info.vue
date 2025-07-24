@@ -45,6 +45,7 @@
               hide-bottom-space
               prepend="From:"
               @change="onLineChange"
+              @invalid-line-selection="onInvalidLineSelection"
               @initiateCall="forceInitiateCall"
             >
             </line-selector>
@@ -447,6 +448,7 @@ export default {
           // Show popup and wait for user to select line
           this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
           this.showLineSelectorPopup = !this.showLineSelectorPopup
+          this.selectedLine = this.contactLastLineUsedId
           return
         }
       }
@@ -528,6 +530,10 @@ export default {
 
     onLineChange (line) {
       this.selectedLine = line
+    },
+
+    onInvalidLineSelection () {
+      this.selectedLine = null
     },
 
     async handleExportCommunications () {
