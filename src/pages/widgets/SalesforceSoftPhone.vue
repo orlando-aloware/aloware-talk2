@@ -40,7 +40,6 @@
     </div>
 
     <webrtc
-      :carrierName="authProfile.carrier_name"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"

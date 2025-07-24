@@ -43,6 +43,8 @@
 
     <tutorial-video-button v-if="!isMobile" />
 
+    <team-inbox-lines-tutorial-button />
+
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
@@ -148,6 +150,7 @@ import { Platform } from 'quasar'
 import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
+import TeamInboxLinesTutorialButton from 'components/teaminbox/teaminbox-lines-tutorial-button.vue'
 import {
   aclMixin,
   avatarMixin,
@@ -157,7 +160,7 @@ import {
   kycMixin,
   userMixin
 } from 'src/plugins/mixins'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import { DEFAULT_COMMUNICATIONS_ROUTE_NAME, COMMUNICATIONS_CHANNELS_ROUTE_NAME, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
@@ -193,7 +196,8 @@ export default {
     InboxToggleFilters,
     InformationCircleIcon,
     TutorialVideoButton,
-    MemoryMonitor
+    MemoryMonitor,
+    TeamInboxLinesTutorialButton
   },
 
   props: {
@@ -352,7 +356,7 @@ export default {
     },
 
     isCommunicationsPage () {
-      return this.$route.name === COMMUNICATIONS_CHANNELS_ROUTE_NAME
+      return [DEFAULT_COMMUNICATIONS_ROUTE_NAME, COMMUNICATIONS_CHANNELS_ROUTE_NAME].includes(this.$route.name)
     },
 
     isTeamInboxPage () {

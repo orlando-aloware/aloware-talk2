@@ -52,16 +52,13 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from 'vuex'
-import {
-  contactMixin,
-  contactV2AttributesMixin,
-  aclMixin,
-  visibilityMixin,
-  selectorMixin
-} from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapState } from 'vuex'
+import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, userMixin, visibilityMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
+import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
+import { COMPANY_AGENT } from 'src/constants/roles'
 
 export default {
   name: 'line-selector',
@@ -71,7 +68,8 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    selectorMixin
+    selectorMixin,
+    userMixin
   ],
 
   props: {
@@ -92,41 +90,41 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact']),
-    ...mapState('contacts', [
-      'lineIncomingNumberLoading',
-      'lineIncomingNumber'
-    ]),
-    ...mapState(['campaigns', 'teamInboxCampaigns']),
-    ...mapState('TeamInbox', ['activeInbox']),
+    ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
+    ...mapState(['campaigns']),
+    ...mapState('TeamInbox', ['activeInbox', 'teamInboxCampaigns']),
 
     /**
      * Returns the appropriate campaigns array based on whether we're in team inbox mode
      */
     campaignsToUse () {
-      return this.teamInbox ? this.activeCampaigns : this.campaigns
-    },
+      if (this.teamInbox) {
+        // Active Team Inbox Campaigns
+        return this.activeCampaigns
+      }
 
-    /**
-     * Returns the active campaigns ids
-     */
-    activeCampaignsIds () {
-      const callWaitingIds = Array.isArray(this.activeInbox?.campaign_ids_as_call_waiting_ring_group)
-        ? this.activeInbox.campaign_ids_as_call_waiting_ring_group
-        : this.activeInbox?.campaign_ids_as_call_waiting_ring_group
-          ? [this.activeInbox.campaign_ids_as_call_waiting_ring_group]
-          : []
+      if (this.shouldLimitAgentLinesVisibility) {
+        // Visible Campaigns (line management enhancements)
+        return this.campaigns.filter(
+          campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
+        )
+      }
 
-      return this.activeInbox?.campaign_ids
-        ? [...this.activeInbox.campaign_ids, ...callWaitingIds]
-        : callWaitingIds
+      // All Campaigns (no limitations)
+      return this.campaigns
     },
 
     /**
      * Returns the active campaigns
      */
     activeCampaigns () {
-      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-      return campaigns.filter(campaign => this.activeCampaignsIds?.includes(campaign.id))
+      return this
+        .teamInboxCampaigns
+        .filter(campaign =>
+          // Active Inbox Campaigns
+          this.activeInboxCampaignIds?.includes(campaign.id) ||
+          isIvrOrDeadEndCampaign(campaign)
+        )
     },
 
     selectedCampaign () {
@@ -203,6 +201,11 @@ export default {
       }
 
       return []
+    },
+
+    shouldLimitAgentLinesVisibility () {
+      return this.hasRole(COMPANY_AGENT) &&
+        this.hasCompanyTeamInboxLineManagementEnhancements
     }
   },
 
@@ -297,7 +300,15 @@ export default {
 
     getIncomingNumber () {
       this.isBusy = true
-      return talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id, this.teamInbox).then(response => {
+
+      let apiCall
+      if (this.teamInbox) {
+        apiCall = talk2TeamInboxApi.contact.getIncomingNumber(this.contact.id, this.selectedLine.id)
+      } else {
+        apiCall = talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id)
+      }
+
+      return apiCall.then(response => {
         this.incomingNumber = response.data
       }).finally(() => {
         this.isBusy = false
@@ -344,7 +355,14 @@ export default {
       if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
         this.setLineIncomingNumberLoading(true)
 
-        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
+        let apiCall
+        if (this.teamInbox) {
+          apiCall = talk2TeamInboxApi.contact.getIncomingNumber(this.contact.id, this.selectedCampaign.id)
+        } else {
+          apiCall = talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id)
+        }
+
+        apiCall.then(response => {
           this.setLineIncomingNumber(response.data)
         }).finally(() => {
           this.setLineIncomingNumberLoading(false)

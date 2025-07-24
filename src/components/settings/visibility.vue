@@ -12,8 +12,7 @@
       </b-form-row>
       <b-form-row class="mt-3"
                   :id="`${SettingsMap.contacts_visibility.hash_keyword}-container`">
-        <b-col sm="12"
-               md="6">
+        <b-col sm="12">
           <div>
             <h5 class="form-label">Contacts Visibility</h5>
             <p class="form-helper-text">Select the contacts visibility settings for this user</p>
@@ -39,8 +38,7 @@
 
       <b-form-row class="mt-4"
                   :id="`${SettingsMap.communications_visibility.hash_keyword}-container`">
-        <b-col sm="12"
-               md="6">
+        <b-col sm="12">
           <div>
             <h5 class="form-label">Communications Visibility</h5>
             <p class="form-helper-text">Communication visibility settings for this user</p>
@@ -55,7 +53,8 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4"
+      <b-form-row v-if="!hasCompanyTeamInboxLineManagementEnhancements"
+                  class="mt-4"
                   :id="`${SettingsMap.line_access_limit.hash_keyword}-container`">
         <b-col sm="12"
                md="12">
@@ -76,7 +75,7 @@
           </b-form-group>
         </b-col>
       </b-form-row>
-      <b-form-row v-if="user.line_access_limit">
+      <b-form-row v-if="user.line_access_limit && !hasCompanyTeamInboxLineManagementEnhancements">
         <b-col sm="12" md="12">
           <b-alert :show="sortedCampaigns && sortedCampaigns.length < 1">Lines data not available</b-alert>
         </b-col>
@@ -96,7 +95,7 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4" v-if="user.line_access_limit">
+      <b-form-row class="mt-4" v-if="user.line_access_limit && !hasCompanyTeamInboxLineManagementEnhancements">
         <b-col sm="12" md="12">
           <b-form-group label="" >
             <b-form-checkbox
@@ -111,7 +110,7 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-0" v-if="user.line_access_limit">
+      <b-form-row class="mt-0" v-if="user.line_access_limit && !hasCompanyTeamInboxLineManagementEnhancements">
         <b-col sm="12" md="12">
           <b-form-group label="" >
             <b-form-checkbox
@@ -194,7 +193,7 @@
 
 <script>
 import VisibilitySelector from 'components/generic-selectors/visibility-selector'
-import { aclMixin, kycMixin } from 'src/plugins/mixins'
+import { aclMixin, kycMixin, userMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import * as ContactAccessTypes from 'src/constants/contact-access-types'
 
@@ -203,7 +202,7 @@ import SettingsMap from 'components/settings/settings-map'
 export default {
   name: 'visibility',
 
-  mixins: [aclMixin, kycMixin],
+  mixins: [aclMixin, kycMixin, userMixin],
 
   components: { VisibilitySelector },
 

@@ -5,6 +5,7 @@
 <script>
 import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
+import teamInboxApi from 'src/plugins/api/teamInboxApi'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
@@ -25,6 +26,7 @@ import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
+import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'dialer',
@@ -68,20 +70,24 @@ export default {
       tokenRetryCount: 0,
       tokenRetryTimeout: null,
       maxTokenRetries: 3,
-      baseRetryDelay: 1000 // 1 second base delay
+      baseRetryDelay: 1000, // 1 second base delay
+      pendingNotificationData: null,
+      notificationShownFromCustomParams: false
     }
   },
 
   computed: {
     ...mapState('cache', ['currentCompany', 'profile']),
 
-    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
+    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups', 'campaigns']),
 
     ...mapState('auth', ['profile', 'authenticated']),
 
     ...mapState('powerDialer', ['powerDialerTasks']),
 
     ...mapState(['isWidget', 'isSalesforceWidget']),
+
+    ...mapState('TeamInbox', ['activeInboxId']),
 
     ...mapFields('powerDialer', [
       'activeTask',
@@ -123,7 +129,7 @@ export default {
         this.setDialerCommunication(data)
 
         const communication = this.dialer?.communication
-        const isGreetingNew = communication?.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+        const isGreetingNew = communication?.legc_uuid && [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
         const user = communication?.added_user
 
         if (user && !isGreetingNew) {
@@ -201,7 +207,7 @@ export default {
     }
 
     this.dialerListeners.makeCall = (data) => {
-      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId, false, false, data.isFromDialer)
     }
 
     this.dialerListeners.transferCall = (data) => {
@@ -402,10 +408,26 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
+      const communicationData = this.buildCommunicationFromCustomParameters()
+      this.notificationShownFromCustomParams = false
+
+      if (communicationData) {
+        if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+          this.$VueEvent.fire('new_in_app_call', communicationData)
+          this.processActionNotification(communicationData, 'call')
+          this.notificationShownFromCustomParams = true
+        } else {
+          this.pendingNotificationData = communicationData
+        }
+      }
+
       this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
-          this.$VueEvent.fire('new_in_app_call', res.data)
-          this.processActionNotification(res.data, 'call')
+          if (!this.notificationShownFromCustomParams) {
+            this.$VueEvent.fire('new_in_app_call', res.data)
+            this.processActionNotification(res.data, 'call')
+            this.pendingNotificationData = null
+          }
           this.addNonOwnedLiveContact(res.data)
         }
       }).catch((err) => {
@@ -546,14 +568,17 @@ export default {
         live: true
       }
 
+      let apiCall
       if (this.currentCompany.team_inbox_enabled) {
-        params.from_team_inbox = true
+        // Use Team Inbox V3 API when team inbox is enabled
+        apiCall = teamInboxApi.communication.info(params)
+      } else {
+        // Use regular V1 API
+        apiCall = this.$axios.get('/api/v1/communication/info', { params })
       }
 
       this.loadingCommunication = true
-      return this.$axios.get('/api/v1/communication/info', {
-        params
-      }).then(res => {
+      return apiCall.then(res => {
         if (this.dialer.communication && !force) {
           return Promise.resolve()
         }
@@ -591,7 +616,7 @@ export default {
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
-        const isGreetingNew = communication.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+        const isGreetingNew = communication.legc_uuid && [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
         const user = communication.added_user
 
         if (user && !isGreetingNew) {
@@ -602,9 +627,9 @@ export default {
         // with the communication's contact id
         // else, set the contact.
         if ((routeTitle &&
-          this.activeTask &&
-          routeTitle === 'Power Dialer Sessions' &&
-          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+            this.activeTask &&
+            routeTitle === 'Power Dialer Sessions' &&
+            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
@@ -735,9 +760,39 @@ export default {
       })
     },
 
-    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null, isCallWaiting = false, shouldAnswer = false) {
-      console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
+    shouldIncludeRingGroupId (isFromDialer, outboundCampaign) {
+      if (isFromDialer) {
+        // Call is made directly from dialer, so we don't need to include the ring group id
+        return false
+      }
 
+      if (!this.activeInboxId) {
+        // No active inbox, so we don't need to include the ring group id
+        return false
+      }
+
+      const campaign = ['number', 'string'].includes(typeof outboundCampaign)
+        ? this.campaigns.find(campaign => campaign.id === outboundCampaign)
+        : outboundCampaign
+
+      if (!isIvrOrDeadEndCampaign(campaign)) {
+        // Campaign is not an IVR or Dead End campaign, so we don't need to include the ring group id
+        return false
+      }
+
+      return true
+    },
+
+    async makeCall (
+      currentNumber,
+      outboundCampaignId,
+      contactName = '',
+      companyName = '',
+      contactId = null,
+      isCallWaiting = false,
+      shouldAnswer = false,
+      isFromDialer = false
+    ) {
       if (!this.dialer.isReady) {
         console.log('Dialer is not ready', currentNumber, outboundCampaignId)
         return
@@ -809,6 +864,12 @@ export default {
 
       if (this.isOnPowerDialerSessionRoute) {
         params['AnswerInPD'] = true
+      }
+
+      if (this.shouldIncludeRingGroupId(isFromDialer, outboundCampaignId)) {
+        // RingGroupId is used to identify the current inbox
+        // when making a call from an IVR line
+        params['RingGroupId'] = this.activeInboxId.toString()
       }
 
       console.log(' %c Making a call to: ', 'background: #000; color: #fff000;', params)
@@ -964,9 +1025,9 @@ export default {
       // only start wrap up timer if there is a communication
       if (this.dialer.communication) {
         const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
-                                  this.hasParkedAndInprogressCall ||
-                                  this.hasCallInProgressNotParked) &&
-                                  !(this.parkFromAnotherTab || this.hungFromAnotherTab)
+            this.hasParkedAndInprogressCall ||
+            this.hasCallInProgressNotParked) &&
+          !(this.parkFromAnotherTab || this.hungFromAnotherTab)
 
         if (shouldStartWrapUp) {
           this.startWrapUpTimer()
@@ -1596,6 +1657,8 @@ export default {
       this.setShowIncomingCallNotification(false)
       this.setDialerAiAgentWhisper(false)
       this.setDialerAiAgentTakeover(false)
+      this.pendingNotificationData = null
+      this.notificationShownFromCustomParams = false
     },
 
     countCallDuration () {
@@ -2047,6 +2110,94 @@ export default {
         clearTimeout(this.tokenRetryTimeout)
         this.tokenRetryTimeout = null
       }
+    },
+
+    buildCommunicationFromCustomParameters () {
+      const customParams = this.dialer.call?.customParameters
+
+      console.log('Attempting to build communication from customParameters:', customParams)
+
+      if (!customParams || !this.dialer.call) {
+        return null
+      }
+
+      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId']
+      const missingParams = requiredParams.filter(param => {
+        return !customParams[param]
+      })
+
+      if (missingParams.length > 0) {
+        console.log(`Missing required parameters in customParameters: ${missingParams.join(', ')}, falling back to API call`)
+        return null
+      }
+
+      const campaignId = parseInt(customParams.CampaignId) || null
+      const campaign = this.getCampaign(campaignId)
+
+      let communicationData
+      let locationData = null
+
+      try {
+        communicationData = JSON.parse(customParams.CommunicationData)
+      } catch (error) {
+        console.error('Failed to parse CommunicationData JSON from customParameters:', error)
+        return null
+      }
+
+      if (!communicationData || !communicationData.Id) {
+        console.error('CommunicationData is missing or invalid')
+        return null
+      }
+
+      if (customParams.LocationData) {
+        try {
+          locationData = JSON.parse(customParams.LocationData)
+        } catch (error) {
+          console.warn('Failed to parse LocationData JSON from customParameters, continuing without location data:', error)
+          locationData = null
+        }
+      }
+
+      const communication = {
+        id: parseInt(communicationData.Id) || null,
+        is_call_waiting: communicationData.CallWaiting,
+        contact: {
+          id: parseInt(customParams.ContactId) || null,
+          name: customParams.ContactName,
+          phone_number: this.dialer.call.from,
+          user_id: customParams?.ContactUserId,
+          company_name: customParams?.CompanyName
+        },
+        city: locationData?.City,
+        state: locationData?.State,
+        country: locationData?.Country,
+        ring_group_id: parseInt(communicationData.RingGroupId) || null,
+        campaign_id: campaignId,
+        campaign: {
+          name: campaign?.name
+        }
+      }
+
+      console.log('Successfully built communication data from customParameters:', communication)
+      return communication
+    },
+
+    getCampaign (campaignId) {
+      if (!campaignId) {
+        return null
+      }
+
+      if (!this.campaigns || !Array.isArray(this.campaigns)) {
+        return null
+      }
+
+      const found = this.campaigns.find(campaign => campaign.id === campaignId)
+
+      if (!found) {
+        return null
+      }
+
+      return found
     }
   },
 
@@ -2054,6 +2205,18 @@ export default {
     'dialer.currentStatus': function (value) {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
+      }
+    },
+
+    agentStatus (newStatus, oldStatus) {
+      if (newStatus === AgentStatus.AGENT_STATUS_RINGING &&
+        oldStatus !== AgentStatus.AGENT_STATUS_RINGING &&
+        this.pendingNotificationData &&
+        !this.notificationShownFromCustomParams) {
+        this.$VueEvent.fire('new_in_app_call', this.pendingNotificationData)
+        this.processActionNotification(this.pendingNotificationData, 'call')
+        this.notificationShownFromCustomParams = true
+        this.pendingNotificationData = null
       }
     }
   },

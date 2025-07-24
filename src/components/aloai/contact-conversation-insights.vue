@@ -359,6 +359,8 @@ import { marked } from 'marked'
 import { QSpinnerBars } from 'quasar'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
 export default {
@@ -368,6 +370,8 @@ export default {
     SparkleIcon,
     QSpinnerBars
   },
+
+  mixins: [teamInboxPropsMixin],
 
   props: {
     contact: {
@@ -485,7 +489,7 @@ export default {
       let renderer = new marked.Renderer()
       renderer.link = function (href, title, text) {
         var link = marked.Renderer.prototype.link.apply(this, arguments)
-        return link.replace('<a', "<a target='_blank'")
+        return link.replace('<a', '<a target=\'_blank\'')
       }
 
       // Use the custom renderer with marked
@@ -620,10 +624,13 @@ export default {
         type: CommunicationTypes.NOTE
       }
 
-      talk2Api.V1.contact.addEngagement(this.contact.id, message)
-        .then(response => {
-          this.$generalNotification('Note has been added.')
-        })
+      const apiCall = this.teamInbox
+        ? talk2TeamInboxApi.calendar.createEvent(this.contact.id, message)
+        : talk2Api.V1.contact.addEngagement(this.contact.id, message)
+
+      apiCall.then(response => {
+        this.$generalNotification('Note has been added.')
+      })
         .catch(error => {
           console.error(error)
           this.$handleErrors(error.response)

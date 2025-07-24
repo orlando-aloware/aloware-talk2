@@ -273,14 +273,14 @@
 
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND &&
-              communication.campaign_id && getCampaign(communication.campaign_id) &&
-              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-            &nbsp; used {{ getCampaign(communication.campaign_id).name }} to {{ communication.type === CommunicationTypes.CALL ? 'call' : 'send' }}
+              communication.campaign_id &&
+              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">&nbsp;used {{ getCampaignName(communication)
+          }} to {{ communication.type === CommunicationTypes.CALL ? 'call' : 'send' }}
         </span>
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.INBOUND &&
-              communication.campaign_id && getCampaign(communication.campaign_id)">
-            &nbsp; to {{ getCampaign(communication.campaign_id).name }}
+              communication.campaign_id">
+            &nbsp; to {{ getCampaignName(communication) }}
         </span>
 
         <span class="text-muted"
@@ -300,7 +300,8 @@
               v-if="communication.direction === CommunicationDirection.OUTBOUND &&
               [CommunicationTypes.SMS].includes(communication.type) &&
               communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-            &nbsp;Failed to {{ communication.type === CommunicationTypes.CALL ? 'call' : 'send' }} from {{ getCampaign(communication.campaign_id).name }} to {{ communication.lead_number | fixPhone }}
+            &nbsp;Failed to {{ communication.type === CommunicationTypes.CALL ? 'call' : 'send'
+          }} from {{ getCampaignName(communication) }} to {{ communication.lead_number | fixPhone }}
         </span>
 
         <q-badge class="is-dot mx-1 grey-light"
@@ -385,13 +386,9 @@
 
 <script>
 import _ from 'lodash'
-import {
-  aclMixin,
-  avatarMixin,
-  userMixin,
-  teamInboxPropsMixin
-} from 'src/plugins/mixins'
-import { mapState, mapGetters } from 'vuex'
+import { aclMixin, avatarMixin, teamInboxPropsMixin, userMixin } from 'src/plugins/mixins'
+import { mapGetters, mapState } from 'vuex'
+import { removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -508,7 +505,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'teamInboxCampaigns', 'workflows', 'dispositionStatuses', 'leadSources', 'isWidget']),
+    ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources', 'isWidget']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
     ...mapState('inbox', [
@@ -754,26 +751,6 @@ export default {
       return this.generateCustomAuditMessage(communication) + notes
     },
 
-    getCampaign (id) {
-      if (!id) {
-        return null
-      }
-
-      id = parseInt(id)
-      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
-      const found = campaigns.find(campaign => campaign.id === id)
-
-      if (found) {
-        return found
-      }
-
-      return {
-        id: id,
-        name: 'Unknown Line',
-        incoming_number: ''
-      }
-    },
-
     getRelativeDateTime () {
       this.relativeDatetime = this.$options.filters.fixRelativeDatetimeFormat(this.communication.created_at)
     },
@@ -994,6 +971,22 @@ export default {
       if (indexToRemove !== -1) {
         this.excluded_audits.splice(indexToRemove, 1)
       }
+    },
+
+    getCampaignName (communication) {
+      // If communication has embedded campaign object, use it
+      if (communication?.campaign?.name) {
+        // Remove the deleted suffix
+        return removeDeletedSuffix(communication.campaign.name)
+      }
+
+      // If we have incoming_number, show that instead
+      if (communication?.incoming_number) {
+        return this.$options.filters.fixPhone(communication.incoming_number)
+      }
+
+      // Only use 'unknown line' if we have neither
+      return 'unknown line'
     }
   }
 }

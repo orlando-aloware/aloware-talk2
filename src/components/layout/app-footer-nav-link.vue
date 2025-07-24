@@ -32,7 +32,7 @@ export default {
       return this.$router.resolve(this.to).resolved.matched
     },
     userSpecificRoutes () {
-      return this.$store.state.auth.is_focused_power_dialer ? allowedRoutes.focusedPowerDialer : allowedRoutes.default
+      return this.$store.state.auth.is_focused_power_dialer ? allowedRoutes.talkLite : allowedRoutes.default
     },
     accessibleByUser () {
       return this.matchedRoutes.some(

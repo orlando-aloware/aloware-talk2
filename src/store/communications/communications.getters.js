@@ -1,6 +1,6 @@
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
-import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, MESSAGES_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 export default {
   selectedFilter: (state) => state.selectedFilter,
@@ -15,7 +15,7 @@ export default {
 
     let defaultFilterModel = {
       name: '',
-      type: ChannelType.CHANNEL_MESSAGES,
+      type: ChannelType.CHANNEL_ALL_COMMUNICATIONS,
       filter: {},
       scope: 'user'
     }
@@ -49,7 +49,7 @@ export default {
       return defaultFilterModel
     }
 
-    if ([CALLS_CHANNEL].includes(channel)) {
+    if (channel === CALLS_CHANNEL) {
       defaultFilterModel.type = ChannelType.CHANNEL_CALLS
       defaultFilterModel.filter = {
         campaigns: Filters.DEFAULT_STATE.filter.campaigns,
@@ -82,41 +82,41 @@ export default {
       return defaultFilterModel
     }
 
-    if (channel === DEFAULT_COMMUNICATIONS_CHANNEL) {
-      defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
+    if (channel === MESSAGES_CHANNEL) {
+      defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
       defaultFilterModel.filter = {
-        ...Filters.DEFAULT_STATE.filter,
-        changed: true,
-        unread_only: 0,
+        campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+        direction: Filters.DEFAULT_STATE.filter.direction,
+        tags: Filters.DEFAULT_STATE.filter.tags,
+        first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+        untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+        exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+        incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+        users: Filters.DEFAULT_STATE.filter.users,
+        workflows: Filters.DEFAULT_STATE.filter.workflows,
+        broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+        contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+        from_date: Filters.DEFAULT_STATE.filter.from_date,
+        to_date: Filters.DEFAULT_STATE.filter.to_date,
+        my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+        creator_type: Filters.DEFAULT_STATE.filter.creator_type,
+        has_international: Filters.DEFAULT_STATE.filter.has_international,
+        answer_status: answerStatus,
+        not_disposed: Filters.DEFAULT_STATE.filter.not_disposed,
         type,
+        unread_only: 0,
         inboxes: Filters.DEFAULT_STATE.filter.inboxes || []
       }
 
       return defaultFilterModel
     }
 
-    defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
+    defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
     defaultFilterModel.filter = {
-      campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-      direction: Filters.DEFAULT_STATE.filter.direction,
-      tags: Filters.DEFAULT_STATE.filter.tags,
-      first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-      untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-      exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-      incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-      users: Filters.DEFAULT_STATE.filter.users,
-      workflows: Filters.DEFAULT_STATE.filter.workflows,
-      broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-      contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-      from_date: Filters.DEFAULT_STATE.filter.from_date,
-      to_date: Filters.DEFAULT_STATE.filter.to_date,
-      my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-      creator_type: Filters.DEFAULT_STATE.filter.creator_type,
-      has_international: Filters.DEFAULT_STATE.filter.has_international,
-      answer_status: answerStatus,
-      not_disposed: Filters.DEFAULT_STATE.filter.not_disposed,
-      type,
+      ...Filters.DEFAULT_STATE.filter,
+      changed: true,
       unread_only: 0,
+      type,
       inboxes: Filters.DEFAULT_STATE.filter.inboxes || []
     }
 

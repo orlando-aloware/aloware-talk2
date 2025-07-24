@@ -278,6 +278,7 @@ import AudioPlaceholder from 'components/message-composer/file-placeholders/audi
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { kycMixin, selectorMixin } from 'src/plugins/mixins'
+import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 export default {
   name: 'message-composer-sms',
 
@@ -349,6 +350,8 @@ export default {
     ...mapState('contacts', [
       'isShortenedUrlRemembered'
     ]),
+
+    ...mapState('TeamInbox', ['activeInboxId']),
 
     ...mapGetters('auth', ['profile']),
 
@@ -555,7 +558,7 @@ export default {
     },
 
     formatMessage () {
-      return {
+      const data = {
         body: this.messageComposer.sms.body,
         contact_id: this.contact.id,
         campaign_id: this.selectedLine.id,
@@ -563,6 +566,14 @@ export default {
         attachments: this.messageComposer.sms.attachments.map(attachment => attachment.uuid),
         gif: this.messageComposer.sms.gif_url
       }
+
+      if (this.activeInboxId && isIvrOrDeadEndCampaign(this.selectedLine)) {
+        // Ring Group ID is used to identify the current inbox
+        // when sending a message from an IVR or Dead End line
+        data.ring_group_id = this.activeInboxId
+      }
+
+      return data
     },
 
     messageSentFormatMessage () {

@@ -50,8 +50,7 @@ export default {
         TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
       ],
       // Store the unread count for the currently selected contact
-      currentContactUnreadCount: 0,
-      loadingTeamInboxCampaigns: false
+      currentContactUnreadCount: 0
     }
   },
 
@@ -76,14 +75,6 @@ export default {
       'isTeamInboxNavListCollapsed',
       'isContactDetailsCollapsed',
       'isSidebarCollapsed'
-    ]),
-
-    ...mapState([
-      'teamInboxCampaigns'
-    ]),
-
-    ...mapState([
-      'isMobile'
     ]),
 
     isMobileContactActive () {
@@ -128,21 +119,14 @@ export default {
         this.$router.replace({ name: 'Inbox' })
       }
     }
-
     this.resizeHandler()
-
-    // Load team inbox campaigns
-    getTeamInboxCampaigns(this)
   },
 
   methods: {
-    ...mapActions([
+    ...mapActions('TeamInbox', [
+      'reset',
       'setTeamInboxCampaigns',
       'setCampaignsIsLoading'
-    ]),
-
-    ...mapActions('TeamInbox', [
-      'reset'
     ]),
 
     onItemSelected (routeData) {
@@ -241,7 +225,8 @@ export default {
     }
   },
 
-  created () {
+  async created () {
+    await getTeamInboxCampaigns(this)
     this.$VueEvent.listen('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
   },
 

@@ -42,6 +42,14 @@
         </b-col>
       </b-form-row>
 
+      <b-form-row v-if="showInvalidCompanyDefaultLineAlert" class="mt-n4">
+        <b-col sm="12">
+          <p class="form-helper-text text-danger">
+            The company default line is no longer available. Please select a different line.
+          </p>
+        </b-col>
+      </b-form-row>
+
       <b-form-row :id="`${SettingsMap.default_outbound_campaign_id.hash_keyword}-container`"
                   v-if="showOutboundLineSelector">
         <b-col sm="12"
@@ -57,12 +65,19 @@
                            :multiple="false"
                            :use-chips="false"
                            :use-input="true"
+                           :hide-bottom-space="true"
                            :generic-styling="false"
                            :generic-multiselect="false"
                            :disable="outboundLineSettingsDisabled"
-                           @change="(eventPayload) => onUpdateFields(eventPayload, 'default_outbound_campaign_id')">
+                           @change="(eventPayload) => onUpdateFields(eventPayload, 'default_outbound_campaign_id')"
+                           @invalid-line-selection="onInvalidLineSelection">
             </line-selector>
-            <b-form-invalid-feedback v-if="!$v.user.default_outbound_campaign_id.required">Please select an outbound line.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="showInvalidLineSelectedError">
+              Line '{{ invalidLineSelected.name }}' is no longer available. Please select a different line.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback v-else-if="!$v.user.default_outbound_campaign_id.required">
+              Please select an outbound line.
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -164,6 +179,8 @@ import {
   OUTBOUND_CALLING_MODE_SELECTOR_USER_SELECT_MANUALLY,
   OUTBOUND_CALLING_MODE_SELECTOR_USER_ALWAYS_ASK
 } from 'src/constants/user-outbound-calling-modes'
+import { COMPANY_AGENT } from 'src/constants/roles'
+import { agentAvailableCampaignsCallback } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'outbound-call',
@@ -195,7 +212,8 @@ export default {
         { text: 'Never Record', value: 3 }
       ],
       accountLevelOutboundCampaign: null,
-      SettingsMap
+      SettingsMap,
+      invalidLineSelected: null
     }
   },
 
@@ -249,6 +267,32 @@ export default {
       }
 
       return this.accountLevelOutboundCampaign?.name
+    },
+
+    availableAgentCampaigns () {
+      if (this.hasRole(COMPANY_AGENT)) {
+        return this.campaigns.filter(
+          campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
+        )
+      }
+
+      return this.campaigns
+    },
+
+    showInvalidCompanyDefaultLineAlert () {
+      if (this.user.outbound_calling_selector !== OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT) {
+        return false
+      }
+
+      if (!this.hasRole(COMPANY_AGENT)) {
+        return false
+      }
+
+      return !this.availableAgentCampaigns.find(campaign => campaign.id === this.currentCompany?.default_outbound_campaign_id)
+    },
+
+    showInvalidLineSelectedError () {
+      return this.invalidLineSelected?.name
     }
   },
 
@@ -270,6 +314,10 @@ export default {
     },
 
     onUpdateFields (value, prop) {
+      if (prop === 'default_outbound_campaign_id') {
+        this.invalidLineSelected = null
+      }
+
       this.user[prop] = value
       this.updateChangedUserProperties({
         name: prop,
@@ -295,6 +343,10 @@ export default {
       if (this.currentCompany && this.currentCompany.force_outbound_line) {
         this.accountLevelOutboundCampaign = this.campaigns?.find(campaign => campaign.id === this.currentCompany.default_outbound_campaign_id)
       }
+    },
+
+    onInvalidLineSelection (campaign) {
+      this.invalidLineSelected = campaign
     }
   },
 

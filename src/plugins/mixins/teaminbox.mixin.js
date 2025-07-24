@@ -1,6 +1,6 @@
 import { SEARCH_FIELDS, THREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 
 export default {
   computed: {
@@ -19,7 +19,24 @@ export default {
       'isLoadingMoreItems',
       'abortController',
       'unreadCountLoaded'
-    ])
+    ]),
+
+    ...mapState(['currentTimezone']),
+
+    dateRanges () {
+      const timezone = this.currentTimezone
+      const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+
+      return {
+        'Today': [this.$moment.tz(timezone).startOf('day').format(DATE_FORMAT), this.$moment.tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Yesterday': [this.$moment.tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT), this.$moment.tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT)],
+        'Last 7 Days': [this.$moment.tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT), this.$moment.tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last 30 Days': [this.$moment.tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT), this.$moment.tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'This Month So Far': [this.$moment.tz(timezone).startOf('month').format(DATE_FORMAT), this.$moment.tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last Month': [this.$moment.tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), this.$moment.tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
+        'All Time': [null, null]
+      }
+    }
   },
 
   methods: {
@@ -56,7 +73,7 @@ export default {
         const nextPage = 1
         const perPage = 50
 
-        const response = await talk2Api.V2.inbox.inboxes.get({
+        const response = await talk2TeamInboxApi.inboxes.get({
           params: {
             page: nextPage,
             per_page: perPage,
@@ -96,7 +113,7 @@ export default {
 
         const perPage = 50
         const nextPage = this.currentInboxesPage + 1
-        const response = await talk2Api.V2.inbox.inboxes.get({
+        const response = await talk2TeamInboxApi.inboxes.get({
           params: {
             page: nextPage,
             per_page: perPage,
@@ -177,12 +194,19 @@ export default {
       // Transform filters to API parameters
       const apiFilters = {}
 
+      const applyFromAndToDates = ['Yesterday', 'Last Month', 'custom'].includes(filters.date_range)
+
       if (filters.from_date) {
-        apiFilters.from_date = filters.from_date
-        // Only send to_date for custom date ranges to prevent timezone cutoff issues
-        if (filters.to_date && filters.date_range === 'custom') {
-          apiFilters.to_date = filters.to_date
+        if (applyFromAndToDates) {
+          apiFilters.from_date = filters.from_date
+        } else {
+          const dateRange = this.dateRanges[filters.date_range] ?? this.dateRanges['Last 30 Days']
+          apiFilters.from_date = dateRange[0]
         }
+      }
+
+      if (filters.to_date && applyFromAndToDates) {
+        apiFilters.to_date = filters.to_date
       }
 
       // Map filter keys to API parameters
@@ -190,8 +214,12 @@ export default {
         apiFilters.unread_only = true
       }
 
-      if (filters.types?.length) {
-        apiFilters.types = filters.types
+      if (filters.channels?.length) {
+        apiFilters.types = filters.channels.filter(channel => channel !== 'mentions')
+
+        if (filters.channels.includes('mentions')) {
+          apiFilters.has_mention = true
+        }
       }
 
       if (filters.directions) {
@@ -202,12 +230,12 @@ export default {
         apiFilters.my_contact = true
       }
 
-      if (filters?.task_status.length) {
+      if (filters.task_status?.length) {
         apiFilters.task_status = filters.task_status
       }
 
-      if (filters.mention) {
-        apiFilters.has_mention = true
+      if (filters.campaigns) {
+        apiFilters.campaigns = filters.campaigns
       }
 
       // Map sort keys to API parameters
@@ -215,25 +243,28 @@ export default {
         apiFilters.order = sort.order
       }
 
-      return talk2Api.V1.reports.communications.get({
-        params: {
-          inbox_id: inboxId,
-          page: nextPage,
-          per_page: 50,
-          ...(this.viewMode === THREADED ? { inbox_type: 'threaded' } : { inbox_type: 'unthreaded' }),
-          ...(search ? {
-            search_text: search,
-            search_fields: SEARCH_FIELDS
-          } : {}),
-          ...apiFilters
-        },
+      const params = {
+        inbox_id: inboxId,
+        page: nextPage,
+        per_page: 50,
+        inbox_type: this.viewMode === THREADED ? 'threaded' : 'unthreaded',
+        ...(search ? {
+          search_text: search,
+          search_fields: SEARCH_FIELDS
+        } : {}),
+        ...apiFilters
+      }
+
+      const config = {
         headers: { 'requested-from': 'api' },
         signal: this.abortController.signal
-      })
+      }
+
+      return talk2TeamInboxApi.reports.communications(params, config)
     },
 
     async checkInboxAccess (inboxId) {
-      const response = await talk2Api.V2.inbox.inboxes.get({
+      const response = await talk2TeamInboxApi.inboxes.get({
         params: {
           inbox_ids: [inboxId]
         }
@@ -257,7 +288,7 @@ export default {
       const filters = this.$store.state.TeamInbox.activeFilters || {}
 
       try {
-        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds, filters)
+        const { data: newData } = await talk2TeamInboxApi.inboxes.unreadCount(inboxIds, contactIds, filters)
         data = newData
 
         switch (data.length) {
@@ -292,6 +323,21 @@ export default {
 
     getInboxUnreadCount (inboxId) {
       return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
+    },
+
+    /**
+     * Check if current user has access to a specific ring group (Team Inbox)
+     * @param {Number} ringGroupId - The ring group ID to check
+     * @returns {Boolean} true if user has access, false otherwise
+     */
+    userHasAccessToRingGroup (ringGroupId) {
+      if (!ringGroupId) {
+        return false
+      }
+
+      // Check in the inboxes list (already fetched Team Inboxes)
+      // The inboxes array contains ONLY the Team Inboxes the current user has access to
+      return this.inboxes.some(inbox => inbox.id === ringGroupId)
     }
   }
 }

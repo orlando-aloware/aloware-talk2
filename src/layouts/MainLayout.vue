@@ -296,12 +296,14 @@ import * as TrialStatus from 'src/constants/trial-account-status'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { MAX_SCREEN_WIDTH_MOBILE_HEADER } from 'src/constants/viewport-sizes'
 import talk2Api from 'src/plugins/api/api'
-import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
+import { getCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
 import * as storage from 'src/plugins/helpers/storage'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import store from 'src/store'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
+import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'MyLayout',
@@ -357,8 +359,6 @@ export default {
   data () {
     return {
       loading: true,
-      loadingCampaigns: false,
-      loadingTeamInboxCampaigns: false,
       loadingRingGroups: false,
       loadingTeams: false,
       loadingContactLists: false,
@@ -434,7 +434,6 @@ export default {
     ...mapState([
       'dialer',
       'campaigns',
-      'teamInboxCampaigns',
       'isMobile',
       'ringGroups',
       'notifications',
@@ -446,7 +445,8 @@ export default {
       'showedKycDialog',
       'showedKycReloadDialog',
       'statics',
-      'isWidget'
+      'isWidget',
+      'campaignsIsLoading'
     ]),
 
     ...mapState('auth', [
@@ -1265,9 +1265,16 @@ export default {
 
       // if disposition status is not in-progress
       // or current status is not queued / ring all, close call notification
-      if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
-        !INCOMING_STATUSES.includes(communication.current_status2)) {
-        // console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
+      // But don't close if this is an add/introduce operation
+      const isAddOrIntroduceOperation = (communication.is_introduce ||
+        communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER ||
+        communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG) &&
+        communication.legc_uuid &&
+        [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
+
+      if ((communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
+        !INCOMING_STATUSES.includes(communication.current_status2)) && !isAddOrIntroduceOperation) {
+        console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
       }
 
@@ -1712,11 +1719,6 @@ export default {
         this.getLeadSources()
         this.getAttributeDictionaries()
         this.getMyQueueList()
-
-        // Load team inbox campaigns (no visibility limits) only if a team inbox is active
-        if (this.hasCompanyTeamInboxEnabled) {
-          getTeamInboxCampaigns(this)
-        }
       })
     },
 
@@ -1765,8 +1767,7 @@ export default {
         return null
       }
 
-      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-      const found = campaigns.find((campaign) => campaign.id === id)
+      const found = this.campaigns.find((campaign) => campaign.id === id)
 
       if (found) {
         return found
@@ -2767,7 +2768,6 @@ export default {
       'resetVuex',
       'setUsage',
       'setCampaigns',
-      'setTeamInboxCampaigns',
       'setCampaignsIsLoading',
       'setRingGroups',
       'setRingGroupsIsLoading',

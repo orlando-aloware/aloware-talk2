@@ -67,6 +67,7 @@
 
 <script>
 import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 import Avatar from 'components/avatar'
@@ -99,13 +100,20 @@ export default {
       this.setMessageComposerNoteBody(value)
     },
     formatMessage () {
-      return {
+      const message = {
         time: null,
         date: null,
         timezone: this.profile.timezone,
         body: this.parseMentionToMarkup(this.messageComposer.note.body),
         type: 10
       }
+
+      // Add ring_group_id when in Team Inbox context
+      if (this.teamInbox && this.teamInboxId) {
+        message.ring_group_id = this.teamInboxId
+      }
+
+      return message
     },
     onAdd () {
       this.isAdding = true
@@ -116,17 +124,20 @@ export default {
         type: CommunicationTypes.NOTE
       })
 
-      talk2Api.V1.contact.addEngagement(this.contact.id, message, this.teamInboxId)
-        .then(response => {
-          this.resetMessageComposerNote()
-          this.$generalNotification('Note has been added.')
-        }).catch(error => {
-          console.log(error)
-          this.$handleErrors(error.response)
-        }).finally(() => {
-          this.isAdding = false
-          // this.$refs.noteMessageBody.focus()
-        })
+      const apiCall = this.teamInbox
+        ? talk2TeamInboxApi.calendar.createEvent(this.contact.id, message)
+        : talk2Api.V1.contact.addEngagement(this.contact.id, message)
+
+      apiCall.then(response => {
+        this.resetMessageComposerNote()
+        this.$generalNotification('Note has been added.')
+      }).catch(error => {
+        console.log(error)
+        this.$handleErrors(error.response)
+      }).finally(() => {
+        this.isAdding = false
+        // this.$refs.noteMessageBody.focus()
+      })
     },
     getMentionableItems () {
       if (this.contact && this.contact.id) {

@@ -11,7 +11,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['campaigns', 'filters', 'dialer', 'teamInboxCampaigns']),
+    ...mapState(['campaigns', 'filters', 'dialer']),
     ...mapState('inbox', [
       'communications',
       'channelChangedFilterFields'
@@ -351,7 +351,7 @@ export default {
             event.communication.owner = event.owner
           }
           // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           // if (campaign) {
           //   event.communication.campaign = campaign
           // }
@@ -374,7 +374,7 @@ export default {
             event.communication.owner = event.owner
           }
           // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           // if (campaign) {
           //   event.communication.campaign = campaign
           // }
@@ -488,7 +488,7 @@ export default {
             event.communication.owner = event.owner
           }
           // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           // if (campaign) {
           //   event.communication.campaign = campaign
           // }
@@ -523,8 +523,7 @@ export default {
         })
         .listen('.incoming_number.created', (event) => {
           this.dispatchToMemoryMonitor('.incoming_number.created', event)
-          const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          const campaign = campaigns.find(campaign => campaign.id === event.incoming_number.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.incoming_number.campaign_id)
           if (campaign) {
             campaign.incoming_number = event.incoming_number.phone_number
             this.updateCampaign(campaign)

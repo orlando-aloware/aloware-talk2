@@ -75,7 +75,27 @@
 
             <!-- Bot Description -->
             <p class="text-muted small mb-2" v-if="bot.description">
-              {{ bot.description }}
+              <span v-if="!expandedDescriptions[bot.id] && bot.description?.length > 200">
+                {{ bot.description?.slice(0, 200) }}...
+                <a
+                  href="#"
+                  class="text-primary"
+                  @click.prevent="$set(expandedDescriptions, bot.id, true)"
+                >
+                  Show more
+                </a>
+              </span>
+              <span v-else>
+                {{ bot.description }}
+                <a
+                  href="#"
+                  class="text-primary"
+                  v-if="bot.description?.length > 200"
+                  @click.prevent="$set(expandedDescriptions, bot.id, false)"
+                >
+                  Show less
+                </a>
+              </span>
             </p>
 
             <div class="d-flex justify-content-between align-items-center">
@@ -213,7 +233,8 @@ export default {
         { label: 'Voice', value: AloAi.TYPE_VOICE },
         { label: 'Text', value: AloAi.TYPE_TEXT }
       ],
-      AloAi
+      AloAi,
+      expandedDescriptions: {}
     }
   },
 
@@ -313,6 +334,7 @@ export default {
         this.selectedBotId = null
         this.selectedBotType = AloAi.ALL
         this.busyBotId = null
+        this.expandedDescriptions = {}
       }, 300)
     },
     onShown () {

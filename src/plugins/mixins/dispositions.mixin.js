@@ -89,11 +89,27 @@ export default {
       return this.dialer.communication?.call_disposition_id
     },
 
+    // get force disposition status from current user session
+    checkDialerForceDisposition () {
+      const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
+        !this.dialer?.contact?.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
+        !this.dialer?.communication?.call_disposition_id
+      return shouldForceContactDisposition || shouldForceCallDisposition
+    },
+
+    // get force disposition from cached last_call
     checkForceDisposition () {
       const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
         !this.profile?.last_call?.contact?.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
+      let shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
         !this.profile?.last_call?.call_disposition_id
+
+      const dialerLastCommunication = this.getDialerLastCommunication()
+      // dont perform this check for transfered calls if last dialer call disposition is already selected
+      if (this.profile?.last_call?.transfer_type && dialerLastCommunication?.call_disposition_id) {
+        shouldForceCallDisposition = false
+      }
 
       return shouldForceContactDisposition || shouldForceCallDisposition
     },
@@ -143,6 +159,12 @@ export default {
 
     onCallDisposed (value) {
       this.setIsCallDisposed(value > 0)
+      if (this.dialer.communication) {
+        localStorage.setItem('dialer_last_communication', JSON.stringify({
+          id: this.dialer.communication.id,
+          call_disposition_id: value
+        }))
+      }
     },
 
     onContactDisposed (value) {
@@ -162,6 +184,17 @@ export default {
       if (!hasContactDispositionId) {
         this.setIsContactDisposed(false)
       }
+    },
+
+    getDialerLastCommunication () {
+      const communication = localStorage.getItem('dialer_last_communication')
+      if (communication) {
+        try {
+          return JSON.parse(communication)
+        } catch (err) {
+          return null
+        }
+      }
     }
   },
 
@@ -175,6 +208,15 @@ export default {
 
       if (isCallInprogress.includes(value) && this.isNotDisposed) {
         this.$VueEvent.fire('pauseWrapUp', true)
+      }
+    },
+
+    'dialer.communication': function (communication) {
+      if (communication) {
+        localStorage.setItem('dialer_last_communication', JSON.stringify({
+          id: communication.id,
+          call_disposition_id: communication.call_disposition_id
+        }))
       }
     },
 

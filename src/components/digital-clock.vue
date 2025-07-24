@@ -1,6 +1,6 @@
 <template>
   <div id="digital-clock" data-testid="digital-clock-wrapper">
-    <span class="time text-md _500">{{ time }}</span>
+    <span class="time _500">{{ time }}</span>
   </div>
 </template>
 
@@ -48,3 +48,13 @@ export default {
 
 }
 </script>
+
+<style lang="scss" scoped>
+.time {
+  font-size: 16px;
+
+  @media (min-width: 768px) {
+    font-size: 14px;
+  }
+}
+</style>

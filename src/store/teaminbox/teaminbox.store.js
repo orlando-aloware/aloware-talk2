@@ -7,15 +7,16 @@ export const INBOX_TYPE_CONNECTED = 'connected'
 export const INBOX_TYPE_WATCHING = 'watching'
 export const SEARCH_FIELDS = ['lead_number', 'contact.name', 'campaign.name']
 export const DEFAULT_FILTERS = {
-  types: [],
+  channels: [],
+  campaigns: [],
   directions: [],
   my_contact: false,
   unread_only: false,
   task_status: [],
   mention: false,
   date_range: 'Last 30 Days',
-  from_date: moment().subtract(30, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss'),
-  to_date: moment().endOf('day').format('MM/DD/YYYY HH:mm:ss')
+  from_date: moment().subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+  to_date: moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
 }
 
 export default function () {
@@ -39,6 +40,7 @@ export default function () {
     showRefreshInboxesButton: false,
     showRefreshCommunicationsButton: false,
     activeFilters: { ...DEFAULT_FILTERS },
+    selectedFilter: null,
     activeSort: {},
     currentSearch: null,
     isInitialLoad: false,
@@ -47,6 +49,8 @@ export default function () {
     unreadCountLoaded: false,
     teamInboxTutorialComponent: null,
     teamInboxEmptyStateVideoComponent: null,
-    contactsLastUsedLines: new Map()
+    contactsLastUsedLines: new Map(),
+    loadingTeamInboxCampaigns: false,
+    teamInboxCampaigns: []
   }
 }
