@@ -193,6 +193,7 @@
                color="primary"
                class="open-contact-details-btn d-flex align-items-center justify-content-center px-2"
                v-b-tooltip.hover="{customClass: 'tooltip-dark'}"
+               v-if="shouldDisplayContactDetailsToggle"
                :title="isContactDetailsCollapsed ? 'Show contact details' : 'Hide contact details'"
                @click="$emit('toggleDetails')">
           <phone-card-icon width="21" height="21" color="#62666E"/>
@@ -275,7 +276,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['isMobile', 'isWidget']),
+    ...mapState(['isMobile', 'isWidget', 'isSalesforceWidget']),
     ...mapState('TeamInbox', ['activeInboxId']),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
     ...mapFields('settings', ['isContactDetailsCollapsed']),
@@ -306,14 +307,21 @@ export default {
       return [ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(this.contact?.task_status) && this.isContactStatusControlEnabled
     },
 
-    inPowerDialerPage () {
-      const previousPage = this.$route?.query?.previousPage
-      return previousPage === 'Power Dialer'
+    isPowerDialer () {
+      return this.$route?.name === 'Power Dialer'
     },
 
     markAllAsReadTooltip () {
       return `<b class="text-nowrap">This will mark all communications for this contact as read in this Team Inbox only.</b>
       <br/><span class="text-nowrap">This does not affect the contact's unread calls or messages in other inboxes.</span>`
+    },
+
+    shouldDisplayContactDetailsToggle () {
+      if (this.isPowerDialer || this.isWidget || this.isSalesforceWidget) {
+        return false
+      }
+
+      return true
     }
   },
   data () {

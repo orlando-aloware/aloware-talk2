@@ -302,6 +302,8 @@ import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import store from 'src/store'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
+import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'MyLayout',
@@ -885,82 +887,7 @@ export default {
     }
 
     this.mainListeners.updateCommunication = (communication) => {
-      const parkedCall = _.get(this.dialer, 'parkedCall', null)
-      const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
-      const parkedCallFound = this.parkedCalls.find(comm => comm.id === communication.id)
-
-      this.removeQueuedNotification(communication.id, communication.disposition_status2, communication.current_status2)
-
-      // update unowned parked call contact's last communication
-      if (isCommunicationHasUnownedContact && parkedCallFound) {
-        this.updateLiveContactLastCommProperties({
-          id: communication.contact_id,
-          status: communication.current_status2,
-          user_id: communication.user_id
-        })
-      }
-
-      // remove the parked call if the caller was disconnected
-      if (communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
-        parkedCall && parkedCall.id === communication.id) {
-        this.setDialerParkedCall()
-        this.removeParkedCall(communication.id)
-      }
-
-      // if disposition status is not in-progress
-      // or current status is not queued / ring all, close call notification
-      if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
-        !INCOMING_STATUSES.includes(communication.current_status2)) {
-        console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
-        this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
-      }
-
-      if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {
-        return
-      }
-
-      if (!this.isNotInInbox || !communication.contact_id) {
-        return
-      }
-
-      const newCommunication = this.$jsonClone(communication)
-
-      const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
-        ALL_INPROGRESS_STATUSES.includes(item.last_communication.current_status2))
-
-      if (isActiveInLiveContactsIndex >= 0 && this.liveContacts[isActiveInLiveContactsIndex].last_communication.id === communication.id) {
-        const liveContacts = _.cloneDeep(this.liveContacts)
-
-        const contactWithV2Attributes = this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[isActiveInLiveContactsIndex])
-
-        // add the v2 contact attributes that we need
-        Object.assign(liveContacts[isActiveInLiveContactsIndex], contactWithV2Attributes)
-
-        // if type is call and completed/voicemail then remove from live calls
-        if (ALL_DIRECTIONS.includes(communication.direction) &&
-          communication.type === CommunicationTypes.CALL &&
-          COMPLETED_STATUSES.includes(communication.current_status2)) {
-          liveContacts.splice(isActiveInLiveContactsIndex, 1)
-        }
-
-        this.processLiveContacts(liveContacts)
-
-        return
-      }
-
-      if (isActiveInLiveContactsIndex >= 0) {
-        return
-      }
-
-      const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
-
-      if (index >= 0) {
-        const liveContacts = _.cloneDeep(this.liveContacts)
-        // add the v2 contact attributes that we need
-        Object.assign(liveContacts[index], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[index]))
-
-        this.processLiveContacts(liveContacts)
-      }
+      this.updateLocalCommunication(communication)
     }
 
     this.mainListeners.newVersion = () => {
@@ -1313,6 +1240,96 @@ export default {
   },
 
   methods: {
+    updateLocalCommunication (communication) {
+      const parkedCall = _.get(this.dialer, 'parkedCall', null)
+      const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
+      const parkedCallFound = this.parkedCalls.find(comm => comm.id === communication.id)
+
+      this.removeQueuedNotification(communication.id, communication.disposition_status2, communication.current_status2)
+
+      // update unowned parked call contact's last communication
+      if (isCommunicationHasUnownedContact && parkedCallFound) {
+        this.updateLiveContactLastCommProperties({
+          id: communication.contact_id,
+          status: communication.current_status2,
+          user_id: communication.user_id
+        })
+      }
+
+      // remove the parked call if the caller was disconnected
+      if (communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
+        parkedCall && parkedCall.id === communication.id) {
+        this.setDialerParkedCall()
+        this.removeParkedCall(communication.id)
+      }
+
+      // if disposition status is not in-progress
+      // or current status is not queued / ring all, close call notification
+      // But don't close if this is an add/introduce operation
+      const isAddOrIntroduceOperation = (communication.is_introduce ||
+        communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER ||
+        communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG) &&
+        communication.legc_uuid &&
+        [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
+
+      if ((communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
+        !INCOMING_STATUSES.includes(communication.current_status2)) && !isAddOrIntroduceOperation) {
+        console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
+        this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+      }
+
+      if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {
+        return
+      }
+
+      if (!this.isNotInInbox || !communication.contact_id) {
+        return
+      }
+
+      console.log('Updating new communication', communication)
+
+      const newCommunication = this.$jsonClone(communication)
+
+      const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
+        ALL_INPROGRESS_STATUSES.includes(item.last_communication.current_status2))
+
+      if (isActiveInLiveContactsIndex >= 0 && this.liveContacts[isActiveInLiveContactsIndex].last_communication.id === communication.id) {
+        console.log('Updating live contacts', this.liveContacts)
+
+        const liveContacts = _.cloneDeep(this.liveContacts)
+
+        const contactWithV2Attributes = this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[isActiveInLiveContactsIndex])
+
+        // add the v2 contact attributes that we need
+        Object.assign(liveContacts[isActiveInLiveContactsIndex], contactWithV2Attributes)
+
+        // if type is call and completed/voicemail then remove from live calls
+        if (ALL_DIRECTIONS.includes(communication.direction) &&
+          communication.type === CommunicationTypes.CALL &&
+          COMPLETED_STATUSES.includes(communication.current_status2)) {
+          liveContacts.splice(isActiveInLiveContactsIndex, 1)
+        }
+
+        this.processLiveContacts(liveContacts)
+
+        return
+      }
+
+      if (isActiveInLiveContactsIndex >= 0) {
+        return
+      }
+
+      const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
+
+      if (index >= 0) {
+        const liveContacts = _.cloneDeep(this.liveContacts)
+        // add the v2 contact attributes that we need
+        Object.assign(liveContacts[index], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[index]))
+
+        this.processLiveContacts(liveContacts)
+      }
+    },
+
     processUrl (url) {
       // New format: expected url like "contact-<phoneNumber>" or "contact-<phoneNumber>?first=...&last=...&isCompany=..."
       let cleaned = url.replace(/contact[:-]/, '')

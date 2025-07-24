@@ -24,13 +24,13 @@
                     label-for="input-2">
         <predefined-time-selector v-model="reminder.time"
                                   data-testid="contact-add-reminder-modal-predefined-time-selector"
-                                  @select="onTimeSelected"/>
+                                  @select="onTimeSelected" />
       </b-form-group>
 
       <b-form-group id="input-group-2"
                     label="Timezone"
                     label-for="input-2">
-        <timezone-selector data-testid="contact-add-reminder-modal-timezone-selector" @select="timezoneSelected"/>
+        <timezone-selector data-testid="contact-add-reminder-modal-timezone-selector" @select="timezoneSelected" />
       </b-form-group>
 
       <b-form-group id="input-group-2"
@@ -42,7 +42,7 @@
                          max-rows="8"
                          no-auto-shrink
                          data-testid="contact-add-reminder-modal-notes-textarea"
-                         v-model="reminder.note"/>
+                         v-model="reminder.note" />
       </b-form-group>
     </b-form>
     <template slot="modal-footer">
@@ -60,7 +60,7 @@
                 data-testid="contact-add-reminder-modal-submit-button"
                 @click="onSubmit">
         <q-spinner-bars color="white"
-                        v-if="isAdding"/>
+                        v-if="isAdding" />
         {{ isAdding ? 'Adding Reminder...' : 'Add Reminder' }}
       </b-button>
     </template>
@@ -69,7 +69,9 @@
 
 <script>
 import talk2Api from 'src/plugins/api/api'
-import { mapGetters, mapActions, mapState } from 'vuex'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import PredefinedTimeSelector from 'components/predefined-time-selector'
 import DateSelector from 'components/date-selector'
 import TimezoneSelector from 'components/timezone-selector'
@@ -77,6 +79,7 @@ import TimezoneSelector from 'components/timezone-selector'
 export default {
   name: 'contact-add-reminder-modal',
   components: { TimezoneSelector, DateSelector, PredefinedTimeSelector },
+  mixins: [teamInboxPropsMixin],
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', ['isAddReminderOpen']),
@@ -115,17 +118,21 @@ export default {
     onSubmit (event) {
       event.preventDefault()
       this.isAdding = true
-      talk2Api.V1.contact.addEngagement(this.contact.id, this.formatParameters())
-        .then(() => {
-          this.onHidden()
-          this.$generalNotification('Reminder has been added.')
-        }).catch(error => {
-          console.log(error)
-          this.$handleErrors(error.response)
-        }).finally(() => {
-          this.isAdding = false
-        })
+      const apiCall = this.teamInbox
+        ? talk2TeamInboxApi.calendar.createEvent(this.contact.id, this.formatParameters())
+        : talk2Api.V1.contact.addEngagement(this.contact.id, this.formatParameters())
+
+      apiCall.then(() => {
+        this.onHidden()
+        this.$generalNotification('Reminder has been added.')
+      }).catch(error => {
+        console.log(error)
+        this.$handleErrors(error.response)
+      }).finally(() => {
+        this.isAdding = false
+      })
     },
+
     onTimeSelected (value) {
       this.reminder.time = value.value
     },

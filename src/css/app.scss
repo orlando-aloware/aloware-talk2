@@ -7844,7 +7844,8 @@ table.datatable {
   }
 }
 
-#inbox-channel-filter-modal {
+#inbox-channel-filter-modal,
+#teaminbox-filter-modal {
   .filter-group-title {
     font-size: 12px;
     color: $grey-80;
@@ -7865,7 +7866,8 @@ table.datatable {
 }
 
 #comms-channel-filter-modal,
-#inbox-channel-filter-modal {
+#inbox-channel-filter-modal,
+#teaminbox-filter-modal {
   .modal-content {
     border-radius: 8px;
     max-height: 92vh;
@@ -7902,8 +7904,6 @@ table.datatable {
       max-height: 85vh;
       overflow: auto;
     }
-
-
 
     .filter-items {
       margin: 5px 0;
@@ -8029,7 +8029,9 @@ table.datatable {
   #comms-channel-filter-modal .modal-lg,
   #comms-channel-filter-modal.modal-xl,
   #inbox-channel-filter-modal .modal-lg,
-  #inbox-channel-filter-modal.modal-xl {
+  #inbox-channel-filter-modal.modal-xl,
+  #teaminbox-filter-modal .modal-lg,
+  #teaminbox-filter-modal.modal-xl {
     max-width: 950px;
   }
 }
@@ -16869,6 +16871,7 @@ hr {
 
   .teaminbox-filter .dropdown-toggle {
     margin: 3px 3px 3px 16px;
+    max-width: calc(100% - 19px) !important; // adjust button width - margins
   }
 
   .teaminbox-sort .dropdown-toggle {
@@ -16925,4 +16928,8 @@ hr {
   display: inline-flex;
   margin-right: 10px;
   align-items: center;
+}
+
+.line-selector-popup-wrapper {
+  padding: 8px;
 }

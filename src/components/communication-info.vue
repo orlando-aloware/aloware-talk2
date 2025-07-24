@@ -591,39 +591,53 @@
                 </div>
 
                 <template
-                  v-if="communication.type === CommunicationTypes.CALL && currentCompany && callDispositions &&  callDispositions.length > 0 && !dialerMode">
-                  <div class="d-flex align-items-center co-12">
-                    <label class="form-control-label mb-1">Call Disposition:</label>
-                    <label class="ml-1 d-flex align-items-center"
-                           v-if="currentCompany.force_call_disposition">
-                      <b-button id="audio-btn"
-                                size="sm"
-                                variant="link"
-                                data-testid="communication-info-as-mandated-button"
-                                class="p-0">
-                        <q-icon name="info"
-                                class="text-danger">
-                        </q-icon>
-                      </b-button>
-                      <b-popover target="audio-btn"
-                                 triggers="focus"
-                                 placement="right"
-                                 data-testid="communication-info-as-mandated-popover"
-                                 delay="100">
-                        Your account admin has mandated call dispositions.
-                      </b-popover>
-                    </label>
+                  v-if="communication.type === CommunicationTypes.CALL && currentCompany && !dialerMode">
+                  <div class="w-100"
+                       v-if="callDispositions && callDispositions.length > 0">
+                    <div class="d-flex align-items-center co-12">
+                      <label class="form-control-label mb-1">Call Disposition:</label>
+                      <label class="ml-1 d-flex align-items-center"
+                             v-if="currentCompany.force_call_disposition">
+                        <b-button id="audio-btn"
+                                  size="sm"
+                                  variant="link"
+                                  data-testid="communication-info-as-mandated-button"
+                                  class="p-0">
+                          <q-icon name="info"
+                                  class="text-danger">
+                          </q-icon>
+                        </b-button>
+                        <b-popover target="audio-btn"
+                                   triggers="focus"
+                                   placement="right"
+                                   data-testid="communication-info-as-mandated-popover"
+                                   delay="100">
+                          Your account admin has mandated call dispositions.
+                        </b-popover>
+                      </label>
+                    </div>
+                    <div class="d-flex align-items-center w-100">
+                      <call-disposition-selector :communication="communication"></call-disposition-selector>
+                    </div>
                   </div>
-                  <div class="d-flex align-items-center w-100">
-                    <call-disposition-selector :communication="communication"></call-disposition-selector>
-                  </div>
-                  <div class="mt-2 w-100"
+
+                  <div class="w-100 mt-2"
                        v-if="currentCompany.hubspot_integration_enabled">
                     <div class="d-flex align-items-center co-12">
                       <label class="form-control-label mb-1">HubSpot Call Type:</label>
                     </div>
                     <div class="d-flex align-items-center w-100">
                       <hubspot-activity-type-selector :communication="communication"></hubspot-activity-type-selector>
+                    </div>
+                  </div>
+
+                  <div class="w-100 mt-2"
+                       v-if="communication.direction === CommunicationDirections.INBOUND">
+                    <div class="d-flex align-items-center co-12">
+                      <label class="form-control-label mb-1">CSAT Score:</label>
+                    </div>
+                    <div class="d-flex align-items-center w-100">
+                      <csat-score :row="communication"></csat-score>
                     </div>
                   </div>
                 </template>
@@ -643,7 +657,8 @@
                                class="d-flex flex-row justify-content-center w-100"
                                data-testid="communication-info-sms-reminders"
                                :communicationId="communication.id"
-                               :campaignId="campaignId"
+                               :campaignId="getAppointmentCampaignId(communication)"
+                               :contactId="contact.id"
                                :appointmentDatetime="communication.engagement_data.appointment_datetime"
                                v-if="communication.type === CommunicationTypes.APPOINTMENT && campaignId">
                 </sms-reminders>
@@ -873,6 +888,7 @@ import * as TranscriptionStatus from '../constants/transcription-status'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
+import CsatScore from 'components/communications/communications-table/csat-score.vue'
 
 export default {
   name: 'communication-info',
@@ -891,6 +907,7 @@ export default {
   ],
 
   components: {
+    CsatScore,
     ExpandableHtmlViewer,
     TranscriptionModal,
     SparkleIcon,
@@ -1323,6 +1340,10 @@ export default {
       }
 
       return false
+    },
+
+    getAppointmentCampaignId (communication) {
+      return communication.engagement_data?.appointment_campaign_id ?? this.campaignId
     }
   },
 

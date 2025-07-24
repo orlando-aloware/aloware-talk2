@@ -253,7 +253,7 @@ export default {
     },
 
     checkCommunicationMatchesInboxFilters (filter, communication) {
-      if (filter.unread_only !== undefined &&
+      if (filter.unread_only === true &&
         communication.inbox_unread_count === 0) {
         return false
       }
@@ -291,6 +291,11 @@ export default {
 
       // if this comes from team inbox, visibility limits are not observed
       if (teamInbox && this.hasCompanyTeamInboxEnabled) {
+        return true
+      }
+
+      // users should always be able to see their own sent messages
+      if (communication.user_id === this.profile.id) {
         return true
       }
 

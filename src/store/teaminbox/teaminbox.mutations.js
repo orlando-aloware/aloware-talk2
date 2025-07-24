@@ -1,4 +1,4 @@
-import { THREADED, DEFAULT_FILTERS } from './teaminbox.store'
+import { THREADED } from './teaminbox.store'
 import { updateField } from 'vuex-map-fields'
 
 export default {
@@ -118,7 +118,15 @@ export default {
   SET_CONTACTS_LAST_USED_LINE (state, { inboxId, contactId, lastLineUsed }) {
     state.contactsLastUsedLines.set(`${inboxId}-${contactId}`, lastLineUsed)
   },
+  SET_TEAM_INBOX_CAMPAIGNS (state, data) {
+    state.teamInboxCampaigns = data
+  },
+  SET_LOADING_TEAM_INBOX_CAMPAIGNS (state, loading) {
+    state.loadingTeamInboxCampaigns = loading
+  },
   RESET (state) {
+    state.activeInboxId = null
+    state.activeInbox = {}
     state.inboxes = []
     state.isLoadingInboxes = false
     state.inboxesUnreadCount = []
@@ -135,9 +143,10 @@ export default {
     state.activeInboxContactUnreadCount = 0
     state.unreadCountLoaded = false
     state.viewMode = THREADED
-    state.activeFilters = { ...DEFAULT_FILTERS }
     state.activeSort = {}
     state.teamInboxTutorialComponent = null
     state.contactsLastUsedLines = new Map()
+    state.teamInboxCampaigns = []
+    state.loadingTeamInboxCampaigns = false
   }
 }

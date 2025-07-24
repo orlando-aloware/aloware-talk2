@@ -97,5 +97,6 @@ export default {
 
     return state.contact?.id === state.contactClone.id &&
       hasChanges && !state.changingSelectedContact
-  }
+  },
+  selectedLineId: (state) => state.selectedLine?.id
 }

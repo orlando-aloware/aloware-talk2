@@ -108,7 +108,7 @@
             <ignore-call-icon v-if="id === 'callFishing'"/>
             <q-tooltip anchor="top middle"
                        self="center middle">
-              {{ id === 'incomingCall' ? 'Decline' : 'Ignore' }}
+              {{ id === 'incomingCall' ? 'Decline' : tooltipMessage }}
             </q-tooltip>
           </q-btn>
           <q-btn class="height-32"
@@ -133,8 +133,9 @@
                  @click="ignoreFishing">
             <ignore-call-icon/>
             <q-tooltip anchor="top middle"
-                       self="center middle">
-              Ignore
+                       self="center middle"
+                       v-if="tooltipMessage">
+              {{ tooltipMessage }}
             </q-tooltip>
           </q-btn>
 
@@ -215,6 +216,7 @@ import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../constants/agent-status'
 import talk2Api from 'src/plugins/api/api'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'action-notification',
@@ -573,6 +575,13 @@ export default {
 
     shouldShowFishingActions () {
       return this.id === 'callFishing' && this.dialer && this.isAgentOrDialerOnCall
+    },
+
+    tooltipMessage () {
+      if (!this.communication) {
+        return ''
+      }
+      return this.isPersonalInbox ? 'Reject' : 'Ignore'
     }
   },
 
@@ -591,8 +600,13 @@ export default {
           this.removeFromCallFishingQueue(communication.id)
         }
 
-        // close the notification
-        if (isCallNotInProgressOrIncoming && this.communicationId === communication.id) {
+        const isAddOrIntroduceOperation = (communication.is_introduce ||
+          communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER ||
+          communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG) &&
+          communication.legc_uuid &&
+          [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
+
+        if (isCallNotInProgressOrIncoming && this.communicationId === communication.id && !isAddOrIntroduceOperation) {
           this.processRemoveFromNotification(communication)
         }
       }
@@ -766,7 +780,7 @@ export default {
       }
 
       this.$closeActionNotification('callFishing')
-      console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
+      // console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
@@ -782,7 +796,7 @@ export default {
             (this.queue && !this.queue.length))
         )
       ) {
-        console.log('[Action 2] Communication when event closeCallNotifications : ', this.communication)
+        // console.log('[Action 2] Communication when event closeCallNotifications : ', this.communication)
         this.closeCallNotifications(this.id, this.communicationId, true)
       }
 

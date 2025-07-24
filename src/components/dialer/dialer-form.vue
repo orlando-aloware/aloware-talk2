@@ -31,7 +31,7 @@
             <line-selector class="line-selector"
                            prepend="From:"
                            specificClass="dialer-line-selector"
-                           :is-dialer="true"
+                           is-dialer
                            :disable="lineSelectorDisabled"
                            :generic-multiselect="false"
                            :is-loading="isLoadingLastUsedCallLine"
@@ -101,7 +101,6 @@
             <line-selector class="line-selector"
                            prepend="From:"
                            check-blocked-messaging
-                           :is-dialer="true"
                            :generic-multiselect="false"
                            :use-only-actives="true"
                            v-model="campaignId"
@@ -548,15 +547,16 @@ export default {
         calls_notifications_open_time: this.currentCompany.calls_notifications_open_time,
         calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
       }
-      this.checkContactTimezone(params, this.makeCall)
+      this.checkContactTimezone(params, () => this.makeCall(true))
     },
 
-    makeCall () {
+    makeCall (isFromDialer = false) {
       if (this.callDisabled) {
         return
       }
 
       this.$VueEvent.fire('makeCall', {
+        isFromDialer,
         currentNumber: this.$options.filters.fixPhone(this.phoneNumber),
         outboundCampaignId: this.campaignId,
         contactName: this.contactName,

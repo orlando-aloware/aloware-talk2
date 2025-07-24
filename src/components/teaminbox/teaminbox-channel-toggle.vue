@@ -30,7 +30,26 @@
         </div>
       </template>
     </q-btn-toggle>
-    <TeamInboxDateFilter @date-change="onDateChange"/>
+
+    <div class="filter-wrapper ml-2">
+      <compact-btn borderless
+                   customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
+                   id="teaminbox-channel-toggle-filter-btn"
+                   data-testid="teaminbox-channel-toggle-filter-btn"
+                   @clicked="onClickFilterButton">
+        <b-tooltip custom-class="talk-table__tooltip"
+                   placement="bottom"
+                   triggers="hover"
+                   target="teaminbox-channel-toggle-filter-btn"
+                   v-if="!isMobile">
+          Open filters
+        </b-tooltip>
+        <filter-icon color="#62666E"
+                     class="filter-icon"
+                     data-testid="teaminbox-channel-toggle-filter-icon">
+        </filter-icon>
+      </compact-btn>
+    </div>
   </div>
 </template>
 
@@ -38,14 +57,15 @@
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+import FilterIcon from 'components/icons/filter-icon'
+import CompactBtn from 'components/compact-btn'
 import { navigationErrorHandler } from 'src/router/routes'
-import TeamInboxDateFilter from 'src/components/teaminbox/teaminbox-date-filter.vue'
-import { mapFields } from 'vuex-map-fields'
 
 export default {
   components: {
     InformationCircleIcon,
-    TeamInboxDateFilter
+    FilterIcon,
+    CompactBtn
   },
 
   mounted () {
@@ -56,8 +76,7 @@ export default {
     ...mapState('TeamInbox', [
       'viewMode'
     ]),
-
-    ...mapFields('TeamInbox', ['activeFilters']),
+    ...mapState(['isMobile']),
 
     options () {
       return [
@@ -119,8 +138,8 @@ export default {
       this.$router.replace({ query }).catch(navigationErrorHandler)
     },
 
-    onDateChange () {
-      this.$emit('date-change', this.activeFilters)
+    onClickFilterButton () {
+      this.$emit('open-filter')
     }
   },
 

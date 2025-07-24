@@ -106,6 +106,7 @@ import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT } from 'src/constants/roles'
+import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'line-selector',
@@ -240,11 +241,6 @@ export default {
       default: false
     },
 
-    isDialer: {
-      type: Boolean,
-      default: false
-    },
-
     preSelectedTeamInboxLineId: {
       type: Number,
       default: null
@@ -258,6 +254,16 @@ export default {
     width: {
       type: String,
       default: undefined
+    },
+
+    showAllLines: {
+      type: Boolean,
+      default: false
+    },
+
+    isDialer: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -267,7 +273,8 @@ export default {
       options: [],
       reference: 'lineSelect',
       emitChange: true,
-      fullOptionsProperty: 'activeCampaignsAlphabeticalOrder'
+      fullOptionsProperty: 'activeCampaignsAlphabeticalOrder',
+      isInitializing: true
     }
   },
 
@@ -275,7 +282,7 @@ export default {
     ...mapState(['campaigns', 'campaignsIsLoading']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['profile']),
-    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox']),
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox', 'activeInboxId', 'teamInboxCampaigns']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
 
     placeholder () {
@@ -296,46 +303,53 @@ export default {
     },
 
     campaignsAlphabeticalOrder () {
-      if (this.campaigns) {
-        let campaigns = _.clone(this.campaigns).sort((a, b) => {
-          const textA = a.name.toUpperCase()
-          const textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
-        })
+      const campaigns = this.activeInboxId && !this.isDialer
+        ? this.teamInboxCampaigns
+        : this.campaigns
 
-        if (this.useOnlyActives) {
-          campaigns = campaigns.filter(campaign => campaign.active === true)
-        }
-
-        return campaigns
+      if (!campaigns) {
+        return []
       }
 
-      return []
+      const orderedCampaigns = _.clone(campaigns).sort((a, b) => {
+        const textA = a.name.toUpperCase()
+        const textB = b.name.toUpperCase()
+        return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+      })
+
+      if (this.useOnlyActives) {
+        return orderedCampaigns.filter(campaign => campaign.active === true)
+      }
+
+      return orderedCampaigns
     },
 
     activeCampaignsAlphabeticalOrder () {
-      if (this.campaignsAlphabeticalOrder.length) {
-        const activeCampaigns = _.clone(this.campaignsAlphabeticalOrder)
-          .filter(campaign => campaign.active === true)
-
-        if (this.shouldLimitAgentLinesVisibility) {
-          // Only show lines that the agent has access to
-          return activeCampaigns.filter(campaign => {
-            return campaign.user_id === this.profile.id ||
-              campaign.has_direct_ring_group_access ||
-              campaign.has_team_membership_access ||
-              campaign.has_direct_watching_access ||
-              campaign.has_team_watching_access ||
-              campaign.ivr_id
-          })
-        }
-
-        return !this.preSelectedTeamInboxLineId
-          ? activeCampaigns
-          : activeCampaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id) || campaign.ivr_id)
+      if (!this.campaignsAlphabeticalOrder.length) {
+        return []
       }
 
-      return []
+      const activeCampaigns = _.clone(this.campaignsAlphabeticalOrder)
+        .filter(campaign => campaign.active === true)
+
+      if (this.showAllLines) {
+        return activeCampaigns
+      }
+
+      if (this.shouldLimitAgentLinesVisibility) {
+        // Only show lines that the agent has access to
+        return activeCampaigns.filter(
+          campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
+        )
+      }
+
+      return !this.preSelectedTeamInboxLineId
+        ? activeCampaigns
+        : activeCampaigns.filter(
+          campaign =>
+            this.activeInboxCampaignIds.includes(campaign.id) ||
+              isIvrOrDeadEndCampaign(campaign)
+        )
     },
 
     pausedCampaignsAlphabeticalOrder () {
@@ -361,7 +375,11 @@ export default {
     },
 
     selectedLine () {
-      return this.campaigns.find(campaign => campaign.id === this.selectedId)
+      const campaigns = this.activeInboxId && !this.isDialer
+        ? this.teamInboxCampaigns
+        : this.campaigns
+
+      return campaigns.find(campaign => campaign.id === this.selectedId)
     },
 
     lineInboxName () {
@@ -370,13 +388,12 @@ export default {
     },
 
     shouldLimitAgentLinesVisibility () {
-      return this.isDialer &&
-        this.hasRole(COMPANY_AGENT) &&
+      return this.hasRole(COMPANY_AGENT) &&
         this.hasCompanyTeamInboxLineManagementEnhancements
     },
 
     noResultsText () {
-      return !this.preSelectedTeamInboxLineId
+      return !this.preSelectedTeamInboxLineId || this.showAllLines
         ? 'No results'
         : 'No lines found in this inbox'
     }
@@ -404,6 +421,13 @@ export default {
       const line = this.activeCampaignsAlphabeticalOrder.find(campaign => campaign.id === this.preSelectedTeamInboxLineId)
       line && this.selectOption(line)
     }
+
+    this.checkUnavailableLine(this.value)
+
+    // Mark initialization as complete
+    this.$nextTick(() => {
+      this.isInitializing = false
+    })
   },
 
   methods: {
@@ -452,6 +476,20 @@ export default {
       if (input) {
         input.style.display = 'block'
       }
+    },
+
+    checkUnavailableLine (lineId) {
+      if (
+        lineId !== null &&
+        this.shouldLimitAgentLinesVisibility &&
+        !this.campaignsIsLoading &&
+        !this.options.find(({ id }) => id === lineId)
+      ) {
+        // If the selected campaign (forced v-model) is not in the options,
+        // emit a change event to clear the value and emit an invalid-line event
+        this.$emit('change', null)
+        this.$emit('invalid-line-selection', this.campaigns.find(({ id }) => id === lineId))
+      }
     }
   },
 
@@ -461,11 +499,14 @@ export default {
         return
       }
 
-      this.selectedId = value
+      // Only update selectedId if not initializing to prevent false change events
+      if (!this.isInitializing) {
+        this.selectedId = value
+      }
     },
 
     selectedId (val) {
-      if (this.selectedId !== this.value) {
+      if (this.selectedId !== this.value && !this.isInitializing) {
         this.$emit('change', val)
       }
 
@@ -474,8 +515,13 @@ export default {
       }
 
       // return the incoming number of the selected campaign
-      const found = this.campaigns.find(campaign => campaign.id === val)
-      this.$emit('selectedNumber', found ? found.incoming_number : '')
+      const campaign = this.campaigns.find(campaign => campaign.id === val)
+      this.$emit('selectedNumber', campaign ? campaign.incoming_number : '')
+
+      // Only check unavailable line if not initializing
+      if (!this.isInitializing) {
+        this.checkUnavailableLine(val)
+      }
     },
 
     campaignsIsLoading (val) {
@@ -484,8 +530,12 @@ export default {
         return
       }
 
-      this.selectedId = this.value
-      this.options = this.campaignsAlphabeticalOrder
+      this.options = this.activeCampaignsAlphabeticalOrder
+
+      // Only set selectedId if not initializing to prevent false change events
+      if (!this.isInitializing) {
+        this.selectedId = this.value
+      }
 
       if (typeof this.$refs.lineSelect !== 'undefined') {
         this.$refs.lineSelect.refresh()
@@ -494,6 +544,10 @@ export default {
 
     activeCampaignsAlphabeticalOrder (value) {
       this.options = value
+    },
+
+    options (value) {
+      this.$emit('update:lineCount', value.length)
     }
   }
 }

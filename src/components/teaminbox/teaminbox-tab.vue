@@ -1,14 +1,14 @@
 <template>
   <div class="teaminbox-tab">
     <TeamInboxTabHeader :collapse-target="collapseTarget"
-                       :search="search"
-                       @search="search = $event" />
+                        :search="search"
+                        @search="search = $event" />
 
     <TeamInboxChannelToggle @channel="onChannel"
-                            @date-change="onFilterChange"/>
+                            @open-filter="onOpenFilter"/>
 
-    <TeamInboxFilters @filter-change="onFilterChange"
-                      @sort-change="onSortChange" />
+    <TeamInboxDropdownFilters @filter-change="onDropdownFilterChange"
+                              @sort-change="onSortChange" />
 
     <!-- Items List -->
     <div class="items-list blue-scroll"
@@ -25,6 +25,20 @@
         @refresh="onRefreshCommunications"
       />
     </div>
+
+    <!-- Filter Dialog -->
+    <TeamInboxFilterDialog ref="teamInboxFilterDialog"
+                           data-testid="teaminbox-tab-filter-dialog"
+                           @createNewFilter="onCreateNewFilter"
+                           @applyFilter="onApplyFilter" />
+
+    <!-- Create Filter Dialog -->
+    <TeamInboxCreateFilterDialog ref="teamInboxCreateFilterDialog"
+                                 :value="newFilterModel"
+                                 :disable-filter-type="!isAdmin"
+                                 data-testid="teaminbox-tab-create-filter-dialog"
+                                 @onCancel="onCancelCreateFilter"
+                                 @onFilterCreated="onFilterCreated" />
   </div>
 </template>
 
@@ -32,16 +46,19 @@
 import CommunicationList from 'src/components/teaminbox/communication-items/communication-list.vue'
 import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
 import TeamInboxTabHeader from './teaminbox-tab-header.vue'
-import TeamInboxFilters from './teaminbox-filters.vue'
-import { TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
+import TeamInboxDropdownFilters from './teaminbox-dropdown-filters.vue'
+import TeamInboxFilterDialog from './teaminbox-filters/filter-dialog.vue'
+import TeamInboxCreateFilterDialog from './teaminbox-filters/create-filter-dialog.vue'
+import { aclMixin, TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
 import { getQueryString } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
-import { mapState, mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import { debounce } from 'lodash'
-import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
 
 export default {
@@ -49,12 +66,15 @@ export default {
     CommunicationList,
     TeamInboxChannelToggle,
     TeamInboxTabHeader,
-    TeamInboxFilters
+    TeamInboxDropdownFilters,
+    TeamInboxFilterDialog,
+    TeamInboxCreateFilterDialog
   },
 
   mixins: [
     TeamInboxMixin,
-    visibilityMixin
+    visibilityMixin,
+    aclMixin
   ],
 
   props: {
@@ -77,7 +97,9 @@ export default {
       CommunicationTypes,
       filterOption: 'All',
       sortOption: 'Newest',
-      loadError: false
+      loadError: false,
+      newFilterModel: {},
+      filterParams: ['channels', 'campaigns', 'directions', 'my_contact', 'unread_only', 'task_status', 'mention', 'date_range', 'from_date', 'to_date']
     }
   },
 
@@ -91,7 +113,6 @@ export default {
       'activeInbox',
       'viewMode',
       'showRefreshCommunicationsButton',
-      'activeFilters',
       'activeSort',
       'currentSearch',
       'isInitialLoad'
@@ -99,9 +120,7 @@ export default {
 
     ...mapState(['isMobile']),
 
-    filteredItems () {
-      return this.items.filter(item => !item.hidden)
-    }
+    ...mapFields('TeamInbox', ['activeFilters', 'selectedFilter'])
   },
 
   created () {
@@ -113,6 +132,9 @@ export default {
     this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
     this.$VueEvent.listen('contact_updated', this.updatedContactListener)
     this.$VueEvent.listen('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
+
+    // Apply URL query parameters to filters if they exist
+    this.applyUrlQueryParams()
   },
 
   beforeDestroy () {
@@ -129,13 +151,38 @@ export default {
 
   methods: {
     ...mapActions('TeamInbox', [
-      'setActiveFilters',
       'setActiveSort',
       'setCurrentSearch',
       'setIsInitialLoad',
       'setIsLoadingMoreItems',
       'setContactsLastUsedLines'
     ]),
+
+    onOpenFilter () {
+      this.$refs.teamInboxFilterDialog.showModal()
+    },
+
+    onCreateNewFilter (filter) {
+      this.$refs.teamInboxFilterDialog.hideModal()
+      this.newFilterModel = filter
+      this.$refs.teamInboxCreateFilterDialog.showModal()
+    },
+
+    onCancelCreateFilter () {
+      this.$refs.teamInboxFilterDialog.showModal()
+    },
+
+    onFilterCreated (newFilter) {
+      this.selectedFilter = newFilter
+      this.$refs.teamInboxFilterDialog.showModal()
+    },
+
+    onApplyFilter () {
+      this.onFilterChange()
+
+      // Update URL query parameters based on applied filters
+      this.updateUrlQueryParams(this.activeFilters)
+    },
 
     getUnreadsProperties (communication) {
       if (this.viewMode === UNTHREADED) {
@@ -200,7 +247,30 @@ export default {
         return
       }
 
-      this.resetItems()
+      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
+    },
+
+    onDropdownFilterChange () {
+      this.$refs.teamInboxFilterDialog.clearSelectedFilter()
+      this.onFilterChange()
+
+      // Update URL query parameters based on applied filters
+      this.updateUrlQueryParams(this.activeFilters)
+    },
+
+    onFilterChange () {
+      if (!this.activeInboxId) {
+        return
+      }
+
+      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
+    },
+
+    onSortChange () {
+      if (!this.activeInboxId) {
+        return
+      }
+
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
     },
 
@@ -329,7 +399,7 @@ export default {
     },
 
     async getUnreadCount (ringGroupId, contactId) {
-      const response = await talk2Api.V2.inbox.inboxes.unreadCount([ringGroupId], [contactId])
+      const response = await talk2TeamInboxApi.inboxes.unreadCount([ringGroupId], [contactId])
       return response.data.find(item => item.ring_group_id === ringGroupId && item.contact_id === contactId)?.unread_count || 0
     },
 
@@ -457,6 +527,11 @@ export default {
     },
 
     async processCommunication (communication, isNew = false) {
+      // Add access control check
+      if (!this.userHasAccessToRingGroup(communication.ring_group_id)) {
+        return
+      }
+
       const dateRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/
       const dateMatch = communication.created_at.match(dateRegex)
 
@@ -530,14 +605,6 @@ export default {
     onRefreshCommunications () {
       this.loadError = false
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
-    },
-
-    onFilterChange (filters) {
-      this.fetchItems(this.activeInboxId, this.search || null, filters, this.activeSort)
-    },
-
-    onSortChange (sort) {
-      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, sort)
     },
 
     // Count distinct contact groups in the current data
@@ -739,7 +806,7 @@ export default {
       return (this.checkCommunicationMatchesSearch(this.search, communication) &&
           this.checkCommunicationMatchesInboxFilters(this.activeFilters, communication, false) &&
           !(sortAsc && this.hasMoreItems)) ||
-          this.communicationInProgress(communication)
+        this.communicationInProgress(communication)
     },
 
     communicationInProgress (communication) {
@@ -747,7 +814,141 @@ export default {
         return false
       }
 
+      if (this.activeFilters.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
+        return false
+      }
+
       return this.ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
+    },
+
+    communicationContactOwnedByCurrentUser (communication) {
+      if (!communication.contact?.user_id) {
+        return false
+      }
+
+      return communication.contact.user_id === this.profile.id
+    },
+
+    updateUrlQueryParams (filter) {
+      const query = { ...this.$route.query }
+
+      // Clear existing filter-related query parameters
+      this.filterParams.forEach(param => {
+        delete query[param]
+      })
+
+      // Add non-default filter values to query parameters
+      if (filter.channels && filter.channels.length > 0) {
+        query.channels = filter.channels.join(',')
+      }
+
+      if (filter.campaigns && filter.campaigns.length > 0) {
+        query.campaigns = filter.campaigns.join(',')
+      }
+
+      if (filter.directions && filter.directions.length > 0) {
+        query.directions = filter.directions.join(',')
+      }
+
+      if (filter.my_contact) {
+        query.my_contact = 'true'
+      }
+
+      if (filter.unread_only) {
+        query.unread_only = 'true'
+      }
+
+      if (filter.task_status && filter.task_status.length > 0) {
+        query.task_status = filter.task_status.join(',')
+      }
+
+      if (filter.mention) {
+        query.mention = 'true'
+      }
+
+      if (filter.date_range && filter.date_range !== 'Last 30 Days') {
+        query.date_range = filter.date_range
+      }
+
+      if (filter.date_range === 'custom') {
+        if (filter.from_date) {
+          query.from_date = filter.from_date
+        }
+
+        if (filter.to_date) {
+          query.to_date = filter.to_date
+        }
+      }
+
+      // Update the URL with the new query parameters
+      this.$router.replace({ query }).catch(() => {
+        // Handle navigation errors silently
+      })
+    },
+
+    applyUrlQueryParams () {
+      const query = this.$route.query
+
+      if (!query || Object.keys(query).length === 0) {
+        return
+      }
+
+      // Check if there are any filter-related query parameters
+      const hasFilterParams = Object.keys(query).some(key => this.filterParams.includes(key))
+      if (!hasFilterParams) {
+        return
+      }
+
+      // Create a new filter object based on current active filters
+      const newFilters = { ...this.activeFilters }
+
+      // Apply query parameters to the filter
+      if (query.channels) {
+        newFilters.channels = query.channels.split(',')
+      }
+
+      if (query.campaigns) {
+        newFilters.campaigns = query.campaigns.split(',').map(id => parseInt(id))
+      }
+
+      if (query.directions) {
+        newFilters.directions = query.directions.split(',')
+      }
+
+      if (query.my_contact === 'true') {
+        newFilters.my_contact = true
+      }
+
+      if (query.unread_only === 'true') {
+        newFilters.unread_only = true
+      }
+
+      if (query.task_status) {
+        newFilters.task_status = query.task_status.split(',')
+      }
+
+      if (query.mention === 'true') {
+        newFilters.mention = true
+      }
+
+      if (query.date_range) {
+        newFilters.date_range = query.date_range
+      }
+
+      if (query.date_range === 'custom') {
+        if (query.from_date) {
+          newFilters.from_date = query.from_date
+        }
+        if (query.to_date) {
+          newFilters.to_date = query.to_date
+        }
+      } else if (query.date_range === 'All Time') {
+        newFilters.from_date = null
+        newFilters.to_date = null
+      }
+
+      // Update active filters
+      this.activeFilters = newFilters
     }
   },
 
@@ -793,6 +994,13 @@ export default {
     search (search) {
       this.setCurrentSearch(search)
       this.fetchItems(this.activeInboxId, search || null, this.activeFilters, this.activeSort)
+    },
+
+    '$route.query' (newQuery, oldQuery) {
+      // Only apply URL query params if the query actually changed
+      if (JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
+        this.applyUrlQueryParams()
+      }
     },
 
     items: {

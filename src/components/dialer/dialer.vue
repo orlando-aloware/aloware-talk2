@@ -5,6 +5,7 @@
 <script>
 import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
+import teamInboxApi from 'src/plugins/api/teamInboxApi'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
@@ -25,6 +26,7 @@ import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
+import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'dialer',
@@ -85,6 +87,8 @@ export default {
 
     ...mapState(['isWidget', 'isSalesforceWidget']),
 
+    ...mapState('TeamInbox', ['activeInboxId']),
+
     ...mapFields('powerDialer', [
       'activeTask',
       'sessionPaused',
@@ -125,7 +129,7 @@ export default {
         this.setDialerCommunication(data)
 
         const communication = this.dialer?.communication
-        const isGreetingNew = communication?.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+        const isGreetingNew = communication?.legc_uuid && [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
         const user = communication?.added_user
 
         if (user && !isGreetingNew) {
@@ -203,7 +207,7 @@ export default {
     }
 
     this.dialerListeners.makeCall = (data) => {
-      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId, false, false, data.isFromDialer)
     }
 
     this.dialerListeners.transferCall = (data) => {
@@ -564,14 +568,17 @@ export default {
         live: true
       }
 
+      let apiCall
       if (this.currentCompany.team_inbox_enabled) {
-        params.from_team_inbox = true
+        // Use Team Inbox V3 API when team inbox is enabled
+        apiCall = teamInboxApi.communication.info(params)
+      } else {
+        // Use regular V1 API
+        apiCall = this.$axios.get('/api/v1/communication/info', { params })
       }
 
       this.loadingCommunication = true
-      return this.$axios.get('/api/v1/communication/info', {
-        params
-      }).then(res => {
+      return apiCall.then(res => {
         if (this.dialer.communication && !force) {
           return Promise.resolve()
         }
@@ -609,7 +616,7 @@ export default {
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
-        const isGreetingNew = communication.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+        const isGreetingNew = communication.legc_uuid && [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
         const user = communication.added_user
 
         if (user && !isGreetingNew) {
@@ -620,9 +627,9 @@ export default {
         // with the communication's contact id
         // else, set the contact.
         if ((routeTitle &&
-          this.activeTask &&
-          routeTitle === 'Power Dialer Sessions' &&
-          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+            this.activeTask &&
+            routeTitle === 'Power Dialer Sessions' &&
+            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
@@ -753,9 +760,39 @@ export default {
       })
     },
 
-    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null, isCallWaiting = false, shouldAnswer = false) {
-      console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
+    shouldIncludeRingGroupId (isFromDialer, outboundCampaign) {
+      if (isFromDialer) {
+        // Call is made directly from dialer, so we don't need to include the ring group id
+        return false
+      }
 
+      if (!this.activeInboxId) {
+        // No active inbox, so we don't need to include the ring group id
+        return false
+      }
+
+      const campaign = ['number', 'string'].includes(typeof outboundCampaign)
+        ? this.campaigns.find(campaign => campaign.id === outboundCampaign)
+        : outboundCampaign
+
+      if (!isIvrOrDeadEndCampaign(campaign)) {
+        // Campaign is not an IVR or Dead End campaign, so we don't need to include the ring group id
+        return false
+      }
+
+      return true
+    },
+
+    async makeCall (
+      currentNumber,
+      outboundCampaignId,
+      contactName = '',
+      companyName = '',
+      contactId = null,
+      isCallWaiting = false,
+      shouldAnswer = false,
+      isFromDialer = false
+    ) {
       if (!this.dialer.isReady) {
         console.log('Dialer is not ready', currentNumber, outboundCampaignId)
         return
@@ -827,6 +864,12 @@ export default {
 
       if (this.isOnPowerDialerSessionRoute) {
         params['AnswerInPD'] = true
+      }
+
+      if (this.shouldIncludeRingGroupId(isFromDialer, outboundCampaignId)) {
+        // RingGroupId is used to identify the current inbox
+        // when making a call from an IVR line
+        params['RingGroupId'] = this.activeInboxId.toString()
       }
 
       console.log(' %c Making a call to: ', 'background: #000; color: #fff000;', params)
@@ -901,23 +944,25 @@ export default {
         return
       }
 
-      this.connection.on(WebrtcEvents.CONNECTION_WARNING, (warningName, warningData) => {
-        console.log(WebrtcEvents.CONNECTION_WARNING, warningName, warningData)
-        // add warning to list
-        if (this.warnings.indexOf(warningName) === -1) {
-          this.warnings.push(warningName)
-        }
+      if (![7113].includes(this.currentCompany?.id)) {
+        this.connection.on(WebrtcEvents.CONNECTION_WARNING, (warningName, warningData) => {
+          console.log(WebrtcEvents.CONNECTION_WARNING, warningName, warningData)
+          // add warning to list
+          if (this.warnings.indexOf(warningName) === -1) {
+            this.warnings.push(warningName)
+          }
 
-        this.setWarnings(this.warnings)
-        this.saveCallIssue(warningName, warningData)
-      })
+          this.setWarnings(this.warnings)
+          this.saveCallIssue(warningName, warningData)
+        })
 
-      this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
-        console.log(WebrtcEvents.CONNECTION_WARNING_CLEARED, warningName)
-        // remove warning from list
-        this.warnings = this.warnings.filter(value => value !== warningName)
-        this.setWarnings(this.warnings)
-      })
+        this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
+          console.log(WebrtcEvents.CONNECTION_WARNING_CLEARED, warningName)
+          // remove warning from list
+          this.warnings = this.warnings.filter(value => value !== warningName)
+          this.setWarnings(this.warnings)
+        })
+      }
 
       this.connection.on(WebrtcEvents.CONNECTION_ACCEPT, (call) => { // On accept call
         console.log('Successfully connected call', call)
@@ -980,9 +1025,9 @@ export default {
       // only start wrap up timer if there is a communication
       if (this.dialer.communication) {
         const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
-                                  this.hasParkedAndInprogressCall ||
-                                  this.hasCallInProgressNotParked) &&
-                                  !(this.parkFromAnotherTab || this.hungFromAnotherTab)
+            this.hasParkedAndInprogressCall ||
+            this.hasCallInProgressNotParked) &&
+          !(this.parkFromAnotherTab || this.hungFromAnotherTab)
 
         if (shouldStartWrapUp) {
           this.startWrapUpTimer()
