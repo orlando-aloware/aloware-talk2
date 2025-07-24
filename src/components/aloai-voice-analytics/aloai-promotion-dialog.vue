@@ -88,8 +88,16 @@ export default {
       return this.currentCompany?.used_transcription_min
     },
 
+    transcriptionRate () {
+      return this.profile?.rate?.transcription
+    },
+
     transcriptionEnabled () {
       return this.currentCompany?.transcription_settings?.call_transcription_enabled
+    },
+
+    overusageRestrictionEnabled () {
+      return this.currentCompany?.transcription_settings?.overusage_restriction_enabled
     },
 
     isTrial () {
@@ -119,6 +127,21 @@ export default {
       }
 
       if (this.usedMinutes >= this.includedMinutes) {
+        if (this.overusageRestrictionEnabled) {
+          // If the plan is not an AI plan, hide cost-related and plan-specific messages.
+          if (!this.currentCompany?.plan?.ai_plan) {
+            return {
+              title: `You’ve used all ${this.includedMinutes} trial minutes, but don’t worry! You can easily purchase additional transcription minutes by reaching out to our CSM team, you can upgrade your plan to include more minutes and unlock additional features.`,
+              message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
+            }
+          }
+          // If the plan is an AI plan, show cost-related messages.
+          return {
+            title: `You’ve reached the ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. However, with Overusage Billing Restriction disabled, you can continue using the service seamlessly. Additional transcription minutes will be charged at just ${Math.round(Number(this.transcriptionRate) * 100)} cents/min.`,
+            message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
+          }
+        }
+
         return {
           title: `You've used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don't worry! You can easily purchase additional transcription minutes by reaching out to our CSM team. You can upgrade your plan to include more minutes and unlock additional features.`,
           message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
