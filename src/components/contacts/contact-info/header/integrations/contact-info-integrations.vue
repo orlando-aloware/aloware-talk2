@@ -1,10 +1,9 @@
 <template>
-  <div :class="{ 'alw-contact-integrations--inline': inline }" class="alw-contact-integrations">
+  <div class="alw-contact-integrations">
     <contact-info-integration-link
       v-for="integration in integrations"
       :key="integration.name"
       :href="integration.link"
-      :inline="inline"
       :integration-name="integration.name"
       :title="`View in ${integration.label}`"
     >
