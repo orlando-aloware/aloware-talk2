@@ -5,7 +5,7 @@
     </span>
     <digital-clock
       :timezone="timezone"
-      class="ml-2"
+      class="ml-1"
       data-testid="contact-info-digital-clock"
     />
   </div>
@@ -33,5 +33,16 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+
+  padding-right: 8px; // Align with "goto" icon
+  padding-bottom: 1px;
+
+  .material-icons {
+    font-size: 18px;
+
+    @media (min-width: 768px) {
+      font-size: 16px;
+    }
+  }
 }
 </style>

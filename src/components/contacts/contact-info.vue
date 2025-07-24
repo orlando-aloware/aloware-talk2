@@ -16,7 +16,7 @@
 
     </div>
 
-    <contact-info-badges class="mt-1" :contact="contact" :phone="phone" />
+    <contact-info-badges :contact="contact" :phone="phone" class="mt-1" />
 
     <div class="d-inline-flex flex-wrap contact-action-button mt-1">
       <b-button class="custom-action-button my-1"
@@ -576,11 +576,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.alw-contact-info-time-section {
-  padding-right: 10px; // Align with "goto" icon
-  padding-bottom: 1px;
 }
 
 </style>
