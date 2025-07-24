@@ -5,7 +5,7 @@
       <contact-info-name-editable :contact="contact" :is-read-only="isReadOnly" />
       <div class="alw-contact-info-actions-group">
         <contact-info-integrations
-          v-if="activeIntegrations.length > 0"
+          v-if="activeIntegrations.length === 1"
           :integrations="activeIntegrations"
           inline
         />

@@ -37,10 +37,6 @@ export default {
       type: String,
       required: true
     },
-    inline: {
-      type: Boolean,
-      default: false
-    },
     integrationName: {
       type: String,
       default: ''
