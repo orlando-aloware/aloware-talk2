@@ -18,6 +18,12 @@
 
     <contact-info-badges :contact="contact" :phone="phone" class="mt-1" />
 
+    <!-- Multiple integrations go on their own line after phone -->
+    <contact-info-integrations
+      v-if="activeIntegrations.length > 1"
+      :integrations="activeIntegrations"
+    />
+
     <div class="d-inline-flex flex-wrap contact-action-button mt-1">
       <b-button class="custom-action-button my-1"
                 data-testid="contact-info-call-button"
@@ -256,6 +262,7 @@ import ContactInfoPhone from './contact-info/contact-info-phone.vue'
 import ContactInfoBadges from './contact-info/contact-info-badges.vue'
 import ContactInfoTime from './contact-info/contact-info-time.vue'
 import LineSelector from 'components/generic-selectors/line-selector'
+import ContactInfoIntegrations from 'components/contacts/contact-info/header/integrations/contact-info-integrations.vue'
 
 export default {
   name: 'contact-info',
@@ -276,6 +283,7 @@ export default {
   ],
 
   components: {
+    ContactInfoIntegrations,
     ContactInfoHeader,
     ContactInfoPhone,
     ContactInfoBadges,
