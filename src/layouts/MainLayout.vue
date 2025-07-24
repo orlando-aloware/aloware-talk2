@@ -28,6 +28,7 @@
               <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"
                                     @shown="onShowMobileLiveCallBar"/>
               <app-header v-if="isShowAppHeader"
+                          :is-phone-visible="isPhoneVisible"
                           @toggleSidebar="toggleSidebar"/>
             </q-header>
             <q-page-container ref="page-container"
