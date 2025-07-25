@@ -169,7 +169,7 @@
 <script>
 import LineSelector from 'components/generic-selectors/line-selector'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, settingsMixin, kycMixin } from 'src/plugins/mixins'
+import { aclMixin, settingsMixin, kycMixin, userMixin } from 'src/plugins/mixins'
 import UserVmDropLibrary from 'components/user-vm-drop-library'
 import SettingsMap from 'components/settings/settings-map'
 import OutboundGreeting from 'components/settings/outbound-greeting.vue'
@@ -185,7 +185,7 @@ import { agentAvailableCampaignsCallback } from 'src/plugins/helpers/campaigns'
 export default {
   name: 'outbound-call',
 
-  mixins: [aclMixin, settingsMixin, kycMixin],
+  mixins: [aclMixin, settingsMixin, kycMixin, userMixin],
 
   components: { UserVmDropLibrary, LineSelector, OutboundGreeting },
 
@@ -221,7 +221,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('settings', ['userClone']),
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'campaignsIsLoading']),
 
     outboundCallSettingEnabled () {
       return !this.hasRole(['Company Admin', 'Company Agent']) || (this.currentCompany && this.currentCompany.force_outbound_recording)
@@ -271,7 +271,7 @@ export default {
     },
 
     availableAgentCampaigns () {
-      if (this.hasRole(COMPANY_AGENT)) {
+      if (this.shouldLimitAgentLinesVisibility) {
         return this.campaigns.filter(
           campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
         )
@@ -281,6 +281,10 @@ export default {
     },
 
     showInvalidCompanyDefaultLineAlert () {
+      if (this.campaignsIsLoading) {
+        return false
+      }
+
       if (this.user.outbound_calling_selector !== OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT) {
         return false
       }
@@ -302,6 +306,11 @@ export default {
       }
 
       return 'The previously selected line is no longer available. Please select a different line.'
+    },
+
+    shouldLimitAgentLinesVisibility () {
+      return this.hasRole(COMPANY_AGENT) &&
+        this.hasCompanyTeamInboxLineManagementEnhancements
     }
   },
 
