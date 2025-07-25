@@ -366,10 +366,15 @@ export default {
       if (!this.contact?.integration_data) return []
 
       const INTEGRATIONS = [
+        { name: 'gohighlevel', label: 'GoHighLevel' },
+        { name: 'gong', label: 'Gong' },
+        { name: 'google-calendar', label: 'Google Calendar' },
+        { name: 'guesty', label: 'Guesty' },
         { name: 'hubspot', label: 'HubSpot' },
-        { name: 'zoho', label: 'Zoho' },
+        { name: 'pipedrive', label: 'Pipedrive' },
         { name: 'salesforce', label: 'Salesforce' },
-        { name: 'pipedrive', label: 'Pipedrive' }
+        { name: 'slack', label: 'Slack' },
+        { name: 'zoho', label: 'Zoho' }
       ]
 
       return INTEGRATIONS
