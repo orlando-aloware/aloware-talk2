@@ -481,18 +481,14 @@ export default {
     },
 
     checkUnavailableLine (lineId) {
-      // Check for visibility limits when it's an agent with line management enabled
-      // or has the pre-selected line (last line used) from the team inbox set
-      const checkVisibilityLimit = this.shouldLimitAgentLinesVisibility || this.preSelectedTeamInboxLineId
-
       if (
         !!lineId &&
-        checkVisibilityLimit &&
         !this.campaignsIsLoading &&
         !this.options.find(({ id }) => id === lineId)
       ) {
         // If the selected campaign (forced v-model) is not in the options,
         // emit a change event to clear the value and emit an invalid-line event
+        this.selectedId = null
         this.$emit('change', null)
         this.$emit('invalid-line-selection', this.campaigns.find(({ id }) => id === lineId))
       }
@@ -505,10 +501,8 @@ export default {
         return
       }
 
-      // Only update selectedId if not initializing to prevent false change events
-      if (!this.isInitializing) {
-        this.selectedId = value
-      }
+      this.selectedId = value
+      this.checkUnavailableLine(value)
     },
 
     selectedId (val) {

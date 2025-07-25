@@ -73,7 +73,7 @@
                            @invalid-line-selection="onInvalidLineSelection">
             </line-selector>
             <b-form-invalid-feedback v-if="showInvalidLineSelectedError">
-              Line '{{ invalidLineSelected.name }}' is no longer available. Please select a different line.
+              {{ invalidLineSelectedErrorMessage }}
             </b-form-invalid-feedback>
             <b-form-invalid-feedback v-else-if="!$v.user.default_outbound_campaign_id.required">
               Please select an outbound line.
@@ -213,7 +213,8 @@ export default {
       ],
       accountLevelOutboundCampaign: null,
       SettingsMap,
-      invalidLineSelected: null
+      invalidLineSelected: null,
+      showInvalidLineSelectedError: false
     }
   },
 
@@ -291,8 +292,16 @@ export default {
       return !this.availableAgentCampaigns.find(campaign => campaign.id === this.currentCompany?.default_outbound_campaign_id)
     },
 
-    showInvalidLineSelectedError () {
-      return this.invalidLineSelected?.name
+    invalidLineSelectedErrorMessage () {
+      if (!this.showInvalidLineSelectedError) {
+        return ''
+      }
+
+      if (this.invalidLineSelected?.name) {
+        return `Line '${this.invalidLineSelected.name}' is no longer available. Please select a different line.`
+      }
+
+      return 'The previously selected line is no longer available. Please select a different line.'
     }
   },
 
@@ -314,8 +323,9 @@ export default {
     },
 
     onUpdateFields (value, prop) {
-      if (prop === 'default_outbound_campaign_id') {
+      if (prop === 'default_outbound_campaign_id' && value) {
         this.invalidLineSelected = null
+        this.showInvalidLineSelectedError = false
       }
 
       this.user[prop] = value
@@ -346,7 +356,9 @@ export default {
     },
 
     onInvalidLineSelection (campaign) {
+      this.onUpdateFields(null, 'default_outbound_campaign_id')
       this.invalidLineSelected = campaign
+      this.showInvalidLineSelectedError = true
     }
   },
 
