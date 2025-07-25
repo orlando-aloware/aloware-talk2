@@ -422,7 +422,9 @@ export default {
       line && this.selectOption(line)
     }
 
-    this.checkUnavailableLine(this.value)
+    // If the pre-selected line is present, check if it's available
+    // Otherwise, check if the regular value is available
+    this.checkUnavailableLine(this.preSelectedTeamInboxLineId || this.value)
 
     // Mark initialization as complete
     this.$nextTick(() => {
@@ -479,9 +481,13 @@ export default {
     },
 
     checkUnavailableLine (lineId) {
+      // Check for visibility limits when it's an agent with line management enabled
+      // or has the pre-selected line (last line used) from the team inbox set
+      const checkVisibilityLimit = this.shouldLimitAgentLinesVisibility || this.preSelectedTeamInboxLineId
+
       if (
-        lineId !== null &&
-        this.shouldLimitAgentLinesVisibility &&
+        !!lineId &&
+        checkVisibilityLimit &&
         !this.campaignsIsLoading &&
         !this.options.find(({ id }) => id === lineId)
       ) {
