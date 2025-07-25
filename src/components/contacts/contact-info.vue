@@ -51,8 +51,8 @@
               hide-bottom-space
               prepend="From:"
               @change="onLineChange"
-              @invalid-line-selection="onInvalidLineSelection"
               @initiateCall="forceInitiateCall"
+              @invalid-line-selection="onInvalidLineSelection"
             >
             </line-selector>
             <q-btn
@@ -366,10 +366,12 @@ export default {
       if (!this.contact?.integration_data) return []
 
       const INTEGRATIONS = [
+        { name: 'gohighlevel', label: 'GoHighLevel' },
+        { name: 'guesty', label: 'Guesty' },
         { name: 'hubspot', label: 'HubSpot' },
-        { name: 'zoho', label: 'Zoho' },
+        { name: 'pipedrive', label: 'Pipedrive' },
         { name: 'salesforce', label: 'Salesforce' },
-        { name: 'pipedrive', label: 'Pipedrive' }
+        { name: 'zoho', label: 'Zoho' }
       ]
 
       return INTEGRATIONS
