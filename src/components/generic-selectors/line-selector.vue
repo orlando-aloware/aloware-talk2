@@ -384,7 +384,11 @@ export default {
 
     lineInboxName () {
       const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = this.selectedLine || {}
-      return ringGroup?.name || personalInbox?.name
+
+      const deletedPattern = /_deleted_\d+$/
+      const name = ringGroup?.name || personalInbox?.name
+
+      return name?.match(deletedPattern) ? '' : name
     },
 
     shouldLimitAgentLinesVisibility () {
@@ -553,3 +557,16 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+// Inbox Name overflow (hint text)
+.line-selector {
+  .q-field__bottom {
+    .q-field__messages {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+</style>
