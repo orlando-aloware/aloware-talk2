@@ -482,6 +482,7 @@ export default {
 
     checkUnavailableLine (lineId) {
       if (
+        !this.multiple &&
         !!lineId &&
         !this.campaignsIsLoading &&
         !this.options.find(({ id }) => id === lineId)
