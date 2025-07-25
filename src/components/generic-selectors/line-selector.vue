@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="generic-line-selector">
     <generic-multi-select :label="`${label}`"
                           :buttonText="buttonText"
                           :values="selectedId"
@@ -560,7 +560,7 @@ export default {
 
 <style lang="scss">
 // Inbox Name overflow (hint text)
-.line-selector {
+.generic-line-selector {
   .q-field__bottom {
     .q-field__messages {
       overflow: hidden;
