@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="generic-line-selector">
     <generic-multi-select :label="`${label}`"
                           :buttonText="buttonText"
                           :values="selectedId"
@@ -384,7 +384,11 @@ export default {
 
     lineInboxName () {
       const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = this.selectedLine || {}
-      return ringGroup?.name || personalInbox?.name
+
+      const deletedPattern = /_deleted_\d+$/
+      const name = ringGroup?.name || personalInbox?.name
+
+      return name?.match(deletedPattern) ? '' : name
     },
 
     shouldLimitAgentLinesVisibility () {
@@ -551,3 +555,16 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+// Inbox Name overflow (hint text)
+.generic-line-selector {
+  .q-field__bottom {
+    .q-field__messages {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+</style>
