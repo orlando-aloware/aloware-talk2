@@ -73,7 +73,7 @@
                            @invalid-line-selection="onInvalidLineSelection">
             </line-selector>
             <b-form-invalid-feedback v-if="showInvalidLineSelectedError">
-              Line '{{ invalidLineSelected.name }}' is no longer available. Please select a different line.
+              {{ invalidLineSelectedErrorMessage }}
             </b-form-invalid-feedback>
             <b-form-invalid-feedback v-else-if="!$v.user.default_outbound_campaign_id.required">
               Please select an outbound line.
@@ -169,7 +169,7 @@
 <script>
 import LineSelector from 'components/generic-selectors/line-selector'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, settingsMixin, kycMixin } from 'src/plugins/mixins'
+import { aclMixin, settingsMixin, kycMixin, userMixin } from 'src/plugins/mixins'
 import UserVmDropLibrary from 'components/user-vm-drop-library'
 import SettingsMap from 'components/settings/settings-map'
 import OutboundGreeting from 'components/settings/outbound-greeting.vue'
@@ -185,7 +185,7 @@ import { agentAvailableCampaignsCallback } from 'src/plugins/helpers/campaigns'
 export default {
   name: 'outbound-call',
 
-  mixins: [aclMixin, settingsMixin, kycMixin],
+  mixins: [aclMixin, settingsMixin, kycMixin, userMixin],
 
   components: { UserVmDropLibrary, LineSelector, OutboundGreeting },
 
@@ -213,14 +213,15 @@ export default {
       ],
       accountLevelOutboundCampaign: null,
       SettingsMap,
-      invalidLineSelected: null
+      invalidLineSelected: null,
+      showInvalidLineSelectedError: false
     }
   },
 
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('settings', ['userClone']),
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'campaignsIsLoading']),
 
     outboundCallSettingEnabled () {
       return !this.hasRole(['Company Admin', 'Company Agent']) || (this.currentCompany && this.currentCompany.force_outbound_recording)
@@ -270,7 +271,7 @@ export default {
     },
 
     availableAgentCampaigns () {
-      if (this.hasRole(COMPANY_AGENT)) {
+      if (this.shouldLimitAgentLinesVisibility) {
         return this.campaigns.filter(
           campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
         )
@@ -280,6 +281,10 @@ export default {
     },
 
     showInvalidCompanyDefaultLineAlert () {
+      if (this.campaignsIsLoading) {
+        return false
+      }
+
       if (this.user.outbound_calling_selector !== OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT) {
         return false
       }
@@ -291,8 +296,21 @@ export default {
       return !this.availableAgentCampaigns.find(campaign => campaign.id === this.currentCompany?.default_outbound_campaign_id)
     },
 
-    showInvalidLineSelectedError () {
-      return this.invalidLineSelected?.name
+    invalidLineSelectedErrorMessage () {
+      if (!this.showInvalidLineSelectedError) {
+        return ''
+      }
+
+      if (this.invalidLineSelected?.name) {
+        return `Line '${this.invalidLineSelected.name}' is no longer available. Please select a different line.`
+      }
+
+      return 'The previously selected line is no longer available. Please select a different line.'
+    },
+
+    shouldLimitAgentLinesVisibility () {
+      return this.hasRole(COMPANY_AGENT) &&
+        this.hasCompanyTeamInboxLineManagementEnhancements
     }
   },
 
@@ -314,8 +332,9 @@ export default {
     },
 
     onUpdateFields (value, prop) {
-      if (prop === 'default_outbound_campaign_id') {
+      if (prop === 'default_outbound_campaign_id' && value) {
         this.invalidLineSelected = null
+        this.showInvalidLineSelectedError = false
       }
 
       this.user[prop] = value
@@ -346,7 +365,9 @@ export default {
     },
 
     onInvalidLineSelection (campaign) {
+      this.onUpdateFields(null, 'default_outbound_campaign_id')
       this.invalidLineSelected = campaign
+      this.showInvalidLineSelectedError = true
     }
   },
 

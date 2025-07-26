@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="generic-line-selector">
     <generic-multi-select :label="`${label}`"
                           :buttonText="buttonText"
                           :values="selectedId"
@@ -384,7 +384,11 @@ export default {
 
     lineInboxName () {
       const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = this.selectedLine || {}
-      return ringGroup?.name || personalInbox?.name
+
+      const deletedPattern = /_deleted_\d+$/
+      const name = ringGroup?.name || personalInbox?.name
+
+      return name?.match(deletedPattern) ? '' : name
     },
 
     shouldLimitAgentLinesVisibility () {
@@ -480,13 +484,14 @@ export default {
 
     checkUnavailableLine (lineId) {
       if (
-        lineId !== null &&
-        this.shouldLimitAgentLinesVisibility &&
+        !this.multiple &&
+        !!lineId &&
         !this.campaignsIsLoading &&
         !this.options.find(({ id }) => id === lineId)
       ) {
         // If the selected campaign (forced v-model) is not in the options,
         // emit a change event to clear the value and emit an invalid-line event
+        this.selectedId = null
         this.$emit('change', null)
         this.$emit('invalid-line-selection', this.campaigns.find(({ id }) => id === lineId))
       }
@@ -499,10 +504,8 @@ export default {
         return
       }
 
-      // Only update selectedId if not initializing to prevent false change events
-      if (!this.isInitializing) {
-        this.selectedId = value
-      }
+      this.selectedId = value
+      this.checkUnavailableLine(value)
     },
 
     selectedId (val) {
@@ -552,3 +555,16 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+// Inbox Name overflow (hint text)
+.generic-line-selector {
+  .q-field__bottom {
+    .q-field__messages {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+</style>
