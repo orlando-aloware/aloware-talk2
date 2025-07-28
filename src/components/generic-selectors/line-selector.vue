@@ -438,6 +438,7 @@ export default {
 
   methods: {
     selectOption (option) {
+      console.log('selectOption', option)
       this.selectedId = option.id
     },
 
@@ -491,6 +492,7 @@ export default {
         !this.campaignsIsLoading &&
         !this.options.find(({ id }) => id === lineId)
       ) {
+        console.log('checkUnavailableLine cleared selectedId', lineId)
         // If the selected campaign (forced v-model) is not in the options,
         // emit a change event to clear the value and emit an invalid-line event
         this.selectedId = null
@@ -502,6 +504,8 @@ export default {
 
   watch: {
     value (value) {
+      console.log('watcher changed selectedId', value)
+
       if (this.campaignsIsLoading || _.isEmpty(this.campaigns)) {
         return
       }
@@ -511,6 +515,8 @@ export default {
     },
 
     selectedId (val) {
+      console.log('selectedId changed', val)
+
       if (this.selectedId !== this.value && !this.isInitializing) {
         this.$emit('change', val)
       }
@@ -531,6 +537,7 @@ export default {
 
     campaignsIsLoading (val) {
       if (val) {
+        console.log('campaignsIsLoading changed selectedId', val)
         this.selectedId = null
         return
       }
