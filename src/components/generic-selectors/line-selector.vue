@@ -22,7 +22,7 @@
               :outlined="outlined"
               :borderless="borderless"
               :clearable="clearable"
-              :loading="campaignsIsLoading || isLoading"
+              :loading="isLoadingCampaigns || isLoading"
               :use-input="useInput"
               :error="hasError"
               :options="options"
@@ -107,6 +107,7 @@ import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT } from 'src/constants/roles'
 import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
+import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'line-selector',
@@ -282,8 +283,20 @@ export default {
     ...mapState(['campaigns', 'campaignsIsLoading']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['profile']),
-    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox', 'activeInboxId', 'teamInboxCampaigns']),
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox', 'activeInboxId', 'teamInboxCampaigns', 'loadingTeamInboxCampaigns']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
+
+    useTeamInboxCampaigns () {
+      return !this.isDialer && // Use standard campaigns for dialer
+        this.activeInboxId && // Check if there is an active inbox (this is cached in store/storage)
+        this.$route.name.includes(TEAMINBOXES_MENU_TITLE) // Only use team inbox campaigns if on the team inbox page
+    },
+
+    isLoadingCampaigns () {
+      return this.useTeamInboxCampaigns
+        ? this.loadingTeamInboxCampaigns
+        : this.campaignsIsLoading
+    },
 
     placeholder () {
       if (this.customPlaceholder) {
@@ -303,7 +316,7 @@ export default {
     },
 
     campaignsAlphabeticalOrder () {
-      const campaigns = this.activeInboxId && !this.isDialer
+      const campaigns = this.useTeamInboxCampaigns
         ? this.teamInboxCampaigns
         : this.campaigns
 
@@ -362,7 +375,7 @@ export default {
     },
 
     disabled () {
-      return this.disable || this.campaignsIsLoading || this.isReadOnly
+      return this.disable || this.isLoadingCampaigns || this.isReadOnly
     },
 
     classes () {
@@ -375,7 +388,7 @@ export default {
     },
 
     selectedLine () {
-      const campaigns = this.activeInboxId && !this.isDialer
+      const campaigns = this.useTeamInboxCampaigns
         ? this.teamInboxCampaigns
         : this.campaigns
 
@@ -416,7 +429,7 @@ export default {
     this.loadPlaceholder()
 
     // Set initial value if campaigns are already loaded
-    if (this.value && !this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
+    if (this.value && !this.isLoadingCampaigns && !_.isEmpty(this.campaigns)) {
       this.selectedId = this.value
     }
 
@@ -488,7 +501,7 @@ export default {
       if (
         !this.multiple &&
         !!lineId &&
-        !this.campaignsIsLoading &&
+        !this.isLoadingCampaigns &&
         !this.options.find(({ id }) => id === lineId)
       ) {
         console.log('checkUnavailableLine cleared selectedId')
@@ -506,7 +519,7 @@ export default {
 
   watch: {
     value (value) {
-      if (this.campaignsIsLoading || _.isEmpty(this.campaigns)) {
+      if (this.isLoadingCampaigns || _.isEmpty(this.campaigns)) {
         return
       }
 
@@ -533,7 +546,7 @@ export default {
       }
     },
 
-    campaignsIsLoading (val) {
+    isLoadingCampaigns (val) {
       if (val) {
         this.selectedId = null
         return

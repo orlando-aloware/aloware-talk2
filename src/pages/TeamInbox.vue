@@ -64,7 +64,9 @@ export default {
       'activeInboxId',
       'activeInbox',
       'inboxesUnreadCount',
-      'items'
+      'items',
+      'teamInboxCampaigns',
+      'loadingTeamInboxCampaigns'
     ]),
 
     ...mapState('cache', [
@@ -126,7 +128,7 @@ export default {
     ...mapActions('TeamInbox', [
       'reset',
       'setTeamInboxCampaigns',
-      'setCampaignsIsLoading'
+      'setLoadingTeamInboxCampaigns'
     ]),
 
     onItemSelected (routeData) {
@@ -226,8 +228,12 @@ export default {
   },
 
   async created () {
-    await getTeamInboxCampaigns(this)
     this.$VueEvent.listen('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
+
+    if (this.teamInboxCampaigns.length === 0 && !this.loadingTeamInboxCampaigns) {
+      // Refresh team inbox campaigns if they're not loaded yet
+      await getTeamInboxCampaigns(this)
+    }
   },
 
   beforeDestroy () {

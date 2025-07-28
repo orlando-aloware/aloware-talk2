@@ -17,7 +17,6 @@ export const DEFAULT_STATE = {
     'TeamInbox.viewMode',
     'TeamInbox.activeFilters',
     'TeamInbox.activeSort',
-    'TeamInbox.activeInboxId',
     'settings.isSidebarCollapsed',
     'settings.isTeamInboxNavListCollapsed',
     'settings.isContactDetailsCollapsed'

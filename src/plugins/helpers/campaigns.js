@@ -92,9 +92,8 @@ export const getTeamInboxCampaigns = async function (context) {
       return resolve()
     }
 
-    context.loadingTeamInboxCampaigns = true
-    if (typeof context.setCampaignsIsLoading === 'function') {
-      context.setCampaignsIsLoading(true)
+    if (typeof context.setLoadingTeamInboxCampaigns === 'function') {
+      context.setLoadingTeamInboxCampaigns(true)
     }
 
     // Use Team Inbox V3 API - no from_team_inbox flag needed
@@ -105,18 +104,18 @@ export const getTeamInboxCampaigns = async function (context) {
         if (typeof context.setTeamInboxCampaigns === 'function') {
           context.setTeamInboxCampaigns(res.data)
         }
-        context.loadingTeamInboxCampaigns = false
-        if (typeof context.setCampaignsIsLoading === 'function') {
-          context.setCampaignsIsLoading(false)
+
+        if (typeof context.setLoadingTeamInboxCampaigns === 'function') {
+          context.setLoadingTeamInboxCampaigns(false)
         }
 
         return resolve()
       })
       .catch((err) => {
         console.log(err)
-        context.loadingTeamInboxCampaigns = false
-        if (typeof context.setCampaignsIsLoading === 'function') {
-          context.setCampaignsIsLoading(false)
+
+        if (typeof context.setLoadingTeamInboxCampaigns === 'function') {
+          context.setLoadingTeamInboxCampaigns(false)
         }
 
         return reject()
