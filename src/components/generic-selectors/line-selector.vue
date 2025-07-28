@@ -348,7 +348,7 @@ export default {
         : activeCampaigns.filter(
           campaign =>
             this.activeInboxCampaignIds.includes(campaign.id) ||
-              isIvrOrDeadEndCampaign(campaign)
+            isIvrOrDeadEndCampaign(campaign)
         )
     },
 
@@ -426,7 +426,9 @@ export default {
       line && this.selectOption(line)
     }
 
-    this.checkUnavailableLine(this.value)
+    // If the pre-selected line is present, check if it's available
+    // Otherwise, check if the regular value is available
+    this.checkUnavailableLine(this.preSelectedTeamInboxLineId || this.value)
 
     // Mark initialization as complete
     this.$nextTick(() => {
@@ -436,6 +438,7 @@ export default {
 
   methods: {
     selectOption (option) {
+      console.log('selectOption', option)
       this.selectedId = option.id
     },
 
@@ -489,6 +492,7 @@ export default {
         !this.campaignsIsLoading &&
         !this.options.find(({ id }) => id === lineId)
       ) {
+        console.log('checkUnavailableLine cleared selectedId', lineId)
         // If the selected campaign (forced v-model) is not in the options,
         // emit a change event to clear the value and emit an invalid-line event
         this.selectedId = null
@@ -500,6 +504,8 @@ export default {
 
   watch: {
     value (value) {
+      console.log('watcher changed selectedId', value)
+
       if (this.campaignsIsLoading || _.isEmpty(this.campaigns)) {
         return
       }
@@ -509,6 +515,8 @@ export default {
     },
 
     selectedId (val) {
+      console.log('selectedId changed', val)
+
       if (this.selectedId !== this.value && !this.isInitializing) {
         this.$emit('change', val)
       }
@@ -529,6 +537,7 @@ export default {
 
     campaignsIsLoading (val) {
       if (val) {
+        console.log('campaignsIsLoading changed selectedId', val)
         this.selectedId = null
         return
       }
