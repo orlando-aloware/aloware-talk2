@@ -316,15 +316,11 @@ export default {
     },
 
     campaignsAlphabeticalOrder () {
-      const campaigns = this.useTeamInboxCampaigns
-        ? this.teamInboxCampaigns
-        : this.campaigns
-
-      if (!campaigns) {
+      if (!this.availableCampaigns) {
         return []
       }
 
-      const orderedCampaigns = _.clone(campaigns).sort((a, b) => {
+      const orderedCampaigns = _.clone(this.availableCampaigns).sort((a, b) => {
         const textA = a.name.toUpperCase()
         const textB = b.name.toUpperCase()
         return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
@@ -388,11 +384,7 @@ export default {
     },
 
     selectedLine () {
-      const campaigns = this.useTeamInboxCampaigns
-        ? this.teamInboxCampaigns
-        : this.campaigns
-
-      return campaigns.find(campaign => campaign.id === this.selectedId)
+      return this.availableCampaigns.find(campaign => campaign.id === this.selectedId)
     },
 
     lineInboxName () {
@@ -413,6 +405,20 @@ export default {
       return !this.preSelectedTeamInboxLineId || this.showAllLines
         ? 'No results'
         : 'No lines found in this inbox'
+    },
+
+    availableCampaigns () {
+      return this.useTeamInboxCampaigns
+        ? this.teamInboxCampaigns
+        : this.campaigns
+    },
+
+    allCampaigns () {
+      // Remove duplicates from the campaigns array
+      return [...this.campaigns, ...this.teamInboxCampaigns]
+        .filter((value, index, self) => {
+          return self.findIndex(v => v.id === value.id) === index
+        })
     }
   },
 
@@ -429,7 +435,7 @@ export default {
     this.loadPlaceholder()
 
     // Set initial value if campaigns are already loaded
-    if (this.value && !this.isLoadingCampaigns && !_.isEmpty(this.campaigns)) {
+    if (this.value && !this.isLoadingCampaigns && !_.isEmpty(this.availableCampaigns)) {
       this.selectedId = this.value
     }
 
@@ -512,14 +518,14 @@ export default {
         // emit a change event to clear the value and emit an invalid-line event
         this.selectedId = null
         this.$emit('change', null)
-        this.$emit('invalid-line-selection', this.campaigns.find(({ id }) => id === lineId))
+        this.$emit('invalid-line-selection', this.allCampaigns.find(({ id }) => id === lineId))
       }
     }
   },
 
   watch: {
     value (value) {
-      if (this.isLoadingCampaigns || _.isEmpty(this.campaigns)) {
+      if (this.isLoadingCampaigns || _.isEmpty(this.availableCampaigns)) {
         return
       }
 
@@ -537,7 +543,7 @@ export default {
       }
 
       // return the incoming number of the selected campaign
-      const campaign = this.campaigns.find(campaign => campaign.id === val)
+      const campaign = this.allCampaigns.find(campaign => campaign.id === val)
       this.$emit('selectedNumber', campaign ? campaign.incoming_number : '')
 
       // Only check unavailable line if not initializing
