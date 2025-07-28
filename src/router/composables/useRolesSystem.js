@@ -19,7 +19,7 @@ export const allowedRoutes = {
     'AloAi',
     'Settings',
     'Phone',
-    'HubSpot Inbox Connect'
+    'HubSpot SMS Channel Connect'
   ]
 }
 

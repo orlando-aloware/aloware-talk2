@@ -9,8 +9,8 @@
     <!-- Start Main Content-->
     <template v-if="!isLoading">
       <!-- Header with Logo -->
-      <div class="hubspot-inbox-header">
-        <div class="hubspot-inbox-header-content">
+      <div class="hubspot-sms-channel-header">
+        <div class="hubspot-sms-channel-header-content">
           <img
             src="/app-icons/menu/aloware-logo-original-inverse.svg"
             alt="Aloware Logo"
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Main Content -->
-      <div class="hubspot-inbox-content-container q-pa-md d-flex flex-column">
+      <div class="hubspot-sms-channel-content-container q-pa-md d-flex flex-column">
         <template v-if="!setupError">
           <div class="text-center q-mb-md">
             <h1 class="text-h5 text-weight-medium q-my-none">Select a Line Number</h1>
@@ -28,13 +28,13 @@
           </div>
 
           <!-- Search Bar -->
-          <div class="hubspot-inbox-search-container q-mb-sm">
+          <div class="hubspot-sms-channel-search-container q-mb-sm">
             <q-input
               v-model="searchQuery"
               placeholder="Search a specific line"
               outlined
               dense
-              class="hubspot-inbox-search-input"
+              class="hubspot-sms-channel-search-input"
               bg-color="white"
               debounce="300"
             >
@@ -44,7 +44,7 @@
             </q-input>
           </div>
 
-          <div class="hubspot-inbox-table-wrapper">
+          <div class="hubspot-sms-channel-table-wrapper">
             <datatable
               custom-class="numbers-table talk-table"
               sticky-headers
@@ -92,13 +92,13 @@
                       </div>
                     </template>
                     <template v-else-if="col.name === 'capabilities'">
-                      <div class="hubspot-inbox-capabilities">
+                      <div class="hubspot-sms-channel-capabilities">
                         <div
                           v-for="(value, key) in row.capabilities"
                           :key="key"
                           :class="[
-                            'hubspot-inbox-chip',
-                            value ? 'hubspot-inbox-chip-enabled' : 'hubspot-inbox-chip-disabled'
+                            'hubspot-sms-channel-chip',
+                            value ? 'hubspot-sms-channel-chip-enabled' : 'hubspot-sms-channel-chip-disabled'
                           ]"
                         >
                           <q-tooltip
@@ -120,12 +120,12 @@
                     <template v-else>
                       <span
                         :class="[
-                          'hubspot-inbox-ellipsis',
-                          'hubspot-inbox-cell-text',
+                          'hubspot-sms-channel-ellipsis',
+                          'hubspot-sms-channel-cell-text',
                           {
                             'text-grey-6': !row.incoming_number,
-                            'hubspot-inbox-disabled-text': !row.is_selectable,
-                            'hubspot-inbox-selectable-text': row.is_selectable
+                            'hubspot-sms-channel-disabled-text': !row.is_selectable,
+                            'hubspot-sms-channel-selectable-text': row.is_selectable
                           }
                         ]"
                       >{{ col.field(row) }}</span>
@@ -149,7 +149,7 @@
               label="Connect with HubSpot"
               :disable="!selectedCampaign || isConnecting"
               :loading="isConnecting"
-              class="hubspot-inbox-connect-btn"
+              class="hubspot-sms-channel-connect-btn"
               style="background: #FF7A59; color: white"
               no-caps
               unelevated
@@ -164,7 +164,7 @@
 
         <!-- Error State -->
         <template v-else>
-          <div class="hubspot-inbox-error-container text-center">
+          <div class="hubspot-sms-channel-error-container text-center">
             <q-icon name="error" size="48px" color="negative" />
             <h2 class="text-h6 text-negative q-mt-md q-mb-xs">Aloware Connection Error</h2>
             <p class="text-body2 text-grey-6">Please contact your administrator</p>
@@ -192,7 +192,7 @@ import Datatable from 'src/components/datatable.vue'
 import { dialerDataMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'HubSpotInboxConnect',
+  name: 'HubspotSmsChannelConnect',
 
   components: {
     Datatable
@@ -370,7 +370,7 @@ export default {
 </script>
 
 <style scoped>
-.hubspot-inbox-header {
+.hubspot-sms-channel-header {
   background-color: #15163f;
   height: 40px;
   display: flex;
@@ -380,7 +380,7 @@ export default {
   justify-content: center;
 }
 
-.hubspot-inbox-header-content {
+.hubspot-sms-channel-header-content {
   width: 100%;
   max-width: 800px;
   padding: 0 16px;
@@ -395,7 +395,7 @@ export default {
   max-width: 124px;
 }
 
-.hubspot-inbox-content-container {
+.hubspot-sms-channel-content-container {
   padding: 16px;
   background-color: white;
   height: calc(100vh - 40px);
@@ -406,21 +406,21 @@ export default {
   margin: 0 auto;
 }
 
-.hubspot-inbox-search-container {
+.hubspot-sms-channel-search-container {
   width: 80%;
   margin: 0 auto 12px;
 }
 
-.hubspot-inbox-search-input {
+.hubspot-sms-channel-search-input {
   width: 100%;
 }
 
-.hubspot-inbox-search-input :deep(.q-field__control) {
+.hubspot-sms-channel-search-input :deep(.q-field__control) {
   border-radius: 4px;
   height: 36px;
 }
 
-.hubspot-inbox-table-wrapper {
+.hubspot-sms-channel-table-wrapper {
   min-height: 0;
   max-height: 60vh;
   margin-bottom: 12px;
@@ -456,34 +456,34 @@ tr.disabled-row td {
 }
 
 /* Only fade main text, not chips */
-.numbers-table :deep(tr.disabled-row .hubspot-inbox-cell-text),
-.numbers-table :deep(tr.disabled-row .hubspot-inbox-ellipsis),
+.numbers-table :deep(tr.disabled-row .hubspot-sms-channel-cell-text),
+.numbers-table :deep(tr.disabled-row .hubspot-sms-channel-ellipsis),
 .numbers-table :deep(tr.disabled-row span),
-tr.disabled-row .hubspot-inbox-cell-text,
-tr.disabled-row .hubspot-inbox-ellipsis,
+tr.disabled-row .hubspot-sms-channel-cell-text,
+tr.disabled-row .hubspot-sms-channel-ellipsis,
 tr.disabled-row span {
   color: #999 !important;
   opacity: 0.6 !important;
 }
 
 /* Restore chip and icon color in disabled rows */
-.numbers-table :deep(tr.disabled-row .hubspot-inbox-chip),
-tr.disabled-row .hubspot-inbox-chip {
+.numbers-table :deep(tr.disabled-row .hubspot-sms-channel-chip),
+tr.disabled-row .hubspot-sms-channel-chip {
   color: white !important;
   opacity: 1 !important;
 }
-.numbers-table :deep(tr.disabled-row .hubspot-inbox-chip-disabled),
-tr.disabled-row .hubspot-inbox-chip-disabled {
+.numbers-table :deep(tr.disabled-row .hubspot-sms-channel-chip-disabled),
+tr.disabled-row .hubspot-sms-channel-chip-disabled {
   background-color: #9e9e9e !important;
   color: white !important;
 }
-.numbers-table :deep(tr.disabled-row .hubspot-inbox-chip-enabled),
-tr.disabled-row .hubspot-inbox-chip-enabled {
+.numbers-table :deep(tr.disabled-row .hubspot-sms-channel-chip-enabled),
+tr.disabled-row .hubspot-sms-channel-chip-enabled {
   background-color: #4caf50 !important;
   color: white !important;
 }
-.numbers-table :deep(tr.disabled-row .hubspot-inbox-chip q-icon),
-tr.disabled-row .hubspot-inbox-chip q-icon {
+.numbers-table :deep(tr.disabled-row .hubspot-sms-channel-chip q-icon),
+tr.disabled-row .hubspot-sms-channel-chip q-icon {
   color: white !important;
   opacity: 1 !important;
 }
@@ -500,33 +500,33 @@ tr.disabled-row:hover {
   opacity: 0.6 !important;
 }
 
-.numbers-table :deep(tr.disabled-row) .hubspot-inbox-ellipsis,
-.numbers-table tr.disabled-row .hubspot-inbox-ellipsis {
+.numbers-table :deep(tr.disabled-row) .hubspot-sms-channel-ellipsis,
+.numbers-table tr.disabled-row .hubspot-sms-channel-ellipsis {
   color: #999 !important;
   opacity: 0.6 !important;
 }
 
-.hubspot-inbox-connect-btn {
+.hubspot-sms-channel-connect-btn {
   min-width: 200px;
   font-weight: 500;
 }
 
-.hubspot-inbox-connect-btn:not(:disabled):hover {
+.hubspot-sms-channel-connect-btn:not(:disabled):hover {
   background: #ff8f73 !important;
 }
 
-.hubspot-inbox-connect-btn:disabled {
+.hubspot-sms-channel-connect-btn:disabled {
   opacity: 0.7;
 }
 
-.hubspot-inbox-ellipsis {
+.hubspot-sms-channel-ellipsis {
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.hubspot-inbox-error-container {
+.hubspot-sms-channel-error-container {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -535,7 +535,7 @@ tr.disabled-row:hover {
   padding: 15% 32px 32px;
 }
 
-.hubspot-inbox-error-container p {
+.hubspot-sms-channel-error-container p {
   max-width: 400px;
   margin: 0 auto;
 }
@@ -558,7 +558,7 @@ tr.disabled-row:hover {
   word-break: break-word;
 }
 
-.hubspot-inbox-capabilities {
+.hubspot-sms-channel-capabilities {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -566,7 +566,7 @@ tr.disabled-row:hover {
   padding: 4px 0;
 }
 
-.hubspot-inbox-chip {
+.hubspot-sms-channel-chip {
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 10px;
@@ -580,27 +580,27 @@ tr.disabled-row:hover {
   align-items: center;
 }
 
-.hubspot-inbox-chip-enabled {
+.hubspot-sms-channel-chip-enabled {
   background-color: #4caf50;
 }
 
-.hubspot-inbox-chip-disabled {
+.hubspot-sms-channel-chip-disabled {
   background-color: #9e9e9e;
 }
 
-.hubspot-inbox-cell-text {
+.hubspot-sms-channel-cell-text {
   display: block;
   text-align: center;
   width: 100%;
   margin: 0 auto;
 }
 
-.hubspot-inbox-selectable-text {
+.hubspot-sms-channel-selectable-text {
   color: #333 !important;
   opacity: 1 !important;
 }
 
-.hubspot-inbox-disabled-text {
+.hubspot-sms-channel-disabled-text {
   color: #999 !important;
   opacity: 0.6 !important;
 }

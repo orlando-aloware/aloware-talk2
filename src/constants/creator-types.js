@@ -82,6 +82,6 @@ export const ALL_CREATOR_TYPES = [
   },
   {
     id: CREATOR_TYPE_HUBSPOT_INBOX_CONVERSATION,
-    label: 'HubSpot Conversation'
+    label: 'HubSpot Inbox Conversation'
   }
 ]
