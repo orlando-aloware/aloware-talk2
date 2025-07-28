@@ -419,6 +419,10 @@ export default {
           this.isLoading = false
           this.isLoaded = true
           this.isLoadingMore = false
+
+          if (this.$route.name.includes('Power Dialer') && params.sort && params.order) {
+            this.$generalNotification('Power Dialer list order successfully updated')
+          }
         })
         .catch((err) => {
           if (this.$axios.isCancel(err)) {
