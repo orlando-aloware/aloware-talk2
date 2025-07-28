@@ -111,7 +111,7 @@ export default {
   setTeamInboxCampaigns: ({ commit }, data) => {
     commit('SET_TEAM_INBOX_CAMPAIGNS', data)
   },
-  setCampaignsIsLoading: ({ commit }, loading) => {
+  setLoadingTeamInboxCampaigns: ({ commit }, loading) => {
     commit('SET_LOADING_TEAM_INBOX_CAMPAIGNS', loading)
   }
 }
