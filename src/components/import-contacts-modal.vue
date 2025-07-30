@@ -287,83 +287,125 @@
          v-if="currentStep === STEPS.SETTINGS">
       <b-overlay class="w-100"
                  :show="loading">
-        <b-form ref="settingsForm"
-                class="d-flex justify-center"
-                @submit.prevent>
-          <b-col class="settings-form-wrapper pb-0"
-                 sm="12"
-                 md="6">
-            <b-form-row>
-              <b-form-group label="List Name"
-                            class="form-label w-100 mb-0"
-                            ref="listName"
-                            :state="validateState('listName')">
-                <b-form-input type="text"
-                              placeholder="Name of the new List"
-                              v-model.trim="$v.settings.listName.$model"
-                              @input="(eventPayload) => onUpdateFields(eventPayload, 'listName')" />
-              </b-form-group>
+        <div class="d-flex justify-center settings-form-wrapper">
+          <b-form class="w-100" @submit.prevent>
+            <b-form-row class="justify-center">
+              <b-col class="pb-0"
+                     md="12"
+                     lg="6">
+                <b-form-row>
+                  <div>
+                    <h5 class="form-label">List Name</h5>
+                    <p class="form-helper-text">This will be the contact list name</p>
+                  </div>
+                  <b-form-group class="form-label w-100 mb-0"
+                                ref="listName"
+                                :state="validateState('listName')">
+                    <b-form-input type="text"
+                                  placeholder="Name of the new List"
+                                  v-model.trim="$v.settings.listName.$model"
+                                  @input="(eventPayload) => onUpdateFields(eventPayload, 'listName')" />
+                  </b-form-group>
 
-              <b-form-invalid-feedback v-if="!$v.settings.listName.required">
-                List Name is required
-              </b-form-invalid-feedback>
+                  <b-form-invalid-feedback v-if="!$v.settings.listName.required">
+                    List Name is required
+                  </b-form-invalid-feedback>
 
-              <b-form-invalid-feedback class="d-block"
-                                       v-if="hasError('name')">
-                {{ getFieldError('name') }}
-              </b-form-invalid-feedback>
+                  <b-form-invalid-feedback class="d-block"
+                                          v-if="hasError('name')">
+                    {{ getFieldError('name') }}
+                  </b-form-invalid-feedback>
+                </b-form-row>
+
+                <b-form-row class="mt-4">
+                  <div>
+                    <h5 class="form-label">Update existing contacts</h5>
+                    <p class="form-helper-text">
+                      Override the original existing contact data with what's in the CSV file?
+                    </p>
+                  </div>
+
+                  <b-form-group label="">
+                    <b-form-checkbox switch
+                                    v-model="settings.updateExisting">
+                      Update existing contacts
+                    </b-form-checkbox>
+                  </b-form-group>
+                </b-form-row>
+
+                <hr class="my-1" />
+
+                <b-form-row class="mt-3">
+                  <div>
+                    <h5 class="form-label">Save unknown columns</h5>
+                    <p class="form-helper-text">
+                      Columns that are not set will be saved to the contact's notes
+                    </p>
+                  </div>
+
+                  <b-form-group label="">
+                    <b-form-checkbox switch
+                                    v-model="$v.settings.saveUnknownColumnAsNotes">
+                      Save unknown columns to notes
+                    </b-form-checkbox>
+                  </b-form-group>
+                </b-form-row>
+
+                <hr class="my-1" />
+
+                <b-form-row>
+                  <div>
+                    <h5 class="form-label">
+                      Multiple contacts for each phone number
+                    </h5>
+                    <p class="form-helper-text">
+                      Creates a separate contact for each phone number found in the file
+                    </p>
+                  </div>
+
+                  <b-form-group label="">
+                    <b-form-checkbox switch
+                                    v-model="$v.settings.cascadeContacts">
+                      Create a separate contact for each phone number
+                    </b-form-checkbox>
+                  </b-form-group>
+                </b-form-row>
+              </b-col>
+              <b-col md="12"
+                     lg="6">
+                <b-form-row>
+                  <div class="w-100">
+                    <div>
+                      <h5 class="form-label">
+                        Assign Contacts To
+                      </h5>
+                      <p class="form-helper-text">
+                        Distribute the leads to this user
+                      </p>
+                    </div>
+                    <b-form-group class="form-label user-form-group w-100 mb-0"
+                                  ref="userId"
+                                  :state="validateState('userId')">
+                    <user-selector :generic-styling="false"
+                                   v-model="$v.settings.userId.$model"
+                                   :disable="!isAdminOrSupervisor"
+                                   :clearable="false"
+                                   @change="(eventPayload) => onUpdateFields(eventPayload, 'userId')" />
+                    </b-form-group>
+                    <b-form-invalid-feedback v-if="!$v.settings.userId.required">
+                      User is required
+                    </b-form-invalid-feedback>
+
+                    <b-form-invalid-feedback class="d-block"
+                                             v-if="hasError('userId')">
+                    {{ getFieldError('userId') }}
+                  </b-form-invalid-feedback>
+                  </div>
+                </b-form-row>
+              </b-col>
             </b-form-row>
-
-            <b-form-row class="mt-4">
-              <div>
-                <h5 class="form-label">Update existing contacts</h5>
-                <p class="form-helper-text">
-                  Override the original existing contact data with what's in the CSV file?
-                </p>
-              </div>
-
-              <b-form-group label="">
-                <b-form-checkbox switch
-                                 v-model="settings.updateExisting">
-                  Update existing contacts
-                </b-form-checkbox>
-              </b-form-group>
-            </b-form-row>
-            <b-form-row class="mt-3">
-              <div>
-                <h5 class="form-label">Save unknown columns</h5>
-                <p class="form-helper-text">
-                  Columns that are not set will be saved to the contact's notes
-                </p>
-              </div>
-
-              <b-form-group label="">
-                <b-form-checkbox switch
-                                 v-model="$v.settings.saveUnknownColumnAsNotes">
-                  Save unknown columns to notes
-                </b-form-checkbox>
-              </b-form-group>
-            </b-form-row>
-
-            <b-form-row class="mt-3">
-              <div>
-                <h5 class="form-label">
-                  Multiple contacts for each phone number
-                </h5>
-                <p class="form-helper-text">
-                  Creates a separate contact for each phone number found in the file
-                </p>
-              </div>
-
-              <b-form-group label="">
-                <b-form-checkbox switch
-                                 v-model="$v.settings.cascadeContacts">
-                  Create a separate contact for each phone number
-                </b-form-checkbox>
-              </b-form-group>
-            </b-form-row>
-          </b-col>
-        </b-form>
+          </b-form>
+        </div>
       </b-overlay>
     </div>
 
@@ -439,6 +481,7 @@ import talk2Api from 'src/plugins/api/api'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { required } from 'vuelidate/lib/validators'
 import { STEPS, contactFields } from 'src/constants/lists/import-contacts-modal'
+import UserSelector from 'components/generic-selectors/user-selector.vue'
 
 export default {
   mixins: [
@@ -451,7 +494,8 @@ export default {
 
   components: {
     FileUploader,
-    InformationCircleIcon
+    InformationCircleIcon,
+    UserSelector
   },
 
   props: {
@@ -565,7 +609,8 @@ export default {
       tableData: [],
       importModel: {},
       settings: {
-        listName: ''
+        listName: '',
+        userId: null
       },
       reviewData: [],
       tableHeader: [],
@@ -586,6 +631,9 @@ export default {
       settings: {
         listName: {
           required
+        },
+        userId: {
+          required
         }
       }
     }
@@ -594,6 +642,9 @@ export default {
   methods: {
     open () {
       this.isOpen = true
+      this.settings.userId = this.userId
+      // todo: remove
+      // this.currentStep = STEPS.SETTINGS
     },
 
     close () {
@@ -611,6 +662,7 @@ export default {
       this.loading = false
       this.done = []
       this.settings.listName = ''
+      this.settings.userId = null
       this.settings.updateExisting = false
       this.settings.saveUnknownColumnAsNotes = false
       this.settings.cascadeContacts = false
@@ -625,6 +677,11 @@ export default {
       // clear server errors if any
       if (prop === 'listName' && this.fieldErrors.name?.length > 0) {
         this.fieldErrors.name = []
+      }
+
+      // clear server errors if any
+      if (prop === 'userId' && this.fieldErrors.userId?.length > 0) {
+        this.fieldErrors.userId = []
       }
 
       this.updateFormValidity()
@@ -761,14 +818,12 @@ export default {
       const data = {
         ...this.importModel,
         name: this.settings.listName,
+        user_id: this.settings.userId,
+        assign_contacts_to: 1,
         update_existing: this.settings.updateExisting,
         unknown_columns_to_notes: this.settings.saveUnknownColumnAsNotes,
         cascade_contacts: this.settings.cascadeContacts,
         show_in_public_folder: this.isPublic
-      }
-
-      if (this.userId) {
-        data.user_id = this.userId
       }
 
       if (this.folderId) {
@@ -807,6 +862,11 @@ export default {
 
     handleCloseClick () {
       this.close()
+    },
+
+    onUserChange (id) {
+      console.log('>>> onUserChange', id)
+      this.settings.assignUserId = id
     }
   },
 
