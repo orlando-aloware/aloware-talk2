@@ -11,7 +11,7 @@ export default {
     },
 
     userCanBargeAndWhisper (communication) {
-      return (this.hasRole('Company Admin') || this.hasRole('Billing Admin') || this.hasPermissionTo('barge and whisper on call')) &&
+      return (this.hasRole('Company Admin') || this.hasPermissionTo('barge and whisper on call')) &&
         ![AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_SENTRY].includes(this.agentStatus) &&
         communication.type === CommunicationTypes.CALL &&
         this.isCallInProgress(communication.disposition_status2, communication.current_status2) &&
