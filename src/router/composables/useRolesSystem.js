@@ -1,6 +1,5 @@
 export const allowedRoutes = {
   talkLite: [
-    'Team Inboxes',
     'Power Dialer',
     'Stats',
     'Settings'
