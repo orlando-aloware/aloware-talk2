@@ -13,7 +13,9 @@ export default {
     name: {
       type: String,
       required: true,
-      validator: value => ['hubspot', 'zoho', 'salesforce', 'pipedrive'].includes(value)
+      validator: value => [
+        'gohighlevel', 'guesty', 'hubspot', 'pipedrive', 'salesforce', 'zoho'
+      ].includes(value)
     },
     inline: {
       type: Boolean,

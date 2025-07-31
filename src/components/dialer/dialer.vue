@@ -1,5 +1,7 @@
 <template>
-  <div></div>
+  <div>
+    <microphone-permission-modal ref="microphonePermissionModal" />
+  </div>
 </template>
 
 <script>
@@ -26,10 +28,15 @@ import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
+import MicrophonePermissionModal from './microphone-permission-modal.vue'
 import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'dialer',
+
+  components: {
+    MicrophonePermissionModal
+  },
 
   mixins: [
     aclMixin,
@@ -793,6 +800,13 @@ export default {
       shouldAnswer = false,
       isFromDialer = false
     ) {
+      // Check microphone permission after device is ready
+      const hasMicrophoneAccess = await this.checkMicrophonePermission()
+      if (!hasMicrophoneAccess) {
+        console.log('Microphone is not allowed by the user')
+        return
+      }
+
       if (!this.dialer.isReady) {
         console.log('Dialer is not ready', currentNumber, outboundCampaignId)
         return
@@ -2198,6 +2212,43 @@ export default {
       }
 
       return found
+    },
+
+    async checkMicrophonePermission () {
+      // Check if the browser supports getUserMedia
+      if (!navigator?.mediaDevices?.getUserMedia) {
+        console.error('[checkMicrophonePermission] microphone not supported')
+        this.showMicrophonePermissionModal()
+        return false
+      }
+
+      // Check current permission status (only if Permissions API is supported)
+      try {
+        const permissionStatus = await navigator.permissions.query({ name: 'microphone' })
+        if (permissionStatus.state === 'denied') {
+          console.error('[checkMicrophonePermission] microphone access denied')
+          this.showMicrophonePermissionModal()
+          return false
+        }
+      } catch (error) {
+        // Permissions API not supported, continue to getUserMedia check
+      }
+
+      // Try to get microphone access to trigger permission request if needed
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        // Stop the stream immediately to avoid keeping the microphone active
+        stream.getTracks().forEach(track => track.stop())
+        return true
+      } catch (error) {
+        console.error('[checkMicrophonePermission] getUserMedia error:', error)
+        this.showMicrophonePermissionModal()
+        return false
+      }
+    },
+
+    showMicrophonePermissionModal () {
+      this.$refs.microphonePermissionModal.show()
     }
   },
 

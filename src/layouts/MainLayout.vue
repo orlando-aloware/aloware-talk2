@@ -296,7 +296,7 @@ import * as TrialStatus from 'src/constants/trial-account-status'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { MAX_SCREEN_WIDTH_MOBILE_HEADER } from 'src/constants/viewport-sizes'
 import talk2Api from 'src/plugins/api/api'
-import { getCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
+import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
 import * as storage from 'src/plugins/helpers/storage'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import store from 'src/store'
@@ -423,7 +423,8 @@ export default {
 
     ...mapState('TeamInbox', {
       teamInboxStoreInboxes: 'inboxes',
-      isLoadingTeamInboxes: 'isLoadingInboxes'
+      isLoadingTeamInboxes: 'isLoadingInboxes',
+      activeTeamInboxId: 'activeInboxId'
     }),
 
     ...mapGetters('TeamInbox', [
@@ -469,7 +470,8 @@ export default {
     ]),
 
     ...mapState('TeamInbox', [
-      'activeInboxId'
+      'activeInboxId',
+      'loadingTeamInboxCampaigns'
     ]),
 
     ...mapState('powerDialer', [
@@ -1719,6 +1721,11 @@ export default {
         this.getLeadSources()
         this.getAttributeDictionaries()
         this.getMyQueueList()
+
+        if (this.hasCompanyTeamInboxEnabled && !this.loadingTeamInboxCampaigns) {
+          // Load Team Inbox campaigns if it's enabled
+          getTeamInboxCampaigns(this)
+        }
       })
     },
 
@@ -2833,6 +2840,10 @@ export default {
       'setIsInboxFiltersLoaded',
       'gettingTasksList',
       'setInboxShowMyContacts'
+    ]),
+    ...mapActions('TeamInbox', [
+      'setTeamInboxCampaigns',
+      'setLoadingTeamInboxCampaigns'
     ])
   },
 

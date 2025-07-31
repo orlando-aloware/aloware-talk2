@@ -52,6 +52,7 @@
               prepend="From:"
               @change="onLineChange"
               @initiateCall="forceInitiateCall"
+              @invalid-line-selection="onInvalidLineSelection"
             >
             </line-selector>
             <q-btn
@@ -365,10 +366,12 @@ export default {
       if (!this.contact?.integration_data) return []
 
       const INTEGRATIONS = [
+        { name: 'gohighlevel', label: 'GoHighLevel' },
+        { name: 'guesty', label: 'Guesty' },
         { name: 'hubspot', label: 'HubSpot' },
-        { name: 'zoho', label: 'Zoho' },
+        { name: 'pipedrive', label: 'Pipedrive' },
         { name: 'salesforce', label: 'Salesforce' },
-        { name: 'pipedrive', label: 'Pipedrive' }
+        { name: 'zoho', label: 'Zoho' }
       ]
 
       return INTEGRATIONS
@@ -455,6 +458,7 @@ export default {
           // Show popup and wait for user to select line
           this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
           this.showLineSelectorPopup = !this.showLineSelectorPopup
+          this.selectedLine = this.contactLastLineUsedId
           return
         }
       }
@@ -536,6 +540,10 @@ export default {
 
     onLineChange (line) {
       this.selectedLine = line
+    },
+
+    onInvalidLineSelection () {
+      this.selectedLine = null
     },
 
     async handleExportCommunications () {
