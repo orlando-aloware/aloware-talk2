@@ -2254,9 +2254,13 @@ export default {
     },
 
     validateTransferFailure (data) {
+      if (!this.dialer.communication) {
+        return
+      }
+
       // Check for "Warm transfer failed" in notes and display error message
       // Compare current dialer communication notes with incoming notes before updating
-      const currentNotes = this.dialer.communication?.notes
+      const currentNotes = this.dialer.communication.notes
       const incomingNotes = data.notes
       if (incomingNotes && currentNotes !== incomingNotes) {
         const notesLines = incomingNotes.split(/\r?\n/).filter(line => line.trim())
