@@ -2258,7 +2258,7 @@ export default {
       // Compare current dialer communication notes with incoming notes before updating
       const currentNotes = this.dialer.communication?.notes
       const incomingNotes = data.notes
-      if (incomingNotes && currentNotes && currentNotes !== incomingNotes) {
+      if (incomingNotes && currentNotes !== incomingNotes) {
         const notesLines = incomingNotes.split(/\r?\n/).filter(line => line.trim())
         const lastLine = notesLines[notesLines.length - 1] ?? ''
         const startIndex = lastLine.indexOf('Warm transfer failed')
