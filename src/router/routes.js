@@ -10,6 +10,7 @@ const Contacts = () => import('src/pages/contacts/Contacts.vue')
 const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
 const ContactsAddView = () => import('src/pages/contacts/ContactsAddView.vue')
 const Dialer = () => import('pages/widgets/Dialer.vue')
+const HubSpotSoftPhone = () => import('pages/widgets/HubSpotSoftPhone.vue')
 const Lists = () => import('pages/lists/Lists.vue')
 const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
 const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
@@ -716,7 +717,7 @@ const routes = [
     name: 'HubSpot Call Extension',
     path: '/widgets/hubspot-call-extension',
     props: true,
-    component: Dialer
+    component: HubSpotSoftPhone
   },
   {
     name: 'Salesforce Softphone',
