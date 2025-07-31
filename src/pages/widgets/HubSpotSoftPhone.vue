@@ -49,7 +49,7 @@
 
     <div class="p-3"
          v-else-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED">
-      <p><strong>Phone number is not chosen</strong></p>
+      <p><strong>Phone number is not chosen (HS Softphone)</strong></p>
       <hr>
       <p>Please click to a phone number to start dialing.</p>
     </div>
@@ -89,7 +89,7 @@ const WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED = 4
 const WIDGET_MSG_CRITICAL_ERROR_HAPPENED = 5
 
 export default {
-  name: 'Dialer',
+  name: 'HubSpotSoftPhone',
 
   components: {
     Webrtc,
@@ -117,7 +117,6 @@ export default {
       startDialing: false,
       small: false,
       initialized: false,
-      needsExtensions: false,
       extensionsInitialized: false,
       // not always this can be switched to true before call
       // in HS Task view it's opening window automatically without sending event when
@@ -206,12 +205,6 @@ export default {
 
     if (this.$route.query.small) {
       this.small = true
-    }
-
-    this.needsExtensions = this.$route.name === 'HubSpot Call Extension'
-
-    if (!this.needsExtensions) {
-      this.extensionsVisibility = true
     }
   },
 
@@ -391,8 +384,7 @@ export default {
       this.widgetMessage = WIDGET_MSG_HIDE
       this.startDialing = true
 
-      if (this.needsExtensions &&
-        this.extensionsInitialized &&
+      if (this.extensionsInitialized &&
         this.extensionsVisibility &&
         this.initialized &&
         this.profile &&
@@ -411,7 +403,7 @@ export default {
     },
 
     handleUserLogin () {
-      if (this.needsExtensions && this.extensionsInitialized) {
+      if (this.extensionsInitialized) {
         this.extensions.userLoggedIn()
         // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
         if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
@@ -532,7 +524,7 @@ export default {
     },
 
     makeCall () {
-      if (this.callDisabled || this.campaignId === null) {
+      if (this.campaignId === null) {
         this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
         this.$generalNotification('The dialer does not meet all the required criteria to start calling.', 'error', 5000, true)
         return
