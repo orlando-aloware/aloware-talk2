@@ -420,7 +420,7 @@ export default {
           this.isLoaded = true
           this.isLoadingMore = false
 
-          if (this.$route.name.includes('Power Dialer') && params.sort && params.order) {
+          if (this.$route.name.includes('Power Dialer') && data?.sort_updated) {
             this.$generalNotification('Power Dialer list order successfully updated')
           }
         })
