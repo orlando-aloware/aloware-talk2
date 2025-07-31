@@ -18,7 +18,8 @@ export const allowedRoutes = {
     'Broadcasts',
     'AloAi',
     'Settings',
-    'Phone'
+    'Phone',
+    'HubSpot SMS Channel Connect'
   ]
 }
 

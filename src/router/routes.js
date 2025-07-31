@@ -36,6 +36,7 @@ const SalesforceMessageWidgetError = () => import('pages/widgets/SalesforceMessa
 const SalesforceSoftPhone = () => import('pages/widgets/SalesforceSoftPhone.vue')
 const AloAi = () => import('pages/AloAi.vue')
 const Apps = () => import('pages/Apps.vue')
+const HubspotSmsChannelConnect = () => import('pages/integrations/HubspotSmsChannelConnect.vue')
 
 export const COMMUNICATIONS_BASE_PATH = 'communications'
 export const DEFAULT_COMMUNICATIONS_CHANNEL = 'all'
@@ -722,6 +723,15 @@ const routes = [
     path: '/salesforce/softphone',
     props: true,
     component: SalesforceSoftPhone
+  },
+  // Integration Misc Pages
+  {
+    name: 'HubSpot SMS Channel Connect',
+    path: '/integrations/misc/hubspot-sms-channel-connect',
+    component: HubspotSmsChannelConnect,
+    meta: {
+      title: 'Connect Aloware SMS'
+    }
   },
   // deep link handlers
   // Apps handlers to open custom protocol
