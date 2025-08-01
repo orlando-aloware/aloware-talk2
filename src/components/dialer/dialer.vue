@@ -2265,7 +2265,7 @@ export default {
       if (incomingNotes && currentNotes !== incomingNotes) {
         const notesLines = incomingNotes.split(/\r?\n/).filter(line => line.trim())
         const lastLine = notesLines[notesLines.length - 1] ?? ''
-        const startIndex = lastLine.indexOf('Warm transfer failed')
+        const startIndex = lastLine.indexOf('Transfer failed')
         if (startIndex !== -1) {
           const message = lastLine.substring(startIndex)
           this.$generalNotification(message, 'error')
