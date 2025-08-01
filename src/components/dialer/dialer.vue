@@ -2195,24 +2195,6 @@ export default {
       return communication
     },
 
-    getCampaign (campaignId) {
-      if (!campaignId) {
-        return null
-      }
-
-      if (!this.campaigns || !Array.isArray(this.campaigns)) {
-        return null
-      }
-
-      const found = this.campaigns.find(campaign => campaign.id === campaignId)
-
-      if (!found) {
-        return null
-      }
-
-      return found
-    },
-
     async checkMicrophonePermission () {
       // Check if the browser supports getUserMedia
       if (!navigator?.mediaDevices?.getUserMedia) {
