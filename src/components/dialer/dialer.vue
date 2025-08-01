@@ -2148,6 +2148,7 @@ export default {
       }
 
       // Ensure that 'campaigns' exists and is an array before proceeding
+      // This prevents showing notifications that lack a valid campaign name
       if (!this.campaigns || !Array.isArray(this.campaigns)) {
         return null
       }
