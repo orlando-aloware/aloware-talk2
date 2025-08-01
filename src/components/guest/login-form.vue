@@ -121,7 +121,8 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState(['statics', 'staticsLoaded', 'isWidget'])
+    ...mapState(['statics', 'staticsLoaded', 'isWidget']),
+    ...mapState('cache', ['currentCompany'])
   },
 
   data () {
@@ -248,11 +249,75 @@ export default {
         redirectPath = decodeURIComponent(redirectQuery)
       }
 
+      // This will fix redirect path if the app is in the HubSpot Extension Context
+      redirectPath = await this.getCorrectRedirectPathForContext(redirectPath)
+
       this.$emit('userLoggedIn')
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
 
       this.resetUser()
+    },
+
+    /**
+     * Checks if the current context requires HubSpot extension redirect
+     *
+     * @returns {Object} - Object containing redirect decision and context info
+     */
+    checkHubSpotRedirectContext () {
+      // Check if we're in HubSpot extension mode or redirecting to HubSpot extension
+      const isHubSpotExtension = this.$route.name === 'HubSpot Call Extension' ||
+                                 this.$route.path.includes('hubspot-call-extension')
+
+      // Get the dynamic HubSpot domain from company settings
+      const hubspotDomain = this.$store?.state?.auth?.profile?.company?.hubspot_company_ui_domain || 'app.hubspot.com'
+
+      // Check if user is coming from HubSpot calling window mode (popup/iframe)
+      // This handles scenarios like: https://app.hubspot.com/calling-integration-popup-ui/49267018
+      // or custom domains like: https://custom.hubspot.com/calling-integration-popup-ui/49267018
+      const referrerHasHubSpot = document.referrer && document.referrer.includes('hubspot-call-extension')
+      const referrerIsHubSpot = document.referrer && document.referrer.includes(hubspotDomain)
+
+      // Determine if any HubSpot extension conditions are met
+      const hasHubSpotConditions = isHubSpotExtension ||
+                                   this.$route.path.includes('hubspot-call-extension') ||
+                                   referrerHasHubSpot ||
+                                   referrerIsHubSpot
+
+      // Check if HubSpot integration is enabled
+      const isHubSpotEnabled = this.$store?.state?.auth?.profile?.company?.hubspot_integration_enabled
+
+      // Determine if we should redirect to HubSpot extension
+      const shouldRedirect = hasHubSpotConditions && isHubSpotEnabled
+
+      return {
+        shouldRedirect,
+        hasHubSpotConditions,
+        isHubSpotEnabled,
+        hubspotDomain
+      }
+    },
+
+    /**
+     * Ensures the redirect path is correct for the current context
+     * This fixes issues where users in HubSpot extension mode get redirected to wrong pages
+     * @param {string} originalPath - The original redirect path from query parameters
+     * @returns {string} - The corrected redirect path
+     */
+    async getCorrectRedirectPathForContext (originalPath) {
+      // Wait for Vuex to resolve completely before checking HubSpot context
+      await this.$nextTick()
+
+      const hubSpotContext = this.checkHubSpotRedirectContext()
+
+      // Redirect to HubSpot extension if conditions are met and integration is enabled
+      if (hubSpotContext.shouldRedirect) {
+        console.log('[HubSpot Login Redirect] ✅ Redirecting to HubSpot extension')
+        return '/widgets/hubspot-call-extension'
+      }
+
+      // Return original path for all other contexts
+      return originalPath
     },
 
     redirectTimeout () {

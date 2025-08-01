@@ -60,7 +60,7 @@
             emit-value
             map-options
             :disable="shouldDisableStatusToggle"
-            :loading="isLoadingAgentStatus"
+            :loading="loadingAgentStatus"
             dense
             outlined
             style="min-width: 140px; width: 140px;"
@@ -331,7 +331,7 @@ export default {
       const isForcedDispositionOnWrapUp = (isForcedCallDisposition || isForcedContactDisposition) &&
         this.dialer.currentStatus === 'WRAP_UP'
 
-      return this.isLoadingAgentStatus ||
+      return this.loadingAgentStatus ||
         ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus) ||
         this.isAgentOnCall || isForcedDispositionOnWrapUp
     },
