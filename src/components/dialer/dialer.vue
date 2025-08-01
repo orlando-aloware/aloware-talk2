@@ -2187,7 +2187,7 @@ export default {
         ring_group_id: parseInt(communicationData.RingGroupId) || null,
         campaign_id: campaignId,
         campaign: {
-          name: customParams.CampaignName
+          name: customParams?.CampaignName || ''
         }
       }
 
