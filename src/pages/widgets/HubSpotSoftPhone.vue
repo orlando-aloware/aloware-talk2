@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="widget-container">
     <b-overlay
       class="h-100 w-100 position-absolute"
       bg-color='#15163f'
@@ -49,9 +49,74 @@
 
     <div class="p-3"
          v-else-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED">
-      <p><strong>Phone number is not chosen (HS Softphone)</strong></p>
+      <div class="status-header">
+        <div class="d-flex align-items-center">
+          <strong>{{ availabilityMessage }}</strong>
+        </div>
+        <div class="d-flex align-items-center">
+          <q-select
+            :value="agentStatus"
+            :options="statusOptionsWithLogout"
+            emit-value
+            map-options
+            :disable="shouldDisableStatusToggle"
+            :loading="isLoadingAgentStatus"
+            dense
+            outlined
+            style="min-width: 140px; width: 140px;"
+            @input="handleStatusChange"
+          >
+            <template v-slot:selected>
+              <div class="row items-center no-wrap">
+                <q-badge
+                  :color="statusBadgeColor"
+                  class="status-badge q-mr-sm"
+                  size="sm"
+                />
+                <span>{{ statusLabel }}</span>
+              </div>
+            </template>
+            <template v-slot:option="scope">
+              <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+                <q-item-section avatar v-if="scope.opt.type !== 'logout'">
+                  <q-badge
+                    :color="scope.opt.color"
+                    class="status-badge"
+                    size="sm"
+                  />
+                </q-item-section>
+                <q-item-section avatar v-else>
+                  <logout-icon width="15" height="15" class="logout-icon" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label :class="scope.opt.type === 'logout' ? 'text-red-80' : ''">
+                    {{ scope.opt.label }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+      <p><strong>Outbound Calls:</strong> Click on any phone number in HubSpot to start dialing.</p>
+      <p><strong>Inbound Calls:</strong> When you receive a call, it will automatically appear here for you to answer.</p>
+
+      <!-- User Information Section -->
       <hr>
-      <p>Please click to a phone number to start dialing.</p>
+      <div v-if="authenticated && profile" class="user-info">
+        <div class="logged-in-label">Logged in as</div>
+        <div>
+          <strong>{{ profile.first_name || profile.name }}</strong>
+          <span v-if="profile.company_name">
+            • {{ profile.company_name }}
+          </span>
+          <div v-if="profile.email">
+            {{ profile.email }}
+          </div>
+        </div>
+      </div>
     </div>
 
     <webrtc
@@ -72,11 +137,12 @@
 <script>
 import DialerListeners from 'components/dialer-listeners.vue'
 import Webrtc from 'components/webrtc'
+import LogoutIcon from 'components/icons/logout-icon'
 import * as AgentStatus from 'src/constants/agent-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import * as storage from 'src/plugins/helpers/storage'
-import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin } from 'src/plugins/mixins'
+import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin } from 'src/plugins/mixins'
 import CallingExtensionsManager from 'src/utils/CallingExtensionsManager'
 import { mapActions, mapState } from 'vuex'
 import { CURRENT_STATUS_HOLD_NEW } from 'src/constants/communication-current-status'
@@ -93,10 +159,11 @@ export default {
 
   components: {
     Webrtc,
-    DialerListeners
+    DialerListeners,
+    LogoutIcon
   },
 
-  mixins: [timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin],
+  mixins: [timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin, notificationMixin],
 
   props: {
     apiKey: {
@@ -178,7 +245,10 @@ export default {
         agentStatusUpdated: null
       },
       // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
-      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY', null]
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY', null],
+
+      // Logout state
+      isLoggingOut: false
     }
   },
 
@@ -199,6 +269,132 @@ export default {
       return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) &&
         !this.dialer?.parkedCall &&
         this.widgetMessage === WIDGET_MSG_HIDE
+    },
+
+    isAgentAvailable () {
+      // Agent is available only when status is ACCEPTING_CALLS
+      return this.profile && this.profile.agent_status === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
+    },
+
+    agentStatus: {
+      get () {
+        return this.profile ? this.profile.agent_status : AgentStatus.AGENT_STATUS_OFFLINE
+      },
+      set (value) {
+        this.changeAgentStatus(value, false, 1, 'HubSpot-StatusSelector')
+      }
+    },
+
+    statusLabel () {
+      switch (this.agentStatus) {
+        case AgentStatus.AGENT_STATUS_OFFLINE:
+          return 'Offline'
+        case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
+          return 'Available'
+        case AgentStatus.AGENT_STATUS_ON_BREAK:
+          return 'On-break'
+        case AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS:
+        case AgentStatus.AGENT_STATUS_ON_CALL:
+        case AgentStatus.AGENT_STATUS_ON_WRAP_UP:
+        case AgentStatus.AGENT_STATUS_RINGING:
+        case AgentStatus.AGENT_STATUS_AUTO_DIAL:
+        case AgentStatus.AGENT_STATUS_SENTRY:
+          return 'Busy'
+        default:
+          return 'Offline'
+      }
+    },
+
+    statusBadgeColor () {
+      switch (this.agentStatus) {
+        case AgentStatus.AGENT_STATUS_OFFLINE:
+          return 'grey-6'
+        case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
+          return 'green-6'
+        case AgentStatus.AGENT_STATUS_ON_BREAK:
+          return 'orange-6'
+        case AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS:
+        case AgentStatus.AGENT_STATUS_ON_CALL:
+        case AgentStatus.AGENT_STATUS_ON_WRAP_UP:
+        case AgentStatus.AGENT_STATUS_RINGING:
+        case AgentStatus.AGENT_STATUS_AUTO_DIAL:
+        case AgentStatus.AGENT_STATUS_SENTRY:
+          return 'red-6'
+        default:
+          return 'grey-6'
+      }
+    },
+
+    shouldDisableStatusToggle () {
+      const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
+      const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
+      const isForcedDispositionOnWrapUp = (isForcedCallDisposition || isForcedContactDisposition) &&
+        this.dialer.currentStatus === 'WRAP_UP'
+
+      return this.isLoadingAgentStatus ||
+        ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus) ||
+        this.isAgentOnCall || isForcedDispositionOnWrapUp
+    },
+
+    statusOptions () {
+      return [
+        {
+          label: 'Offline',
+          value: AgentStatus.AGENT_STATUS_OFFLINE,
+          color: 'grey-6'
+        },
+        {
+          label: 'Available',
+          value: AgentStatus.AGENT_STATUS_ACCEPTING_CALLS,
+          color: 'green-6'
+        },
+        {
+          label: 'Busy',
+          value: AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS,
+          color: 'red-6'
+        },
+        {
+          label: 'On-break',
+          value: AgentStatus.AGENT_STATUS_ON_BREAK,
+          color: 'orange-6'
+        }
+      ]
+    },
+
+    statusOptionsWithLogout () {
+      return [
+        ...this.statusOptions,
+        {
+          label: 'Logout',
+          value: 'logout',
+          type: 'logout'
+        }
+      ]
+    },
+
+    availabilityMessage () {
+      switch (this.agentStatus) {
+        case AgentStatus.AGENT_STATUS_OFFLINE:
+          return 'Currently Offline'
+        case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
+          return 'Ready for Calls'
+        case AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS:
+          return 'Not Accepting Calls'
+        case AgentStatus.AGENT_STATUS_ON_BREAK:
+          return 'On Break'
+        case AgentStatus.AGENT_STATUS_ON_CALL:
+          return 'Currently on Call'
+        case AgentStatus.AGENT_STATUS_ON_WRAP_UP:
+          return 'Wrapping Up Call'
+        case AgentStatus.AGENT_STATUS_RINGING:
+          return 'Incoming Call'
+        case AgentStatus.AGENT_STATUS_AUTO_DIAL:
+          return 'Auto Dialing'
+        case AgentStatus.AGENT_STATUS_SENTRY:
+          return 'Monitoring Calls'
+        default:
+          return 'Status Unknown'
+      }
     }
   },
 
@@ -665,6 +861,48 @@ export default {
       }
 
       this.handleCallCompletedEvent(true)
+    },
+
+    handleStatusChange (value) {
+      if (value === 'logout') {
+        return this.handleLogout()
+      }
+
+      this.changeAgentStatus(value, false, 1, 'HubSpot-StatusSelector')
+    },
+
+    async handleLogout () {
+      this.isLoggingOut = true
+
+      try {
+        // Notify HubSpot SDK that user is logging out
+        if (this.extensions) {
+          this.extensions.userLoggedOut()
+        }
+
+        // Use the standard logout action which will handle the API call and state clearing
+        await this.logoutUser()
+
+        // Reset dialer state
+        this.widgetMessage = WIDGET_MSG_HIDE
+        this.startDialing = false
+        this.isDialed = false
+        this.setHubspotDialNumber(null)
+        this.setDialerCommunication(null)
+        this.setDialerContact(null)
+        this.setDialerCurrentStatus('OFFLINE')
+
+        // Reset extensions state
+        this.extensionsVisibility = false
+
+        // Redirect to login page with current route as redirect parameter
+        this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
+      } catch (error) {
+        console.error('Error during logout:', error)
+        this.$generalNotification('Failed to log out. Please try again.', 'error', 5000, true)
+      } finally {
+        this.isLoggingOut = false
+      }
     }
   },
 
@@ -672,7 +910,12 @@ export default {
     authenticated (newVal) {
       if (newVal && this.extensions) {
         this.extensions.initialized({
-          isLoggedIn: newVal
+          isLoggedIn: newVal,
+          isAvailable: this.isAgentAvailable,
+          sizeInfo: {
+            height: 522,
+            width: 300
+          }
         })
       }
     },
@@ -691,6 +934,15 @@ export default {
         // if hidden, reset HubSpot dial number
         this.setHubspotDialNumber(null)
       }
+    },
+    'profile.agent_status' (newStatus) {
+      if (this.extensionsInitialized && this.extensions) {
+        if (newStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS) {
+          this.extensions.userAvailable()
+        } else {
+          this.extensions.userUnavailable()
+        }
+      }
     }
   }
 }
@@ -701,6 +953,60 @@ html,
 body {
   background: transparent !important;
   width: 300px;
-  height: 522px;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: fit-content !important;
+}
+
+/* Widget Container */
+.widget-container {
+  max-width: 350px;
+  margin: 0 auto;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: fit-content !important;
+}
+
+/* Add border only for wide screens */
+@media (min-width: 351px) {
+  .widget-container {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.75em;
+    margin: 1.25em auto;
+  }
+}
+
+/* Status Header */
+.status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.625em;
+}
+
+/* Section Divider */
+.section-divider {
+  margin-top: 0.625em;
+}
+
+/* User Info Section */
+.user-info {
+  margin-top: 1em;
+}
+
+/* Logged In Label */
+.logged-in-label {
+  font-size: 0.75em;
+  color: #666;
+}
+
+.status-badge {
+  border-radius: 50% !important;
+  width: 8px !important;
+  height: 8px !important;
+  min-width: 8px !important;
+  min-height: 8px !important;
+  padding: 0 !important;
+  display: inline-block !important;
 }
 </style>
