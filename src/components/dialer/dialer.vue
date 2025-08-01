@@ -620,7 +620,7 @@ export default {
           return Promise.resolve()
         }
 
-        this.validateTransferFailure(res.data)
+        this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
         const isGreetingNew = communication.legc_uuid && [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
