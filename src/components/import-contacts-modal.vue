@@ -490,6 +490,8 @@ import { required } from 'vuelidate/lib/validators'
 import { STEPS, contactFields } from 'src/constants/lists/import-contacts-modal'
 import UserSelector from 'components/generic-selectors/user-selector.vue'
 
+const ASSIGN_CONTACTS_TO_USER = 1
+
 export default {
   mixins: [
     aclMixin,
@@ -826,7 +828,7 @@ export default {
         ...this.importModel,
         name: this.settings.listName,
         user_id: this.settings.userId,
-        assign_contacts_to: 1,
+        assign_contacts_to: ASSIGN_CONTACTS_TO_USER,
         update_existing: this.settings.updateExisting,
         unknown_columns_to_notes: this.settings.saveUnknownColumnAsNotes,
         cascade_contacts: this.settings.cascadeContacts,
