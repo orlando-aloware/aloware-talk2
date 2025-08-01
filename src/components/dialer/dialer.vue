@@ -2147,6 +2147,10 @@ export default {
         return null
       }
 
+      if (!this.campaigns || !Array.isArray(this.campaigns)) {
+        return null
+      }
+
       const campaignId = parseInt(customParams.CampaignId) || null
       const campaign = this.getCampaign(campaignId)
 
