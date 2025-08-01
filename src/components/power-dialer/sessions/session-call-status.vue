@@ -496,6 +496,7 @@ import { isEmpty, cloneDeep, get, debounce } from 'lodash'
 import moment from 'moment-timezone'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
 import talk2Api from 'src/plugins/api/api'
 import HangupIcon from 'components/icons/hangup-icon.vue'
 import PlayBarIcon from 'components/icons/play-bar-icon.vue'
@@ -1569,40 +1570,33 @@ export default {
       }
 
       // hangup in-progress call
-      if (this.callInProgress && this.dialer.currentStatus !== 'WRAP_UP') {
+      if (this.dialer.currentStatus === 'CALL_CONNECTED' || (this.callInProgress && this.dialer.currentStatus !== 'WRAP_UP')) {
         this.processHangup()
       }
 
-      if (this.dialer.currentStatus !== 'CALL_CONNECTED' || forceSkip) {
-        this.wrapUp = false
+      this.wrapUp = false
+      this.hasActiveTask = false
+      const task = get(this.powerDialerTasks.in_queue, '0', null)
+
+      this.taskToCall = cloneDeep(task)
+
+      if (isEmpty(task)) {
         this.hasActiveTask = false
-        const task = get(this.powerDialerTasks.in_queue, '0', null)
-
-        this.taskToCall = cloneDeep(task)
-
-        if (isEmpty(task)) {
-          this.hasActiveTask = false
-          this.reRoute()
-          return
-        }
-
-        // move task to bottom
-        await this.moveContactItems({
-          id: this.selectedList.id,
-          params: {
-            contact_list_item_ids: [this.activeTask.contact_list_item_id],
-            direction: 2
-          }
-        })
-
-        this.processRemoveFirstInQueueTask()
-        this.processSession(noWrapUp)
+        this.reRoute()
         return
       }
 
-      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-        this.processHangup()
-      }
+      // move task to bottom
+      await this.moveContactItems({
+        id: this.selectedList.id,
+        params: {
+          contact_list_item_ids: [this.activeTask.contact_list_item_id],
+          direction: MOVE_CONTACTS_DIRECTION.bottom
+        }
+      })
+
+      this.processRemoveFirstInQueueTask()
+      this.processSession(noWrapUp)
     },
 
     hangupCall (event) {
