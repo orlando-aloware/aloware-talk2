@@ -2135,7 +2135,7 @@ export default {
         return null
       }
 
-      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId']
+      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId', 'CampaignName']
       const missingParams = requiredParams.filter(param => {
         return !customParams[param]
       })
