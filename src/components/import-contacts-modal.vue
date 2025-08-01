@@ -405,7 +405,7 @@
                              class="schedule-notice py-1 px-2 mt-1 mb-0 text-sm"
                              variant="warning">
                       <information-circle-icon />
-                      By default, this option only distributes new leads. Toggle <b>"Update existing contacts"</b> option to override this setting
+                      By default, this option only distributes new leads. Enable <b>"Update existing contacts"</b> option to override this setting.
                     </b-alert>
                   </div>
                 </b-form-row>
