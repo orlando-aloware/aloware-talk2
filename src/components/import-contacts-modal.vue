@@ -386,11 +386,11 @@
                     <b-form-group class="form-label user-form-group w-100 mb-0"
                                   ref="userId"
                                   :state="validateState('userId')">
-                    <user-selector :generic-styling="false"
-                                   v-model="$v.settings.userId.$model"
-                                   :disable="!isAdminOrSupervisor"
-                                   :clearable="false"
-                                   @change="(eventPayload) => onUpdateFields(eventPayload, 'userId')" />
+                      <user-selector :generic-styling="false"
+                                     v-model="$v.settings.userId.$model"
+                                     :disable="!isAdminOrSupervisor"
+                                     :clearable="false"
+                                     @change="(eventPayload) => onUpdateFields(eventPayload, 'userId')" />
                     </b-form-group>
                     <b-form-invalid-feedback v-if="!$v.settings.userId.required">
                       User is required
@@ -398,8 +398,15 @@
 
                     <b-form-invalid-feedback class="d-block"
                                              v-if="hasError('userId')">
-                    {{ getFieldError('userId') }}
-                  </b-form-invalid-feedback>
+                      {{ getFieldError('userId') }}
+                    </b-form-invalid-feedback>
+
+                    <b-alert show
+                             class="schedule-notice py-1 px-2 mt-1 mb-0 text-sm"
+                             variant="warning">
+                      <information-circle-icon />
+                      By default, this option only distributes new leads. Toggle <b>"Update existing contacts"</b> option to override this setting
+                    </b-alert>
                   </div>
                 </b-form-row>
               </b-col>
@@ -644,7 +651,7 @@ export default {
       this.isOpen = true
       this.settings.userId = this.userId
       // todo: remove
-      // this.currentStep = STEPS.SETTINGS
+      this.currentStep = STEPS.SETTINGS
     },
 
     close () {
@@ -862,11 +869,6 @@ export default {
 
     handleCloseClick () {
       this.close()
-    },
-
-    onUserChange (id) {
-      console.log('>>> onUserChange', id)
-      this.settings.assignUserId = id
     }
   },
 
