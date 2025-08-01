@@ -2147,6 +2147,7 @@ export default {
         return null
       }
 
+      // Ensure that 'campaigns' exists and is an array before proceeding
       if (!this.campaigns || !Array.isArray(this.campaigns)) {
         return null
       }
