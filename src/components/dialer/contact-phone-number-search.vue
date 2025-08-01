@@ -102,7 +102,6 @@ export default {
       }
 
       this.phoneNumbers = []
-      this.$emit('searchResults', true)
 
       // Skip contact search for talk lite users, but still emit events
       if (this.$store.state.auth.is_focused_power_dialer) {
@@ -116,6 +115,8 @@ export default {
         })
         return
       }
+
+      this.$emit('searchResults', true)
 
       this.$axios.get('api/v2/contacts/quick-search', {
         params: {
