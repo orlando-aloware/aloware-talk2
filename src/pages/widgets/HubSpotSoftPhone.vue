@@ -141,7 +141,9 @@ export default {
                 width: 300
               }
             }
-            this.extensions.initialized(payload)
+            if (this.extensions) {
+              this.extensions.initialized(payload)
+            }
           },
           onDialNumber: async (event) => {
             this.setHubspotDialNumber(event)
@@ -229,6 +231,17 @@ export default {
           error: probableError
         }
       })
+
+      // Set a no-op object to prevent runtime errors
+      // Example error: "Cannot read property 'initialized' of null" when this.extensions.initialized() is called
+      // This happens when HubSpot SDK fails to initialize but the app still tries to call extension methods
+      const initErrorMessage = 'HS SDK not initialized - called initialized with args:'
+      this.extensions = {
+        initialized: (...args) => console.log(initErrorMessage, args),
+        callEnded: (...args) => console.log(initErrorMessage, args),
+        userLoggedIn: (...args) => console.log(initErrorMessage, args),
+        callCompleted: (...args) => console.log(initErrorMessage, args)
+      }
     }
 
     CallingExtensionsManager.subscribe(this.callSdkOptions.eventHandlers)
@@ -404,7 +417,10 @@ export default {
 
     handleUserLogin () {
       if (this.extensionsInitialized) {
-        this.extensions.userLoggedIn()
+        if (this.extensions) {
+          this.extensions.userLoggedIn()
+        }
+
         // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
         if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
           this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
@@ -436,6 +452,7 @@ export default {
           if (!skipCallFinished) {
             this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
           }
+
           this.startDialing = false
         }
 
@@ -473,9 +490,11 @@ export default {
 
       // if the call is canceled, we close the widget in HS
       setTimeout(() => {
-        this.extensions.callCompleted({
-          hideWidget: true
-        })
+        if (this.extensions) {
+          this.extensions.callCompleted({
+            hideWidget: true
+          })
+        }
       }, 50)
     },
 
