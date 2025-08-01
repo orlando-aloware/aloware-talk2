@@ -132,7 +132,6 @@ export default {
     this.dialerListeners.updateCommunication = (data) => {
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
-        this.validateTransferFailure(data)
         data = _.merge(this.dialer.communication, data)
         this.setDialerCommunication(data)
 
@@ -622,7 +621,6 @@ export default {
         }
 
         this.validateTransferFailure(res.data)
-        this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
         const isGreetingNew = communication.legc_uuid && [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
@@ -2262,26 +2260,6 @@ export default {
 
     showMicrophonePermissionModal () {
       this.$refs.microphonePermissionModal.show()
-    },
-
-    validateTransferFailure (data) {
-      if (!this.dialer.communication) {
-        return
-      }
-
-      // Check for "Warm transfer failed" in notes and display error message
-      // Compare current dialer communication notes with incoming notes before updating
-      const currentNotes = this.dialer.communication.notes
-      const incomingNotes = data.notes
-      if (incomingNotes && currentNotes !== incomingNotes) {
-        const notesLines = incomingNotes.split(/\r?\n/).filter(line => line.trim())
-        const lastLine = notesLines[notesLines.length - 1] ?? ''
-        const startIndex = lastLine.indexOf('Warm transfer failed')
-        if (startIndex !== -1) {
-          const message = lastLine.substring(startIndex)
-          this.$generalNotification(message, 'error')
-        }
-      }
     }
   },
 
