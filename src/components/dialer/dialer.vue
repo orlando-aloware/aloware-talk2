@@ -2156,6 +2156,7 @@ export default {
       const campaignId = parseInt(customParams.CampaignId) || null
       const campaign = this.getCampaign(campaignId)
 
+      // Ensure a valid campaign was found
       if (!campaign) {
         return null
       }
