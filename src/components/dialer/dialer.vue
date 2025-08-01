@@ -2156,6 +2156,10 @@ export default {
       const campaignId = parseInt(customParams.CampaignId) || null
       const campaign = this.getCampaign(campaignId)
 
+      if (!campaign) {
+        return null
+      }
+
       let communicationData
       let locationData = null
 
