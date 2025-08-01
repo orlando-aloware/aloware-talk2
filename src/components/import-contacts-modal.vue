@@ -652,8 +652,6 @@ export default {
     open () {
       this.isOpen = true
       this.settings.userId = this.userId
-      // todo: remove
-      this.currentStep = STEPS.SETTINGS
     },
 
     close () {
