@@ -132,7 +132,6 @@ export default {
     this.dialerListeners.updateCommunication = (data) => {
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
-        this.validateTransferFailure(data)
         data = _.merge(this.dialer.communication, data)
         this.setDialerCommunication(data)
 
@@ -335,6 +334,13 @@ export default {
       }
     }
 
+    this.dialerListeners.colleagueStatusNotification = (event) => {
+      // Show error notification in the dialer
+      if (event.message && this.dialer.communication?.id === event.communication_id) {
+        this.$generalNotification(event.message, 'error')
+      }
+    }
+
     this.startDialerEvents()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -524,6 +530,7 @@ export default {
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.listen('colleague_status_notification', this.dialerListeners.colleagueStatusNotification)
     },
 
     stopDialerEvents () {
@@ -557,6 +564,7 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.stop('colleague_status_notification', this.dialerListeners.colleagueStatusNotification)
     },
 
     forceRefreshCommunication () {
@@ -621,7 +629,6 @@ export default {
           return Promise.resolve()
         }
 
-        this.validateTransferFailure(res.data)
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
@@ -2251,26 +2258,6 @@ export default {
 
     showMicrophonePermissionModal () {
       this.$refs.microphonePermissionModal.show()
-    },
-
-    validateTransferFailure (data) {
-      if (!this.dialer.communication) {
-        return
-      }
-
-      // Check for "Warm transfer failed" in notes and display error message
-      // Compare current dialer communication notes with incoming notes before updating
-      const currentNotes = this.dialer.communication.notes
-      const incomingNotes = data.notes
-      if (incomingNotes && currentNotes !== incomingNotes) {
-        const notesLines = incomingNotes.split(/\r?\n/).filter(line => line.trim())
-        const lastLine = notesLines[notesLines.length - 1] ?? ''
-        const startIndex = lastLine.indexOf('Transfer failed')
-        if (startIndex !== -1) {
-          const message = lastLine.substring(startIndex)
-          this.$generalNotification(message, 'error')
-        }
-      }
     }
   },
 
