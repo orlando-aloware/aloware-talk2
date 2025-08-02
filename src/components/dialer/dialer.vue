@@ -336,7 +336,7 @@ export default {
 
     this.dialerListeners.colleagueStatusNotification = (event) => {
       // Show error notification in the dialer
-      if (event.message && this.dialer.communication?.id === event.communication_id) {
+      if (event.message && event.communication_id && this.dialer.communication?.id === event.communication_id) {
         this.$generalNotification(event.message, 'error')
       }
     }
