@@ -2135,7 +2135,7 @@ export default {
         return null
       }
 
-      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId']
+      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId', 'CampaignName']
       const missingParams = requiredParams.filter(param => {
         return !customParams[param]
       })
@@ -2146,7 +2146,6 @@ export default {
       }
 
       const campaignId = parseInt(customParams.CampaignId) || null
-      const campaign = this.getCampaign(campaignId)
 
       let communicationData
       let locationData = null
@@ -2188,30 +2187,12 @@ export default {
         ring_group_id: parseInt(communicationData.RingGroupId) || null,
         campaign_id: campaignId,
         campaign: {
-          name: campaign?.name
+          name: customParams?.CampaignName
         }
       }
 
       console.log('Successfully built communication data from customParameters:', communication)
       return communication
-    },
-
-    getCampaign (campaignId) {
-      if (!campaignId) {
-        return null
-      }
-
-      if (!this.campaigns || !Array.isArray(this.campaigns)) {
-        return null
-      }
-
-      const found = this.campaigns.find(campaign => campaign.id === campaignId)
-
-      if (!found) {
-        return null
-      }
-
-      return found
     },
 
     async checkMicrophonePermission () {
