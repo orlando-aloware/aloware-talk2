@@ -196,12 +196,20 @@ export default {
         debugMode: true,
         // eventHandlers handle inbound messages
         eventHandlers: {
-          onReady: () => {
+          onReady: (data) => {
+            console.log('onReady event received:', data)
+
+            // Store the portal ID from HubSpot SDK
+            this.hubspotPortalId = data.portalId
+            console.log('Portal ID received from HubSpot SDK:', data.portalId)
+
             this.$VueEvent.fire('resetCall')
 
             const payload = {
               // Whether a user is logged-in
               isLoggedIn: this.authenticated,
+              // Whether the agent is available for calls
+              isAvailable: this.isAgentAvailable,
               // Optionally send the desired widget size
               sizeInfo: {
                 height: 522,
@@ -222,12 +230,37 @@ export default {
 
             await this.postDialNumber()
           },
+          onIncomingCall: async (event) => {
+            console.log('Incoming call received from HubSpot:', event)
+            // This event is triggered when HubSpot receives a call
+            // For now, we'll just log it - this would be used if calls came to HubSpot first
+          },
           onVisibilityChanged: (data) => {
             this.extensionsVisibility = !data?.isHidden
 
             if (!this.extensionsVisibility) {
               this.endActiveCall()
             }
+          },
+          // Add missing event handlers for HubSpot SDK errors
+          onExternalCallIdNotPresent: (data) => {
+            console.warn('External call ID not present:', data)
+            // This is expected for some call flows, just log it
+          },
+          onInitiateCallIdFailed: (data) => {
+            console.warn('Failed to initiate call ID:', data)
+            // This might happen if HubSpot can't create the call record
+            // Continue with the call flow
+          },
+          onCallerIdMatchFailed: (data) => {
+            console.warn('Caller ID match failed:', data)
+            // This might happen if the phone number doesn't match any contact
+            // Continue with the call flow
+          },
+          onCreateEngagementFailed: (data) => {
+            console.warn('Failed to create engagement:', data)
+            // This might happen if HubSpot can't create the engagement record
+            // Continue with the call flow
           }
         }
       },
@@ -246,6 +279,9 @@ export default {
       },
       // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
       isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY', null],
+
+      // HubSpot portal ID received from SDK
+      hubspotPortalId: null,
 
       // Logout state
       isLoggingOut: false
@@ -434,6 +470,17 @@ export default {
     this.extensionsInitialized = true
     await this.init()
     this.isFirstLoading = false
+
+    // Set up listener for inbound calls from Aloware
+    console.log('Setting up listener for new_in_app_call events')
+    this.$VueEvent.listen('new_in_app_call', this.handleIncomingCall)
+    console.log('Successfully registered new_in_app_call listener')
+  },
+
+  beforeDestroy () {
+    // Clean up inbound call listener
+    this.$VueEvent.stop('new_in_app_call', this.handleIncomingCall)
+    console.log('Successfully removed new_in_app_call listener')
   },
 
   methods: {
@@ -634,10 +681,8 @@ export default {
         this.extensions.callEnded()
 
         if (!this.dialer.parkedCall) {
-          if (!skipCallFinished) {
-            this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
-          }
-
+          // Return to ready state when call is completed
+          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED
           this.startDialing = false
         }
 
@@ -892,6 +937,61 @@ export default {
       } finally {
         this.isLoggingOut = false
       }
+    },
+
+    // Handle inbound calls from Aloware and notify HubSpot
+    async handleIncomingCall (communication) {
+      console.log('Inbound call received:', communication)
+
+      if (!this.authenticated) {
+        console.log('User not authenticated, skipping inbound call')
+        return
+      }
+
+      if (!this.isAgentAvailable) {
+        console.log('Agent not available, skipping inbound call')
+        return
+      }
+
+      // For HubSpot inbound calls, we need to properly notify HubSpot
+      if (this.extensions) {
+        console.log('Extensions available, proceeding with HubSpot notification')
+        const phoneNumber = this.$options.filters.fixPhone(communication.contact?.phone_number)
+
+        try {
+          // Notify HubSpot about the inbound call
+          await this.extensions.callStarted({
+            phoneNumber: phoneNumber,
+            contactName: communication.contact?.name || 'Unknown Caller',
+            contactId: communication.contact?.id?.toString(),
+            callId: communication.id?.toString()
+          })
+          console.log('Successfully notified HubSpot about inbound call')
+        } catch (error) {
+          console.error('Error handling HubSpot notification:', error)
+          // Continue with the call flow even if HubSpot notification fails
+        }
+      } else {
+        console.log('No extensions available')
+      }
+
+      // Set up the dialer state for the main Aloware system to handle
+      this.widgetMessage = WIDGET_MSG_HIDE
+      this.setDialerCommunication(communication)
+      this.setDialerContact(communication.contact)
+      this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
+
+      console.log('Set dialer state for inbound call:', {
+        communication: communication.id,
+        contact: communication.contact?.name,
+        status: 'RECEIVED_CALL_INVITE'
+      })
+
+      // Call processActionNotification to trigger the action notification system
+      // This is what shows the accept/reject buttons
+      this.processActionNotification(communication, 'call')
+
+      console.log('Inbound call handling completed successfully')
     }
   },
 

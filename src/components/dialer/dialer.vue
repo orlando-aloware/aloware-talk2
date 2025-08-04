@@ -390,9 +390,13 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      // Avoid continuing with the incoming call if it's a widget,
-      // and ignore the call. Otherwise, Twilio will play the default incoming sound.
-      if (this.isSalesforceWidget ? false : this.isWidget) {
+      // Check if this is a HubSpot widget that needs to handle inbound calls
+      const isHubSpotWidget = this.$route && this.$route.name === 'HubSpot Call Extension'
+
+      // Only ignore calls for regular widgets (not Salesforce or HubSpot widgets)
+      const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !isHubSpotWidget
+
+      if (shouldIgnoreCall) {
         call._connection.ignore()
         return
       }
