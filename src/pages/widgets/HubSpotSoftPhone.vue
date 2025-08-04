@@ -427,17 +427,6 @@ export default {
           error: probableError
         }
       })
-
-      // Set a no-op object to prevent runtime errors
-      // Example error: "Cannot read property 'initialized' of null" when this.extensions.initialized() is called
-      // This happens when HubSpot SDK fails to initialize but the app still tries to call extension methods
-      const initErrorMessage = 'HS SDK not initialized - called initialized with args:'
-      this.extensions = {
-        initialized: (...args) => console.log(initErrorMessage, args),
-        callEnded: (...args) => console.log(initErrorMessage, args),
-        userLoggedIn: (...args) => console.log(initErrorMessage, args),
-        callCompleted: (...args) => console.log(initErrorMessage, args)
-      }
     }
 
     CallingExtensionsManager.subscribe(this.callSdkOptions.eventHandlers)
