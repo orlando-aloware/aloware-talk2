@@ -8765,7 +8765,6 @@ span.mention {
 }
 
 .settings-form-wrapper {
-
   padding-bottom: 5rem;
 
   .scrollableArea {
@@ -8788,6 +8787,7 @@ span.mention {
     color: $grey-90;
     letter-spacing: -0.0025em;
     margin-top: 10px;
+    margin-bottom: 8px;
   }
 
   form {
@@ -8795,6 +8795,10 @@ span.mention {
       margin-right: 0 !important;
       margin-left: 0 !important;
       padding: 0.5rem !important;
+    }
+
+    input[type=text] {
+      height: 40px;
     }
   }
 
@@ -8811,6 +8815,10 @@ span.mention {
     .q-field__marginal {
       display: none !important;
     }
+  }
+
+  .user-form-group~.invalid-feedback {
+    margin-top: -4px;
   }
 }
 
