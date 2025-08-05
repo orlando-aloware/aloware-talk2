@@ -334,6 +334,13 @@ export default {
       }
     }
 
+    this.dialerListeners.colleagueStatusNotification = (event) => {
+      // Show error notification in the dialer
+      if (event.message && event.communication_id && this.dialer.communication?.id === event.communication_id) {
+        this.$generalNotification(event.message, 'error')
+      }
+    }
+
     this.startDialerEvents()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -523,6 +530,7 @@ export default {
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.listen('colleague_status_notification', this.dialerListeners.colleagueStatusNotification)
     },
 
     stopDialerEvents () {
@@ -556,6 +564,7 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.stop('colleague_status_notification', this.dialerListeners.colleagueStatusNotification)
     },
 
     forceRefreshCommunication () {
