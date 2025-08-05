@@ -960,7 +960,7 @@ export default {
 
         try {
           // Notify HubSpot about the inbound call
-          await this.extensions.callStarted({
+          this.extensions.incomingCall({
             phoneNumber: phoneNumber,
             contactName: communication.contact?.name || 'Unknown Caller',
             contactId: communication.contact?.id?.toString(),
