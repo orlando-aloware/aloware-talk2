@@ -830,6 +830,26 @@
               </b-form-row>
               <hr />
             </div>
+
+            <!--HOLD TIME-->
+            <div
+              v-if="![CommunicationTypes.SMS, CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && verbose"
+            >
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Hold Time: </q-item-label>
+                </b-col>
+                <b-col cols="7">
+                  <div class="d-flex align-items-center">
+                    <span
+                      v-if="communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW"
+                    >{{ communication.hold_time | fixDuration }}</span>
+                    <span v-else>-</span>
+                  </div>
+                </b-col>
+              </b-form-row>
+              <hr />
+            </div>
           </q-card-section>
 
           <q-card-section class="pt-0 pb-0"
