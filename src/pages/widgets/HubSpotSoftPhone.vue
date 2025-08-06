@@ -221,13 +221,24 @@ export default {
             }
           },
           onDialNumber: async (event) => {
+            console.log('[HubSpot Widget] onDialNumber event received:', event)
+            console.log('[HubSpot Widget] Current state:', {
+              initialized: this.initialized,
+              isDialed: this.isDialed,
+              authenticated: this.authenticated,
+              profile: this.profile,
+              dialerStatus: this.dialer?.currentStatus
+            })
+
             this.setHubspotDialNumber(event)
 
             // do not continue if we not logged-in or we're already dialing
             if (!this.initialized || this.isDialed) {
+              console.log('[HubSpot Widget] Skipping postDialNumber - not initialized or already dialing')
               return
             }
 
+            console.log('[HubSpot Widget] Proceeding with postDialNumber')
             await this.postDialNumber()
           },
           onIncomingCall: async (event) => {
@@ -649,10 +660,7 @@ export default {
 
     handleUserLogin () {
       if (this.extensionsInitialized) {
-        if (this.extensions) {
-          this.extensions.userLoggedIn()
-        }
-
+        this.extensions.userLoggedIn()
         // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
         if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
           this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
@@ -741,7 +749,8 @@ export default {
         if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS &&
           this.widgetMessage === WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
           !this.isDialed) {
-          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
+          // For HubSpot widget, return to ready state instead of showing call finished
+          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED
         } else if (this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
           this.isFirstLoading &&
           agentStatus === AgentStatus.AGENT_STATUS_ON_CALL &&
@@ -773,24 +782,37 @@ export default {
     },
 
     makeCall () {
+      console.log('[HubSpot Widget] makeCall started')
+      console.log('[HubSpot Widget] Current state:', {
+        campaignId: this.campaignId,
+        hubspotDialNumber: this.hubspotDialNumber,
+        contactDetails: this.contactDetails
+      })
+
       if (this.campaignId === null) {
+        console.log('[HubSpot Widget] Campaign ID is null')
         this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
         this.$generalNotification('The dialer does not meet all the required criteria to start calling.', 'error', 5000, true)
         return
       }
 
       if (this.validateHasActiveCallStatus()) {
+        console.log('[HubSpot Widget] validateHasActiveCallStatus returned true, returning early')
         return
       }
 
-      this.widgetMessage = WIDGET_MSG_HIDE
-      this.$VueEvent.fire('makeCall', {
+      const callParams = {
         currentNumber: this.$options.filters.fixPhone(this.hubspotDialNumber?.phoneNumber),
         outboundCampaignId: this.campaignId.toString(),
         contactName: this.contactDetails.contactName,
         companyName: this.contactDetails.companyName,
         contactId: this.contactDetails.contactId
-      })
+      }
+
+      console.log('[HubSpot Widget] Firing makeCall event with params:', callParams)
+      this.widgetMessage = WIDGET_MSG_HIDE
+      this.$VueEvent.fire('makeCall', callParams)
+      console.log('[HubSpot Widget] makeCall completed')
     },
 
     defineDefaultOutboundCampaignId () {
@@ -1025,6 +1047,9 @@ export default {
       }
     },
     'profile.agent_status' (newStatus) {
+      // Update the isAvailable property in callSdkOptions
+      this.callSdkOptions.isAvailable = this.isAgentAvailable
+
       if (this.extensionsInitialized && this.extensions) {
         if (newStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS) {
           this.extensions.userAvailable()
