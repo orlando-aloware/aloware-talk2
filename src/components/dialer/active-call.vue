@@ -73,12 +73,24 @@ import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as AgentStatus from 'src/constants/agent-status'
-import { dialerWrapUpMixin, sessionCallStatusMixin } from 'src/plugins/mixins'
+import { dialerWrapUpMixin, sessionCallStatusMixin, dispositionsMixin } from 'src/plugins/mixins'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'active-call',
 
-  mixins: [dialerWrapUpMixin, sessionCallStatusMixin],
+  mixins: [
+    dialerWrapUpMixin,
+    sessionCallStatusMixin,
+    dispositionsMixin
+  ],
+
+  props: {
+    isPhoneVisible: {
+      type: Boolean,
+      default: false
+    }
+  },
 
   data () {
     return {
@@ -191,6 +203,11 @@ export default {
 
     isDisabledEndWrapUpBtn () {
       return this.dialer.currentStatus !== 'WRAP_UP' || this.wrapUpPaused
+    },
+
+    isCallCompleted () {
+      return (this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) ||
+        ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)
     }
   },
 
@@ -221,6 +238,10 @@ export default {
     },
 
     togglePhone () {
+      if (this.isPhoneVisible && this.isCallCompleted && (this.isHighlightedCallDisposition || this.isHighlightedContactDisposition)) {
+        return
+      }
+
       this.$VueEvent.fire('togglePhone')
     },
 

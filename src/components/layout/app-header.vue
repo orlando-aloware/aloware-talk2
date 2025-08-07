@@ -65,7 +65,8 @@
 
         <parked-call v-if="!isMobile" />
 
-        <active-call v-if="!isMobile" />
+        <active-call :is-phone-visible="isPhoneVisible"
+                     v-if="!isMobile" />
 
         <q-item v-if="!titleOnly">
           <q-btn id="dialer-form-button"
@@ -212,6 +213,11 @@ export default {
     },
 
     titleOnly: {
+      type: Boolean,
+      default: false
+    },
+
+    isPhoneVisible: {
       type: Boolean,
       default: false
     }
