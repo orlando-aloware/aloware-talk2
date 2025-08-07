@@ -49,12 +49,12 @@
                        :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                        :repeats="viewMode === UNTHREADED ? item.repeats : null"
                        :is-live-call="isLiveCall(item)"
-                       :team-inbox-id="activeInboxId"
+                       :team-inbox-id="getTeamInboxIdForCommunication(item)"
                        :from-team-inbox="true"
                        :view-mode="viewMode"
                        :communication-id="item.id"
                        :last_call_source="item.last_call_source"
-                       :contact="item.contact" />
+                       :contact="item.contact"/>
       </div>
 
       <!-- Load more indicator -->
@@ -87,7 +87,7 @@ import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
+import { THREADED, UNTHREADED, ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 import { mapState } from 'vuex'
 
 export default {
@@ -142,6 +142,16 @@ export default {
 
   methods: {
     isLiveCall,
+
+    getTeamInboxIdForCommunication (communication) {
+      console.log('>>> getTeamInboxIdForCommunication', this.activeInboxId)
+      // If we're in "all" inboxes view, use the communication's ring_group_id
+      if (this.activeInboxId === ALL_INBOXES_ID) {
+        return communication.ring_group_id
+      }
+      // Otherwise, use the active inbox ID
+      return this.activeInboxId
+    },
 
     getUnreadsProperties (communication) {
       if (this.viewMode === UNTHREADED) {

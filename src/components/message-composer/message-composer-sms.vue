@@ -279,6 +279,8 @@ import MessageComposerOptions from 'components/message-composer/message-composer
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { kycMixin, selectorMixin } from 'src/plugins/mixins'
 import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
+
 export default {
   name: 'message-composer-sms',
 
@@ -570,7 +572,15 @@ export default {
       if (this.activeInboxId && isIvrOrDeadEndCampaign(this.selectedLine)) {
         // Ring Group ID is used to identify the current inbox
         // when sending a message from an IVR or Dead End line
-        data.ring_group_id = this.activeInboxId
+
+        console.log('>>> messageComposer/activeInboxId', this.activeInboxId)
+
+        // todo: obtain ring group id if all inboxes is selected
+        let activeInboxId = this.activeInboxId
+        if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+          activeInboxId = +this.$route.query.inboxId
+        }
+        data.ring_group_id = activeInboxId
       }
 
       return data

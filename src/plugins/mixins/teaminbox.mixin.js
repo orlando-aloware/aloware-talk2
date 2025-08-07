@@ -1,4 +1,4 @@
-import { SEARCH_FIELDS, THREADED } from 'src/store/teaminbox/teaminbox.store'
+import { SEARCH_FIELDS, THREADED, ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 
@@ -238,13 +238,19 @@ export default {
         apiFilters.campaigns = filters.campaigns
       }
 
+      if (filters.inboxes?.length) {
+        apiFilters.inbox_ids = filters.inboxes
+      }
+
       // Map sort keys to API parameters
       if (sort.order) {
         apiFilters.order = sort.order
       }
 
       const params = {
-        inbox_id: inboxId,
+        ...(inboxId !== ALL_INBOXES_ID ? {
+          inbox_id: inboxId
+        } : {}),
         page: nextPage,
         per_page: 50,
         inbox_type: this.viewMode === THREADED ? 'threaded' : 'unthreaded',
@@ -264,6 +270,11 @@ export default {
     },
 
     async checkInboxAccess (inboxId) {
+      // "All" inbox is always accessible if user has any inboxes
+      if (inboxId === ALL_INBOXES_ID) {
+        return this.inboxes.length > 0
+      }
+
       const response = await talk2TeamInboxApi.inboxes.get({
         params: {
           inbox_ids: [inboxId]
@@ -322,6 +333,10 @@ export default {
     },
 
     getInboxUnreadCount (inboxId) {
+      // For "all" inbox, sum up all unread counts
+      if (inboxId === ALL_INBOXES_ID) {
+        return this.inboxesUnreadCount?.reduce((total, inbox) => total + (inbox.unread_count || 0), 0) || 0
+      }
       return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
     },
 

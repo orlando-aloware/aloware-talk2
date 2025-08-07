@@ -53,7 +53,7 @@ import { aclMixin, TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
 import { getQueryString } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
+import { THREADED, UNTHREADED, ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
@@ -238,11 +238,18 @@ export default {
         return
       }
 
-      const queryString = getQueryString(this.$route.query)
+      // Add inboxId to query parameters when in "all" inboxes view
+      const query = { ...this.$route.query }
+      if (this.activeInboxId === ALL_INBOXES_ID) {
+        query.inboxId = item.ring_group_id
+      }
+
+      const queryString = getQueryString(query)
       this.$router.push(`${route}${queryString}`)
     },
 
     onChannel () {
+      console.log('>>> onChannel', this.activeInboxId)
       if (!this.activeInboxId) {
         return
       }
@@ -569,6 +576,8 @@ export default {
       if (!contactId || !ringGroupId || !campaignId || !isCommunicationInProgress) {
         return
       }
+
+      console.log('>>> updateContactLastUsedLine/ringGroupId', ringGroupId)
 
       // Update the last used line for the contact in the store
       this.setContactsLastUsedLines({
@@ -945,6 +954,10 @@ export default {
       } else if (query.date_range === 'All Time') {
         newFilters.from_date = null
         newFilters.to_date = null
+      }
+
+      if (query.inboxes) {
+        newFilters.inboxes = query.inboxes.split(',').map(id => parseInt(id))
       }
 
       // Update active filters

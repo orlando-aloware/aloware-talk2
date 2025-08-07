@@ -183,6 +183,7 @@ import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import { teamInboxPropsMixin } from 'src/plugins/mixins'
 import DateSelector from 'components/date-selector'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'appointment-form-modal',
@@ -343,8 +344,15 @@ export default {
       }
 
       // Add ring_group_id when in Team Inbox context
-      if (this.teamInbox && this.teamInboxId) {
-        params.ring_group_id = this.teamInboxId
+      if (this.teamInbox) {
+        let inboxId = this.teamInboxId
+        if (this.$route.params.inboxId === ALL_INBOXES_ID && !isNaN(+this.$route.query.inboxId)) {
+          inboxId = +this.$route.query.inboxId
+        }
+
+        if (inboxId) {
+          params.ring_group_id = inboxId
+        }
       }
 
       return params

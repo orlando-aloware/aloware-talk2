@@ -118,6 +118,7 @@ export default {
      * Returns the active campaigns
      */
     activeCampaigns () {
+      console.log('>>> activeCampaigns teamInboxCampaigns:', this.teamInboxCampaigns, 'activeInboxCampaignIds:', this.activeInboxCampaignIds)
       return this
         .teamInboxCampaigns
         .filter(campaign =>

@@ -97,6 +97,7 @@ import SearchInput from 'src/components/search-input.vue'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
 import { mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   props: {
@@ -139,6 +140,11 @@ export default {
     activeInboxUnreadCount () {
       if (!this.activeInbox?.id) {
         return 0
+      }
+
+      // For "all" inbox, sum up all unread counts
+      if (this.activeInbox.id === ALL_INBOXES_ID) {
+        return this.inboxesUnreadCount?.reduce((total, inbox) => total + (inbox.unread_count || 0), 0) || 0
       }
 
       return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === this.activeInbox.id)?.unread_count || 0

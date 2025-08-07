@@ -149,7 +149,7 @@ import FilterForm from './filter-form.vue'
 import _ from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import { mapFields } from 'vuex-map-fields'
-import { DEFAULT_FILTERS } from 'src/store/teaminbox/teaminbox.store'
+import { DEFAULT_FILTERS, ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 import { TeamInboxMixin } from 'src/plugins/mixins'
 
 export default {
@@ -215,8 +215,15 @@ export default {
         return false
       }
 
+      const filterFields = [...this.filterFields]
+
+      // Remove inboxes from filter fields if it's not all inboxes type
+      if (this.$route.params.inboxId !== ALL_INBOXES_ID) {
+        filterFields.splice(filterFields.indexOf('inboxes'), 1)
+      }
+
       if (this.selectedFilter) {
-        for (const field of this.filterFields) {
+        for (const field of filterFields) {
           if (JSON.stringify(this.filter[field]) !== JSON.stringify(this.selectedFilter.filter[field])) {
             return true
           }
@@ -224,7 +231,7 @@ export default {
         return false
       }
 
-      for (const field of this.filterFields) {
+      for (const field of filterFields) {
         if (JSON.stringify(this.filter[field]) !== JSON.stringify(this.defaultFilter[field])) {
           return true
         }
