@@ -196,6 +196,7 @@
                  :current-page="currentPage"
                  :last-page="lastPage"
                  :total-rows="totalRows"
+                 :start-order="filteredListSorts"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
                  @reordered="onColumnsReordered"
@@ -816,6 +817,17 @@ export default {
 
     activeList () {
       return this.listItems[this.selectedListId]?.data || []
+    },
+
+    filteredListSorts () {
+      if (!this.filteredList?.sort_by || !this.filteredList?.sort_order) {
+        return null
+      }
+
+      return {
+        orderBy: this.filteredList.sort_by,
+        order: this.filteredList.sort_order
+      }
     },
 
     hasContacts () {

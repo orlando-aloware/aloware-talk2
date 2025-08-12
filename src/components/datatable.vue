@@ -535,6 +535,10 @@ export default {
       */
       let sorts = Object.assign({}, this.getColumnSorts(column))
 
+      if (sorts.orderBy !== this.sorts.orderBy) {
+        this.sorts.order = 'asc'
+      }
+
       setTimeout(() => {
         this.$emit('sort', sorts)
       }, 100)
@@ -661,9 +665,9 @@ export default {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
     },
 
-    sorts (newVal, oldVal) {
-      if (newVal.orderBy !== oldVal.orderBy) {
-        this.sorts.order = 'asc'
+    startOrder (newVal) {
+      if (newVal) {
+        this.sorts = newVal
       }
     },
 
