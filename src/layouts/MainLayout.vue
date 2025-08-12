@@ -1897,35 +1897,6 @@ export default {
       }
     },
 
-    getExtensions (page = 1) {
-      if (this.hasPermissionTo('list user')) {
-        let params = {
-          user_type_filter: 'Extensions',
-          page: page,
-          per_page: 500,
-          token: Math.random().toString(36)
-        }
-
-        return this.$axios
-          .get('/api/v2/users', { params })
-          .then(res => {
-            if (res.data.data && res.data.data.length) {
-              let newUsers = res.data.data
-              this.setUsers([...this.users, ...newUsers])
-            }
-            if (res.data.current_page !== res.data.last_page) {
-              this.getExtensions(page + 1)
-            }
-
-            return Promise.resolve()
-          }).catch(err => {
-            console.log(err)
-
-            return Promise.reject()
-          })
-      }
-    },
-
     getWorkflows (page = 1) {
       if (this.hasPermissionTo('list workflow')) {
         this.loadingWorkflows = true
@@ -2207,13 +2178,11 @@ export default {
 
         const getCurrentCompany = this.getCurrentCompany()
         const getUsers = this.getUsers()
-        const getExtensions = this.getExtensions()
         const fetchAllParkedCalls = this.fetchAllParkedCalls()
 
         await Promise.all([
           getCurrentCompany,
           getUsers,
-          getExtensions,
           fetchAllParkedCalls
         ])
       }
