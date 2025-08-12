@@ -532,6 +532,11 @@ export default {
         return
       }
 
+      // Visibility check for Team Inbox
+      if (!this.checkCommunicationMatchesUserAccessibility(communication, true)) {
+        return
+      }
+
       const dateRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/
       const dateMatch = communication.created_at.match(dateRegex)
 
