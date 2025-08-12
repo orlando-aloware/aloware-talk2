@@ -196,7 +196,7 @@
                  :current-page="currentPage"
                  :last-page="lastPage"
                  :total-rows="totalRows"
-                 :start-order="filteredListSorts"
+                 :start-order="currentListSorts"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
                  @reordered="onColumnsReordered"
@@ -819,14 +819,14 @@ export default {
       return this.listItems[this.selectedListId]?.data || []
     },
 
-    filteredListSorts () {
-      if (!this.filteredList?.sort_by || !this.filteredList?.sort_order) {
+    currentListSorts () {
+      if (!this.currentList) {
         return null
       }
 
       return {
-        orderBy: this.filteredList.sort_by,
-        order: this.filteredList.sort_order
+        orderBy: this.currentList.sort_by,
+        order: this.currentList.sort_order
       }
     },
 
@@ -931,7 +931,8 @@ export default {
       selectedItem: null,
       hasFilters: false,
       pdViewListeners: {},
-      bulkAddStatusReport: {}
+      bulkAddStatusReport: {},
+      currentList: null
     }
   },
 
@@ -1020,6 +1021,12 @@ export default {
 
     onSortByField (sorts) {
       this.$emit('sort', sorts)
+
+      const sourceListItem = Object.values(this.lists).find(list => list.id === this.currentList?.id)
+      if (sourceListItem) {
+        sourceListItem.sort_by = sorts.orderBy
+        sourceListItem.sort_order = sorts.order
+      }
     },
 
     onPaginate (params) {
@@ -1354,6 +1361,12 @@ export default {
     isLoading (loading) {
       if (!loading) {
         this.checkTaskAddedNotification()
+      }
+    },
+
+    filteredList () {
+      if (this.filteredList?.id !== this.currentList?.id) {
+        this.currentList = { ...this.filteredList }
       }
     }
   },
