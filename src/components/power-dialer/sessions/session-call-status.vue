@@ -982,7 +982,7 @@ export default {
 
     redialDropdownTooltip () {
       if (!this.statusCallConnected) {
-        return
+        return 'Redial is only available when call is connected'
       }
 
       if (this.isForcedCallDisposition && !this.isCallDisposed) {
@@ -1026,6 +1026,7 @@ export default {
     this.$VueEvent.listen('holdFailed', this.onHoldFailed)
     this.$VueEvent.listen('unholdFailed', this.onUnholdFailed)
     this.$VueEvent.listen('onNextTask', this.onNextTask)
+    this.$VueEvent.listen('onCallBackClick', this.onCallBackClick)
 
     this.isSessionRunning = false
   },
@@ -1045,6 +1046,16 @@ export default {
       'incrementRedialedTaskCount',
       'moveContactItems'
     ]),
+
+    onCallBackClick () {
+      this.clearWarmUpCountDown()
+
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.wrapUp = false
+      }
+
+      this.onRedial(true)
+    },
 
     onDispositionsClick () {
       this.$emit('on-dispositions')
@@ -1123,6 +1134,8 @@ export default {
       const wasInWrapUpStatusAndPaused = this.dialer.currentStatus === 'WRAP_UP' &&
         this.wrapUpPaused
 
+      const wasForcedToDispose = this.dialer.communication && this.isNotDisposed
+
       this.countdownInterval = setInterval(() => {
         // if paused, we should not continue the countdown
         if (this.sessionPaused) {
@@ -1148,41 +1161,57 @@ export default {
           this.countdownTimer = 0
         }
 
-        this.countdownTimer--
-        this.onTimerIsOver()
+        if (this.countdownTimer >= 0) {
+          this.countdownTimer--
+        }
+
+        if (this.timerIsOver) {
+          // halt if forced to dispose and not yet disposed
+          if (this.isForcedToDisposeAndNotDisposed) {
+            return
+          }
+
+          // trigger reset call if redial is required
+          if (this.shouldProcessRedial || wasForcedToDispose) {
+            this.clearWarmUpCountDown()
+            this.wrapUp = false
+            this.$VueEvent.fire('resetCall')
+            return
+          }
+
+          this.onTimerIsOver()
+        }
       }, 1000)
     },
 
     onTimerIsOver () {
-      if (this.timerIsOver) {
-        this.clearWarmUpCountDown()
+      this.clearWarmUpCountDown()
 
-        const hasEnded = this.toggleEnd || !this.hasQueuedTaskLists
-        const noActiveTask = !this.hasActiveTask || !this.activeTask
+      const hasEnded = this.toggleEnd || !this.hasQueuedTaskLists
+      const noActiveTask = !this.hasActiveTask || !this.activeTask
 
-        if (hasEnded && noActiveTask) {
-          this.reRoute()
-          return
-        }
+      if (hasEnded && noActiveTask) {
+        this.reRoute()
+        return
+      }
 
-        if (!this.togglePause && !this.wrapUp) {
-          this.runTask()
-        }
+      if (!this.togglePause && !this.wrapUp) {
+        this.runTask()
+      }
 
-        if (this.wrapUp) {
-          this.initialize()
-        }
+      if (this.wrapUp) {
+        this.initialize()
+      }
 
-        // end wrap-up if wrap-up seconds
-        // is not indefinite
-        if (this.wrapUp && this.wrapUpSeconds !== 0) {
-          this.wrapUp = false
-          this.isSessionRunning = false
-        }
+      // end wrap-up if wrap-up seconds
+      // is not indefinite
+      if (this.wrapUp && this.wrapUpSeconds !== 0) {
+        this.wrapUp = false
+        this.isSessionRunning = false
+      }
 
-        if (this.togglePause) {
-          this.sessionPaused = true
-        }
+      if (this.togglePause) {
+        this.sessionPaused = true
       }
     },
 
@@ -1534,7 +1563,11 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      // clearInterval(this.countdownInterval)
+      // halt if forced to dispose and not yet disposed
+      if (this.isForcedToDisposeAndNotDisposed) {
+        return
+      }
+
       this.loadingNext = true
       this.clearWarmUpCountDown()
 
@@ -1796,7 +1829,9 @@ export default {
     startDialing () {
       this.clearWarmUpCountDown()
       this.togglePause = false
-      this.onTimerIsOver()
+      if (this.timerIsOver) {
+        this.onTimerIsOver()
+      }
     }
   },
 
@@ -1920,6 +1955,7 @@ export default {
     this.$VueEvent.stop('holdFailed', this.onHoldFailed)
     this.$VueEvent.stop('unholdFailed', this.onUnholdFailed)
     this.$VueEvent.stop('onNextTask', this.onNextTask)
+    this.$VueEvent.stop('onCallBackClick', this.onCallBackClick)
 
     window.localStorage.removeItem(PD_PAUSED_PROP_NAME)
   }

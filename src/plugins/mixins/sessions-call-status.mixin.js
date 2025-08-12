@@ -207,6 +207,30 @@ export default {
       }
 
       return !this.wrapUp && !this.togglePause && !this.sessionPaused && this.countdownTimer > 0
+    },
+
+    // Check if the resetting call needs to be redialed
+    shouldProcessRedial () {
+      // If not on a PD session/page or no activeTask
+      if (!this.isSessionRunning || !this.isOnPowerDialerSessionRoute || !this.activeTask) {
+        return false
+      }
+
+      // Redial not required, skip
+      if (!this.redialRequired) {
+        return false
+      }
+
+      // Skip if task already being redialed
+      if (this.redialedTask?.id || this.activeTask.forcedRedial) {
+        return false
+      }
+
+      return true
+    },
+
+    isForcedToDisposeAndNotDisposed () {
+      return this.dialer.communication && this.isNotDisposed
     }
   },
 

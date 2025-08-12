@@ -692,7 +692,7 @@
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
                   :disabled="shouldDisableCallBackButton || temporaryDisableFinishButton"
-                  @click="makeCall">
+                  @click="onCallBackClick">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
           </b-icon>
@@ -2713,6 +2713,15 @@ export default {
       if (this.$route.path.includes('/widgets/hubspot-call-extension')) {
         this.setIsWidget(true)
       }
+    },
+
+    onCallBackClick () {
+      if (this.isOnPowerDialerSessionRoute) {
+        this.$VueEvent.fire('onCallBackClick')
+        return
+      }
+
+      this.makeCall()
     },
 
     ...mapActions([
