@@ -1028,7 +1028,7 @@
 
             <!--TRANSFERRED TO-->
             <b-form-row
-              v-if="communication.transfer_target_user_ids"
+              v-if="communication.transfer_target_users && communication.transfer_target_users.length > 0"
               data-testid="comm-details-transferred-to-row"
             >
               <b-col
@@ -1044,14 +1044,14 @@
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
-                    :key="userId + '-user-' + index"
+                    :key="user.id + '-user-' + index"
                     data-testid="comm-details-transferred-to-open-user-in-classic"
-                    @click="onOpenUserInClassicClicked(userId)"
-                    v-for="(userId, index) in communication.transfer_target_user_ids"
+                    @click="onOpenUserInClassicClicked(user.id)"
+                    v-for="(user, index) in communication.transfer_target_users"
                   >
                     <span
                       class="text-blue cursor-pointer"
-                      :title="getUserName(getUser(userId))"
+                      :title="getUserName(user)"
                     >
                       <q-tooltip
                         class="item"
@@ -1060,9 +1060,9 @@
                         data-testid="comm-details-transferred-to-tooltip"
                         self="bottom middle"
                       >
-                        {{ getUserName(getUser(userId)) }}
+                        {{ user.name && user.name.toLowerCase().includes('_deleted_') ? 'Deleted User' : getUserName(user) }}
                       </q-tooltip>
-                      <user-display :user-id="userId" />
+                      <user-display :user-id="user.id" />
                     </span>
                   </div>
                 </div>
