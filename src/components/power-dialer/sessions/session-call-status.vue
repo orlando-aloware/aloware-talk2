@@ -1134,8 +1134,6 @@ export default {
       const wasInWrapUpStatusAndPaused = this.dialer.currentStatus === 'WRAP_UP' &&
         this.wrapUpPaused
 
-      const wasForcedToDispose = this.dialer.communication && this.isNotDisposed
-
       this.countdownInterval = setInterval(() => {
         // if paused, we should not continue the countdown
         if (this.sessionPaused) {
@@ -1161,57 +1159,41 @@ export default {
           this.countdownTimer = 0
         }
 
-        if (this.countdownTimer >= 0) {
-          this.countdownTimer--
-        }
-
-        if (this.timerIsOver) {
-          // halt if forced to dispose and not yet disposed
-          if (this.isForcedToDisposeAndNotDisposed) {
-            return
-          }
-
-          // trigger reset call if redial is required
-          if (this.shouldProcessRedial || wasForcedToDispose) {
-            this.clearWarmUpCountDown()
-            this.wrapUp = false
-            this.$VueEvent.fire('resetCall')
-            return
-          }
-
-          this.onTimerIsOver()
-        }
+        this.countdownTimer--
+        this.onTimerIsOver()
       }, 1000)
     },
 
     onTimerIsOver () {
-      this.clearWarmUpCountDown()
+      if (this.timerIsOver) {
+        this.clearWarmUpCountDown()
 
-      const hasEnded = this.toggleEnd || !this.hasQueuedTaskLists
-      const noActiveTask = !this.hasActiveTask || !this.activeTask
+        const hasEnded = this.toggleEnd || !this.hasQueuedTaskLists
+        const noActiveTask = !this.hasActiveTask || !this.activeTask
 
-      if (hasEnded && noActiveTask) {
-        this.reRoute()
-        return
-      }
+        if (hasEnded && noActiveTask) {
+          this.reRoute()
+          return
+        }
 
-      if (!this.togglePause && !this.wrapUp) {
-        this.runTask()
-      }
+        if (!this.togglePause && !this.wrapUp) {
+          this.runTask()
+        }
 
-      if (this.wrapUp) {
-        this.initialize()
-      }
+        if (this.wrapUp) {
+          this.initialize()
+        }
 
-      // end wrap-up if wrap-up seconds
-      // is not indefinite
-      if (this.wrapUp && this.wrapUpSeconds !== 0) {
-        this.wrapUp = false
-        this.isSessionRunning = false
-      }
+        // end wrap-up if wrap-up seconds
+        // is not indefinite
+        if (this.wrapUp && this.wrapUpSeconds !== 0) {
+          this.wrapUp = false
+          this.isSessionRunning = false
+        }
 
-      if (this.togglePause) {
-        this.sessionPaused = true
+        if (this.togglePause) {
+          this.sessionPaused = true
+        }
       }
     },
 
@@ -1563,11 +1545,6 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      // halt if forced to dispose and not yet disposed
-      if (this.isForcedToDisposeAndNotDisposed) {
-        return
-      }
-
       this.loadingNext = true
       this.clearWarmUpCountDown()
 
@@ -1829,9 +1806,7 @@ export default {
     startDialing () {
       this.clearWarmUpCountDown()
       this.togglePause = false
-      if (this.timerIsOver) {
-        this.onTimerIsOver()
-      }
+      this.onTimerIsOver()
     }
   },
 
