@@ -42,7 +42,7 @@ export const CONTACT_VARIABLES = [
   {
     label: '[OwnerName]',
     value: '[OwnerName]',
-    description: 'to include lead owner’s full name'
+    description: 'to include contact owner’s full name'
   },
   {
     label: '[OwnerFirstName]',
@@ -53,6 +53,11 @@ export const CONTACT_VARIABLES = [
     label: '[OwnerLastName]',
     value: '[OwnerLastName]',
     description: 'to include contact owner’s last name'
+  },
+  {
+    label: '[OwnerEmail]',
+    value: '[OwnerEmail]',
+    description: 'to include contact owner’s email address'
   },
   {
     label: '[LeadNumber]',
