@@ -238,10 +238,6 @@ export default {
     },
 
     togglePhone () {
-      if (this.isPhoneVisible && this.isCallCompleted && (this.isHighlightedCallDisposition || this.isHighlightedContactDisposition)) {
-        return
-      }
-
       this.$VueEvent.fire('togglePhone')
     },
 
