@@ -36,10 +36,41 @@ export default {
       const spanEl = doc.querySelectorAll('span.mention-tag')
       spanEl.forEach(function (value, i) {
         const id = value.getAttribute('data-id')
-
-        value.parentNode.replaceChild(document.createTextNode('<user:' + id + '>'), value)
+        const textNode = doc.createTextNode('<user:' + id + '>')
+        value.parentNode.replaceChild(textNode, value)
       })
-      return doc.body.innerText
+
+      // Get the HTML after mention replacement
+      let result = doc.body.innerHTML
+
+      // Convert <br> tags to newlines
+      result = result.replace(/<br\s*\/?>/gi, '\n')
+
+      // Convert <div> tags to newlines (contenteditable often uses divs for new lines)
+      result = result.replace(/<\/div><div>/gi, '\n')
+      result = result.replace(/<div>/gi, '\n')
+      result = result.replace(/<\/div>/gi, '')
+
+      // Convert paragraph breaks to newlines
+      result = result.replace(/<\/p><p>/gi, '\n\n')
+      result = result.replace(/<p>/gi, '')
+      result = result.replace(/<\/p>/gi, '')
+
+      // Remove any remaining HTML tags
+      result = result.replace(/<[^>]*>/g, '')
+
+      // Decode HTML entities
+      const textarea = document.createElement('textarea')
+      textarea.innerHTML = result
+      result = textarea.value
+
+      // Remove leading newline if it exists (often added by contenteditable)
+      result = result.replace(/^\n/, '')
+
+      // Limit consecutive newlines to maximum of 2
+      result = result.replace(/\n{3,}/g, '\n\n')
+
+      return result
     }
   }
 }
