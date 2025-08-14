@@ -1658,7 +1658,11 @@ export default {
     },
 
     resetCall () {
-      if (this.shouldProcessRedial()) {
+      if (this.shouldProcessRedial) {
+      // Set active task as redialed, so it won't process redial again for this task
+        this.activeTask.forcedRedial = true
+        // Trigger onNextTask to handle redialing
+        this.$VueEvent.fire('onNextTask')
         return
       }
 
@@ -1787,6 +1791,11 @@ export default {
       // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
       if (signature !== 'Talk-Connection.OnCancel') {
         this.resetAgentStatus(forceStatus, signature)
+      }
+
+      // halt due to required forced dispositions
+      if (this.isForcedToDisposeAndNotDisposed) {
+        return
       }
 
       this.resetCall(signature)
@@ -2046,28 +2055,6 @@ export default {
       } else {
         console.warn('Warning: Missing required data for saving call issue.')
       }
-    },
-
-    // Check if the resetting call needs to be redialed
-    // then process the redial before resetting
-    shouldProcessRedial () {
-      // If not on a PD session/page or no activeTask
-      if (!this.isSessionRunning || !this.isOnPowerDialerSessionRoute || !this.activeTask) {
-        return false
-      }
-      // Redial not required, skip
-      if (!this.redialRequired) {
-        return false
-      }
-      // Skip if task already being redialed
-      if (this.redialedTask?.id || this.activeTask.forcedRedial) {
-        return false
-      }
-      // Set active task as redialed, so it won't process redial again for this task
-      this.activeTask.forcedRedial = true
-      // Trigger onNextTask to handle redialing
-      this.$VueEvent.fire('onNextTask')
-      return true
     },
 
     fetchAndSetAiAgentCallMode (commId, type = null) {
