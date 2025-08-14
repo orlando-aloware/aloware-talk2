@@ -96,15 +96,28 @@ export default {
     },
 
     getPhoneNumbers (search) {
-      if (this.$store.state.auth.is_focused_power_dialer) return
-
       if (!search) {
         this.phoneNumbers = []
         return
       }
 
       this.phoneNumbers = []
+
+      // Skip contact search for talk lite users, but still emit events
+      if (this.$store.state.auth.is_focused_power_dialer) {
+        this.$emit('searchResults', false)
+        this.changePhoneNumber({
+          phone_number: this.query,
+          contactName: null,
+          company_name: null,
+          contact_id: null,
+          timezone: null
+        })
+        return
+      }
+
       this.$emit('searchResults', true)
+
       this.$axios.get('api/v2/contacts/quick-search', {
         params: {
           search: search
@@ -140,7 +153,7 @@ export default {
       // this.blurInput()
     },
 
-    lookupPhoneNumber: debounce(function (newVal) {
+    lookupPhoneNumber (newVal) {
       if (this.selectedPhoneNumber && this.selectedPhoneNumber !== newVal) {
         this.changePhoneNumber({
           phone_number: this.query,
@@ -150,6 +163,16 @@ export default {
           timezone: null
         })
       }
+
+      // Use debounce for regular users (API calls), immediate for talk lite users
+      if (this.$store.state.auth.is_focused_power_dialer) {
+        this.getPhoneNumbers(this.query)
+      } else {
+        this.debouncedGetPhoneNumbers()
+      }
+    },
+
+    debouncedGetPhoneNumbers: debounce(function () {
       this.getPhoneNumbers(this.query)
     }, 1000)
   },

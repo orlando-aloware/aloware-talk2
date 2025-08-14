@@ -1,5 +1,6 @@
 export const allowedRoutes = {
   talkLite: [
+    'Team Inboxes',
     'Power Dialer',
     'Stats',
     'Settings'
@@ -18,7 +19,8 @@ export const allowedRoutes = {
     'Broadcasts',
     'AloAi',
     'Settings',
-    'Phone'
+    'Phone',
+    'HubSpot SMS Channel Connect'
   ]
 }
 

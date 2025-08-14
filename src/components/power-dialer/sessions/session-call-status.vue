@@ -982,7 +982,7 @@ export default {
 
     redialDropdownTooltip () {
       if (!this.statusCallConnected) {
-        return
+        return 'Redial is only available when call is connected'
       }
 
       if (this.isForcedCallDisposition && !this.isCallDisposed) {
@@ -1026,6 +1026,7 @@ export default {
     this.$VueEvent.listen('holdFailed', this.onHoldFailed)
     this.$VueEvent.listen('unholdFailed', this.onUnholdFailed)
     this.$VueEvent.listen('onNextTask', this.onNextTask)
+    this.$VueEvent.listen('onCallBackClick', this.onCallBackClick)
 
     this.isSessionRunning = false
   },
@@ -1045,6 +1046,16 @@ export default {
       'incrementRedialedTaskCount',
       'moveContactItems'
     ]),
+
+    onCallBackClick () {
+      this.clearWarmUpCountDown()
+
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.wrapUp = false
+      }
+
+      this.onRedial(true)
+    },
 
     onDispositionsClick () {
       this.$emit('on-dispositions')
@@ -1534,7 +1545,6 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      // clearInterval(this.countdownInterval)
       this.loadingNext = true
       this.clearWarmUpCountDown()
 
@@ -1920,6 +1930,7 @@ export default {
     this.$VueEvent.stop('holdFailed', this.onHoldFailed)
     this.$VueEvent.stop('unholdFailed', this.onUnholdFailed)
     this.$VueEvent.stop('onNextTask', this.onNextTask)
+    this.$VueEvent.stop('onCallBackClick', this.onCallBackClick)
 
     window.localStorage.removeItem(PD_PAUSED_PROP_NAME)
   }

@@ -104,7 +104,11 @@
                size="12px"
                padding="none"
                flat
+               :disabled="isClosePhoneDisabled"
                @click="closePhone">
+          <q-tooltip v-if="isClosePhoneDisabled && closePhoneDisabledTooltip">
+            {{ closePhoneDisabledTooltip }}
+          </q-tooltip>
         </q-btn>
       </div>
     </div>
@@ -688,7 +692,7 @@
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
                   :disabled="shouldDisableCallBackButton || temporaryDisableFinishButton"
-                  @click="makeCall">
+                  @click="onCallBackClick">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
           </b-icon>
@@ -1992,6 +1996,22 @@ export default {
       const line = this.campaigns.find(campaign => campaign.id === this.dialer.communication?.campaign_id)
       const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = line || {}
       return ringGroup?.name || personalInbox?.name
+    },
+
+    isClosePhoneDisabled () {
+      return this.isCallCompleted && (this.isHighlightedCallDisposition || this.isHighlightedContactDisposition)
+    },
+
+    closePhoneDisabledTooltip () {
+      if (this.isHighlightedCallDisposition) {
+        return 'Please select a Call Disposition'
+      }
+
+      if (this.isHighlightedContactDisposition) {
+        return 'Please select a Contact Disposition'
+      }
+
+      return ''
     }
   },
 
@@ -2693,6 +2713,15 @@ export default {
       if (this.$route.path.includes('/widgets/hubspot-call-extension')) {
         this.setIsWidget(true)
       }
+    },
+
+    onCallBackClick () {
+      if (this.isOnPowerDialerSessionRoute) {
+        this.$VueEvent.fire('onCallBackClick')
+        return
+      }
+
+      this.makeCall()
     },
 
     ...mapActions([

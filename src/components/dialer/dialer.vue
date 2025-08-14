@@ -334,6 +334,13 @@ export default {
       }
     }
 
+    this.dialerListeners.colleagueStatusNotification = (event) => {
+      // Show error notification in the dialer
+      if (event.message && event.communication_id && this.dialer.communication?.id === event.communication_id) {
+        this.$generalNotification(event.message, 'error')
+      }
+    }
+
     this.startDialerEvents()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -523,6 +530,7 @@ export default {
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.listen('colleague_status_notification', this.dialerListeners.colleagueStatusNotification)
     },
 
     stopDialerEvents () {
@@ -556,6 +564,7 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.stop('colleague_status_notification', this.dialerListeners.colleagueStatusNotification)
     },
 
     forceRefreshCommunication () {
@@ -1779,6 +1788,7 @@ export default {
       if (signature !== 'Talk-Connection.OnCancel') {
         this.resetAgentStatus(forceStatus, signature)
       }
+
       this.resetCall(signature)
     },
 
@@ -2045,23 +2055,18 @@ export default {
       if (!this.isSessionRunning || !this.isOnPowerDialerSessionRoute || !this.activeTask) {
         return false
       }
-
       // Redial not required, skip
       if (!this.redialRequired) {
         return false
       }
-
       // Skip if task already being redialed
       if (this.redialedTask?.id || this.activeTask.forcedRedial) {
         return false
       }
-
       // Set active task as redialed, so it won't process redial again for this task
       this.activeTask.forcedRedial = true
-
       // Trigger onNextTask to handle redialing
       this.$VueEvent.fire('onNextTask')
-
       return true
     },
 
@@ -2135,7 +2140,7 @@ export default {
         return null
       }
 
-      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId']
+      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId', 'CampaignName']
       const missingParams = requiredParams.filter(param => {
         return !customParams[param]
       })
@@ -2146,7 +2151,6 @@ export default {
       }
 
       const campaignId = parseInt(customParams.CampaignId) || null
-      const campaign = this.getCampaign(campaignId)
 
       let communicationData
       let locationData = null
@@ -2188,30 +2192,12 @@ export default {
         ring_group_id: parseInt(communicationData.RingGroupId) || null,
         campaign_id: campaignId,
         campaign: {
-          name: campaign?.name
+          name: customParams?.CampaignName
         }
       }
 
       console.log('Successfully built communication data from customParameters:', communication)
       return communication
-    },
-
-    getCampaign (campaignId) {
-      if (!campaignId) {
-        return null
-      }
-
-      if (!this.campaigns || !Array.isArray(this.campaigns)) {
-        return null
-      }
-
-      const found = this.campaigns.find(campaign => campaign.id === campaignId)
-
-      if (!found) {
-        return null
-      }
-
-      return found
     },
 
     async checkMicrophonePermission () {

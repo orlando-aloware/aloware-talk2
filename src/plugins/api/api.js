@@ -378,30 +378,59 @@ const talk2Api = {
           }
 
           return response
+        },
+
+        /**
+         * Get the available lifecycle stages
+         *
+         * @returns Promise<axios.AxiosResponse<{success: boolean, data: {lifecycle_stages: Object, can_update_lifecycle_stages: boolean}}>>
+         */
+        async getLifecycleStages () {
+          return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/lifecycle-stages`)
+        },
+
+        /**
+         * Get the company association of the contact
+         *
+         * @param contactId
+         * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
+         */
+        getContactCompanyAssociation (contactId) {
+          if (!contactId) {
+            return null
+          }
+
+          return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
+        },
+
+        /**
+         * Get HubSpot Inbox Configuration Data
+         *
+         * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
+         */
+        getInboxSetupData () {
+          return window.axios.get(`${suffixV1}integrations/hubspot/inbox`)
+        },
+
+        /**
+         * Connect HubSpot Inbox to a company
+         *
+         * @param params
+         * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object>>}
+         */
+        connectInbox (params) {
+          return window.axios.post(`${suffixV1}integrations/hubspot/inbox/connect`, params)
+        },
+
+        /**
+         * Retrieve the conversation threads of a contact
+         *
+         * @param contactId
+         * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object>>}
+         */
+        getContactConversationThreads (contactId) {
+          return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/conversation-threads/${contactId}`)
         }
-      },
-
-      /**
-       * Get the available lifecycle stages
-       *
-       * @returns Promise<axios.AxiosResponse<{success: boolean, data: {lifecycle_stages: Object, can_update_lifecycle_stages: boolean}}>>
-       */
-      async getLifecycleStages () {
-        return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/lifecycle-stages`)
-      },
-
-      /**
-       * Get the company association of the contact
-       *
-       * @param contactId
-       * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object}>>|null}
-       */
-      getContactCompanyAssociation (contactId) {
-        if (!contactId) {
-          return null
-        }
-
-        return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
       },
 
       zoho: {

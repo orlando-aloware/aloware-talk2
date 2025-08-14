@@ -207,6 +207,10 @@ export default {
       }
 
       return !this.wrapUp && !this.togglePause && !this.sessionPaused && this.countdownTimer > 0
+    },
+
+    isForcedToDisposeAndNotDisposed () {
+      return this.dialer.communication && this.isNotDisposed
     }
   },
 
