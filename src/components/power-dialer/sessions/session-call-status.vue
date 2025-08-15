@@ -590,18 +590,6 @@ export default {
       'selectedList'
     ]),
 
-    forcedWrapUpAccount () {
-      return this.profile.company.force_wrap_up
-    },
-
-    wrapUpSeconds () {
-      if (this.forcedWrapUpAccount) {
-        return this.profile.company.wrap_up_seconds
-      }
-
-      return this.profile.wrap_up_seconds
-    },
-
     currentSessionStatus () {
       return this.dialer?.currentStatus || ''
     },
@@ -829,9 +817,7 @@ export default {
     },
 
     canRedialNow () {
-      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
-        !this.activeTask?.redialed &&
-        !this.isRedialClicked
+      return this.dialer.currentStatus === 'CALL_CONNECTED' && !this.isRedialClicked
     },
 
     pauseButtonText () {
@@ -1134,6 +1120,8 @@ export default {
       const wasInWrapUpStatusAndPaused = this.dialer.currentStatus === 'WRAP_UP' &&
         this.wrapUpPaused
 
+      const wasForcedToDispose = this.dialer.communication && this.isNotDisposed
+
       this.countdownInterval = setInterval(() => {
         // if paused, we should not continue the countdown
         if (this.sessionPaused) {
@@ -1159,41 +1147,57 @@ export default {
           this.countdownTimer = 0
         }
 
-        this.countdownTimer--
-        this.onTimerIsOver()
+        if (this.countdownTimer > -1) {
+          this.countdownTimer--
+        }
+
+        if (this.timerIsOver) {
+          // halt if forced to dispose and not yet disposed
+          if (this.isForcedToDisposeAndNotDisposed) {
+            return
+          }
+
+          // trigger reset call if redial is required
+          if (this.shouldProcessRedial || wasForcedToDispose) {
+            this.clearWarmUpCountDown()
+            this.wrapUp = false
+            this.$VueEvent.fire('resetCall')
+            return
+          }
+
+          this.onTimerIsOver()
+        }
       }, 1000)
     },
 
     onTimerIsOver () {
-      if (this.timerIsOver) {
-        this.clearWarmUpCountDown()
+      this.clearWarmUpCountDown()
 
-        const hasEnded = this.toggleEnd || !this.hasQueuedTaskLists
-        const noActiveTask = !this.hasActiveTask || !this.activeTask
+      const hasEnded = this.toggleEnd || !this.hasQueuedTaskLists
+      const noActiveTask = !this.hasActiveTask || !this.activeTask
 
-        if (hasEnded && noActiveTask) {
-          this.reRoute()
-          return
-        }
+      if (hasEnded && noActiveTask) {
+        this.reRoute()
+        return
+      }
 
-        if (!this.togglePause && !this.wrapUp) {
-          this.runTask()
-        }
+      if (!this.togglePause && !this.wrapUp) {
+        this.runTask()
+      }
 
-        if (this.wrapUp) {
-          this.initialize()
-        }
+      if (this.wrapUp) {
+        this.initialize()
+      }
 
-        // end wrap-up if wrap-up seconds
-        // is not indefinite
-        if (this.wrapUp && this.wrapUpSeconds !== 0) {
-          this.wrapUp = false
-          this.isSessionRunning = false
-        }
+      // end wrap-up if wrap-up seconds
+      // is not indefinite
+      if (this.wrapUp && this.wrapUpSeconds !== 0) {
+        this.wrapUp = false
+        this.isSessionRunning = false
+      }
 
-        if (this.togglePause) {
-          this.sessionPaused = true
-        }
+      if (this.togglePause) {
+        this.sessionPaused = true
       }
     },
 
@@ -1452,10 +1456,17 @@ export default {
           }
 
           break
+        case 'CALL_CONNECTED':
+          // clear redial state in order to properly handle it again if needed
+          if (this.activeTask.forcedRedial) {
+            this.activeTask.forcedRedial = false
+            this.redialedTask = {}
+          }
+          break
         case 'WRAP_UP':
-          // if task is manually skipped through the
-          // Next button, end the wrap up
-          if (this.skipWrapUp) {
+          // if task is manually skipped through the Next button (or no wrap up)
+          // end the wrap up
+          if (this.skipWrapUp || (this.redialRequired && this.wrapUpSeconds === -1 && !this.isForcedToDisposeAndNotDisposed)) {
             // we need to clear the wrap-up (set agent status to available)
             // after the session ended
             if (this.powerDialerTasks.in_queue.length === 0) {
@@ -1472,10 +1483,8 @@ export default {
           this.wrapUp = true
           this.countdownTimer = this.wrapUpSeconds
 
-          // if status is wrap-up and wrap-up seconds
-          // is "no wrap-up", then skip wrap-up countdown timer
-          // and proceed immediately to the next task
-          if (this.isSessionRunning && this.wrapUpSeconds === -1) {
+          // if "No Wrap-up" is set and not forced to dispose, proceed to the next task
+          if (this.isSessionRunning && this.wrapUpSeconds === -1 && !this.isForcedToDisposeAndNotDisposed) {
             this.onNextTask(true)
           }
 
@@ -1618,41 +1627,6 @@ export default {
       }
 
       this.$VueEvent.fire('hangupCall')
-    },
-
-    async onNextTaskWhenOnWrapUp () {
-      this.onPhoneExpansionReset()
-      this.wrapUp = false
-      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
-
-      if (this.taskToCall) {
-        this.processRemoveFirstInQueueTask()
-        this.activeTask = this.taskToCall
-        this.hasActiveTask = true
-        this.hangUpIntervalCounter = 0
-
-        this.hangUpInterval = setInterval(() => {
-          if (this.dialer.currentStatus === 'WRAP_UP') {
-            this.processSession()
-            clearInterval(this.hangUpInterval)
-          }
-
-          this.hangUpIntervalCounter++
-
-          if (this.hangUpIntervalCounter >= 120) {
-            clearInterval(this.hangUpInterval)
-          }
-        }, 500)
-
-        return
-      }
-
-      if (this.dialer.currentStatus === 'WRAP_UP') {
-        this.$VueEvent.fire('endWrapUp')
-      }
-
-      this.hasActiveTask = false
-      this.reRoute()
     },
 
     onInitiateSession (session) {
@@ -1806,7 +1780,9 @@ export default {
     startDialing () {
       this.clearWarmUpCountDown()
       this.togglePause = false
-      this.onTimerIsOver()
+      if (this.timerIsOver) {
+        this.onTimerIsOver()
+      }
     }
   },
 
