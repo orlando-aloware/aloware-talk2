@@ -42,9 +42,9 @@
                            :disable="lineSelectorDisabled"
                            :generic-multiselect="false"
                            :is-loading="isLoadingLastUsedCallLine"
+                           data-testid="dialer-call-line-selector"
                            v-model="campaignId"
-                           @change="changeCampaignId"
-                           data-testid="dialer-call-line-selector">
+                           @change="changeCampaignId">
             </line-selector>
           </b-form-group>
 
@@ -59,11 +59,11 @@
                                            id="calls-popover"
                                            ref="callContactPhoneNumberSearch"
                                            :no_prepend="true"
+                                           data-testid="dialer-call-phone-search"
                                            v-model="phoneNumber"
                                            @change="phoneNumberChanged"
                                            @keyup.enter.native="onCall"
-                                           @searchResults="onPhoneNumberSearch"
-                                           data-testid="dialer-call-phone-search">
+                                           @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
             <div data-testid="dialer-call-button-container">
@@ -76,8 +76,8 @@
                      flat
                      :ripple="true"
                      :disable="callDisabled"
-                     @click="onCall"
-                     data-testid="dialer-call-button">
+                     data-testid="dialer-call-button"
+                     @click="onCall">
               </q-btn>
               <q-tooltip data-testid="dialer-agent-on-call-tooltip"
                          v-if="isAgentOnCall">
@@ -123,9 +123,9 @@
                            check-blocked-messaging
                            :generic-multiselect="false"
                            :use-only-actives="true"
+                           data-testid="dialer-message-line-selector"
                            v-model="campaignId"
-                           @change="changeCampaignId"
-                           data-testid="dialer-message-line-selector">
+                           @change="changeCampaignId">
             </line-selector>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
@@ -137,11 +137,11 @@
                           data-testid="dialer-message-phone-group">
               <contact-phone-number-search ref="textContactPhoneNumberSearch"
                                            id="texts-popover"
+                                           data-testid="dialer-message-phone-search"
                                            v-model="phoneNumber"
                                            @change="phoneNumberChanged"
                                            @keyup.enter.native="sendText"
-                                           @searchResults="onPhoneNumberSearch"
-                                           data-testid="dialer-message-phone-search">
+                                           @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
           </div>
@@ -181,8 +181,8 @@
                          flat
                          :disable="sendDisabled || isSending || isMessagingBlocked(selectedCampaign, true)"
                          :ripple="false"
-                         @click="sendText"
-                         data-testid="dialer-message-send-button">
+                         data-testid="dialer-message-send-button"
+                         @click="sendText">
                     <send-text-icon :width="isMobile ? 18 : 16"
                                     :height="isMobile ? 18: 16"
                                     :color="sendTextColor">
@@ -195,8 +195,8 @@
                                rows="2"
                                max-rows="3"
                                :disabled="isBlockTooltipPopoverEnabled"
-                               v-model="textMessage"
-                               data-testid="dialer-message-textarea">
+                               data-testid="dialer-message-textarea"
+                               v-model="textMessage">
               </b-form-textarea>
             </b-input-group>
           </div>
