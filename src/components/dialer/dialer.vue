@@ -1659,7 +1659,7 @@ export default {
 
     resetCall () {
       if (this.shouldProcessRedial) {
-      // Set active task as redialed, so it won't process redial again for this task
+        // Set active task as redialed, so it won't process redial again for this task
         this.activeTask.forcedRedial = true
         // Trigger onNextTask to handle redialing
         this.$VueEvent.fire('onNextTask')
