@@ -4,16 +4,16 @@
        data-testid="dialer-form-wrapper"
        :class="dialerFormClass">
     <div class="loading-container"
-         v-if="isMakingCall"
-         data-testid="dialer-loading-container">
+         data-testid="dialer-loading-container"
+         v-if="isMakingCall">
       <div class="mobile-call-loader">
         <q-spinner-bars color="white" size="5em"/>
       </div>
     </div>
     <div class="col phone-padding dialer-tabs-wrapper"
          :class="{'no-padding': !isMobile}"
-         v-if="!isMakingCall"
-         data-testid="dialer-tabs-container">
+         data-testid="dialer-tabs-container"
+         v-if="!isMakingCall">
       <b-tabs class="dialer-tabs"
               pills
               vertical
@@ -21,16 +21,16 @@
         <block-tooltip placement="left"
                        triggers="hover focus"
                        target="dialer-popover"
+                       data-testid="dialer-block-tooltip"
                        :show.sync="blockTooltipHandler.show"
                        :task="blockTooltipHandler.task"
                        :message="getMessagingBlocked(selectedCampaign)"
-                       v-if="isBlockTooltipPopoverEnabled"
-                       data-testid="dialer-block-tooltip">
+                       v-if="isBlockTooltipPopoverEnabled">
         </block-tooltip>
         <b-tab title="Call"
+               data-testid="dialer-call-tab"
                :active="mode === 'call'"
-               @click="setMode('call')"
-               data-testid="dialer-call-tab">
+               @click="setMode('call')">
           <b-form-group class="mb-1"
                         :invalid-feedback="invalidCampaign"
                         :state="validCampaign"
@@ -49,8 +49,8 @@
           </b-form-group>
 
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
-               v-if="mode === 'call'"
-               data-testid="dialer-call-controls">
+               data-testid="dialer-call-controls"
+               v-if="mode === 'call'">
             <b-form-group class="mb-0"
                           :invalid-feedback="invalidPhoneNumber"
                           :state="validPhoneNumberSearch"
@@ -79,41 +79,41 @@
                      @click="onCall"
                      data-testid="dialer-call-button">
               </q-btn>
-              <q-tooltip v-if="isAgentOnCall"
-                         data-testid="dialer-agent-on-call-tooltip">
+              <q-tooltip data-testid="dialer-agent-on-call-tooltip"
+                         v-if="isAgentOnCall">
                 There is a call in progress on another device. If you think this is an error, please refresh your screen.
               </q-tooltip>
             </div>
           </div>
 
           <div class="dialer-contact-info width-190"
-               v-if="contactId"
-               data-testid="dialer-call-contact-info">
+               data-testid="dialer-call-contact-info"
+               v-if="contactId">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
-                 v-if="contactId"
-                 data-testid="dialer-call-contact-header">
+                 data-testid="dialer-call-contact-header"
+                 v-if="contactId">
               <div class="d-inline-flex text-left" data-testid="dialer-call-contact-name">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
               <div class="d-inline-flex text-right"
-                   v-if="currentLocalTime"
-                   data-testid="dialer-call-contact-time">
+                   data-testid="dialer-call-contact-time"
+                   v-if="currentLocalTime">
                 ~{{ currentLocalTime }}
               </div>
             </div>
             <p class="text-size-sm text-grey-80 _400 mb-1"
-               v-if="contactId && companyName"
-               data-testid="dialer-call-company-name">
+               data-testid="dialer-call-company-name"
+               v-if="contactId && companyName">
               {{ companyName }}
             </p>
-            <div v-if="!contactId && validPhoneNumber && phoneNumber && !loadingContact"
-                 data-testid="dialer-call-new-number">
+            <div data-testid="dialer-call-new-number"
+                 v-if="!contactId && validPhoneNumber && phoneNumber && !loadingContact">
               <span class="text-size-sm text-grey-80 _400">New number</span>
             </div>
           </div>
         </b-tab>
         <b-tab title="Message"
+               data-testid="dialer-message-tab"
                :active="mode === 'text'"
-               @click="setMode('text')"
-               data-testid="dialer-message-tab">
+               @click="setMode('text')">
           <b-form-group class="mb-1"
                         :invalid-feedback="invalidCampaign"
                         :state="validCampaign"
@@ -129,8 +129,8 @@
             </line-selector>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
-               v-if="mode === 'text'"
-               data-testid="dialer-message-controls">
+               data-testid="dialer-message-controls"
+               v-if="mode === 'text'">
             <b-form-group class="mb-0 w-100"
                           :invalid-feedback="invalidPhoneNumber"
                           :state="validPhoneNumberSearch"
@@ -147,25 +147,25 @@
           </div>
 
           <div class="dialer-contact-info w-100"
-               v-if="contactId"
-               data-testid="dialer-message-contact-info">
+               data-testid="dialer-message-contact-info"
+               v-if="contactId">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
-                 v-if="contactId"
-                 data-testid="dialer-message-contact-header">
+                 data-testid="dialer-message-contact-header"
+                 v-if="contactId">
               <div class="d-inline-flex text-left" data-testid="dialer-message-contact-name">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
               <div class="d-inline-flex text-right"
-                   v-if="currentLocalTime"
-                   data-testid="dialer-message-contact-time">
+                   data-testid="dialer-message-contact-time"
+                   v-if="currentLocalTime">
                 ~{{ currentLocalTime }}
               </div>
             </div>
             <p class="text-size-sm text-grey-80 _400 mb-1"
-               v-if="contactId && companyName"
-               data-testid="dialer-message-company-name">
+               data-testid="dialer-message-company-name"
+               v-if="contactId && companyName">
               {{ companyName }}
             </p>
-            <div v-if="!contactId && validPhoneNumber && phoneNumber && !loadingContact"
-                 data-testid="dialer-message-new-number">
+            <div data-testid="dialer-message-new-number"
+                 v-if="!contactId && validPhoneNumber && phoneNumber && !loadingContact">
               <span class="text-size-sm text-grey-80 _400">New number</span>
             </div>
           </div>
@@ -204,16 +204,16 @@
       </b-tabs>
     </div>
     <h1 class="phone-padding lh-27 mb-3"
-        v-if="isMobile && parkedCalls.length > 0"
-        data-testid="dialer-parked-calls-title">
+        data-testid="dialer-parked-calls-title"
+        v-if="isMobile && parkedCalls.length > 0">
       Parked Call{{ parkedCalls.length > 1 ? 's' : '' }}
     </h1>
     <div class="mobile-parked-calls-list"
-         v-if="isMobile"
-         data-testid="dialer-parked-calls-container">
+         data-testid="dialer-parked-calls-container"
+         v-if="isMobile">
       <div class="loading-container"
-           v-if="loadingParkedCalls"
-           data-testid="dialer-parked-calls-loading">
+           data-testid="dialer-parked-calls-loading"
+           v-if="loadingParkedCalls">
         <div class="mobile-call-loader">
           <q-spinner-bars color="white"
                           size="5em"
@@ -221,8 +221,8 @@
         </div>
       </div>
       <div class="position-relative h-100"
-           v-if="parkedCalls.length"
-           data-testid="dialer-parked-calls-list">
+           data-testid="dialer-parked-calls-list"
+           v-if="parkedCalls.length">
         <div class="overflow-y-scroll h-100"
              data-testid="dialer-parked-calls-scroll">
           <template v-for="parkedCall in parkedCalls">
