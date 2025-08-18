@@ -1181,7 +1181,7 @@ export default {
         return
       }
 
-      if (!this.togglePause && this.dialer.currentStatus !== 'WRAP_UP') {
+      if (!this.togglePause && !this.wrapUp) {
         this.runTask()
       }
 
