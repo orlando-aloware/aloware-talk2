@@ -587,8 +587,6 @@ export default {
     updateContactLastUsedLine (communication) {
       const { contact_id: contactId, ring_group_id: ringGroupId, campaign_id: campaignId } = communication
       const isCommunicationInProgress = this.communicationInProgress(communication)
-      console.log('>>> updateContactLastUsedLine/ringGroupId', ringGroupId)
-
       if (!contactId || !ringGroupId || !campaignId || !isCommunicationInProgress) {
         return
       }
