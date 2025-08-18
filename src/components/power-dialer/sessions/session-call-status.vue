@@ -1158,7 +1158,7 @@ export default {
           }
 
           // trigger reset call if redial is required
-          if (this.shouldProcessRedial || wasForcedToDispose) {
+          if (this.dialer.currentStatus === 'WRAP_UP' && (this.shouldProcessRedial || wasForcedToDispose)) {
             this.clearWarmUpCountDown()
             this.wrapUp = false
             this.$VueEvent.fire('resetCall')
@@ -1181,7 +1181,10 @@ export default {
         return
       }
 
-      if (!this.togglePause && !this.wrapUp) {
+      console.log('>>> onTimerIsOver/togglePause', this.togglePause)
+      console.log('>>> onTimerIsOver/wrapUp', this.wrapUp)
+
+      if (!this.togglePause && this.dialer.currentStatus !== 'WRAP_UP') {
         this.runTask()
       }
 
