@@ -1181,9 +1181,6 @@ export default {
         return
       }
 
-      console.log('>>> onTimerIsOver/togglePause', this.togglePause)
-      console.log('>>> onTimerIsOver/wrapUp', this.wrapUp)
-
       if (!this.togglePause && this.dialer.currentStatus !== 'WRAP_UP') {
         this.runTask()
       }
