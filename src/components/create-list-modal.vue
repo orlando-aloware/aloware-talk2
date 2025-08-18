@@ -81,7 +81,7 @@
         <div v-if="showIntegrationSelector">
           <hr class="w-100 my-2" />
           <div class="mb-3"
-               v-if="integrationsEnabled.length > 1">
+               v-if="filteredEnabledIntegrations.length > 1">
               <div class="row">
                   <div class="col-6 d-flex align-items-center pl-0">
                       <span>Select from available integrations: </span>
@@ -94,14 +94,14 @@
                                 map-options
                                 dense
                                 hide-bottom-space
-                                :options="integrationsEnabled"
+                                :options="filteredEnabledIntegrations"
                                 v-model="selectedIntegration"/>
                   </div>
               </div>
           </div>
           <p class="mb-2"
              v-else>
-              Currently enabled integration: <span class="text-bold"> {{ integrationsEnabled[0] }} </span>
+              Currently enabled integration: <span class="text-bold"> {{ filteredEnabledIntegrations[0] }} </span>
           </p>
           <integration-list-selector ref="list-selector"
                                      :use-chips="false"
@@ -275,8 +275,8 @@ export default {
   mounted () {
     this.loadFolders()
     this.loadPublicLists()
-    if (this.integrationsEnabled.length === 1) {
-      this.selectedIntegration = this.integrationsEnabled[0]
+    if (this.filteredEnabledIntegrations.length === 1) {
+      this.selectedIntegration = this.filteredEnabledIntegrations[0]
       this.loadSelectionOptions()
     }
   },
@@ -366,11 +366,11 @@ export default {
     },
 
     getIntegration () {
-      return (this.selectedIntegration ?? this.integrationsEnabled[0])?.toLowerCase()
+      return (this.selectedIntegration ?? this.filteredEnabledIntegrations[0])?.toLowerCase()
     },
 
     showIntegrationSelector () {
-      return this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE && this.integrationsEnabled?.length > 0
+      return this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE && this.filteredEnabledIntegrations?.length > 0
     },
 
     isIntegrationListType () {
@@ -379,6 +379,13 @@ export default {
 
     disableNameInput () {
       return this.isLoading || this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE
+    },
+
+    filteredEnabledIntegrations () {
+      // show only ready for contact list integrations
+      return this.integrationsEnabled.filter(integration => [
+        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION
+      ].includes(integration.toLowerCase()))
     }
   },
 
