@@ -144,12 +144,10 @@ export default {
     isLiveCall,
 
     getTeamInboxIdForCommunication (communication) {
-      console.log('>>> getTeamInboxIdForCommunication', this.activeInboxId)
-      // If we're in "all" inboxes view, use the communication's ring_group_id
       if (this.activeInboxId === ALL_INBOXES_ID) {
         return communication.ring_group_id
       }
-      // Otherwise, use the active inbox ID
+
       return this.activeInboxId
     },
 

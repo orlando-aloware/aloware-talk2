@@ -249,7 +249,6 @@ export default {
     },
 
     onChannel () {
-      console.log('>>> onChannel', this.activeInboxId)
       if (!this.activeInboxId) {
         return
       }
@@ -498,14 +497,25 @@ export default {
       this.itemsData = sortedItems
     },
 
-    async processCommunicationInActiveInbox (communication, isNew = false) {
-      // fetch unread count for the active inbox (from the backend)
-      const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
-      const unreadCountData = unreadCount[0]
-      const isInActiveInbox = unreadCountData && unreadCountData.ring_group_id === this.activeInboxId
-      const unreadCountForContact = isInActiveInbox ? unreadCountData['unread_contact_' + communication.contact_id] : 0
-      communication.inbox_unread_count = unreadCountForContact || 0
+    async processCommunicationInAllInboxes (communication, isNew = false) {
+      if (this.viewMode === UNTHREADED) {
+        await this.handleUnthreadedCommunication(communication)
+      } else {
+        await this.handleThreadedCommunication(communication, isNew)
+      }
 
+      if (!this.activeId) {
+        return
+      }
+
+      // Emits the signal to update the unread count for the active inbox
+      const index = this.itemsData.findIndex(item => item.contact_id === this.activeId)
+      if (index >= 0) {
+        this.onItemClick(this.itemsData[index])
+      }
+    },
+
+    async processCommunicationInActiveInbox (communication, isNew = false) {
       if (this.viewMode === UNTHREADED) {
         await this.handleUnthreadedCommunication(communication)
       } else {
@@ -550,6 +560,11 @@ export default {
         communication.created_at = new Date().toISOString()
       }
 
+      if (this.isAllInboxesPage) {
+        await this.processCommunicationInAllInboxes(communication, isNew)
+        return
+      }
+
       // If the communication is in the active inbox, process it
       if (communication.ring_group_id === this.activeInboxId) {
         await this.processCommunicationInActiveInbox(communication, isNew)
@@ -572,12 +587,11 @@ export default {
     updateContactLastUsedLine (communication) {
       const { contact_id: contactId, ring_group_id: ringGroupId, campaign_id: campaignId } = communication
       const isCommunicationInProgress = this.communicationInProgress(communication)
+      console.log('>>> updateContactLastUsedLine/ringGroupId', ringGroupId)
 
       if (!contactId || !ringGroupId || !campaignId || !isCommunicationInProgress) {
         return
       }
-
-      console.log('>>> updateContactLastUsedLine/ringGroupId', ringGroupId)
 
       // Update the last used line for the contact in the store
       this.setContactsLastUsedLines({

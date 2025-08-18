@@ -319,7 +319,11 @@ export default {
 
       this.resetItems()
       // Pass current filters and sorting
-      const filters = this.$store.state.TeamInbox.activeFilters || {}
+      const filters = { ...(this.$store.state.TeamInbox.activeFilters || {}) }
+      // inboxes filter only applies to All Inboxes
+      if (inboxId !== ALL_INBOXES_ID) {
+        delete filters.inboxes
+      }
       const sort = this.$store.state.TeamInbox.activeSort || {}
       const search = this.$store.state.TeamInbox.currentSearch || null
       this.fetchItems(inboxId, search, filters, sort)

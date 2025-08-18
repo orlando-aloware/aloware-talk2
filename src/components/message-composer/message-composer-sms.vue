@@ -573,9 +573,6 @@ export default {
         // Ring Group ID is used to identify the current inbox
         // when sending a message from an IVR or Dead End line
 
-        console.log('>>> messageComposer/activeInboxId', this.activeInboxId)
-
-        // todo: obtain ring group id if all inboxes is selected
         let activeInboxId = this.activeInboxId
         if (this.$route.params.inboxId === ALL_INBOXES_ID) {
           activeInboxId = +this.$route.query.inboxId

@@ -101,11 +101,9 @@ export default {
     },
 
     parsedTeamInboxId () {
-      console.log('>>> parsedTeamInboxId route.params.inboxId', this.$route.params.inboxId, 'route.query.inboxId', this.$route.query.inboxId)
-
       if (this.$route.params.inboxId === ALL_INBOXES_ID) {
         const inboxId = +this.$route.query.inboxId
-        return !isNaN(inboxId) ? inboxId : null // todo: check if queried inboxId exists in allInboxes
+        return !isNaN(inboxId) ? inboxId : null
       }
 
       return this.activeInboxId
