@@ -5,6 +5,7 @@
 
     <q-list bordered
             class="notes-wrapper float-right"
+            :class="[communication.direction === CommunicationDirections.INBOUND ? 'inbound-note' : '']"
             data-testid="communication-info-list"
             v-if="communication.type === CommunicationTypes.NOTE">
       <q-item>
@@ -1402,5 +1403,14 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.inbound-note {
+  background-color: #f5f5f5 !important;
+  border-color: #e0e0e0 !important;
+}
+
+.inbound-note .q-item {
+  background-color: #f5f5f5 !important;
 }
 </style>
