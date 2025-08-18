@@ -1158,7 +1158,7 @@ export default {
           }
 
           // trigger reset call if redial is required
-          if (this.shouldProcessRedial || wasForcedToDispose) {
+          if (this.dialer.currentStatus === 'WRAP_UP' && (this.shouldProcessRedial || wasForcedToDispose)) {
             this.clearWarmUpCountDown()
             this.wrapUp = false
             this.$VueEvent.fire('resetCall')
