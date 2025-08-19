@@ -72,6 +72,7 @@ export default function () {
     formIsValid: true,
     isSidebarCollapsed: undefined,
     isTeamInboxNavListCollapsed: undefined,
-    isContactDetailsCollapsed: false
+    isContactDetailsCollapsed: false,
+    contactsListSortPreference: {}
   }
 }

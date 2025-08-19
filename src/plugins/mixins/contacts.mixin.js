@@ -59,7 +59,7 @@ export default {
 
   mounted () {
     if (!this.isPowerDialer) {
-      this.loadData()
+      this.loadData(true, false, true)
     }
   },
 
@@ -93,7 +93,7 @@ export default {
 
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
 
-    init: _.debounce(function (clear = false) {
+    init: _.debounce(function (clear = false, firstLoad = false) {
       if (this.$route.name === 'Contact') {
         this.isLoadingMore = true
       }
@@ -114,7 +114,7 @@ export default {
 
       const params = typeof defaultFilters === 'string' ? {} : this.$jsonClone(defaultFilters)
 
-      this.fetch(params, true, clear)
+      this.fetch(params, true, clear, false, false, firstLoad)
 
       this.initialListFilters = defaultFilters
       this.filtersCount = this.getFiltersCount(defaultFilters)
@@ -453,7 +453,7 @@ export default {
         })
     },
 
-    fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
+    fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false, firstLoad = false) {
       let params = this.$jsonClone(data)
       const event = params?.event
 
@@ -490,25 +490,8 @@ export default {
         this.setPreviousListId(this.id)
       }
 
-      let defaultSort = _.get(params, 'sort', this.defaultContactDateFilter)
-
-      if (defaultSort.constructor !== 'Function') {
-        defaultSort = this.isPowerDialer ? 'order' : this.defaultContactDateFilter
-      }
-
-      let order = _.get(params, 'order', 'desc')
-      const emptySortOrder = this.isPowerDialer ? 'asc' : order
-
-      order = this.sorts
-        ? this.sorts.order
-        : emptySortOrder
-
-      if (hasOrder) {
-        params.sort = _.isString(this.defaultDateFilter)
-          ? this.defaultDateFilter
-          : defaultSort
-        params.order = order
-      }
+      console.log('>>> fetch firstLoad', firstLoad, 'sorts', this.sorts)
+      this.handleSortingParams(params, hasOrder, firstLoad)
 
       // add the event back
       params.event = event
@@ -535,6 +518,35 @@ export default {
 
       // contacts list contacts fetching
       this.processFetch(params, true, false, clear, isSearch)
+    },
+
+    // adjust request sorting params
+    handleSortingParams (params, hasOrder, firstLoad) {
+      if (firstLoad && this.sorts) {
+        params.sort = this.sorts.orderBy
+        params.order = this.sorts.order
+        return
+      }
+
+      let defaultSort = _.get(params, 'sort', this.defaultContactDateFilter)
+
+      if (defaultSort.constructor !== 'Function') {
+        defaultSort = this.isPowerDialer ? 'order' : this.defaultContactDateFilter
+      }
+
+      let order = _.get(params, 'order', 'desc')
+      const emptySortOrder = this.isPowerDialer ? 'asc' : order
+
+      order = this.sorts
+        ? this.sorts.order
+        : emptySortOrder
+
+      if (hasOrder) {
+        params.sort = _.isString(this.defaultDateFilter)
+          ? this.defaultDateFilter
+          : defaultSort
+        params.order = order
+      }
     },
 
     buildQueryString (params, isContactModule = true) {
@@ -987,13 +999,13 @@ export default {
         })
     },
 
-    loadData (skipCancelToken = true, clear = false) {
+    loadData (skipCancelToken = true, clear = false, firstLoad = false) {
       const isIneligibleList = !this.list || typeof this.list === 'undefined' ||
         this.list.id !== this.$route.params.id
 
       if (isIneligibleList && this.id !== 'all' && this.$route.name === 'Contacts') {
         this.getListData().then(() => {
-          this.init(clear)
+          this.init(clear, firstLoad)
         }).catch(err => {
           console.log(err)
         })
@@ -1006,7 +1018,7 @@ export default {
         this.listDataSource = this.listDataCancelToken.source()
       }
 
-      this.init(clear)
+      this.init(clear, firstLoad)
     },
 
     loadUrlFilters (filters) {
