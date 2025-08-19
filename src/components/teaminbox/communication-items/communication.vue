@@ -35,6 +35,18 @@
                   :team-inbox-id="teamInboxId"
                   :from-team-inbox="fromTeamInbox" />
       </div>
+
+      <!-- Inbox name display for "All Inboxes" view -->
+      <div v-if="shouldShowInboxName"
+           class="d-flex align-items-center mt-1"
+           data-testid="communication-inbox-name">
+        <div class="communication__inbox-name d-flex align-items-center border bg-white rounded overflow-hidden">
+          <inbox-o-icon width="15"
+                        height="15"
+                        class="flex-shrink-0 mr-1" />
+          <span class="text-muted text-truncate">{{ inboxName }}</span>
+        </div>
+      </div>
     </div>
     <div class="pr-2"
          v-if="!isLiveCall">
@@ -59,6 +71,7 @@ import ContactName from './contact-name.vue'
 import LastCommunication from './last-communication.vue'
 import LastCommunicationDate from './last-communication-date.vue'
 import PhoneNumber from './phone-number.vue'
+import InboxOIcon from 'components/icons/inbox-o-icon'
 import { avatarMixin, liveCallsMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import LiveCallControls from 'components/shared/live-call-controls'
 import { mapState } from 'vuex'
@@ -78,7 +91,8 @@ export default {
     LastCommunication,
     LastCommunicationDate,
     PhoneNumber,
-    LiveCallControls
+    LiveCallControls,
+    InboxOIcon
   },
 
   props: {
@@ -180,6 +194,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns']),
+    ...mapState('TeamInbox', ['inboxes']),
 
     communication () {
       return {
@@ -195,6 +210,21 @@ export default {
           call_waiting_ring_group_id: this.campaign ? this.campaign.call_waiting_ring_group_id : this.getCampaign(this.campaignId)?.call_waiting_ring_group_id
         }
       }
+    },
+
+    inboxName () {
+      // Only show inbox name when in "all" inboxes view
+      if (!this.isAllInboxesRoute) {
+        return null
+      }
+
+      // Find the inbox by ring_group_id
+      const inbox = this.inboxes.find(inbox => inbox.id === this.teamInboxId)
+      return inbox ? inbox.name : null
+    },
+
+    shouldShowInboxName () {
+      return this.isAllInboxesRoute && this.inboxName
     }
   },
 
@@ -230,6 +260,15 @@ export default {
 
   &.live-call-item {
     background-color: #e1ebfe;
+  }
+
+  &__inbox-name {
+    padding: 2px 5px;
+
+    span {
+      font-size: 11px;
+      line-height: 0.875em;
+    }
   }
 }
 </style>

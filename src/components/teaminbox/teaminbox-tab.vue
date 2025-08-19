@@ -53,7 +53,7 @@ import { aclMixin, TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
 import { getQueryString } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
+import { THREADED, UNTHREADED, ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
@@ -238,7 +238,13 @@ export default {
         return
       }
 
-      const queryString = getQueryString(this.$route.query)
+      // Add inboxId to query parameters when in "all" inboxes view
+      const query = { ...this.$route.query }
+      if (this.activeInboxId === ALL_INBOXES_ID) {
+        query.inboxId = item.ring_group_id
+      }
+
+      const queryString = getQueryString(query)
       this.$router.push(`${route}${queryString}`)
     },
 
@@ -491,14 +497,25 @@ export default {
       this.itemsData = sortedItems
     },
 
-    async processCommunicationInActiveInbox (communication, isNew = false) {
-      // fetch unread count for the active inbox (from the backend)
-      const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
-      const unreadCountData = unreadCount[0]
-      const isInActiveInbox = unreadCountData && unreadCountData.ring_group_id === this.activeInboxId
-      const unreadCountForContact = isInActiveInbox ? unreadCountData['unread_contact_' + communication.contact_id] : 0
-      communication.inbox_unread_count = unreadCountForContact || 0
+    async processCommunicationInAllInboxes (communication, isNew = false) {
+      if (this.viewMode === UNTHREADED) {
+        await this.handleUnthreadedCommunication(communication)
+      } else {
+        await this.handleThreadedCommunication(communication, isNew)
+      }
 
+      if (!this.activeId) {
+        return
+      }
+
+      // Emits the signal to update the unread count for the active inbox
+      const index = this.itemsData.findIndex(item => item.contact_id === this.activeId)
+      if (index >= 0) {
+        this.onItemClick(this.itemsData[index])
+      }
+    },
+
+    async processCommunicationInActiveInbox (communication, isNew = false) {
       if (this.viewMode === UNTHREADED) {
         await this.handleUnthreadedCommunication(communication)
       } else {
@@ -548,6 +565,11 @@ export default {
         communication.created_at = new Date().toISOString()
       }
 
+      if (this.isAllInboxesPage) {
+        await this.processCommunicationInAllInboxes(communication, isNew)
+        return
+      }
+
       // If the communication is in the active inbox, process it
       if (communication.ring_group_id === this.activeInboxId) {
         await this.processCommunicationInActiveInbox(communication, isNew)
@@ -570,7 +592,6 @@ export default {
     updateContactLastUsedLine (communication) {
       const { contact_id: contactId, ring_group_id: ringGroupId, campaign_id: campaignId } = communication
       const isCommunicationInProgress = this.communicationInProgress(communication)
-
       if (!contactId || !ringGroupId || !campaignId || !isCommunicationInProgress) {
         return
       }
@@ -950,6 +971,10 @@ export default {
       } else if (query.date_range === 'All Time') {
         newFilters.from_date = null
         newFilters.to_date = null
+      }
+
+      if (query.inboxes) {
+        newFilters.inboxes = query.inboxes.split(',').map(id => parseInt(id))
       }
 
       // Update active filters

@@ -9,6 +9,7 @@ import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import * as storage from 'src/plugins/helpers/storage'
 import { mapActions, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   mixins: [teamInboxPropsMixin],
@@ -630,7 +631,12 @@ export default {
       this.mapCommunicationsData()
 
       if (this.teamInbox) {
-        const key = `${this.teamInboxId}-${contactId}`
+        let inboxId = this.teamInboxId
+        if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+          inboxId = +this.$route.query.inboxId
+        }
+
+        const key = `${inboxId}-${contactId}`
 
         if (this.contactsLastUsedLines.has(key)) {
           this.selectedCampaignId = this.contactsLastUsedLines.get(key)
@@ -761,6 +767,16 @@ export default {
       // Add inbox_id when in Team Inbox context
       if (this.teamInbox && this.teamInboxId) {
         params.inbox_id = this.teamInboxId
+      }
+
+      if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+        // show communications for all inboxes user has access to
+        delete params.inbox_id
+
+        // send inbox_ids filter if applied
+        if (this.$store.state.TeamInbox.activeFilters.inboxes?.length) {
+          params.inbox_ids = this.$store.state.TeamInbox.activeFilters.inboxes.map(item => parseInt(item.id))
+        }
       }
 
       // Use Team Inbox API when in Team Inbox context

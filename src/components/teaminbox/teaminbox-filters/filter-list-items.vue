@@ -130,7 +130,6 @@ export default {
     },
 
     shouldShowFilterActions (filter) {
-      console.log('filter', filter)
       return (!filter.is_on_company || this.isAdmin) && !this.isRenaming
     }
   },

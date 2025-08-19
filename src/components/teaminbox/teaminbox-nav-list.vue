@@ -110,6 +110,8 @@ import {
   INBOX_TYPE_CONNECTED,
   INBOX_TYPE_PERSONAL,
   INBOX_TYPE_WATCHING,
+  INBOX_TYPE_ALL,
+  ALL_INBOXES_ID,
   UNTHREADED
 } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -205,7 +207,18 @@ export default {
     },
 
     typedInboxes () {
+      const allInboxes = [
+        ...this.parsedInboxes.personal,
+        ...this.parsedInboxes.connected,
+        ...this.parsedInboxes.watching
+      ]
+
       return [
+        {
+          id: INBOX_TYPE_ALL,
+          name: 'All Inboxes',
+          inboxes: allInboxes.length > 0 ? [{ id: ALL_INBOXES_ID, name: 'All Inboxes' }] : []
+        },
         {
           id: INBOX_TYPE_PERSONAL,
           name: 'Personal Inboxes',
@@ -239,17 +252,28 @@ export default {
     ]),
 
     findInboxById (id) {
+      // Handle "all" inbox as a special case
+      if (id === ALL_INBOXES_ID) {
+        return { id: ALL_INBOXES_ID, name: 'All Inboxes' }
+      }
       return this.inboxes.find(inbox => inbox.id === id)
     },
 
     determineInboxToSelect () {
       const defaultInboxId = this.getFirstInboxId()
-      const urlInboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId, 10) : null
+      const urlInboxId = this.$route.params.inboxId
       const urlContactId = this.$route.params.id ? parseInt(this.$route.params.id, 10) : null
 
-      // Check if URL has inbox ID and inbox exists
-      if (urlInboxId && this.findInboxById(urlInboxId)) {
-        return { id: urlInboxId, contactId: urlContactId, force: true }
+      // Check if URL has inbox ID and inbox exists (handle both "all" and numeric IDs)
+      if (urlInboxId) {
+        if (urlInboxId === ALL_INBOXES_ID) {
+          return { id: urlInboxId, contactId: urlContactId, force: true }
+        } else {
+          const numericInboxId = parseInt(urlInboxId, 10)
+          if (this.findInboxById(numericInboxId)) {
+            return { id: numericInboxId, contactId: urlContactId, force: true }
+          }
+        }
       }
 
       // Default to first inbox
@@ -281,23 +305,32 @@ export default {
       }
 
       if (inboxId !== this.activeInboxId) {
-        // checks if user has access to the inbox
-        if (!this.checkInboxAccess(inboxId)) {
+        // For "all" inbox, we don't need to check access since it's a virtual inbox
+        if (inboxId !== ALL_INBOXES_ID && !this.checkInboxAccess(inboxId)) {
           this.$generalNotification('You don\'t have access to this inbox.', 'error')
           this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
 
           return
         }
 
-        this.setActiveInboxId(parseInt(inboxId))
+        // Set the active inbox ID - for "all" use the string, for others use integer
+        this.setActiveInboxId(inboxId === ALL_INBOXES_ID ? inboxId : parseInt(inboxId))
       }
 
       this.resetItems()
       // Pass current filters and sorting
-      const filters = this.$store.state.TeamInbox.activeFilters || {}
+      const filters = { ...(this.$store.state.TeamInbox.activeFilters || {}) }
+      // inboxes filter only applies to All Inboxes
+      if (inboxId !== ALL_INBOXES_ID) {
+        delete filters.inboxes
+      }
       const sort = this.$store.state.TeamInbox.activeSort || {}
       const search = this.$store.state.TeamInbox.currentSearch || null
       this.fetchItems(inboxId, search, filters, sort)
+
+      if (this.$route.query.inboxId) {
+        delete this.$route.query.inboxId
+      }
 
       const queryString = getQueryString(this.$route.query)
       const contactRouteId = contactId ? `/contacts/${contactId}/communications` : ''
@@ -341,6 +374,17 @@ export default {
     getFirstInboxId () {
       if (this.isMobile || !this.inboxes.length) {
         return null
+      }
+
+      // If user has any inboxes, prioritize "All Inboxes" as the first option
+      const allInboxes = [
+        ...this.parsedInboxes.personal,
+        ...this.parsedInboxes.connected,
+        ...this.parsedInboxes.watching
+      ]
+
+      if (allInboxes.length > 0) {
+        return ALL_INBOXES_ID
       }
 
       return this.parsedInboxes.personal.length ? this.parsedInboxes.personal[0]?.id : this.inboxes[0]?.id
@@ -441,7 +485,12 @@ export default {
         return
       }
 
-      this.fetchInboxesUnreadCount(inboxIds)
+      // Filter out the "all" inbox ID since it's virtual
+      const realInboxIds = inboxIds.filter(id => id !== ALL_INBOXES_ID)
+
+      if (realInboxIds.length > 0) {
+        this.fetchInboxesUnreadCount(realInboxIds)
+      }
     }
   },
 

@@ -1,7 +1,8 @@
 <template>
   <div class="teaminbox-nav-type"
        v-if="typedInboxes.length">
-    <div class="teaminbox-nav-type__label">
+    <div class="teaminbox-nav-type__label"
+         v-if="!isAllInboxesType">
       {{ label }}
     </div>
 
@@ -23,6 +24,7 @@
 <script>
 import TeamInboxNavItem from './teaminbox-nav-item.vue'
 import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   components: {
@@ -46,14 +48,20 @@ export default {
     },
 
     activeInboxId: {
-      type: Number,
+      type: [String, Number],
       required: false
     }
   },
 
   mixins: [
     TeamInboxMixin
-  ]
+  ],
+
+  computed: {
+    isAllInboxesType () {
+      return this.type === ALL_INBOXES_ID
+    }
+  }
 }
 </script>
 

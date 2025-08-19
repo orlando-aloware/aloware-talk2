@@ -5,6 +5,8 @@ export const UNTHREADED = 2
 export const INBOX_TYPE_PERSONAL = 'personal'
 export const INBOX_TYPE_CONNECTED = 'connected'
 export const INBOX_TYPE_WATCHING = 'watching'
+export const INBOX_TYPE_ALL = 'all'
+export const ALL_INBOXES_ID = 'all'
 export const SEARCH_FIELDS = ['lead_number', 'contact.name', 'campaign.name']
 export const DEFAULT_FILTERS = {
   channels: [],
@@ -16,7 +18,8 @@ export const DEFAULT_FILTERS = {
   mention: false,
   date_range: 'Last 30 Days',
   from_date: moment().subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
-  to_date: moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
+  to_date: moment().endOf('day').format('YYYY-MM-DD HH:mm:ss'),
+  inboxes: []
 }
 
 export default function () {
