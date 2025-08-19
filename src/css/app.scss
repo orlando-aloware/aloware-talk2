@@ -11481,12 +11481,15 @@ screen and (max-width: 956px) {
 .notes-wrapper {
   border-radius: 12px;
   padding: 14px;
-  background: linear-gradient(0deg, $blue-70, $blue-70);
-  border: 1px solid rgba(47, 128, 237, 0.25);
 
   .q-item {
     padding: 0 !important;
     min-height: 10px !important;
+  }
+
+  &:not(.inbound-note) {
+    background: linear-gradient(0deg, $blue-70, $blue-70);
+    border: 1px solid rgba(47, 128, 237, 0.25);
   }
 }
 
