@@ -1,12 +1,13 @@
 <template>
   <q-btn
+    :to="contactUrl"
     color="primary"
     data-testid="contact-info-redirect-link"
     dense
     flat
     round
     size="md"
-    @click="navigateToContact"
+    class="text-decoration-none"
   >
     <q-tooltip
       v-if="!isMobile"
@@ -39,13 +40,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(['isMobile'])
-  },
-  methods: {
-    navigateToContact () {
-      if (this.contact?.id) {
-        this.$router.push(`/contacts/${this.contact.id}`)
-      }
+    ...mapState(['isMobile']),
+
+    contactUrl () {
+      return this.contact?.id ? `/contacts/${this.contact.id}` : '#'
     }
   }
 }
