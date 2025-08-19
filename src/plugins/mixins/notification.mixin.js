@@ -342,7 +342,7 @@ export default {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
           console.log('processActionNotification - params.data', params.data)
 
-          if (this.isOnPowerDialerSessionRoute && ringGroup?.experimental_fishing_mode_repeat_call_routing) {
+          if (this.isOnPowerDialerSessionRoute && (ringGroup?.experimental_fishing_mode_repeat_call_routing || ringGroup?.fishing_mode)) {
             const contactWithCommunication = {
               ...params.data.contact,
               'communication_id': params.data.communicationId
