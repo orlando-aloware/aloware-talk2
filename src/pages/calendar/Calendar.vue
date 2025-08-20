@@ -144,10 +144,8 @@
           </scheduler>
         </div>
       </div>
-      <manager ref="manager"
-               @render-schedule="renderSchedule"
-               @close-filters-menu="closeEventModal">
-      </manager>
+      <appointment-form-modal :contact="contact">
+      </appointment-form-modal>
     </div>
 
     <calendar-event-list :is-mobile="isMobile"
@@ -164,12 +162,12 @@
 </template>
 
 <script>
-import _ from 'lodash'
+
 import CalendarIcon from '../../components/icons/calendar-icon.vue'
 import DateSelector from '../../components/date-selector.vue'
 import Filters from '../../components/calendar/calendar-filters.vue'
 import Helper from '../../components/calendar/calendar-helper.vue'
-import Manager from '../../components/calendar/calendar-event-manager.vue'
+import AppointmentFormModal from '../../components/appointments/appointment-form-modal.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
 import CalendarEventList from 'components/calendar/calendar-event-list.vue'
 import moment from 'moment'
@@ -190,7 +188,7 @@ export default {
     DateSelector,
     Filters,
     Helper,
-    Manager,
+    AppointmentFormModal,
     Scheduler,
     CalendarEventList
   },
@@ -245,6 +243,10 @@ export default {
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState(['isMobile']),
+
+    contact () {
+      return this.events.length > 0 && this.events[0].contact ? this.events[0].contact : {}
+    },
 
     currentDate () {
       let d = ''
@@ -363,7 +365,9 @@ export default {
     },
 
     editSchedule (event) {
-      this.$refs.manager.editSchedule(event)
+      // The appointment-form-modal doesn't have editSchedule method
+      // Using addAppointmentOpen from vuex instead
+      this.$store.dispatch('contacts/addAppointmentOpen', true)
     },
 
     addSchedule (date) {
@@ -372,7 +376,7 @@ export default {
         return
       }
 
-      this.$refs.manager.addSchedule(date)
+      this.$store.dispatch('contacts/addAppointmentOpen', true)
     },
 
     loadCalendarData (state) {
@@ -513,38 +517,9 @@ export default {
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
     },
 
-    renderSchedule (engagement) {
-      let data = _.cloneDeep(engagement.data)
-      let action = engagement.action
-
-      if (action === 'add') {
-        this.events.push(data)
-      }
-
-      if (action === 'update') {
-        let index = this.events.findIndex(ev => ev.id === data.id)
-
-        if (index > -1) {
-          this.events.splice(index, 1, data)
-        }
-      }
-
-      if (action === 'delete') {
-        let index = this.events.findIndex(ev => ev.id === data.id)
-
-        if (index > -1) {
-          this.events.splice(index, 1)
-
-          // remove the event directly from the scheduler
-          this.$refs.scheduler.deleteEvent(data.id)
-        }
-      }
-
-      if (this.isShowingEventEditModal) {
-        this.isShowingEventEditModal = false
-        this.isEventsModalOpen = true
-      }
-
+    // appointment-form-modal doesn't emit render-schedule events
+    // This method is kept as a placeholder for future implementation
+    renderSchedule () {
       this.$refs.scheduler.customParse(this.eventsConvertedToTheRightTimezone)
     },
 
@@ -647,6 +622,9 @@ export default {
     },
 
     closeEventModal () {
+      // Using the contacts/addAppointmentOpen action to close the modal
+      this.$store.dispatch('contacts/addAppointmentOpen', false)
+
       if (this.isShowingEventEditModal) {
         this.isShowingEventEditModal = false
         this.isEventsModalOpen = true
