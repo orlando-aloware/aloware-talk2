@@ -23,10 +23,17 @@
            v-if="mode === 'edit'">
         </i>
         {{ title }}
+        <span v-if="mode === 'edit' && schedule.is_past" class="ml-2 badge badge-secondary">Past Event</span>
       </h6>
     </template>
     <b-form class="p-3"
             ref="scheduleForm">
+      <b-alert v-if="mode === 'edit' && schedule.is_past"
+               variant="warning"
+               show>
+        <i class="fa fa-clock mr-2"></i>
+        This is a past event. Some fields may be disabled for editing.
+      </b-alert>
       <b-row>
         <b-col>
           <b-form-group class="form-label"
@@ -297,17 +304,28 @@
       <div class="mt-2 d-flex w-100">
         <button class="btn btn-sm bg-danger text-white"
                 v-if="isDeletable"
+                :disabled="isProcessingDelete"
                 @click="deleteSchedule(schedule.id)">
-          Remove
+          <q-spinner-bars v-if="isProcessingDelete"
+                          class="mr-1"
+                          color="white"
+                          size="14px" />
+          {{ isProcessingDelete ? 'Removing...' : 'Remove' }}
         </button>
         <div class="ml-auto">
             <button class="btn btn-sm btn-outline-dark mr-2"
+                    :disabled="isProcessingSave"
                     @click.prevent="onCancelClicked">
               Cancel
             </button>
             <button class="btn btn-sm bg-primary text-white"
+                    :disabled="isProcessingSave"
                     @click.prevent="saveSchedule">
-              Save Event
+              <q-spinner-bars v-if="isProcessingSave"
+                          class="mr-1"
+                          color="white"
+                          size="14px" />
+              {{ isProcessingSave ? 'Saving...' : 'Save Event' }}
             </button>
         </div>
       </div>
@@ -431,6 +449,8 @@ export default {
         send_contact_reminder: false
       },
       originalSchedule: {},
+      isProcessingDelete: false,
+      isProcessingSave: false,
       // not defined as camelCase because its used directly in API
       sms_reminder_fields: {
         enabled: true,
@@ -670,6 +690,7 @@ export default {
         .then(value => {
           if (value) {
             this.loading = true
+            this.isProcessingDelete = true
 
             this.$axios.delete(`/api/v1/calendar/events/contact/${this.schedule.contact.id}/${scheduleId}`).then(r => {
               this.$emit('render-schedule', {
@@ -677,11 +698,13 @@ export default {
                 action: 'delete'
               })
               this.loading = false
+              this.isProcessingDelete = false
               this.showManager = false
 
               this.$generalNotification('Event removed.')
             }).catch(err => {
               this.loading = false
+              this.isProcessingDelete = false
               this.showManager = false
               console.log(err)
             })
@@ -701,6 +724,7 @@ export default {
       if (this.mode === 'add') {
         if (contactId !== null && this.schedule.type !== null) {
           this.loading = true
+          this.isProcessingSave = true
 
           // If event type is APPOINTMENT and sms reminder option is enabled
           // - include sms reminder option
@@ -714,6 +738,7 @@ export default {
 
           this.$axios.post(`/api/v1/calendar/events/contact/${contactId}/create`, postData).then(res => {
             this.loading = false
+            this.isProcessingSave = false
 
             this.$emit('render-schedule', {
               data: res.data,
@@ -725,12 +750,14 @@ export default {
             this.$generalNotification('Event added.')
           }).catch(err => {
             this.loading = false
+            this.isProcessingSave = false
             this.$handleErrors(err.response)
           })
         }
       } else {
         if (contactId != null && eventId != null) {
           this.loading = true
+          this.isProcessingSave = true
 
           if (this.isAppointment && this.sms_reminder_fields.enabled) {
             this.schedule.sms_reminder = this.sms_reminder_fields
@@ -743,6 +770,7 @@ export default {
 
           this.$axios.post(`/api/v1/calendar/events/contact/${contactId}/update/${eventId}`, postData).then(res => {
             this.loading = false
+            this.isProcessingSave = false
 
             this.$emit('render-schedule', {
               data: res.data,
@@ -754,6 +782,7 @@ export default {
             this.$generalNotification('Event updated.')
           }).catch(err => {
             this.loading = false
+            this.isProcessingSave = false
             this.$handleErrors(err.response)
           })
         }
