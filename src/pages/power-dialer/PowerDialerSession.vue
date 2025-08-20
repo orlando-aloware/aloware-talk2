@@ -60,7 +60,7 @@
         <div>Preparing session...</div>
       </div>
     </template>
-    <appointment-form-modal :contact="contact">
+    <appointment-form-modal :contact="contact" :key="contact.id">
     </appointment-form-modal>
     <contact-add-reminder-modal/>
   </b-overlay>
