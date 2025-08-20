@@ -442,7 +442,7 @@ export default {
         disposition_status2: null,
         is_past: true,
         text: '',
-        timezone: this.profile?.timezone || this.profile?.company?.timezone || '',
+        timezone: this.profile?.timezone || this.profile?.company?.timezone,
         date: moment().format(DATE_FORMAT),
         time: DEFAULT_HOUR,
         type: null,
@@ -666,7 +666,7 @@ export default {
         status: CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW,
         body: '',
         date_time: 1,
-        timezone: timezone || this.profile?.company?.timezone || ''
+        timezone: timezone || this.profile?.company?.timezone
       }
 
       this.schedule = _.clone(this.originalSchedule)
