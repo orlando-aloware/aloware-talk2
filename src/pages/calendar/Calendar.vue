@@ -164,7 +164,7 @@
 </template>
 
 <script>
-
+import _ from 'lodash'
 import CalendarIcon from '../../components/icons/calendar-icon.vue'
 import DateSelector from '../../components/date-selector.vue'
 import Filters from '../../components/calendar/calendar-filters.vue'
@@ -514,7 +514,7 @@ export default {
     },
 
     renderSchedule (engagement) {
-      let data = engagement.data
+      let data = _.cloneDeep(engagement.data)
       let action = engagement.action
 
       if (action === 'add') {
