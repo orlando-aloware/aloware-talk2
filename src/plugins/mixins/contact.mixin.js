@@ -779,7 +779,7 @@ export default {
 
         // send inbox_ids filter if applied
         if (this.$store.state.TeamInbox.activeFilters.inboxes?.length) {
-          params.inbox_ids = this.$store.state.TeamInbox.activeFilters.inboxes.map(item => parseInt(item.id))
+          params.inbox_ids = this.$store.state.TeamInbox.activeFilters.inboxes.map(inboxId => parseInt(inboxId))
         }
       }
 

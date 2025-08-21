@@ -269,6 +269,10 @@ export default {
         return
       }
 
+      // clear selected contact when changing filters
+      const viewMode = this.viewMode === UNTHREADED ? 'Unthreaded' : 'Threaded'
+      this.$router.push(`/team-inboxes/${this.activeInboxId}?viewMode=${viewMode}`).catch(() => {})
+
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
     },
 
