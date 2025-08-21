@@ -404,9 +404,19 @@ export default {
       return `${communication.id}`
     },
 
-    async getUnreadCount (ringGroupId, contactId) {
-      const response = await talk2TeamInboxApi.inboxes.unreadCount([ringGroupId], [contactId])
-      return response.data.find(item => item.ring_group_id === ringGroupId && item.contact_id === contactId)?.unread_count || 0
+    async getUnreadCount (ringGroupIds, contactId) {
+      const response = await talk2TeamInboxApi.inboxes.unreadCount(ringGroupIds, [contactId])
+
+      let unreadCount = 0
+
+      // sum up the unread counts for the ring groups
+      response.data.forEach(item => {
+        if (item.contact_id === contactId && ringGroupIds.includes(item.ring_group_id)) {
+          unreadCount += item.unread_count
+        }
+      })
+
+      return unreadCount
     },
 
     async handleThreadedCommunication (communication, isNew = false) {
@@ -437,19 +447,19 @@ export default {
         return
       }
 
-      // Update the communication in the list, by removing it first, then adding it back in the same position
-      this.itemsData.splice(index, 1)
-      this.itemsData.splice(index, 0, communication)
+      const currentCommunication = this.itemsData[index]
 
       if (isNew) {
-        // Remove the communication from the list
-        this.itemsData.splice(index, 1)
-
         if (isAscendingOrder) {
           this.itemsData.push(communication)
         } else {
           this.itemsData.unshift(communication)
         }
+      } else if (communication.id >= currentCommunication.id) {
+        // We just want to update the latest communication of the grouped contact
+        // if the existing communication was updated or it is a new one
+        this.itemsData.splice(index, 1)
+        this.itemsData.splice(index, 0, communication)
       }
 
       this.sortItems()
@@ -461,7 +471,7 @@ export default {
       // First, group calls by their position in the list
       const groupedItems = {}
 
-      this.itemsData.forEach((item, index) => {
+      this.itemsData.forEach((item) => {
         const key = this.getGroupKey(item)
         groupedItems[key] = item
       })
@@ -498,6 +508,13 @@ export default {
     },
 
     async processCommunicationInAllInboxes (communication, isNew = false) {
+      const unreadCount = await this.fetchInboxesUnreadCount(this.inboxes.map(inbox => inbox.id), [communication.contact_id])
+      let unreadCountForContact = 0
+      unreadCount.forEach((item) => {
+        unreadCountForContact += item['unread_contact_' + communication.contact_id] ?? 0
+      })
+      communication.inbox_unread_count = unreadCountForContact || 0
+
       if (this.viewMode === UNTHREADED) {
         await this.handleUnthreadedCommunication(communication)
       } else {
@@ -516,6 +533,14 @@ export default {
     },
 
     async processCommunicationInActiveInbox (communication, isNew = false) {
+      const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
+      const unreadCountData = unreadCount[0]
+      const isInActiveInbox = unreadCountData && unreadCountData.ring_group_id === this.activeInboxId
+      const unreadCountForContact = isInActiveInbox
+        ? unreadCountData['unread_contact_' + communication.contact_id]
+        : 0
+      communication.inbox_unread_count = unreadCountForContact || 0
+
       if (this.viewMode === UNTHREADED) {
         await this.handleUnthreadedCommunication(communication)
       } else {
@@ -533,7 +558,7 @@ export default {
       }
     },
 
-    async processCommunicationInOtherInbox (communication, isNew = false) {
+    async processCommunicationInOtherInbox (communication) {
       const index = this.inboxes.findIndex(inbox => inbox.id === communication.ring_group_id)
 
       if (index === -1) {
@@ -565,7 +590,7 @@ export default {
         communication.created_at = new Date().toISOString()
       }
 
-      if (this.isAllInboxesPage) {
+      if (this.isAllInboxesRoute) {
         await this.processCommunicationInAllInboxes(communication, isNew)
         return
       }
@@ -577,7 +602,7 @@ export default {
       }
 
       // If the communication is not in the active inbox, process it
-      await this.processCommunicationInOtherInbox(communication, isNew)
+      await this.processCommunicationInOtherInbox(communication)
     },
 
     async newCommunicationListener (communication) {
@@ -790,12 +815,19 @@ export default {
         return
       }
 
+      let inboxIds = []
+      if (this.isAllInboxesRoute) {
+        inboxIds = this.inboxes.map(inbox => inbox.id)
+      } else {
+        inboxIds = [this.activeInboxId]
+      }
+
       // update the unread count for the contact
-      const unreadCount = await this.getUnreadCount(this.activeInboxId, this.activeId)
+      const unreadCount = await this.getUnreadCount(inboxIds, this.activeId)
       item.inbox_unread_count = unreadCount
 
       // fetch unread count for the active inbox (from the backend)
-      await this.fetchInboxesUnreadCount([this.activeInboxId])
+      await this.fetchInboxesUnreadCount(inboxIds)
 
       // Update all communications from this contact in the unthreaded view
       if (this.viewMode === UNTHREADED) {
