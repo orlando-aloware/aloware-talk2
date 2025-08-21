@@ -36,6 +36,10 @@ export default {
         'Last Month': [this.$moment.tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), this.$moment.tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
         'All Time': [null, null]
       }
+    },
+
+    isAllInboxesRoute () {
+      return this.$route.params.inboxId === ALL_INBOXES_ID
     }
   },
 
@@ -248,9 +252,7 @@ export default {
       }
 
       const params = {
-        ...(inboxId !== ALL_INBOXES_ID ? {
-          inbox_id: inboxId
-        } : {}),
+        inbox_id: inboxId,
         page: nextPage,
         per_page: 50,
         inbox_type: this.viewMode === THREADED ? 'threaded' : 'unthreaded',
@@ -259,6 +261,11 @@ export default {
           search_fields: SEARCH_FIELDS
         } : {}),
         ...apiFilters
+      }
+
+      if (inboxId === ALL_INBOXES_ID) {
+        delete params.inbox_id
+        params.all_inboxes = true
       }
 
       const config = {

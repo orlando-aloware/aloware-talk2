@@ -218,6 +218,10 @@ export default {
       }
 
       return Boolean(this.contact.is_read_only) || false
+    },
+
+    isAllInboxesRoute () {
+      return this.$route.params.inboxId === ALL_INBOXES_ID
     }
   },
 
@@ -632,7 +636,7 @@ export default {
 
       if (this.teamInbox) {
         let inboxId = this.teamInboxId
-        if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+        if (this.isAllInboxesRoute) {
           inboxId = +this.$route.query.inboxId
         }
 
@@ -769,13 +773,13 @@ export default {
         params.inbox_id = this.teamInboxId
       }
 
-      if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+      if (this.isAllInboxesRoute) {
         // show communications for all inboxes user has access to
         delete params.inbox_id
 
         // send inbox_ids filter if applied
         if (this.$store.state.TeamInbox.activeFilters.inboxes?.length) {
-          params.inbox_ids = this.$store.state.TeamInbox.activeFilters.inboxes.map(item => parseInt(item.id))
+          params.inbox_ids = this.$store.state.TeamInbox.activeFilters.inboxes.map(inboxId => parseInt(inboxId))
         }
       }
 
@@ -924,7 +928,9 @@ export default {
 
         const params = {}
 
-        if (this.teamInbox) {
+        if (this.isAllInboxesRoute) {
+          params.all_inboxes = true
+        } else if (this.teamInbox && this.teamInboxId) {
           params.ring_group_id = this.teamInboxId
         }
 
