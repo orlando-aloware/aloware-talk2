@@ -450,14 +450,11 @@ export default {
       const currentCommunication = this.itemsData[index]
 
       if (isNew) {
-        if (isAscendingOrder) {
-          this.itemsData.push(communication)
-        } else {
-          this.itemsData.unshift(communication)
-        }
+        const insertIndex = isAscendingOrder ? 0 : this.itemsData.length
+        this.itemsData.splice(insertIndex, 0, communication)
       } else if (communication.id >= currentCommunication.id) {
         // We just want to update the latest communication of the grouped contact
-        // if the existing communication was updated or it is a new one
+        // if the currentCommunication was updated or it is a new one
         this.itemsData.splice(index, 1)
         this.itemsData.splice(index, 0, communication)
       } else {
