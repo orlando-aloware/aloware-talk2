@@ -355,10 +355,6 @@ export default {
 
       // checks if communication matches user communication visibility
       if (this.profile.communications_visibility === CommunicationAccessTypes.COMMUNICATIONS_OWNED_ONLY) {
-        if (communication.direction === CommunicationDirections.INBOUND && teamInbox) {
-          return true
-        }
-
         if (
           communication.user_id &&
           communication.user_id !== this.profile.id
