@@ -460,6 +460,11 @@ export default {
         // if the existing communication was updated or it is a new one
         this.itemsData.splice(index, 1)
         this.itemsData.splice(index, 0, communication)
+      } else {
+        // if an older communication is updated, update unread count
+        currentCommunication.inbox_unread_count = communication.inbox_unread_count
+        this.itemsData.splice(index, 1)
+        this.itemsData.splice(index, 0, currentCommunication)
       }
 
       this.sortItems()
