@@ -381,6 +381,14 @@ export default {
     isReadOnly: {
       type: Boolean,
       default: false
+    },
+    fromTeamInbox: {
+      type: Boolean,
+      default: false
+    },
+    teamInboxId: {
+      type: Number,
+      default: null
     }
   },
 
@@ -450,10 +458,14 @@ export default {
 
   methods: {
     getData (force = false) {
+      const params = { force }
+
+      if (this.fromTeamInbox) {
+        params.ring_group_id = this.teamInboxId
+      }
+
       return talk2Api.V2.contact.getConversationSummary(this.contact.id, {
-        params: {
-          force
-        }
+        params
       }).then(response => {
         this.insights = response.data
         // Filter out key_topics that are objects or empty
@@ -681,10 +693,14 @@ export default {
       this.scrollToBottom() // Scroll to show loading message
 
       try {
+        const params = { question }
+
+        if (this.fromTeamInbox) {
+          params.ring_group_id = this.teamInboxId
+        }
+
         const response = await talk2Api.V2.contact.askQuestion(this.contact.id, {
-          params: {
-            question
-          }
+          params
         })
 
         // Process the response - handle both array and string cases
