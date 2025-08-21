@@ -221,7 +221,6 @@
                         :state="validateState('campaign_id', 'sms_reminder_fields')">
             <contact-line-selector :show-paused="false"
                                    :use-groups="false"
-                                   preselect-first
                                    v-model="$v.sms_reminder_fields.campaign_id.$model"
                                    @select="lineSelected"
                                    @loaded="onLineComponentLoaded">
