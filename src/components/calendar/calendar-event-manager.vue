@@ -223,7 +223,8 @@
                                    :use-groups="false"
                                    preselect-first
                                    v-model="$v.sms_reminder_fields.campaign_id.$model"
-                                   @select="lineSelected">
+                                   @select="lineSelected"
+                                   @loaded="onLineComponentLoaded">
             </contact-line-selector>
           </b-form-group>
 
@@ -1208,6 +1209,15 @@ export default {
     onSmsReminderToggle (enabled) {
       // Save user's preference for future form opens
       this.userSmsReminderPreference = enabled
+    },
+
+    onLineComponentLoaded (lines) {
+      // When the line selector loads and preselects the first item,
+      // ensure that our data model is updated to match the displayed selection
+      if (lines && lines.length > 0 && !this.sms_reminder_fields.campaign_id) {
+        // Update the campaign_id to match what's visually displayed as selected
+        this.sms_reminder_fields.campaign_id = lines[0].id
+      }
     }
   },
 
@@ -1219,5 +1229,4 @@ export default {
     }
   }
 }
-
 </script>
