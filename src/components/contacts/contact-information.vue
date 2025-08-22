@@ -1,6 +1,19 @@
 <template>
   <b-card class="border-0 position-relative contact-about-wrapper" data-testid="contact-information-wrapper">
-    <h4 v-if="hasExpanded" data-testid="contact-information-has-expanded">About this contact</h4>
+    <div v-if="hasExpanded" class="d-flex justify-content-between align-items-center">
+      <h4 class="mb-0" data-testid="contact-information-has-expanded">About this contact</h4>
+      <b-link :to="SettingsMap.contact_customization.route"
+              class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center">
+          <q-tooltip anchor="top middle"
+                     self="bottom middle"
+                     :offset="[0, 16]">
+           Customize contact fields
+         </q-tooltip>
+        <setting-icon width="16"
+                      height="16"
+                      class="search-icon" />
+      </b-link>
+    </div>
 
     <div :class="`information-container ${autoHeightClass}`">
       <div class="w-100 mt-2"
@@ -237,6 +250,8 @@ import DatePickerSelector from 'components/generic-selectors/date-picker-selecto
 import LineSelector from 'components/generic-selectors/line-selector'
 import ContactAttributes from 'components/contacts/contact-attributes/contact-attributes'
 import LeadSourceSelector from 'components/generic-selectors/lead-source-selector.vue'
+import SettingIcon from 'components/icons/setting-o-icon'
+import SettingsMap from 'components/settings/settings-map'
 
 export default {
   name: 'contact-information',
@@ -267,11 +282,16 @@ export default {
     LocationCountrySelector,
     LocationStateSelector,
     LineSelector,
-    LeadSourceSelector
+    LeadSourceSelector,
+    SettingIcon
   },
 
   computed: {
     ...mapGetters('contacts', ['contact', 'contactAttributes']),
+
+    SettingsMap () {
+      return SettingsMap
+    },
 
     autoHeightClass () {
       return this.expanded ? 'auto-height' : 'overflow-hidden'
