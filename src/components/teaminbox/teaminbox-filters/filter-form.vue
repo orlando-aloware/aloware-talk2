@@ -261,11 +261,10 @@ export default {
 
     parsedTeamInboxId () {
       if (this.$route.params.inboxId === ALL_INBOXES_ID) {
-        const inboxId = +this.$route.query.inboxId
-        return !isNaN(inboxId) ? inboxId : null
+        return null
       }
 
-      return this.teamInboxId
+      return this.activeInboxId
     },
 
     isAllInboxesRoute () {
