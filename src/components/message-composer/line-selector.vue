@@ -141,8 +141,6 @@ export default {
     },
 
     formattedLineOptions () {
-      console.log('>>> formattedLineOptions/this.contactCampaignsFromCommunications', this.contactCampaignsFromCommunications)
-
       const contactLines = { data: [] }
       if (this.contactCampaignsFromCommunications.length > 0) {
         contactLines.data = [...this.contactCampaignsFromCommunications.filter(item => item.active === true)]
