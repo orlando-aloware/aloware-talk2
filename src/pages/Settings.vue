@@ -25,6 +25,8 @@
                           v-if="$route.params.tab === 'inbound-call' && !isLoading"/>
             <outbound-call :user="user"
                            v-if="$route.params.tab === 'outbound-call' && !isLoading"/>
+            <contact-customization :user="user"
+                                   v-if="$route.params.tab === 'contact' && !isLoading"/>
             <diagnosis :user="user"
                        v-if="$route.params.tab === 'diagnosis' && !isLoading"/>
             <connection-test :user="user"
@@ -51,6 +53,7 @@ import Personalization from 'components/settings/personalization'
 import Visibility from 'components/settings/visibility'
 import InboundCall from 'components/settings/inbound-call'
 import OutboundCall from 'components/settings/outbound-call'
+import ContactCustomization from 'components/settings/contact-customization'
 import Diagnosis from 'components/settings/diagnosis'
 import ConnectionTest from 'components/settings/connection-test'
 import SmsTemplates from 'components/settings/sms-templates'
@@ -74,7 +77,8 @@ export default {
     NotificationSettings,
     Profile,
     GeneralInformation,
-    SettingsSide
+    SettingsSide,
+    ContactCustomization
   },
 
   computed: {
