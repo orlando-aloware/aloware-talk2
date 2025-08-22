@@ -1,17 +1,17 @@
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import { mapFields } from 'vuex-map-fields'
-import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
-import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { ALL_COLUMNS } from 'src/constants/contacts-columns'
-import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
-import qs from 'qs'
 import _ from 'lodash'
+import moment from 'moment'
+import qs from 'qs'
+import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
+import { ALL_COLUMNS } from 'src/constants/contacts-columns'
+import { DEFAULT_STATE } from 'src/constants/contacts-default'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { RELATIONS } from 'src/constants/contacts-list-relations'
-import moment from 'moment'
-import { DEFAULT_STATE } from 'src/constants/contacts-default'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { OPERATORS } from 'src/constants/contacts-filter-operators'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   data () {
@@ -426,6 +426,7 @@ export default {
         })
         .catch((err) => {
           if (this.$axios.isCancel(err)) {
+            console.log('Request canceled', err.message)
             this.removeAxiosUniqueId(axiosUniqueId)
           }
 
