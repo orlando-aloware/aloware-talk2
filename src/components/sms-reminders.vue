@@ -31,7 +31,7 @@
               hide-bottom-space
               :show-all-lines="!activeInboxId"
               :line-count.sync="lineCount"
-              :pre-selected-team-inbox-line-id="campaignId"
+              :pre-selected-team-inbox-line-id="selectedLineId || campaignId"
               :generic-multiselect="false"
               :use-only-actives="true"
               @change="onLineChange"
@@ -65,7 +65,7 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import LineSelector from 'components/generic-selectors/line-selector'
 
 export default {
@@ -106,7 +106,8 @@ export default {
 
   computed: {
     ...mapState(['campaigns']),
-    ...mapState('TeamInbox', ['activeInboxId'])
+    ...mapState('TeamInbox', ['activeInboxId']),
+    ...mapGetters('contacts', ['selectedLineId'])
   },
 
   methods: {
@@ -114,7 +115,7 @@ export default {
       setTimeout(() => {
         if (this.showLineSelectorPopup && this.lineCount === 0) {
           // If the line popup should be shown but no lines are available,
-          // force the creation of the SMS reminder with the saved campaign ID
+          // force the creation of the SMS reminder with the line selected in the appointment
           // (even if the line is not available in the current inbox)
           // 1ms delay to ensure the lineCount sync is complete
           this.showLineSelectorPopup = false
@@ -124,21 +125,24 @@ export default {
     },
 
     onClickSendSmsReminder () {
-      // Always show the line selector popup when the button is clicked
-      this.showLineSelectorPopup = !this.showLineSelectorPopup
-
-      // If the popup is being shown, pre-select the saved campaign ID
-      if (this.showLineSelectorPopup && this.campaignId) {
-        this.selectedId = this.campaignId
+      if (!this.campaignId) {
+        // Show line selector popup if no line is selected
+        this.showLineSelectorPopup = !this.showLineSelectorPopup
+        return this.checkShouldForceSendSmsReminder()
       }
 
-      // Check if we should force send (when no lines are available)
-      return this.checkShouldForceSendSmsReminder()
+      if (this.selectedLineId !== this.campaignId) {
+        // Show line selector popup if the selected line in the message composer
+        // is different from the one selected in the appointment
+        this.showLineSelectorPopup = !this.showLineSelectorPopup
+        return this.checkShouldForceSendSmsReminder()
+      }
+
+      this.createSmsReminder()
     },
 
     createSmsReminder () {
-      // Only use the selected ID from the line selector
-      const campaignId = this.selectedId
+      const campaignId = this.selectedId || this.campaignId
 
       this.loading = true
       this.showLineSelectorPopup = false
