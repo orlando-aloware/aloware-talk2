@@ -6,11 +6,11 @@
                    :id="`comm-attempt-${_uid}`"
                    :key="index"
                    target="_blank"
-                   @click.native="handleUserClick($event, userId)"
-                   :to="{ path: getUserActivityURL(userId) }"
-                   v-for="(userId, index) in row[prop]">
+                   @click.native="handleUserClick($event, user.id ?? user)"
+                   :to="{ path: getUserActivityURL(user.id ?? user) }"
+                   v-for="(user, index) in row[prop]">
         <external-link-icon color="#1976D2"/>
-        <user-display :user-id="userId" />
+        <user-display :user="getUser(user)" :user-id="getUserId(user)"/>
         <b-tooltip custom-class="talk-table__tooltip"
                    :target="`comm-attempt-${_uid}`">
           Click to go to user's page
@@ -21,8 +21,8 @@
     <div v-else-if="row[prop]?.length">
       <span class="text-blue cursor-pointer ellipse"
             :key="index"
-            v-for="(userId, index) in row[prop]">
-        <user-display :user-id="userId" />
+            v-for="(user, index) in row[prop]">
+        <user-display :user="getUser(user)" :user-id="getUserId(user)"/>
       </span>
     </div>
 
@@ -63,7 +63,7 @@ export default {
       type: String,
       required: true,
       validator (value) {
-        return ['transfer_prior_user_ids', 'transfer_target_user_ids'].includes(value)
+        return ['transfer_prior_user_ids', 'transfer_target_user_ids', 'transfer_target_users'].includes(value)
       }
     }
   },
@@ -73,6 +73,14 @@ export default {
       const url = this.getUserActivityURL(userId)
       // Only handle navigation in Electron, let browser handle it normally
       this.handleElectronNavigation(e, url)
+    },
+
+    getUser (user) {
+      return user.constructor === Object ? user : null
+    },
+
+    getUserId (user) {
+      return user.constructor !== Object ? user : null
     }
   }
 }

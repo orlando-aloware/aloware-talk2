@@ -191,7 +191,7 @@
                   :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'transfer_target_user_ids'">
-                <transferred prop="transfer_target_user_ids"
+                <transferred prop="transfer_target_users"
                              :row="row" />
               </td>
 
