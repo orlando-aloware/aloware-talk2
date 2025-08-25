@@ -179,6 +179,12 @@ export default {
       }
     }
 
+    this.dialerListeners.updateRecordingStatus = (data) => {
+      if (data.communication_id === this.dialer.communication.id) {
+        this.setDialerRecordingStatus(data.recording_status)
+      }
+    }
+
     this.dialerListeners.reconnectDialer = () => {
       // Reset retry count for manual reconnection
       this.resetTokenRetryState()
@@ -502,6 +508,7 @@ export default {
     },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.listen('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.listen('endWrapUp', this.dialerListeners.endWrapUp)
@@ -536,6 +543,7 @@ export default {
 
     stopDialerEvents () {
       this.$VueEvent.stop('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.stop('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.stop('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.stop('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.stop('endWrapUp', this.dialerListeners.endWrapUp)
