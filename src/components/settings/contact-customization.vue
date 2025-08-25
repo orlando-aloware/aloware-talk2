@@ -22,6 +22,25 @@
             <p class="form-helper-text">{{ SettingsMap.contact_customization.description }}</p>
           </div>
         </b-col>
+
+        <b-col sm="12" class="px-0">
+          <contact-fields-selector
+            v-if="!loadingAttributeDictionaries"
+            :selected-fields="selectedFields"
+            @change="onChange"
+          />
+          <div
+            v-else
+            class="mt-4 flex justify-start items-center"
+          >
+            <q-spinner
+              color="primary"
+              class="mr-2"
+              size="2em"
+            />
+            Loading custom attributes...
+          </div>
+        </b-col>
       </b-form-row>
     </b-form>
   </b-container>
@@ -29,14 +48,87 @@
 
 <script>
 import SettingsMap from 'components/settings/settings-map'
+import ContactFieldsSelector from 'components/contacts/contact-fields-selector'
+import { DEFAULT_FIELD_ORDER } from 'src/constants/contact-fields-definitions'
+import { mapActions, mapGetters } from 'vuex'
+import { settingsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-customization',
 
+  components: {
+    ContactFieldsSelector
+  },
+
+  mixins: [settingsMixin],
+
+  props: {
+    user: {
+      type: Object,
+      required: true
+    }
+  },
+
+  data () {
+    return {
+      loadingAttributeDictionaries: true,
+      selectedFields: []
+    }
+  },
+
   computed: {
+    ...mapGetters('auth', ['profile']),
+
     SettingsMap () {
       return SettingsMap
     }
+  },
+
+  methods: {
+    ...mapActions(['setAttributeDictionaries']),
+
+    ...mapActions('settings', ['updateChangedUserProperties', 'setFormValidity', 'setUserClone']),
+
+    loadAttributeDictionaries () {
+      this.$axios.get('/api/v1/attribute-dictionary').then(res => {
+        this.setAttributeDictionaries(res.data.data)
+      }).finally(() => {
+        this.loadingAttributeDictionaries = false
+      })
+    },
+
+    initializeSelectedFields () {
+      this.selectedFields = this.profile.setting_contact_fields
+        ? [...this.profile.setting_contact_fields]
+        : [...DEFAULT_FIELD_ORDER]
+    },
+
+    onChange (newSelectedFields) {
+      this.selectedFields = newSelectedFields
+      console.log('Selected fields updated:', newSelectedFields)
+      // TODO: Save to user preferences/API
+
+      this.onUpdateFields(newSelectedFields, 'setting_contact_fields')
+    },
+
+    onUpdateFields (value, prop) {
+      this.user[prop] = value
+      this.updateChangedUserProperties({
+        name: prop,
+        value: value
+      })
+    }
+  },
+
+  created () {
+    this.initializeSelectedFields()
+    this.loadAttributeDictionaries()
+  },
+
+  mounted () {
+    // TODO: Load user preferences from store/API
+    console.log('Contact customization component mounted')
+    console.log('Custom attributes available:', this.$store.getters.getAttributeDictionaries)
   }
 }
 </script>

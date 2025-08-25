@@ -25,12 +25,20 @@ const check = async (authModule, payload, skipSetAuthenticated) => {
       commit('SET_AUTHENTICATED', true)
     }
 
-    commit('SET_PROFILE', response.data.user)
+    const user = response.data.user
+    user.settings.forEach(setting => {
+      // Map setting name to user property
+      const { name, value } = setting
+      user[`setting_${name}`] = value
+    })
+    delete user.settings
+
+    commit('SET_PROFILE', user)
     setRouterType(authModule)
     commit('SET_LOADING', false)
-    commit('SET_USAGE', response.data.user.usage, { root: true })
-    commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
-    commit('SET_CURRENT_TIMEZONE', response.data.user.company.timezone, { root: true })
+    commit('SET_USAGE', user.usage, { root: true })
+    commit('SET_USER_STATUS', user.enabled, { root: true })
+    commit('SET_CURRENT_TIMEZONE', user.company.timezone, { root: true })
 
     return response
   } catch (err) {
