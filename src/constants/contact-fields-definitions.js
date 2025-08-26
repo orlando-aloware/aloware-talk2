@@ -212,7 +212,8 @@ export const CONTACT_FIELD_DEFINITIONS = {
       useInput: true,
       clearable: true,
       borderless: true,
-      outlined: false
+      outlined: false,
+      hideBottomSpace: true
     }
   },
 

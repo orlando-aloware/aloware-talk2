@@ -16,211 +16,128 @@
     </div>
 
     <div :class="`information-container ${autoHeightClass}`">
-      <div class="w-100 mt-2"
-           v-if="hasPermissionTo('list user')">
-        <p class="text-muted custom-input-label mb-0">Owner</p>
-        <user-selector custom-class="inline-select"
-                       :disable="!hasPermissionTo('change contact ownership') || isReadOnly"
-                       :generic-styling="false"
-                       :multiple="false"
-                       :use-chips="false"
-                       :outlined="false"
-                       :show-placeholder="false"
-                       v-model="contact.user_id"
-                       data-testid="contact-information-user-selector"
-                       @change="(eventPayload) => onUpdateFields(eventPayload, 'user_id')">
-        </user-selector>
-      </div>
+      <!-- Dynamic field rendering based on user settings -->
+      <div
+        v-for="(field, index) in renderableFields"
+        :key="field.key"
+        class="w-100"
+        :class="{ 'mt-2': index === 0 }"
+      >
+          <p class="text-muted custom-input-label mb-0">{{ field.label }}</p>
 
-      <div class="w-100"
-           v-if="hasPermissionTo('list disposition status')">
-        <p class="text-muted custom-input-label mb-0">Contact Disposition</p>
-        <contact-disposition-selector custom-class="inline-select"
-                                      :disable="!hasPermissionTo('dispose contact') || isReadOnly"
-                                      :generic-styling="false"
-                                      :multiple="false"
-                                      :use-chips="false"
-                                      :outlined="false"
-                                      :show-placeholder="false"
-                                      :emit-value="true"
-                                      data-testid="contact-information-disposition-selector"
-                                      v-model="contact.disposition_status_id"
-                                      @change="(eventPayload) => onUpdateFields(eventPayload, 'disposition_status_id')">
-        </contact-disposition-selector>
-      </div>
+          <!-- User Selector -->
+          <user-selector
+            v-if="field.component === 'user-selector'"
+            v-bind="getFieldProps(field)"
+            :disable="isFieldDisabled(field)"
+            v-model="contact[field.dataField]"
+            :data-testid="getFieldTestId(field)"
+            @change="(eventPayload) => onUpdateFields(eventPayload, field.dataField)"
+          />
 
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Email</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                             v-model="contact.email"
-                             data-testid="contact-information-email-input"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'email')">
-        </contact-input-field>
-      </div>
+          <!-- Contact Disposition Selector -->
+          <contact-disposition-selector
+            v-else-if="field.component === 'contact-disposition-selector'"
+            v-bind="getFieldProps(field)"
+            :disable="isFieldDisabled(field)"
+            v-model="contact[field.dataField]"
+            :data-testid="getFieldTestId(field)"
+            @change="(eventPayload) => onUpdateFields(eventPayload, field.dataField)"
+          />
 
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Address</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                             v-model="contact.address"
-                             data-testid="contact-information-address-input"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'address')">
-        </contact-input-field>
-      </div>
+          <!-- Contact Input Field -->
+          <contact-input-field
+            v-else-if="field.component === 'contact-input-field'"
+            v-bind="getFieldProps(field)"
+            :disabled="isFieldDisabled(field)"
+            v-model="contact[field.dataField]"
+            :data-testid="getFieldTestId(field)"
+            @updateField="(eventPayload) => onUpdateFields(eventPayload, field.dataField)"
+          />
 
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Company</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                             v-model="contact.company_name"
-                             data-testid="contact-information-company-input"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'company_name')">
-        </contact-input-field>
-      </div>
+          <!-- Location State Selector -->
+          <location-state-selector
+            v-else-if="field.component === 'location-state-selector'"
+            v-bind="getFieldProps(field)"
+            :disabled="isFieldDisabled(field)"
+            v-model="contact[field.dataField]"
+            :data-testid="getFieldTestId(field)"
+            @select="(eventPayload) => onUpdateFields(eventPayload, field.dataField)"
+          />
 
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Website</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                             v-model="contact.website"
-                             data-testid="contact-information-website-input"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'website')">
-        </contact-input-field>
-      </div>
+          <!-- Location Country Selector -->
+          <location-country-selector
+            v-else-if="field.component === 'location-country-selector'"
+            v-bind="getFieldProps(field)"
+            :disabled="isFieldDisabled(field)"
+            v-model="contact[field.dataField]"
+            :data-testid="getFieldTestId(field)"
+            @select="(eventPayload) => onUpdateFields(eventPayload, field.dataField)"
+          />
 
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">City</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                             v-model="contact.cnam_city"
-                             data-testid="contact-information-city-input"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_city')">
-        </contact-input-field>
-      </div>
+          <!-- Timezone Selector -->
+          <q-timezone-selector
+            v-else-if="field.component === 'q-timezone-selector'"
+            v-bind="getFieldProps(field)"
+            :disabled="isFieldDisabled(field)"
+            v-model="contact[field.dataField]"
+            :data-testid="getFieldTestId(field)"
+            @select="(eventPayload) => onUpdateFields(eventPayload, field.dataField)"
+          />
 
-      <div class="w-100"
-           v-if="contact.cnam_country && ['US', 'CA'].includes(contact.cnam_country)">
-        <p class="text-muted custom-input-label mb-0">State</p>
-        <location-state-selector :contact="contact"
-                                 :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                                 v-model="contact.cnam_state"
-                                 data-testid="contact-information-state-selector"
-                                 @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_state')">
-        </location-state-selector>
-      </div>
+          <!-- Date Picker Selector -->
+          <date-picker-selector
+            v-else-if="field.component === 'date-picker-selector'"
+            v-bind="getFieldProps(field)"
+            :can-edit="!isFieldDisabled(field)"
+            v-model="contact[field.dataField]"
+            :data-testid="getFieldTestId(field)"
+            @change="(eventPayload) => onUpdateFields(eventPayload, field.dataField)"
+          />
 
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Country</p>
-        <location-country-selector :contact="contact"
-                                   :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                                   v-model="contact.cnam_country"
-                                   data-testid="contact-information-country-selector"
-                                   @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_country')">
-        </location-country-selector>
-      </div>
+          <!-- Lead Source Selector -->
+          <lead-source-selector
+            v-else-if="field.component === 'lead-source-selector'"
+            v-bind="getFieldProps(field)"
+            :disable="isFieldDisabled(field)"
+            v-model="contact[field.dataField]"
+            :data-testid="getFieldTestId(field)"
+            @change="(eventPayload) => onUpdateFields(eventPayload, field.dataField)"
+          />
 
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Zip Code</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                             v-model="contact.cnam_zipcode"
-                             data-testid="contact-information-zip-code-input"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_zipcode')">
-        </contact-input-field>
-      </div>
+          <!-- Line Selector -->
+          <line-selector
+            v-else-if="field.component === 'line-selector'"
+            v-bind="getFieldProps(field)"
+            :is-read-only="isFieldDisabled(field)"
+            v-model="contact[field.dataField]"
+            :data-testid="getFieldTestId(field)"
+            @change="(eventPayload) => onUpdateFields(eventPayload, field.dataField)"
+          />
 
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Timezone</p>
-        <q-timezone-selector :disabled="!isAdmin || isReadOnly"
-                             v-model="contact.timezone"
-                             data-testid="contact-information-timezone-selector"
-                             @select="(eventPayload) => onUpdateFields(eventPayload, 'timezone')">
-        </q-timezone-selector>
-      </div>
+          <!-- Custom Attributes (individual rendering) -->
+          <template v-else-if="field.type === 'custom_attribute'">
+            <attribute-type-date-picker
+              v-if="field.attributeType === ContactAttributeTypeEnum.DATE_PICKER"
+              :attribute="getCustomAttribute(field.attributeId)"
+              :disabled="isFieldDisabled(field)"
+              :timezone="contact.timezone || ''"
+              :data-testid="getFieldTestId(field)"
+              @updateField="(eventPayload) => onUpdateCustomAttribute(eventPayload, field.attributeId)"
+            />
+            <attribute-type-text
+              v-else
+              :attribute="getCustomAttribute(field.attributeId)"
+              :disabled="isFieldDisabled(field)"
+              :data-testid="getFieldTestId(field)"
+              @updateField="(eventPayload) => onUpdateCustomAttribute(eventPayload, field.attributeId)"
+            />
+          </template>
 
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Date of Birth</p>
-        <date-picker-selector wrapperClass="date-of-birth-field"
-                              contentClass="inline-input contact-info-editable"
-                              popoverClass="contact-info-popover"
-                              popoverId="popover-date-picker-sync"
-                              v-model="contact.date_of_birth"
-                              data-testid="contact-information-date-of-birth-selector"
-                              :can-edit="hasPermissionTo('update contact') && !isReadOnly"
-                              @change="(eventPayload) => onUpdateFields(eventPayload, 'date_of_birth')">
-        </date-picker-selector>
-      </div>
-
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Lead Source</p>
-        <lead-source-selector specificClass="inline-select"
-                              useInput
-                              clearable
-                              borderless
-                              :genericStyling="false"
-                              :outlined="false"
-                              :disable="!hasPermissionTo('update contact') || isReadOnly"
-                              v-model="contact.lead_source"
-                              data-testid="contact-information-lead-source-selector"
-                              @change="(eventPayload) => onUpdateFields(eventPayload, 'lead_source')">
-        </lead-source-selector>
-      </div>
-
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Initial Line</p>
-        <line-selector specificClass="inline-select"
-                       :genericMultiselect="false"
-                       :genericStyling="false"
-                       :useInput="true"
-                       :clearable="true"
-                       :borderless="true"
-                       :outlined="false"
-                       :is-read-only="isReadOnly"
-                       v-model="contact.initial_campaign_id"
-                       data-testid="contact-information-initial-line-selector"
-                       @change="(eventPayload) => onUpdateFields(eventPayload, 'initial_campaign_id')">
-        </line-selector>
-      </div>
-
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Custom Field 1</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                             v-model="contact.csf1"
-                             data-testid="contact-information-custom-field-1-input"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf1')">
-        </contact-input-field>
-      </div>
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Custom Field 2</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
-                             v-model="contact.csf2"
-                             data-testid="contact-information-custom-field-2-input"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
-        </contact-input-field>
-      </div>
-      <contact-attributes data-testid="contact-information-attributes"
-                          :contact="contact"
-                          :is-read-only="isReadOnly"
-                          v-if="contact.id"/>
-
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
-        <p>{{ contact.text_authorized | fixBooleanType }}</p>
-      </div>
-
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Created At</p>
-        <p>{{ contact.created_at | fixFullDateUTCRelative }}</p>
-      </div>
-
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Time of First Outbound Call</p>
-        <p>{{ timeOfFirstOutboundCall }}</p>
-      </div>
-
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Time to First Outbound Call</p>
-        <p>{{ timeToFirstOutboundCall }}</p>
-      </div>
-
-      <div class="w-100">
-        <p class="text-muted custom-input-label mb-0">Intake Source</p>
-        <p>{{ contact.intake_source | toUpperCase }}</p>
+          <!-- Display-only fields (readonly text) -->
+          <p v-else-if="field.component === 'readonly-text'">
+            {{ getFormattedFieldValue(field) }}
+          </p>
       </div>
     </div>
 
@@ -240,6 +157,7 @@
 import { mapActions, mapGetters } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
+import { CONTACT_FIELD_DEFINITIONS, ContactFieldsHelper, DEFAULT_FIELD_ORDER } from 'src/constants/contact-fields-definitions'
 import LocationStateSelector from 'src/components/contacts/location-state-selector'
 import LocationCountrySelector from 'src/components/contacts/location-country-selector'
 import ContactInputField from 'src/components/contacts/contact-input-field'
@@ -248,7 +166,9 @@ import ContactDispositionSelector from 'components/generic-selectors/contact-dis
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
 import DatePickerSelector from 'components/generic-selectors/date-picker-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
-import ContactAttributes from 'components/contacts/contact-attributes/contact-attributes'
+import AttributeTypeText from 'components/contacts/contact-attributes/attribute-types/attribute-type-text'
+import AttributeTypeDatePicker from 'components/contacts/contact-attributes/attribute-types/attribute-type-date-picker'
+import { ContactAttributeTypeEnum } from 'components/contacts/contact-attributes/enums/contact-attribute-type-enum'
 import LeadSourceSelector from 'components/generic-selectors/lead-source-selector.vue'
 import SettingIcon from 'components/icons/setting-o-icon'
 import SettingsMap from 'components/settings/settings-map'
@@ -273,7 +193,8 @@ export default {
   },
 
   components: {
-    ContactAttributes,
+    AttributeTypeText,
+    AttributeTypeDatePicker,
     DatePickerSelector,
     QTimezoneSelector,
     ContactDispositionSelector,
@@ -288,6 +209,7 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact', 'contactAttributes']),
+    ...mapGetters('auth', ['profile']),
 
     SettingsMap () {
       return SettingsMap
@@ -320,18 +242,40 @@ export default {
       }
 
       return true
+    },
+
+    visibleFields () {
+      const selectedFields = this.profile.setting_contact_fields || DEFAULT_FIELD_ORDER
+      return selectedFields.map(fieldKey => {
+        // Handle custom attributes
+        if (fieldKey.startsWith('custom_attribute_')) {
+          const attributeId = parseInt(fieldKey.replace('custom_attribute_', ''))
+          const attribute = this.contactAttributes.find(attr => attr.attribute_id === attributeId)
+          return attribute
+            ? ContactFieldsHelper.createCustomAttributeDefinition(attribute)
+            : null
+        }
+
+        // Handle standard fields
+        return CONTACT_FIELD_DEFINITIONS[fieldKey] || null
+      }).filter(field => field !== null)
+    },
+
+    renderableFields () {
+      return this.visibleFields.filter(field => this.shouldShowField(field))
     }
   },
 
   data () {
     return {
       isExpanded: false,
-      attributes: []
+      attributes: [],
+      ContactAttributeTypeEnum: ContactAttributeTypeEnum
     }
   },
 
   methods: {
-    ...mapActions('contacts', ['setContactAttributes', 'setContact', 'updateChangedContactProperties']),
+    ...mapActions('contacts', ['setContactAttributes', 'setContact', 'updateChangedContactProperties', 'updateChangedContactAttributes']),
 
     onExpanded () {
       this.isExpanded = !this.isExpanded
@@ -425,6 +369,119 @@ export default {
       const temp = Math.floor(duration[field]())
 
       return `${temp} ${temp > 1 ? field : singular}`
+    },
+
+    /**
+     * Get field value from contact data
+     */
+    getFieldValue (field) {
+      if (field.computed) {
+        // Handle computed fields
+        switch (field.key) {
+          case 'time_of_first_outbound_call':
+            return this.timeOfFirstOutboundCall
+          case 'time_to_first_outbound_call':
+            return this.timeToFirstOutboundCall
+          default:
+            return this.contact[field.dataField]
+        }
+      }
+      return this.contact[field.dataField]
+    },
+
+    /**
+     * Check if field should be visible based on permissions and conditions
+     */
+    shouldShowField (field) {
+      // Check permissions
+      if (field.permissions && field.permissions.length > 0) {
+        if (!field.permissions.some(permission => this.hasPermissionTo(permission))) {
+          return false
+        }
+      }
+
+      // Check conditions
+      if (field.condition && typeof field.condition === 'function') {
+        return field.condition(this.contact)
+      }
+
+      return true
+    },
+
+    /**
+     * Check if field is disabled for editing
+     */
+    isFieldDisabled (field) {
+      if (field.type === 'display_only') {
+        return true
+      }
+
+      if (field.editPermissions && field.editPermissions.length > 0) {
+        // Special case for admin permission
+        if (field.editPermissions.includes('admin')) {
+          return !this.isAdmin || this.isReadOnly
+        }
+
+        return !field.editPermissions.some(permission => this.hasPermissionTo(permission)) || this.isReadOnly
+      }
+
+      return this.isReadOnly
+    },
+
+    /**
+     * Get component props for a field
+     */
+    getFieldProps (field) {
+      const props = { ...field.props }
+
+      // Handle dynamic props
+      Object.keys(props).forEach(key => {
+        if (typeof props[key] === 'function') {
+          props[key] = props[key](this.contact)
+        }
+      })
+
+      return props
+    },
+
+    /**
+     * Get test id for a field
+     */
+    getFieldTestId (field) {
+      return `contact-information-${field.key.replace(/_/g, '-')}-${field.component.includes('selector') ? 'selector' : 'input'}`
+    },
+
+    /**
+     * Get formatted field value with appropriate filter
+     */
+    getFormattedFieldValue (field) {
+      const value = this.getFieldValue(field)
+
+      if (field.filter && this.$options.filters[field.filter]) {
+        return this.$options.filters[field.filter](value)
+      }
+
+      return value
+    },
+
+    /**
+     * Get custom attribute by ID
+     */
+    getCustomAttribute (attributeId) {
+      return this.contactAttributes.find(attr => attr.id === attributeId) || {}
+    },
+
+    /**
+     * Handle custom attribute updates
+     */
+    onUpdateCustomAttribute (value, attributeId) {
+      const attribute = this.getCustomAttribute(attributeId)
+      if (attribute) {
+        this.updateChangedContactAttributes({
+          name: attribute.name,
+          value: value
+        })
+      }
     }
   }
 }
