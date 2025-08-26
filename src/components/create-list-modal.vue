@@ -29,7 +29,8 @@
                  autofocus
                  :disabled="disableNameInput"
                  v-model="createList.name"/>
-          <small v-if="isIntegrationListType" class="text-dark">List name will be obtained from the selected integration List</small>
+          <small v-if="isIntegrationListType && getIntegration !== HIGHLEVEL_INTEGRATION" class="text-dark">List name will be obtained from the selected integration List</small>
+          <small v-if="isIntegrationListType && getIntegration === HIGHLEVEL_INTEGRATION" class="text-dark">Enter a name for your HighLevel list</small>
         </div>
 
         <div :class="['flex-grow-1', isCreateListModeFromBulkMenuOrFilters ? 'py-4' : 'pt-4 pb-2']"
@@ -103,7 +104,8 @@
              v-else>
               Currently enabled integration: <span class="text-bold"> {{ filteredEnabledIntegrations[0] }} </span>
           </p>
-          <integration-list-selector ref="list-selector"
+          <integration-list-selector v-if="shouldShowListSelector"
+                                     ref="list-selector"
                                      :use-chips="false"
                                      :multiple="false"
                                      :clearable="true"
@@ -128,6 +130,13 @@
                 </span>
               </b-form-checkbox>
             </b-form-group>
+          </div>
+
+          <div v-if="getIntegration === HIGHLEVEL_INTEGRATION">
+            <highlevel-search-criteria-form
+              v-model="highlevelSearchCriteria"
+              @input="onHighlevelCriteriaChange"
+            />
           </div>
         </div>
 
@@ -233,18 +242,21 @@ import {
 } from 'src/plugins/mixins'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import HighlevelSearchCriteriaForm from 'components/integrations/highlevel-search-criteria-form'
 import talk2Api from 'src/plugins/api/api'
 import {
   HUBSPOT_INTEGRATION,
   PIPEDRIVE_INTEGRATION,
   SALESFORCE_INTEGRATION,
-  ZOHO_INTEGRATION
+  ZOHO_INTEGRATION,
+  HIGHLEVEL_INTEGRATION
 } from 'src/constants/integrations'
 
 export default {
   components: {
     IntegrationListSelector,
-    InformationCircleIcon
+    InformationCircleIcon,
+    HighlevelSearchCriteriaForm
   },
 
   mixins: [
@@ -349,12 +361,22 @@ export default {
       return this.selectedIntegration === null
     },
 
+    shouldShowListSelector () {
+      // Don't show list selector for HighLevel since it uses search criteria instead
+      return this.getIntegration !== HIGHLEVEL_INTEGRATION
+    },
+
     disableSubmit () {
       if (this.isLoading) {
         return true
       }
 
       if (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE) {
+        // HighLevel doesn't have a list ID, so we need to check if the name is valid
+        if (this.getIntegration === HIGHLEVEL_INTEGRATION) {
+          return !this.isNameValid || !this.highlevelSearchCriteria.field
+        }
+
         return !this.integrationList
       }
 
@@ -378,13 +400,13 @@ export default {
     },
 
     disableNameInput () {
-      return this.isLoading || this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE
+      return this.isLoading || (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE && this.getIntegration !== HIGHLEVEL_INTEGRATION)
     },
 
     filteredEnabledIntegrations () {
       // show only ready for contact list integrations
       return this.integrationsEnabled.filter(integration => [
-        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION
+        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION, HIGHLEVEL_INTEGRATION
       ].includes(integration.toLowerCase()))
     }
   },
@@ -732,6 +754,8 @@ export default {
           return this.addPipedriveFilter()
         case ZOHO_INTEGRATION:
           return this.addZohoView()
+        case HIGHLEVEL_INTEGRATION:
+          return this.importFromHighlevel()
       }
     },
 
@@ -795,6 +819,38 @@ export default {
         })
     },
 
+    async importFromHighlevel () {
+      try {
+        // For HighLevel, we use search criteria instead of a list ID
+        const params = {
+          search_criteria: {
+            filters: [
+              {
+                field: this.highlevelSearchCriteria.field,
+                operator: this.highlevelSearchCriteria.operator,
+                value: this.highlevelSearchCriteria.value
+              }
+            ]
+          },
+          list_name: this.createList.name
+        }
+
+        console.log('Importing HighLevel criteria:', params)
+
+        await talk2Api.V2.integrations.highlevel.importCriteria(params)
+
+        console.log('HighLevel import successful')
+        this.$generalNotification('Your HighLevel contacts are being imported based on search criteria. It can take a couple of minutes if it\'s a large result set.')
+        this.createListClose()
+        this.loadFolders()
+        this.loadPublicLists()
+      } catch (error) {
+        console.error('HighLevel import failed:', error)
+        this.isLoading = false
+        this.$generalNotification('Unable to import contacts from HighLevel, please try again.', 'error')
+      }
+    },
+
     onConfirmIntegrationImport () {
       this.showIntegrationImportConfirmDialog = false
       this.importFromIntegration()
@@ -810,6 +866,8 @@ export default {
           return this.checkPipedriveFilter()
         case ZOHO_INTEGRATION:
           return this.checkZohoView()
+        case HIGHLEVEL_INTEGRATION:
+          return this.checkHighlevelCriteria()
       }
     },
 
@@ -849,12 +907,49 @@ export default {
       }
     },
 
+    async checkHighlevelCriteria () {
+      // For HighLevel, we check if the search criteria already exists
+      const params = {
+        search_criteria: {
+          filters: [
+            {
+              field: this.highlevelSearchCriteria.field,
+              operator: this.highlevelSearchCriteria.operator,
+              value: this.highlevelSearchCriteria.value
+            }
+          ]
+        },
+        list_name: this.createList.name
+      }
+
+      console.log('Checking HighLevel criteria:', params)
+
+      try {
+        const res = await talk2Api.V2.integrations.highlevel.criteriaExists(params)
+        console.log('HighLevel criteria check response:', res)
+
+        if (res.data.exists) {
+          this.integrationImportConfirmMessage = 'The HighLevel criteria you are trying to import already exists in another list. Would you like to proceed and update that list?'
+          this.showIntegrationImportConfirmDialog = true
+        }
+      } catch (error) {
+        console.error('HighLevel criteria check failed:', error)
+        this.isLoading = false
+        this.$generalNotification('Unable to check if HighLevel criteria already exists. Please try again.', 'error')
+        throw error // Re-throw to prevent import from proceeding
+      }
+    },
+
     onConfirmIntegrationImportClose () {
       this.showIntegrationImportConfirmDialog = false
     },
 
     onListTypeSelected (listType) {
       this.createList.type = listType
+    },
+
+    onHighlevelCriteriaChange (criteria) {
+      this.highlevelSearchCriteria = criteria
     }
   },
 
@@ -880,7 +975,9 @@ export default {
       integrationImportConfirmMessage: '',
       HUBSPOT_INTEGRATION,
       PIPEDRIVE_INTEGRATION,
-      ZOHO_INTEGRATION
+      ZOHO_INTEGRATION,
+      HIGHLEVEL_INTEGRATION,
+      highlevelSearchCriteria: {}
     }
   },
 

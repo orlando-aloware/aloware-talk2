@@ -443,6 +443,12 @@ const talk2Api = {
         getFilters () {
           return window.axios.get(`${suffixV1}integration/pipedrive/filters`)
         }
+      },
+
+      highlevel: {
+        getSearchOptions () {
+          return window.axios.get(`${suffixV2}contacts-list/highlevel-search-options`)
+        }
       }
 
     },
@@ -977,6 +983,18 @@ const talk2Api = {
         },
         importFilterToPowerDialer (target, params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-pipedrive-filter/${target}`, params)
+        }
+      },
+
+      highlevel: {
+        importCriteria (params) {
+          return window.axios.post(`${suffixV2}contacts-list/import-highlevel-criteria`, params)
+        },
+        criteriaExists (params) {
+          return window.axios.post(`${suffixV2}contacts-list/highlevel-criteria-exists`, params)
+        },
+        getSearchOptions () {
+          return window.axios.get(`${suffixV2}contacts-list/highlevel-search-options`)
         }
       }
 
