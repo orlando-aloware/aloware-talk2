@@ -117,6 +117,7 @@ import {
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
 import { mapFields } from 'vuex-map-fields'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
   components: {
@@ -127,7 +128,8 @@ export default {
   },
 
   mixins: [
-    TeamInboxMixin
+    TeamInboxMixin,
+    userMixin
   ],
 
   data () {
@@ -213,12 +215,7 @@ export default {
         ...this.parsedInboxes.watching
       ]
 
-      return [
-        {
-          id: INBOX_TYPE_ALL,
-          name: 'All Inboxes',
-          inboxes: allInboxes.length > 0 ? [{ id: ALL_INBOXES_ID, name: 'All Inboxes' }] : []
-        },
+      const navItems = [
         {
           id: INBOX_TYPE_PERSONAL,
           name: 'Personal Inboxes',
@@ -235,6 +232,17 @@ export default {
           inboxes: this.parsedInboxes.watching
         }
       ]
+
+      // Add "All Inboxes" only for demo companies
+      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+        navItems.unshift({
+          id: INBOX_TYPE_ALL,
+          name: 'All Inboxes',
+          inboxes: allInboxes.length > 0 ? [{ id: ALL_INBOXES_ID, name: 'All Inboxes' }] : []
+        })
+      }
+
+      return navItems
     },
 
     dateFilter () {
@@ -377,14 +385,16 @@ export default {
       }
 
       // If user has any inboxes, prioritize "All Inboxes" as the first option
-      const allInboxes = [
-        ...this.parsedInboxes.personal,
-        ...this.parsedInboxes.connected,
-        ...this.parsedInboxes.watching
-      ]
+      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+        const allInboxes = [
+          ...this.parsedInboxes.personal,
+          ...this.parsedInboxes.connected,
+          ...this.parsedInboxes.watching
+        ]
 
-      if (allInboxes.length > 0) {
-        return ALL_INBOXES_ID
+        if (allInboxes.length > 0) {
+          return ALL_INBOXES_ID
+        }
       }
 
       return this.parsedInboxes.personal.length ? this.parsedInboxes.personal[0]?.id : this.inboxes[0]?.id
