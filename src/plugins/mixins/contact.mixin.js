@@ -770,12 +770,11 @@ export default {
 
       // Add inbox_id when in Team Inbox context
       if (this.teamInbox && this.teamInboxId) {
-        params.inbox_id = this.teamInboxId
+        params.inbox_ids = [this.teamInboxId]
       }
 
       if (this.isAllInboxesRoute) {
-        // show communications for all inboxes user has access to
-        delete params.inbox_id
+        delete params.inbox_ids
 
         // send inbox_ids filter if applied
         if (this.$store.state.TeamInbox.activeFilters.inboxes?.length) {

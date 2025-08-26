@@ -624,19 +624,19 @@
                   <ul class="list list-unstyled inset mb-0">
                     <li
                       class="pb-1"
-                      :key="attemptingUser + '-user-' + index"
+                      :key="attemptingUser.id + '-user-' + index"
                       v-for="(attemptingUser, index) in communication.attempting_users"
                     >
                       <div
                         class="flex items-center mr-1 h-100"
-                        @click="onOpenUserInClassicClicked(getUser(attemptingUser).id)"
+                        @click="onOpenUserInClassicClicked(attemptingUser.id)"
                       >
                         <span
                           class="text-blue cursor-pointer"
-                          :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
-                          :title="getUserName(getUser(attemptingUser))"
+                          :class="getAttemptingClass(attemptingUser.d, communication.disposition_status2, communication.user_id)"
+                          :title="getUserName(attemptingUser)"
                         >
-                          <user-display :user-id="attemptingUser" />
+                          <user-display :user="attemptingUser" />
                         </span>
                       </div>
                     </li>
@@ -1062,7 +1062,7 @@
                       >
                         {{ user.name && user.name.toLowerCase().includes('_deleted_') ? 'Deleted User' : getUserName(user) }}
                       </q-tooltip>
-                      <user-display :user-id="user.id" />
+                      <user-display :user="user"/>
                     </span>
                   </div>
                 </div>

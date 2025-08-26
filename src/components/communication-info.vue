@@ -350,14 +350,14 @@
                   <span class="text-greyish">
                       <ul class="list list-unstyled inset mb-0">
                         <template v-for="(attemptingUser, index) in communication.attempting_users">
-                            <li :key="attemptingUser + '-user-' + index"
-                                v-if="getUser(attemptingUser) && getUser(attemptingUser).id"
+                            <li :key="attemptingUser.id + '-user-' + index"
+                                v-if="attemptingUser.id"
                                 class="pb-1">
                                 <div @click="onOpenUserInClassicClicked(communication?.user_id)">
                                   <span class="cursor-pointer"
-                                        :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
-                                        :title="getUserName(getUser(attemptingUser))">
-                                    <user-display :user-id="attemptingUser" />
+                                        :class="getAttemptingClass(attemptingUser.id, communication.disposition_status2, communication.user_id)"
+                                        :title="getUserName(attemptingUser)">
+                                    <user-display :user="attemptingUser" />
                                   </span>
                                 </div>
                             </li>

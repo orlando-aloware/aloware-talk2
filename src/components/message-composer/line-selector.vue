@@ -59,6 +59,7 @@ import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
 import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 import { COMPANY_AGENT } from 'src/constants/roles'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'line-selector',
@@ -100,7 +101,7 @@ export default {
     campaignsToUse () {
       if (this.teamInbox) {
         // Active Team Inbox Campaigns
-        return this.activeCampaigns
+        return this.activeTeamInboxCampaigns
       }
 
       if (this.shouldLimitAgentLinesVisibility) {
@@ -115,16 +116,19 @@ export default {
     },
 
     /**
-     * Returns the active campaigns
+     * Returns the active Team Inbox campaigns
      */
-    activeCampaigns () {
+    activeTeamInboxCampaigns () {
       return this
         .teamInboxCampaigns
-        .filter(campaign =>
-          // Active Inbox Campaigns
-          this.activeInboxCampaignIds?.includes(campaign.id) ||
-          isIvrOrDeadEndCampaign(campaign)
-        )
+        .filter(campaign => {
+          if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+            return campaign.active === true
+          }
+
+          return this.activeInboxCampaignIds?.includes(campaign.id) ||
+            isIvrOrDeadEndCampaign(campaign)
+        })
     },
 
     selectedCampaign () {

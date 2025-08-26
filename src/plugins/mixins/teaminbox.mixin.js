@@ -242,17 +242,13 @@ export default {
         apiFilters.campaigns = filters.campaigns
       }
 
-      if (filters.inboxes?.length) {
-        apiFilters.inbox_ids = filters.inboxes
-      }
-
       // Map sort keys to API parameters
       if (sort.order) {
         apiFilters.order = sort.order
       }
 
       const params = {
-        inbox_id: inboxId,
+        inbox_ids: inboxId !== ALL_INBOXES_ID ? [inboxId] : [],
         page: nextPage,
         per_page: 50,
         inbox_type: this.viewMode === THREADED ? 'threaded' : 'unthreaded',
@@ -264,8 +260,12 @@ export default {
       }
 
       if (inboxId === ALL_INBOXES_ID) {
-        delete params.inbox_id
         params.all_inboxes = true
+
+        // apply Inboxes filter if any
+        if (filters.inboxes?.length) {
+          params.inbox_ids = [ ...params.inbox_ids, ...filters.inboxes ]
+        }
       }
 
       const config = {

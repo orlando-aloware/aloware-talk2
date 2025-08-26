@@ -98,15 +98,15 @@ export default {
 
       const data = []
       const layerNumber = { data: 0 }
-      const userIds = { id: null }
-      for (userIds.id of this.communication.target_users) {
+      const users = { user: null }
+      for (users.user of this.communication.target_users) {
         layerNumber.data++
         const entry = {
           id: layerNumber.data,
           label: `Layer ${layerNumber.data}`,
           children: []
         }
-        entry.children = this.generateAttemptingUsersTree(userIds.id)
+        entry.children = this.generateAttemptingUsersTree(users.user)
         data.push(entry)
       }
 
@@ -155,7 +155,7 @@ export default {
       const userId = { id: null }
       const user = { data: null }
       for (userId.id of attemptingUsers) {
-        user.data = this.getUser(userId.id)
+        user.data = userId.id.constructor === Object ? userId.id : this.getUser(userId.id)
         if (!user.data) {
           continue
         }
