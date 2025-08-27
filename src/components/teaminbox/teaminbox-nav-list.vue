@@ -234,7 +234,7 @@ export default {
       ]
 
       // Add "All Inboxes" only for demo companies
-      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) && !this.search) {
         navItems.unshift({
           id: INBOX_TYPE_ALL,
           name: 'All Inboxes',
@@ -391,7 +391,7 @@ export default {
       }
 
       // If user has any inboxes, prioritize "All Inboxes" as the first option
-      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) && !this.search) {
         const allInboxes = [
           ...this.parsedInboxes.personal,
           ...this.parsedInboxes.connected,
