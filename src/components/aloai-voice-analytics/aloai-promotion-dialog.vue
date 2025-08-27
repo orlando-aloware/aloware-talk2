@@ -123,7 +123,7 @@ export default {
         if (planType === 'iPro' || planType === 'uPro') {
           const upgradeText = planType === 'uPro' ? 'or you can upgrade to xPro+Ai to include unlimited minutes' : 'or you can upgrade your plan to include more minutes'
           return {
-            title: `You've used all ${this.includedMinutes} transcription minutes included in your ${planType}+Ai plan this month. Don't worry, your minutes will reset on the 1st, ${upgradeText} and unlock additional features by reaching out to the Aloware Team at <a href="mailto:Support@Aloware.com">Support@Aloware.com</a>`,
+            title: `You've used all ${this.includedMinutes} transcription minutes included in your ${planType}+Ai plan this month. Don't worry, your minutes will reset on the 1st, ${upgradeText} and unlock additional features by reaching out to the Aloware Team at <a href="mailto:support@aloware.com">support@aloware.com</a>`,
             message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
           }
         }
