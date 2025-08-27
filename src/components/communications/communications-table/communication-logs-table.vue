@@ -538,7 +538,8 @@ export default {
     },
 
     newCommunicationListener (communication) {
-      if (this.isInboundNote(communication)) {
+      if (this.isNote(communication)) {
+        // Do not show note type communications
         return
       }
 
@@ -724,9 +725,8 @@ export default {
       })
     },
 
-    isInboundNote (communication) {
-      const { type, direction } = communication
-      return type === CommunicationTypes.NOTE && direction === CommunicationDirections.INBOUND
+    isNote (communication) {
+      return communication.type === CommunicationTypes.NOTE
     }
   },
 
