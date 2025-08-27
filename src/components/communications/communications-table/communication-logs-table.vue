@@ -330,6 +330,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { merge } from 'lodash'
 import Datatable from 'src/components/datatable.vue'
 import CommunicationsMobileRowDetails from './communications-mobile-row-details.vue'
+import * as CommunicationDirections from 'src/constants/communication-direction'
 import Vue from 'vue'
 
 export default {
@@ -537,6 +538,10 @@ export default {
     },
 
     newCommunicationListener (communication) {
+      if (this.isInboundNote(communication)) {
+        return
+      }
+
       const found = this.communicationsData.find(c => c.id === communication.id)
 
       if (!found) {
@@ -717,6 +722,11 @@ export default {
 
         return b.communication_id - a.communication_id
       })
+    },
+
+    isInboundNote (communication) {
+      const { type, direction } = communication
+      return type === CommunicationTypes.NOTE && direction === CommunicationDirections.INBOUND
     }
   },
 
