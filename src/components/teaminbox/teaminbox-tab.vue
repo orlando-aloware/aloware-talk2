@@ -59,7 +59,6 @@ import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import { debounce } from 'lodash'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
-import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
 
 export default {
   components: {
@@ -91,7 +90,6 @@ export default {
       THREADED,
       UNTHREADED,
       TEAMINBOXES_MENU_ITEMS_TITLE,
-      ALL_INPROGRESS_STATUSES,
       itemsData: [],
       CommunicationDirections,
       CommunicationTypes,
@@ -869,20 +867,7 @@ export default {
     checkCommunication (communication, sortAsc = false) {
       return (this.checkCommunicationMatchesSearch(this.search, communication) &&
           this.checkCommunicationMatchesInboxFilters(this.activeFilters, communication, false) &&
-          !(sortAsc && this.hasMoreItems)) ||
-        this.communicationInProgress(communication)
-    },
-
-    communicationInProgress (communication) {
-      if (communication.type !== CommunicationTypes.CALL) {
-        return false
-      }
-
-      if (this.activeFilters.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
-        return false
-      }
-
-      return this.ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
+          !(sortAsc && this.hasMoreItems))
     },
 
     communicationContactOwnedByCurrentUser (communication) {

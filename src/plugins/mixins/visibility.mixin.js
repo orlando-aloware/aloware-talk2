@@ -9,6 +9,7 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_ABANDONED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_UNANSWERED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT, COMPANY_REPORTER_ACCESS } from 'src/constants/roles'
+import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
 
 export default {
   mixins: [userMixin],
@@ -255,7 +256,8 @@ export default {
 
     checkCommunicationMatchesInboxFilters (filter, communication) {
       if (filter.unread_only === true &&
-        communication.inbox_unread_count === 0) {
+        communication.inbox_unread_count === 0 &&
+        !this.communicationInProgress(communication)) {
         return false
       }
 
@@ -281,7 +283,23 @@ export default {
         return false
       }
 
+      if (filter.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
+        return false
+      }
+
       return true
+    },
+
+    communicationInProgress (communication) {
+      if (communication.type !== CommunicationTypes.CALL) {
+        return false
+      }
+
+      if (this.activeFilters.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
+        return false
+      }
+
+      return ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
     },
 
     checkCommunicationMatchesUserAccessibility (communication, teamInbox = false) {
