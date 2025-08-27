@@ -9,7 +9,8 @@
                      :offset="[0, 16]">
            Customize contact fields
          </q-tooltip>
-        <setting-icon width="16"
+        <setting-icon color="#256eff"
+                      width="16"
                       height="16"
                       class="search-icon" />
       </b-link>

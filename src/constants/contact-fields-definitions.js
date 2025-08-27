@@ -1,13 +1,6 @@
 import { ContactAttributeTypeEnum } from 'components/contacts/contact-attributes/enums/contact-attribute-type-enum'
 
-/**
- * Complete field definitions for contact information
- * This defines all available fields, their components, permissions, and properties
- */
 export const CONTACT_FIELD_DEFINITIONS = {
-  // =============================================================================
-  // DEFAULT SYSTEM FIELDS
-  // =============================================================================
   owner: {
     key: 'owner',
     label: 'Owner',
@@ -155,7 +148,7 @@ export const CONTACT_FIELD_DEFINITIONS = {
     type: 'default',
     dataField: 'timezone',
     permissions: [],
-    editPermissions: ['admin'], // Special case: isAdmin check required
+    editPermissions: ['admin'],
     readonly: false,
     props: {}
   },
@@ -217,9 +210,6 @@ export const CONTACT_FIELD_DEFINITIONS = {
     }
   },
 
-  // =============================================================================
-  // CUSTOM STATIC FIELDS
-  // =============================================================================
   custom_field_1: {
     key: 'custom_field_1',
     label: 'Custom Field 1',
@@ -244,9 +234,6 @@ export const CONTACT_FIELD_DEFINITIONS = {
     props: {}
   },
 
-  // =============================================================================
-  // DISPLAY-ONLY FIELDS (not editable but can be shown/hidden)
-  // =============================================================================
   tcpa_approved: {
     key: 'tcpa_approved',
     label: 'TCPA Approved',
@@ -278,11 +265,11 @@ export const CONTACT_FIELD_DEFINITIONS = {
     label: 'Time of First Outbound Call',
     component: 'readonly-text',
     type: 'display_only',
-    dataField: 'time_of_first_outbound_call', // Computed field
+    dataField: 'time_of_first_outbound_call',
     permissions: [],
     editPermissions: [],
     readonly: false,
-    computed: true, // Indicates this is a computed value
+    computed: true,
     props: {}
   },
 
@@ -291,11 +278,11 @@ export const CONTACT_FIELD_DEFINITIONS = {
     label: 'Time to First Outbound Call',
     component: 'readonly-text',
     type: 'display_only',
-    dataField: 'time_to_first_outbound_call', // Computed field
+    dataField: 'time_to_first_outbound_call',
     permissions: [],
     editPermissions: [],
     readonly: false,
-    computed: true, // Indicates this is a computed value
+    computed: true,
     props: {}
   },
 
@@ -329,41 +316,6 @@ export const ContactFieldsHelper = {
    */
   getFieldDefinition (key) {
     return CONTACT_FIELD_DEFINITIONS[key]
-  },
-
-  /**
-   * Get fields by type
-   */
-  getFieldsByType (type) {
-    return Object.values(CONTACT_FIELD_DEFINITIONS).filter(field => field.type === type)
-  },
-
-  /**
-   * Get default system fields
-   */
-  getDefaultFields () {
-    return this.getFieldsByType('default')
-  },
-
-  /**
-   * Get custom static fields
-   */
-  getCustomStaticFields () {
-    return this.getFieldsByType('custom_static')
-  },
-
-  /**
-   * Get display-only fields (not editable but can be shown/hidden)
-   */
-  getDisplayOnlyFields () {
-    return this.getFieldsByType('display_only')
-  },
-
-  /**
-   * Get all fields (since all fields can now be selected for display)
-   */
-  getAllFields () {
-    return Object.values(CONTACT_FIELD_DEFINITIONS)
   },
 
   /**
@@ -401,33 +353,9 @@ export const ContactFieldsHelper = {
       default:
         return 'attribute-type-text'
     }
-  },
-
-  /**
-   * Check if field is of specific type
-   */
-  isFieldType (field, type) {
-    return field.type === type
-  },
-
-  /**
-   * Check if field is editable (can user input/change values)
-   */
-  isFieldEditable (field) {
-    return field.type !== 'display_only'
-  },
-
-  /**
-   * Check if field is selectable (can be shown/hidden in field selector)
-   */
-  isFieldSelectable (field) {
-    return true // All fields can now be selected for display
   }
 }
 
-/**
- * Default field order - this could be overridden by user preferences
- */
 export const DEFAULT_FIELD_ORDER = [
   'owner',
   'contact_disposition',
