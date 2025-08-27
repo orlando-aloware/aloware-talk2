@@ -427,6 +427,9 @@ export default {
 
       // Check filters and sorting settings
       if (!this.checkCommunication(communication, isAscendingOrder)) {
+        if (index !== -1) {
+          this.itemsData.splice(index, 1)
+        }
         return
       }
 
