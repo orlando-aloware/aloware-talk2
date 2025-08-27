@@ -550,12 +550,6 @@ export default {
         return
       }
 
-      console.log('>>> $route.params.inboxId watcher inboxId', inboxId, 'inboxes', this.inboxes)
-      // if (inboxId === ALL_INBOXES_ID) {
-      //   this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
-      //   return
-      // }
-
       const newInboxId = parseInt(inboxId)
 
       if (!isNaN(newInboxId) && newInboxId !== this.activeInboxId) {
