@@ -273,14 +273,14 @@ export default {
         }
       }
 
-      if (filter.direction === 'inbound' &&
-        communication.direction !== CommunicationDirections.INBOUND) {
-        return false
-      }
+      if (filter.directions?.length) {
+        if (communication.direction === CommunicationDirections.INBOUND && !filter.directions.includes('inbound')) {
+          return false
+        }
 
-      if (filter.direction === 'outbound' &&
-        communication.direction !== CommunicationDirections.OUTBOUND) {
-        return false
+        if (communication.direction === CommunicationDirections.OUTBOUND && !filter.directions.includes('outbound')) {
+          return false
+        }
       }
 
       if (filter.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
