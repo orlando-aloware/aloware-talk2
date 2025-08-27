@@ -537,6 +537,11 @@ export default {
     },
 
     newCommunicationListener (communication) {
+      if (this.isNote(communication)) {
+        // Do not show note type communications
+        return
+      }
+
       const found = this.communicationsData.find(c => c.id === communication.id)
 
       if (!found) {
@@ -717,6 +722,10 @@ export default {
 
         return b.communication_id - a.communication_id
       })
+    },
+
+    isNote (communication) {
+      return communication.type === CommunicationTypes.NOTE
     }
   },
 
