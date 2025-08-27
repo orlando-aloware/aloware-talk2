@@ -264,7 +264,10 @@ export default {
 
         // apply Inboxes filter if any
         if (filters.inboxes?.length) {
-          params.inbox_ids = [ ...params.inbox_ids, ...filters.inboxes ]
+          params.inbox_ids = filters.inboxes
+        } else {
+          // if no filtered Inboxes, send all Inboxes
+          params.inbox_ids = this.inboxes.map(inbox => inbox.id)
         }
       }
 
