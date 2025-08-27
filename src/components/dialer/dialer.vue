@@ -431,7 +431,6 @@ export default {
 
       const communicationData = this.buildCommunicationFromCustomParameters()
       this.notificationShownFromCustomParams = false
-      let ringGroup = null
 
       if (communicationData) {
         if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
@@ -441,23 +440,10 @@ export default {
         } else {
           this.pendingNotificationData = communicationData
         }
-
-        if (communicationData.ring_group_id) {
-          ringGroup = this.getRingGroup(communicationData.ring_group_id)
-        }
-      }
-
-      if (ringGroup) {
-        this.checkForAutoAnswer(ringGroup)
       }
 
       this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
-          if (!ringGroup && res.data.ring_group_id) {
-            ringGroup = this.getRingGroup(res.data.ring_group_id)
-            this.checkForAutoAnswer(ringGroup)
-          }
-
           if (!this.notificationShownFromCustomParams) {
             this.$VueEvent.fire('new_in_app_call', res.data)
             this.processActionNotification(res.data, 'call')
@@ -494,13 +480,6 @@ export default {
   },
 
   methods: {
-    checkForAutoAnswer (ringGroup) {
-      if (ringGroup.auto_answer) {
-        this.answerCall()
-        this.$generalNotification('The call was answered automatically.', 'info')
-        this.playAudio()
-      }
-    },
     checkForcedStatus () {
       if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
         return
