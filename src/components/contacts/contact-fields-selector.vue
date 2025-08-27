@@ -3,7 +3,9 @@
     <div class="fields-container row q-col-gutter-md">
       <!-- Available Fields -->
       <div class="col-12 col-sm-6">
-        <div class="text-subtitle2 q-mb-sm">Available Fields</div>
+        <div class="text-subtitle2 q-mb-sm">
+          Available Fields ({{ unselectedFields.length }})
+        </div>
         <div class="fields-list available">
           <template v-if="hasAvailableFields">
             <div class="available-field-item"
@@ -25,11 +27,22 @@
             All fields are selected
           </div>
         </div>
+        <b-button variant="light"
+                  class="mt-2"
+                  size="sm"
+                  :disabled="unselectedFields.length === 0"
+                  @click="selectAllFields"
+        >
+          <i class="fa fa-check"></i>
+          Select All
+        </b-button>
       </div>
 
       <!-- Selected Fields -->
       <div class="col-12 col-sm-6">
-        <div class="text-subtitle2 q-mb-sm">Selected Fields ({{ selectedFields.length }})</div>
+        <div class="text-subtitle2 q-mb-sm">
+          Selected Fields ({{ selectedFields.length }})
+        </div>
         <div class="fields-list">
           <div class="selected-field-item"
                draggable="true"
@@ -59,34 +72,33 @@
             </div>
           </div>
         </div>
+        <b-button variant="light"
+                  size="sm"
+                  class="mt-2"
+                  :disabled="selectedFields.length === 0"
+                  @click="deselectAllFields"
+        >
+          <i class="fa fa-times"></i>
+          Deselect All
+        </b-button>
       </div>
-    </div>
 
-    <!-- Action Buttons -->
-    <div class="q-mt-md">
-      <q-btn label="Reset to Default"
-             color="grey"
-             flat
-             size="sm"
-             @click="resetToDefault"
-             class="q-mr-sm" />
-      <q-btn label="Select All"
-             color="primary"
-             flat
-             size="sm"
-             @click="selectAllFields"
-             class="q-mr-sm" />
-      <q-btn label="Deselect All"
-             color="primary"
-             flat
-             size="sm"
-             @click="deselectAllFields" />
+      <div class="col-12">
+        <b-button variant="light"
+                  class="mt-2"
+                  size="sm"
+                  @click="resetToDefault"
+        >
+          <i class="fa fa-undo"></i>
+          Reset to Default
+        </b-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ContactFieldsHelper, DEFAULT_FIELD_ORDER, FIELD_CATEGORIES } from 'src/constants/contact-fields-definitions'
+import { ContactFieldsHelper, DEFAULT_FIELD_ORDER } from 'src/constants/contact-fields-definitions'
 import { mapState } from 'vuex'
 
 export default {
@@ -96,6 +108,15 @@ export default {
     selectedFields: {
       type: Array,
       default: () => [...DEFAULT_FIELD_ORDER]
+    }
+  },
+
+  data () {
+    return {
+      draggedItem: null,
+      isDragging: false,
+      dragOverItem: null,
+      dragPosition: null
     }
   },
 
@@ -216,10 +237,8 @@ export default {
      * Add field to selection
      */
     addField (fieldKey) {
-      console.log('addField called with:', fieldKey)
       if (!this.selectedFields.includes(fieldKey)) {
         const selectedFields = [...this.selectedFields, fieldKey]
-        console.log('Emitting change:', selectedFields)
         this.$emit('change', selectedFields)
       }
     },
@@ -228,12 +247,10 @@ export default {
      * Remove field from selection
      */
     removeField (fieldKey) {
-      console.log('removeField called with:', fieldKey)
       const selectedIndex = this.selectedFields.indexOf(fieldKey)
       if (selectedIndex > -1) {
         const selectedFields = [...this.selectedFields]
         selectedFields.splice(selectedIndex, 1)
-        console.log('Emitting change (remove):', selectedFields)
         this.$emit('change', selectedFields)
       }
     },
@@ -285,38 +302,22 @@ export default {
       selectedFields.splice(fromIndex, 1)
       selectedFields.splice(toIndex, 0, this.draggedItem.key)
 
-      console.log('Emitting change (reorder):', selectedFields)
       this.$emit('change', selectedFields)
       this.onDragEnd()
     },
 
-    /**
-     * Reset to default selection
-     */
     resetToDefault () {
-      console.log('Emitting change (reset):', this.defaultFieldOrderWithCustomAttributes)
       this.$emit('change', [...this.defaultFieldOrderWithCustomAttributes])
     },
 
-    /**
-     * Select all fields
-     */
     selectAllFields () {
-      console.log('Emitting change (select all):', this.allAvailableFieldKeys)
       this.$emit('change', [...this.allAvailableFieldKeys])
     },
 
-    /**
-     * Deselect all fields
-     */
     deselectAllFields () {
-      console.log('Emitting change (deselect all):', [])
       this.$emit('change', [])
     },
 
-    /**
-     * Initialize with proper defaults including custom attributes
-     */
     initializeDefaults () {
       const defaultOrder = this.defaultFieldOrderWithCustomAttributes
 
@@ -324,20 +325,8 @@ export default {
       const isUsingStaticDefaults = JSON.stringify(this.selectedFields) === JSON.stringify(DEFAULT_FIELD_ORDER)
 
       if (isUsingStaticDefaults && this.attributeDictionaries.length > 0) {
-        console.log('Initializing with custom attributes in default order')
         this.$emit('change', [...defaultOrder])
       }
-    }
-  },
-
-  data () {
-    return {
-      FIELD_CATEGORIES,
-      // Drag and drop state
-      draggedItem: null,
-      isDragging: false,
-      dragOverItem: null,
-      dragPosition: null
     }
   },
 
@@ -357,14 +346,6 @@ export default {
   },
 
   mounted () {
-    console.log('ContactFieldsSelector mounted')
-    console.log('Props received:')
-    console.log('- selectedFields:', this.selectedFields)
-    console.log('- fieldOrder:', this.fieldOrder)
-    console.log('- attributeDictionaries:', this.attributeDictionaries)
-    console.log('Available fields count:', this.availableFields.length)
-    console.log('Unselected fields count:', this.unselectedFields.length)
-
     // Initialize with custom attributes if using default state
     this.$nextTick(() => {
       this.initializeDefaults()
@@ -385,6 +366,7 @@ export default {
   min-height: 350px;
   padding: 8px;
   overflow-y: auto;
+  height: 600px;
 }
 
 .fields-list.available {

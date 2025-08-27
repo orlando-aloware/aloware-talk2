@@ -453,31 +453,3 @@ export const DEFAULT_FIELD_ORDER = [
   'time_to_first_outbound_call',
   'intake_source'
 ]
-
-/**
- * Field categories for grouping in the UI
- */
-export const FIELD_CATEGORIES = {
-  CONTACT_INFO: {
-    label: 'Contact Information',
-    fields: ['email', 'address', 'company_name', 'website', 'city', 'state', 'country', 'zip_code']
-  },
-  MANAGEMENT: {
-    label: 'Management',
-    fields: ['owner', 'contact_disposition', 'timezone', 'date_of_birth']
-  },
-  TRACKING: {
-    label: 'Tracking & Source',
-    fields: ['lead_source', 'initial_line']
-  },
-  CUSTOM: {
-    label: 'Custom Fields',
-    fields: ['custom_field_1', 'custom_field_2']
-    // Note: Dynamic custom attributes will be added by components as needed
-  },
-  SYSTEM: {
-    label: 'System Information',
-    description: 'Display-only fields that cannot be edited but can be shown/hidden',
-    fields: ['tcpa_approved', 'created_at', 'time_of_first_outbound_call', 'time_to_first_outbound_call', 'intake_source']
-  }
-}
