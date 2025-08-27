@@ -119,8 +119,17 @@ export default {
       }
 
       if (this.usedMinutes >= this.includedMinutes) {
+        const planType = this.currentCompany?.plan?.use_case
+        if (planType === 'iPro' || planType === 'uPro') {
+          const upgradeText = planType === 'uPro' ? 'or you can upgrade to xPro+Ai to include unlimited minutes' : 'or you can upgrade your plan to include more minutes'
+          return {
+            title: `You've used all ${this.includedMinutes} transcription minutes included in your ${planType}+Ai plan this month. Don't worry, your minutes will reset on the 1st, ${upgradeText} and unlock additional features by reaching out to the Aloware Team at <a href="mailto:Support@Aloware.com">Support@Aloware.com</a>`,
+            message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
+          }
+        }
+
         return {
-          title: `You've used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don't worry! You can easily purchase additional transcription minutes by reaching out to our CSM team. You can upgrade your plan to include more minutes and unlock additional features.`,
+          title: `You've used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. Don't worry, your minutes will reset on the 1st, or you can upgrade your plan to include more minutes and unlock additional features.`,
           message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
         }
       }
