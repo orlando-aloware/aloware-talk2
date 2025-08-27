@@ -330,7 +330,6 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { merge } from 'lodash'
 import Datatable from 'src/components/datatable.vue'
 import CommunicationsMobileRowDetails from './communications-mobile-row-details.vue'
-import * as CommunicationDirections from 'src/constants/communication-direction'
 import Vue from 'vue'
 
 export default {
