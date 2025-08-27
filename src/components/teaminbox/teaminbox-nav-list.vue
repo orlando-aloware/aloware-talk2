@@ -313,8 +313,14 @@ export default {
       }
 
       if (inboxId !== this.activeInboxId) {
-        // For "all" inbox, we don't need to check access since it's a virtual inbox
-        if (inboxId !== ALL_INBOXES_ID && !this.checkInboxAccess(inboxId)) {
+        // For "all" inbox check if is filtering by a specific inbox and restrict if needed
+        if (inboxId === ALL_INBOXES_ID) {
+          const queryInboxId = this.$route.query.inboxId
+          if (queryInboxId && !this.inboxes?.find(inbox => inbox.id === +queryInboxId)) {
+            contactId = null
+            this.$generalNotification('You don\'t have access to this inbox.', 'error')
+          }
+        } else if (!this.checkInboxAccess(inboxId)) {
           this.$generalNotification('You don\'t have access to this inbox.', 'error')
           this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
 
@@ -543,6 +549,12 @@ export default {
         this.onInboxSelect(this.getFirstInboxId())
         return
       }
+
+      console.log('>>> $route.params.inboxId watcher inboxId', inboxId, 'inboxes', this.inboxes)
+      // if (inboxId === ALL_INBOXES_ID) {
+      //   this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
+      //   return
+      // }
 
       const newInboxId = parseInt(inboxId)
 
