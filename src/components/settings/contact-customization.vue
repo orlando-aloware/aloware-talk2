@@ -105,10 +105,10 @@ export default {
 
     onChange (newSelectedFields) {
       this.selectedFields = newSelectedFields
-      console.log('Selected fields updated:', newSelectedFields)
-      // TODO: Save to user preferences/API
-
       this.onUpdateFields(newSelectedFields, 'setting_contact_fields')
+
+      const isValid = newSelectedFields.length > 0
+      this.setFormValidity(isValid)
     },
 
     onUpdateFields (value, prop) {
@@ -123,12 +123,6 @@ export default {
   created () {
     this.initializeSelectedFields()
     this.loadAttributeDictionaries()
-  },
-
-  mounted () {
-    // TODO: Load user preferences from store/API
-    console.log('Contact customization component mounted')
-    console.log('Custom attributes available:', this.$store.getters.getAttributeDictionaries)
   }
 }
 </script>

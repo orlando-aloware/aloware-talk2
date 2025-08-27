@@ -15,7 +15,7 @@
       </b-link>
     </div>
 
-    <div :class="`information-container ${autoHeightClass}`">
+    <div :class="`information-container ${autoHeightClass}`" :style="maxHeightStyle">
       <!-- Dynamic field rendering based on user settings -->
       <div
         v-for="(field, index) in renderableFields"
@@ -145,7 +145,7 @@
               variant="light"
               size="sm"
               pill
-              v-if="hasExpanded"
+              v-if="shouldShowExpandToggle"
               data-testid="contact-information-toggle"
               @click="onExpanded">
       <i class="material-icons icon">{{ expanded ? 'expand_less' : 'expand_more' }}</i>
@@ -219,6 +219,23 @@ export default {
       return this.expanded ? 'auto-height' : 'overflow-hidden'
     },
 
+    shouldShowExpandToggle () {
+      const minFieldsToShowToggle = 5
+      return this.hasExpanded && this.renderableFieldsCount >= minFieldsToShowToggle
+    },
+
+    maxHeightStyle () {
+      if (this.expanded) {
+        return ''
+      }
+
+      const heightPerField = 60
+      const maxNotExpandedHeight = 225
+      const totalFieldsHeight = this.renderableFieldsCount * heightPerField
+      const maxHeight = totalFieldsHeight > maxNotExpandedHeight ? maxNotExpandedHeight : totalFieldsHeight
+      return `max-height: ${maxHeight}px;`
+    },
+
     timeOfFirstOutboundCall () {
       if (this.firstOutboundCall) {
         return this.$options.filters.fixFullDateUTCRelative(this.firstOutboundCall.created_at)
@@ -263,6 +280,10 @@ export default {
 
     renderableFields () {
       return this.visibleFields.filter(field => this.shouldShowField(field))
+    },
+
+    renderableFieldsCount () {
+      return this.renderableFields.length
     }
   },
 

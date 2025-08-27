@@ -87,30 +87,20 @@
 
 <script>
 import { ContactFieldsHelper, DEFAULT_FIELD_ORDER, FIELD_CATEGORIES } from 'src/constants/contact-fields-definitions'
-import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   name: 'contact-fields-selector',
 
   props: {
-    // User's current field preferences (will come from database later)
     selectedFields: {
       type: Array,
-      default: () => [...DEFAULT_FIELD_ORDER] // Default to all fields for now
+      default: () => [...DEFAULT_FIELD_ORDER]
     }
   },
 
-  emits: ['change'],
-
   computed: {
-    ...mapGetters(['getAttributeDictionaries']),
-
-    attributeDictionaries () {
-      if (Array.isArray(this.getAttributeDictionaries)) {
-        return this.getAttributeDictionaries
-      }
-      return []
-    },
+    ...mapState(['attributeDictionaries']),
 
     /**
      * Default field order including custom attributes dynamically
@@ -118,7 +108,7 @@ export default {
     defaultFieldOrderWithCustomAttributes () {
       const customAttributeFields = this.attributeDictionaries.map(attr => `custom_attribute_${attr.id}`)
 
-      // Insert custom attributes after custom_field_2
+      // Insert custom attributes after custom_field_2 (this was the default order in the ui)
       const baseOrder = [...DEFAULT_FIELD_ORDER]
       const custom2Index = baseOrder.indexOf('custom_field_2')
 
