@@ -303,6 +303,10 @@ export default {
     },
 
     getIncomingNumber () {
+      if (!this.selectedLine || !this.contact?.id) {
+        return
+      }
+
       this.isBusy = true
 
       let apiCall
@@ -321,9 +325,7 @@ export default {
 
     setDefaultLine () {
       this.selectedLine = this.selectedCampaign
-      if (this.selectedLine && this.contact.id) {
-        this.getIncomingNumber()
-      }
+      this.getIncomingNumber()
     },
 
     setIncomingNumber () {

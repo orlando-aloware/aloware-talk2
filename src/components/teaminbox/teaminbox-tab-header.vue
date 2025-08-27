@@ -178,7 +178,7 @@ export default {
       }
 
       // Add the inbox ID as ring_groups query parameter if available
-      if (this.activeInbox && this.activeInbox.id) {
+      if (this.activeInbox && this.activeInbox.id && this.activeInbox.id !== ALL_INBOXES_ID) {
         route.query.ring_groups = this.activeInbox.id
       }
 
