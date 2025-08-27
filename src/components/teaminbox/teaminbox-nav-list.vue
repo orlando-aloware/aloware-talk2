@@ -234,7 +234,7 @@ export default {
       ]
 
       // Add "All Inboxes" only for demo companies
-      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) && !this.search) {
         navItems.unshift({
           id: INBOX_TYPE_ALL,
           name: 'All Inboxes',
@@ -391,7 +391,7 @@ export default {
       }
 
       // If user has any inboxes, prioritize "All Inboxes" as the first option
-      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) && !this.search) {
         const allInboxes = [
           ...this.parsedInboxes.personal,
           ...this.parsedInboxes.connected,
@@ -532,6 +532,12 @@ export default {
           inboxToSelect.contactId,
           inboxToSelect.force
         )
+      }
+    } else {
+      // restrict when no inboxes and user is trying to access all inboxes
+      if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+        this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
+        return
       }
     }
 
