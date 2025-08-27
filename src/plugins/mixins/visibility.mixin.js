@@ -261,14 +261,14 @@ export default {
         return false
       }
 
-      if (filter.types?.length) {
-        const selectedTypesMap = {
+      if (filter.channels?.length) {
+        const selectedChannelsMap = {
           [CommunicationTypes.CALL_TYPE]: CommunicationTypes.CALL,
           [CommunicationTypes.SMS_TYPE]: CommunicationTypes.SMS,
           [CommunicationTypes.RVM_TYPE]: CommunicationTypes.RVM
         }
         // checks if communication type is present in the selected types
-        if (!filter.types.some((type) => selectedTypesMap[type] === communication.type)) {
+        if (!filter.channels.some((channel) => selectedChannelsMap[channel] === communication.type)) {
           return false
         }
       }
