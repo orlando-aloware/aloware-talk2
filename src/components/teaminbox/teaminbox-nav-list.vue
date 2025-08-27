@@ -533,6 +533,12 @@ export default {
           inboxToSelect.force
         )
       }
+    } else {
+      // restrict when no inboxes and user is trying to access all inboxes
+      if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+        this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
+        return
+      }
     }
 
     // Listen to ring group events
