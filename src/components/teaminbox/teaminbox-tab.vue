@@ -427,12 +427,9 @@ export default {
 
       // Check filters and sorting settings
       if (!this.checkCommunication(communication, isAscendingOrder)) {
-        if (index !== -1) {
-          this.itemsData.splice(index, 1)
-        }
-
         return
       }
+
       // New communication (not in the list)
       if (index === -1) {
         // For new communications, add them at appropriate position based on sort order
