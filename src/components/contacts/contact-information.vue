@@ -209,7 +209,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'contactAttributes']),
+    ...mapGetters('contacts', ['contact', 'contactAttributes', 'contactAttributesClone']),
     ...mapGetters('auth', ['profile']),
 
     SettingsMap () {
@@ -317,8 +317,28 @@ export default {
     }
   },
 
+  mounted () {
+    this.setUpCustomAttributeListeners()
+  },
+
+  beforeDestroy () {
+    this.removeCustomAttributeListeners()
+  },
+
+  watch: {
+    contactAttributes: {
+      handler (newAttributes) {
+        // Whenever attributes change, update the clone for change tracking
+        if (newAttributes && newAttributes.length > 0) {
+          this.setContactAttributesClone(newAttributes)
+        }
+      },
+      immediate: true
+    }
+  },
+
   methods: {
-    ...mapActions('contacts', ['setContactAttributes', 'setContact', 'updateChangedContactProperties', 'updateChangedContactAttributes']),
+    ...mapActions('contacts', ['setContactAttributes', 'setContactAttributesClone', 'setContact', 'updateChangedContactProperties', 'updateChangedContactAttributes']),
 
     onExpanded () {
       this.isExpanded = !this.isExpanded
@@ -540,6 +560,38 @@ export default {
         name: attribute.name,
         value: value
       })
+    },
+
+    removeCustomAttributeListeners () {
+      this.$VueEvent.stop('cancelContactChanges', this.onCancelContactChanges)
+      this.$VueEvent.stop('customAttributesUpdated', this.onCustomAttributesUpdated)
+    },
+
+    setUpCustomAttributeListeners () {
+      // Ensure the clone is created for existing attributes
+      if (this.contactAttributes && this.contactAttributes.length > 0) {
+        this.setContactAttributesClone(this.contactAttributes)
+      }
+
+      // Listen for cancel changes event to reset attribute values to original
+      this.$VueEvent.listen('cancelContactChanges', this.onCancelContactChanges)
+
+      // Listen for successful save to update the clone with new baseline values
+      this.$VueEvent.listen('customAttributesUpdated', this.onCustomAttributesUpdated)
+    },
+
+    onCancelContactChanges () {
+      if (this.contactAttributesClone && this.contactAttributesClone.length > 0) {
+        // Reset contactAttributes to their original values from the clone
+        this.setContactAttributes([...this.contactAttributesClone])
+      }
+    },
+
+    onCustomAttributesUpdated (contact) {
+      if (this.contact.id === contact.id && this.contactAttributes) {
+        // Update the clone with the current values as the new baseline
+        this.setContactAttributesClone([...this.contactAttributes])
+      }
     }
   }
 }
