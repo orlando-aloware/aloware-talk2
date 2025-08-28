@@ -322,6 +322,8 @@ export default {
   },
 
   beforeDestroy () {
+    // Reset any unsaved custom attribute changes before leaving the page
+    this.onCancelContactChanges()
     this.removeCustomAttributeListeners()
   },
 
