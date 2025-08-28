@@ -351,15 +351,9 @@ export const ContactFieldsHelper = {
    * Get the appropriate component for custom attribute types
    */
   getCustomAttributeComponent (attributeType) {
-    switch (attributeType) {
-      case ContactAttributeTypeEnum.DATE_PICKER:
-        return 'attribute-type-date-picker'
-      case ContactAttributeTypeEnum.NUMBER:
-      case ContactAttributeTypeEnum.TEXT:
-      case ContactAttributeTypeEnum.DROPDOWN:
-      default:
-        return 'attribute-type-text'
-    }
+    return attributeType === ContactAttributeTypeEnum.DATE_PICKER
+      ? 'attribute-type-date-picker'
+      : 'attribute-type-text'
   }
 }
 
