@@ -429,6 +429,10 @@ const talk2Api = {
          * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object>>}
          */
         getContactConversationThreads (contactId) {
+          if (!contactId) {
+            return null
+          }
+
           return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/conversation-threads/${contactId}`)
         }
       },

@@ -258,7 +258,7 @@
         </span>
 
         <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.INBOUND">
+              v-if="showBottomCommunicationInfo">
           <router-link
             :to="{ name: 'Communication', params: { contactId: contact.id , communicationId: communication.id }}">
             <information-circle-icon style="cursor: help;"
@@ -581,6 +581,20 @@ export default {
 
     shouldDisplayCommunication () {
       return (this.communication.property !== undefined && !this.excluded_audits.includes(this.communication.property)) || this.communication.property === undefined
+    },
+
+    showBottomCommunicationInfo () {
+      const { direction, type } = this.communication
+
+      if (direction === CommunicationDirection.OUTBOUND) {
+        return false
+      }
+
+      if (type === CommunicationTypes.NOTE) {
+        return false
+      }
+
+      return true
     }
   },
 
