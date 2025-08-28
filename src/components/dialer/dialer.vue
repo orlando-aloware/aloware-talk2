@@ -113,11 +113,11 @@ export default {
     },
 
     hasParkedAndInprogressCall () {
-      return this.dialer.parkedCall && this.dialer.call
+      return this.dialer.parkedCall && (this.dialer.call !== null)
     },
 
     hasCallInProgressNotParked () {
-      return !this.dialer.parkedCall && this.dialer.call
+      return !this.dialer.parkedCall && (this.dialer.call !== null)
     },
 
     shouldPushPhoneRoute () {
@@ -1084,7 +1084,7 @@ export default {
         return
       }
 
-      this.backToDial('Talk-Device.OnDisconnect')
+      this.backToDial('Talk-Device.OnDisconnect', false, true)
     },
 
     hangupCall () {
@@ -1432,7 +1432,7 @@ export default {
       }
 
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
-        console.log('Call parked')
+        console.log('Call parked combo')
 
         if (shouldAnswer) {
           if (this.dialer.communication) {
@@ -1800,14 +1800,14 @@ export default {
       clearInterval(this.$options.parkedCallDurationInterval)
     },
 
-    backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
+    backToDial (signature = 'Talk-BackToDial', forceStatus = false, ignoreForceDisposition = false) {
       // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
       if (signature !== 'Talk-Connection.OnCancel') {
         this.resetAgentStatus(forceStatus, signature)
       }
 
       // halt due to required forced dispositions
-      if (this.isForcedToDisposeAndNotDisposed) {
+      if (this.isForcedToDisposeAndNotDisposed && !ignoreForceDisposition) {
         return
       }
 
