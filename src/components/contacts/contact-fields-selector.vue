@@ -307,14 +307,18 @@ export default {
     },
 
     resetToDefault () {
+      // Reset to default field order with custom attributes
       this.$emit('change', [...this.defaultFieldOrderWithCustomAttributes])
     },
 
     selectAllFields () {
-      this.$emit('change', [...this.allAvailableFieldKeys])
+      // Keep current selected fields in their order, then add unselected fields
+      const unselectedFieldKeys = this.unselectedFields.map(field => field.key)
+      this.$emit('change', [...this.selectedFields, ...unselectedFieldKeys])
     },
 
     deselectAllFields () {
+      // Remove all fields
       this.$emit('change', [])
     },
 
