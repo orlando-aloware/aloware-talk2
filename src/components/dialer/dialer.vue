@@ -113,11 +113,11 @@ export default {
     },
 
     hasParkedAndInprogressCall () {
-      return this.dialer.parkedCall && this.dialer.call
+      return this.dialer.parkedCall && (this.dialer.call !== null)
     },
 
     hasCallInProgressNotParked () {
-      return !this.dialer.parkedCall && this.dialer.call
+      return !this.dialer.parkedCall && (this.dialer.call !== null)
     },
 
     shouldPushPhoneRoute () {
@@ -176,6 +176,12 @@ export default {
             this.stopParkedCallTimer()
           }
         }
+      }
+    }
+
+    this.dialerListeners.updateRecordingStatus = (data) => {
+      if (data.communication_id === this.dialer.communication.id) {
+        this.setDialerRecordingStatus(data.recording_status)
       }
     }
 
@@ -502,6 +508,7 @@ export default {
     },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.listen('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.listen('endWrapUp', this.dialerListeners.endWrapUp)
@@ -536,6 +543,7 @@ export default {
 
     stopDialerEvents () {
       this.$VueEvent.stop('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.stop('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.stop('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.stop('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.stop('endWrapUp', this.dialerListeners.endWrapUp)
@@ -1076,7 +1084,7 @@ export default {
         return
       }
 
-      this.backToDial('Talk-Device.OnDisconnect')
+      this.backToDial('Talk-Device.OnDisconnect', false, true)
     },
 
     hangupCall () {
@@ -1424,7 +1432,7 @@ export default {
       }
 
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
-        console.log('Call parked')
+        console.log('Call parked combo')
 
         if (shouldAnswer) {
           if (this.dialer.communication) {
@@ -1792,14 +1800,14 @@ export default {
       clearInterval(this.$options.parkedCallDurationInterval)
     },
 
-    backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
+    backToDial (signature = 'Talk-BackToDial', forceStatus = false, ignoreForceDisposition = false) {
       // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
       if (signature !== 'Talk-Connection.OnCancel') {
         this.resetAgentStatus(forceStatus, signature)
       }
 
       // halt due to required forced dispositions
-      if (this.isForcedToDisposeAndNotDisposed) {
+      if (this.isForcedToDisposeAndNotDisposed && !ignoreForceDisposition) {
         return
       }
 

@@ -191,7 +191,7 @@
                   :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'transfer_target_user_ids'">
-                <transferred prop="transfer_target_user_ids"
+                <transferred prop="transfer_target_users"
                              :row="row" />
               </td>
 
@@ -537,6 +537,11 @@ export default {
     },
 
     newCommunicationListener (communication) {
+      if (this.isNote(communication)) {
+        // Do not show note type communications
+        return
+      }
+
       const found = this.communicationsData.find(c => c.id === communication.id)
 
       if (!found) {
@@ -717,6 +722,10 @@ export default {
 
         return b.communication_id - a.communication_id
       })
+    },
+
+    isNote (communication) {
+      return communication.type === CommunicationTypes.NOTE
     }
   },
 

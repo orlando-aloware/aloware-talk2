@@ -117,6 +117,7 @@ import {
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
 import { mapFields } from 'vuex-map-fields'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
   components: {
@@ -127,7 +128,8 @@ export default {
   },
 
   mixins: [
-    TeamInboxMixin
+    TeamInboxMixin,
+    userMixin
   ],
 
   data () {
@@ -213,12 +215,7 @@ export default {
         ...this.parsedInboxes.watching
       ]
 
-      return [
-        {
-          id: INBOX_TYPE_ALL,
-          name: 'All Inboxes',
-          inboxes: allInboxes.length > 0 ? [{ id: ALL_INBOXES_ID, name: 'All Inboxes' }] : []
-        },
+      const navItems = [
         {
           id: INBOX_TYPE_PERSONAL,
           name: 'Personal Inboxes',
@@ -235,6 +232,17 @@ export default {
           inboxes: this.parsedInboxes.watching
         }
       ]
+
+      // Add "All Inboxes" only for demo companies
+      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) && !this.search) {
+        navItems.unshift({
+          id: INBOX_TYPE_ALL,
+          name: 'All Inboxes',
+          inboxes: allInboxes.length > 0 ? [{ id: ALL_INBOXES_ID, name: 'All Inboxes' }] : []
+        })
+      }
+
+      return navItems
     },
 
     dateFilter () {
@@ -305,8 +313,14 @@ export default {
       }
 
       if (inboxId !== this.activeInboxId) {
-        // For "all" inbox, we don't need to check access since it's a virtual inbox
-        if (inboxId !== ALL_INBOXES_ID && !this.checkInboxAccess(inboxId)) {
+        // For "all" inbox check if is filtering by a specific inbox and restrict if needed
+        if (inboxId === ALL_INBOXES_ID) {
+          const queryInboxId = this.$route.query.inboxId
+          if (queryInboxId && !this.inboxes?.find(inbox => inbox.id === +queryInboxId)) {
+            contactId = null
+            this.$generalNotification('You don\'t have access to this inbox.', 'error')
+          }
+        } else if (!this.checkInboxAccess(inboxId)) {
           this.$generalNotification('You don\'t have access to this inbox.', 'error')
           this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
 
@@ -377,14 +391,16 @@ export default {
       }
 
       // If user has any inboxes, prioritize "All Inboxes" as the first option
-      const allInboxes = [
-        ...this.parsedInboxes.personal,
-        ...this.parsedInboxes.connected,
-        ...this.parsedInboxes.watching
-      ]
+      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) && !this.search) {
+        const allInboxes = [
+          ...this.parsedInboxes.personal,
+          ...this.parsedInboxes.connected,
+          ...this.parsedInboxes.watching
+        ]
 
-      if (allInboxes.length > 0) {
-        return ALL_INBOXES_ID
+        if (allInboxes.length > 0) {
+          return ALL_INBOXES_ID
+        }
       }
 
       return this.parsedInboxes.personal.length ? this.parsedInboxes.personal[0]?.id : this.inboxes[0]?.id
@@ -516,6 +532,12 @@ export default {
           inboxToSelect.contactId,
           inboxToSelect.force
         )
+      }
+    } else {
+      // restrict when no inboxes and user is trying to access all inboxes
+      if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+        this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
+        return
       }
     }
 
