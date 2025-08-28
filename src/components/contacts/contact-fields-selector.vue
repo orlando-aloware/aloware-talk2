@@ -226,14 +226,6 @@ export default {
     },
 
     /**
-     * Get field label by key
-     */
-    getFieldLabel (fieldKey) {
-      const field = this.getFieldByKey(fieldKey)
-      return field ? field.label : fieldKey
-    },
-
-    /**
      * Add field to selection
      */
     addField (fieldKey) {
