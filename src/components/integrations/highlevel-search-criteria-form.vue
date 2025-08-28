@@ -7,114 +7,212 @@
       <div class="mt-2">Loading search options...</div>
     </div>
 
-    <div v-else class="form-group mb-3">
-      <label class="form-label">Search Criteria</label>
+    <div v-else class="search-criteria-summary">
+      <div class="criteria-display">
+        <div class="criteria-item">
+          <div class="criteria-content">
+            <div class="criteria-text">
+              {{ getCriteriaSummary || 'No criteria set' }}
+            </div>
+            <div class="criteria-actions">
+              <button class="btn btn-outline-primary btn-sm"
+                      @click="showEditDialog = true">
+                {{ hasCriteria ? 'Edit' : 'Add' }} Criteria
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <!-- Compact Summary View -->
-      <div class="search-criteria-summary">
-        <div v-if="hasCriteria" class="criteria-display">
-          <div class="criteria-item">
-            <span class="criteria-text">
-              {{ getCriteriaSummary }}
-            </span>
-            <button class="btn btn-link small text-muted"
-                    @click="openEditDialog">
-              <i class="fa fa-edit"/>
-            </button>
+    <b-modal
+      v-model="showEditDialog"
+      title="Edit Search Criteria"
+      size="lg"
+      centered
+      :hide-footer="false"
+    >
+      <div class="criteria-editor">
+        <div class="search-criteria-box">
+          <div class="criteria-list">
+            <template v-for="(block, blockIndex) in searchCriteria.filters">
+              <!-- OR separator for all blocks except the first -->
+              <div v-if="blockIndex > 0" :key="`or-separator-${blockIndex}`" class="or-separator">
+                <span class="or-text">OR</span>
+              </div>
+
+              <!-- Criteria block -->
+              <div :key="`block-${blockIndex}`" class="criteria-block">
+                <!-- AND Group -->
+                <div v-if="block.group === 'AND'" class="and-group">
+                  <div v-for="(filter, filterIndex) in block.filters"
+                       :key="`filter-${blockIndex}-${filterIndex}`"
+                       class="criteria-row">
+
+                    <div class="criteria-form-row">
+                      <div class="criteria-form-field">
+                        <label v-if="filterIndex === 0" class="field-label">Field</label>
+                        <q-select
+                          v-model="filter.field"
+                          :options="availableFields"
+                          outlined
+                          dense
+                          emit-value
+                          map-options
+                          placeholder="Select a field"
+                          class="criteria-form-input"
+                        />
+                      </div>
+
+                      <div class="criteria-form-field">
+                        <label v-if="filterIndex === 0" class="field-label">Operator</label>
+                        <q-select
+                          v-model="filter.operator"
+                          :options="availableOperators"
+                          outlined
+                          dense
+                          emit-value
+                          map-options
+                          placeholder="Select an operator"
+                          class="criteria-form-input"
+                        />
+                      </div>
+
+                      <div class="criteria-form-field">
+                        <label v-if="filterIndex === 0" class="field-label">Value</label>
+                        <q-input
+                          v-model="filter.value"
+                          outlined
+                          dense
+                          placeholder="Enter value"
+                          class="criteria-form-input"
+                        />
+                      </div>
+
+                      <div class="delete-button-container">
+                        <button class="btn btn-outline-danger btn-sm delete-button"
+                                @click="removeFilterFromGroup(blockIndex, filterIndex)"
+                                :disabled="block.filters.length === 1">
+                          <i class="fa fa-trash"/>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="group-and-button">
+                    <compact-btn
+                      variant="primary"
+                      :disabled="!isLastFilterValid(block)"
+                      @clicked="addAndCriteria(blockIndex)"
+                    >
+                      <i class="fa fa-plus mr-2"/>
+                      AND
+                    </compact-btn>
+                  </div>
+                </div>
+
+                <!-- Single Filter -->
+                <div v-else class="single-filter">
+                  <div class="criteria-form-row">
+                    <div class="criteria-form-field">
+                      <label v-if="blockIndex === 0" class="field-label">Field</label>
+                      <q-select
+                        v-model="block.field"
+                        :options="availableFields"
+                        outlined
+                        dense
+                        emit-value
+                        map-options
+                        placeholder="Select a field"
+                        class="criteria-form-input"
+                      />
+                    </div>
+
+                    <div class="criteria-form-field">
+                      <label v-if="blockIndex === 0" class="field-label">Operator</label>
+                      <q-select
+                        v-model="block.operator"
+                        :options="availableOperators"
+                        outlined
+                        dense
+                        emit-value
+                        map-options
+                        placeholder="Select an operator"
+                        class="criteria-form-input"
+                      />
+                    </div>
+
+                    <div class="criteria-form-field">
+                      <label v-if="blockIndex === 0" class="field-label">Value</label>
+                      <q-input
+                        v-model="block.value"
+                        outlined
+                        dense
+                        placeholder="Enter value"
+                        class="criteria-form-input"
+                      />
+                    </div>
+
+                    <div class="delete-button-container">
+                      <button class="btn btn-outline-danger btn-sm delete-button"
+                              @click="removeCriteria(blockIndex)"
+                              :disabled="searchCriteria.filters.length === 1">
+                        <i class="fa fa-trash"/>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="single-filter-and-button">
+                    <compact-btn
+                      variant="primary"
+                      :disabled="!isFilterValid(block)"
+                      @clicked="addAndCriteria(blockIndex)"
+                    >
+                      <i class="fa fa-plus mr-2"/>
+                      AND
+                    </compact-btn>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
 
-        <div v-else class="no-criteria">
-          <span class="text-muted">No search criteria defined</span>
-          <button class="btn btn-link small text-muted ml-2"
-                  @click="openEditDialog">
-            <i class="fa fa-plus"/>
-          </button>
+        <div class="add-or-section">
+          <compact-btn
+            variant="primary"
+            :disabled="!canAddOrBlock"
+            @clicked="addOrCriteria"
+          >
+            <i class="fa fa-plus-circle mr-2"/>
+            OR
+          </compact-btn>
         </div>
       </div>
 
-      <!-- Detailed Edit Dialog -->
-      <b-modal
-        id="highlevel-criteria-modal"
-        title="Edit Search Criteria"
-        size="lg"
-        centered
-        :hide-footer="false"
-        v-model="showEditDialog"
-        @hidden="showEditDialog = false"
-      >
-        <div class="criteria-editor">
-          <!-- Single Criteria Row -->
-          <div class="criteria-form-row">
-            <div class="criteria-form-field">
-              <label class="field-label">Field</label>
-              <q-select
-                v-model="searchCriteria.field"
-                :options="availableFields"
-                outlined
-                dense
-                emit-value
-                map-options
-                placeholder="Select a field"
-                class="criteria-form-input"
-              />
-            </div>
-
-            <div class="criteria-form-field">
-              <label class="field-label">Operator</label>
-              <q-select
-                v-model="searchCriteria.operator"
-                :options="filteredOperators"
-                outlined
-                dense
-                emit-value
-                map-options
-                placeholder="Select an operator"
-                class="criteria-form-input"
-              />
-            </div>
-
-            <div class="criteria-form-field">
-              <label class="field-label">Value</label>
-              <q-input
-                v-model="searchCriteria.value"
-                outlined
-                dense
-                placeholder="Enter value"
-                class="criteria-form-input"
-              />
-            </div>
-          </div>
-
-          <!-- Placeholder for future multi-criteria support -->
-          <div class="mt-3 text-center">
-            <small class="text-muted">
-              Additional criteria with OR/AND logic will be added here in future updates
-            </small>
-          </div>
+      <template #modal-footer>
+        <div class="d-flex align-items-center">
+          <button class="btn btn-block btn-light mt-0 mr-2"
+                  @click="showEditDialog = false">
+            Cancel
+          </button>
+          <button class="btn btn-block btn-primary mt-0"
+                  @click="applyCriteria">
+            Apply
+          </button>
         </div>
-
-        <template #modal-footer>
-          <div class="d-flex align-items-center">
-            <button class="btn btn-block btn-light mt-0 mr-2"
-                    @click="showEditDialog = false">
-              Cancel
-            </button>
-            <button class="btn btn-block btn-primary mt-0"
-                    @click="applyCriteria"
-                    :disabled="!isCriteriaValid">
-              Apply
-            </button>
-          </div>
-        </template>
-      </b-modal>
-    </div>
+      </template>
+    </b-modal>
   </div>
 </template>
 
 <script>
 export default {
   name: 'HighlevelSearchCriteriaForm',
+
+  components: {
+    CompactBtn: () => import('../../components/compact-btn.vue')
+  },
 
   props: {
     value: {
@@ -129,51 +227,134 @@ export default {
 
   data () {
     return {
-      searchCriteria: {
-        field: '',
-        operator: '',
-        value: ''
-      },
+      showEditDialog: false,
+      isLoading: false,
       availableFields: [],
       availableOperators: [],
-      isLoading: false,
-      showEditDialog: false
+      searchCriteria: {
+        filters: [
+          { field: '', operator: '', value: '' }
+        ]
+      }
     }
   },
 
   computed: {
     hasCriteria () {
-      return this.searchCriteria.field && this.searchCriteria.operator && this.searchCriteria.value
-    },
-
-    isCriteriaValid () {
-      return this.searchCriteria.field && this.searchCriteria.operator && this.searchCriteria.value
+      return this.searchCriteria.filters.some(block => {
+        if (block.group === 'AND') {
+          return block.filters.some(filter => filter.field && filter.operator)
+        }
+        return block.field && block.operator
+      })
     },
 
     getCriteriaSummary () {
-      if (!this.hasCriteria) return ''
+      if (!this.hasCriteria) return 'No criteria set'
 
-      const fieldLabel = this.availableFields.find(f => f.value === this.searchCriteria.field)?.label || this.searchCriteria.field
-      const operatorLabel = this.availableOperators.find(o => o.value === this.searchCriteria.operator)?.label || this.searchCriteria.operator
+      const fieldCache = {}
+      const operatorCache = {}
 
-      return `${fieldLabel} ${operatorLabel.toLowerCase()} "${this.searchCriteria.value}"`
+      const summaries = this.searchCriteria.filters.map(block => {
+        if (block.group === 'AND') {
+          const filterSummaries = block.filters.map(filter => {
+            const fieldLabel = this.getFieldLabel(filter.field, fieldCache)
+            const operatorLabel = this.getOperatorLabel(filter.operator, operatorCache)
+            return `${fieldLabel} ${operatorLabel.toLowerCase()} "${filter.value}"`
+          })
+          return filterSummaries.join(' AND ')
+        } else {
+          const fieldLabel = this.getFieldLabel(block.field, fieldCache)
+          const operatorLabel = this.getOperatorLabel(block.operator, operatorCache)
+          return `${fieldLabel} ${operatorLabel.toLowerCase()} "${block.value}"`
+        }
+      })
+
+      return summaries.join(' OR ')
     },
 
-    filteredOperators () {
-      if (!this.searchCriteria.field) {
-        return this.availableOperators
-      }
-
-      const field = this.availableFields.find(f => f.value === this.searchCriteria.field)
-      if (!field || !field.supportedOperators) {
-        return this.availableOperators
-      }
-
-      return this.availableOperators.filter(op => field.supportedOperators.includes(op.value))
+    canAddOrBlock () {
+      return this.hasCriteria && this.searchCriteria.filters.length < 5
     }
   },
 
   methods: {
+    // Helper methods
+    getFieldLabel (fieldValue, cache) {
+      if (!cache[fieldValue]) {
+        cache[fieldValue] = this.availableFields.find(f => f.value === fieldValue)?.label || fieldValue
+      }
+      return cache[fieldValue]
+    },
+
+    getOperatorLabel (operatorValue, cache) {
+      if (!cache[operatorValue]) {
+        cache[operatorValue] = this.availableOperators.find(o => o.value === operatorValue)?.label || operatorValue
+      }
+      return cache[operatorValue]
+    },
+
+    isFilterValid (filter) {
+      if (!filter.field || !filter.operator) return false
+      if (['exists', 'not_exists'].includes(filter.operator)) return true
+      return filter.value !== undefined && filter.value !== null && filter.value !== ''
+    },
+
+    isLastFilterValid (block) {
+      if (!block.filters || block.filters.length === 0) return false
+      const lastFilter = block.filters[block.filters.length - 1]
+      return this.isFilterValid(lastFilter)
+    },
+
+    // Main action methods
+    applyCriteria () {
+      this.showEditDialog = false
+      this.emitValue()
+    },
+
+    emitValue () {
+      this.$emit('input', this.searchCriteria)
+    },
+
+    addOrCriteria () {
+      const newFilter = { field: '', operator: '', value: '' }
+      this.searchCriteria.filters.push(newFilter)
+    },
+
+    addAndCriteria (blockIndex) {
+      const currentBlock = this.searchCriteria.filters[blockIndex]
+
+      if (currentBlock.group === 'AND') {
+        const newFilter = { field: '', operator: '', value: '' }
+        currentBlock.filters.push(newFilter)
+      } else {
+        const singleFilter = { ...currentBlock }
+        const newFilter = { field: '', operator: '', value: '' }
+
+        this.$set(this.searchCriteria.filters, blockIndex, {
+          group: 'AND',
+          filters: [singleFilter, newFilter]
+        })
+      }
+    },
+
+    removeCriteria (blockIndex) {
+      if (this.searchCriteria.filters.length > 1) {
+        this.searchCriteria.filters.splice(blockIndex, 1)
+      }
+    },
+
+    removeFilterFromGroup (blockIndex, filterIndex) {
+      const block = this.searchCriteria.filters[blockIndex]
+      if (block.group === 'AND' && block.filters.length > 1) {
+        block.filters.splice(filterIndex, 1)
+
+        if (block.filters.length === 1) {
+          this.searchCriteria.filters[blockIndex] = block.filters[0]
+        }
+      }
+    },
+
     async fetchSearchOptions () {
       this.isLoading = true
       try {
@@ -181,7 +362,6 @@ export default {
         const data = response.data.data
 
         if (data.fields) {
-          // Transform fields to include label and supported operators
           this.availableFields = Object.entries(data.fields).map(([value, fieldData]) => ({
             label: fieldData.label,
             value: value,
@@ -190,35 +370,17 @@ export default {
         }
 
         if (data.operators) {
-          // Transform operators to include label
           this.availableOperators = Object.entries(data.operators).map(([value, label]) => ({
             label: label,
             value: value
           }))
         }
-
-        console.log('HighLevel search options loaded:', { fields: this.availableFields, operators: this.availableOperators })
       } catch (error) {
         console.error('Failed to fetch HighLevel search options:', error)
         this.$generalNotification('Failed to load HighLevel search options. Please try again.', 'error')
       } finally {
         this.isLoading = false
       }
-    },
-
-    openEditDialog () {
-      this.showEditDialog = true
-    },
-
-    applyCriteria () {
-      if (this.isCriteriaValid) {
-        this.emitValue()
-        this.showEditDialog = false
-      }
-    },
-
-    emitValue () {
-      this.$emit('input', this.searchCriteria)
     }
   },
 
@@ -228,16 +390,6 @@ export default {
         this.emitValue()
       },
       deep: true
-    },
-
-    'searchCriteria.field' (newField) {
-      // Reset operator when field changes to ensure compatibility
-      if (newField && this.searchCriteria.operator) {
-        const field = this.availableFields.find(f => f.value === newField)
-        if (field && field.supportedOperators && !field.supportedOperators.includes(this.searchCriteria.operator)) {
-          this.searchCriteria.operator = ''
-        }
-      }
     }
   }
 }
@@ -267,6 +419,13 @@ export default {
 
 .criteria-item {
   display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+.criteria-content {
+  display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
@@ -278,18 +437,9 @@ export default {
   flex-grow: 1;
 }
 
-.no-criteria {
+.criteria-actions {
   display: flex;
   align-items: center;
-  width: 100%;
-  color: #6c757d;
-  font-style: italic;
-}
-
-.form-label {
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 8px;
 }
 
 .field-label {
@@ -303,12 +453,16 @@ export default {
   padding: 16px 0;
 }
 
-/* Form layout classes */
+.search-criteria-box {
+  margin-bottom: 16px;
+}
+
 .criteria-form-row {
   display: flex;
   gap: 16px;
   margin: 0;
   padding: 0;
+  align-items: flex-end;
 }
 
 .criteria-form-field {
@@ -321,5 +475,94 @@ export default {
 .criteria-form-input {
   width: 100%;
   height: 40px;
+}
+
+.delete-button-container {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.delete-button {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dc3545;
+  border-radius: 4px;
+  background-color: white;
+  color: #dc3545;
+  transition: all 0.2s ease;
+  transform: translateY(-8px);
+}
+
+.delete-button:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.single-filter-and-button,
+.group-and-button {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.add-or-section {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.criteria-block {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background-color: #fafbfc;
+}
+
+.and-group,
+.single-filter {
+  padding: 16px;
+  background-color: #fafbfc;
+}
+
+.single-filter {
+  border-radius: 6px;
+}
+
+.criteria-row {
+  margin-bottom: 8px;
+}
+
+.criteria-row:last-child {
+  margin-bottom: 0;
+}
+
+.or-separator {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.or-separator::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #dee2e6;
+  z-index: 1;
+}
+
+.or-text {
+  background-color: white;
+  padding: 0 16px;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 14px;
+  position: relative;
+  z-index: 2;
 }
 </style>
