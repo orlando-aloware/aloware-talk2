@@ -326,7 +326,6 @@ export const ContactFieldsHelper = {
     const attributeId = attribute.id || attribute.attribute_id
 
     if (!attributeId || !attribute.name) {
-      console.error('createCustomAttributeDefinition called with invalid attribute:', attribute)
       return null
     }
 
