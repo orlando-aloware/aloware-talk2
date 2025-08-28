@@ -267,11 +267,32 @@ export default {
       return selectedFields.map(fieldKey => {
         // Handle custom attributes
         if (fieldKey.startsWith('custom_attribute_')) {
-          const attributeId = parseInt(fieldKey.replace('custom_attribute_', ''))
-          const attribute = this.contactAttributes.find(attr => attr.attribute_id === attributeId)
-          return attribute
-            ? ContactFieldsHelper.createCustomAttributeDefinition(attribute)
-            : null
+          const attributeIdStr = fieldKey.replace('custom_attribute_', '')
+          const attributeId = parseInt(attributeIdStr)
+
+          // Validate the parsed attribute ID
+          if (isNaN(attributeId) || !attributeIdStr) {
+            return null
+          }
+
+          // Find attribute - handle both id and attribute_id properties
+          const attribute = this.contactAttributes.find(attr =>
+            attr.id === attributeId || attr.attribute_id === attributeId
+          )
+
+          if (!attribute) {
+            return null
+          }
+
+          // Normalize attribute structure for createCustomAttributeDefinition
+          const normalizedAttribute = {
+            ...attribute,
+            id: attribute.id || attribute.attribute_id,
+            name: attribute.name,
+            type: attribute.type
+          }
+
+          return ContactFieldsHelper.createCustomAttributeDefinition(normalizedAttribute)
         }
 
         // Handle standard fields
@@ -490,20 +511,35 @@ export default {
      * Get custom attribute by ID
      */
     getCustomAttribute (attributeId) {
-      return this.contactAttributes.find(attr => attr.id === attributeId) || {}
+      if (!attributeId || isNaN(attributeId)) {
+        return {}
+      }
+
+      const attribute = this.contactAttributes.find(attr =>
+        attr.id === attributeId || attr.attribute_id === attributeId
+      )
+
+      return attribute || {}
     },
 
     /**
      * Handle custom attribute updates
      */
     onUpdateCustomAttribute (value, attributeId) {
-      const attribute = this.getCustomAttribute(attributeId)
-      if (attribute) {
-        this.updateChangedContactAttributes({
-          name: attribute.name,
-          value: value
-        })
+      if (!attributeId || isNaN(attributeId)) {
+        return
       }
+
+      const attribute = this.getCustomAttribute(attributeId)
+
+      if (!attribute || !attribute.name) {
+        return
+      }
+
+      this.updateChangedContactAttributes({
+        name: attribute.name,
+        value: value
+      })
     }
   }
 }

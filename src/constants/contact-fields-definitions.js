@@ -322,13 +322,21 @@ export const ContactFieldsHelper = {
    * Create custom attribute field definition
    */
   createCustomAttributeDefinition (attribute) {
+    // Handle both id and attribute_id properties for compatibility
+    const attributeId = attribute.id || attribute.attribute_id
+
+    if (!attributeId || !attribute.name) {
+      console.error('createCustomAttributeDefinition called with invalid attribute:', attribute)
+      return null
+    }
+
     return {
-      key: `custom_attribute_${attribute.id}`,
+      key: `custom_attribute_${attributeId}`,
       label: attribute.name,
       component: this.getCustomAttributeComponent(attribute.type),
       type: 'custom_attribute',
-      dataField: `attribute_${attribute.id}`,
-      attributeId: attribute.id,
+      dataField: `attribute_${attributeId}`,
+      attributeId: attributeId,
       attributeType: attribute.type,
       permissions: [],
       editPermissions: ['update contact'],
