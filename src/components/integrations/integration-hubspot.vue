@@ -410,10 +410,12 @@ export default {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true
 
-          // Load the other sections
-          this.setLifecycleStagesSection()
-          this.setCompanyAssociationSection(this.contact.id)
-          this.setConversationThreads(this.contact.id)
+          // There are times when the contact is not loaded yet, so no need to load the other sections
+          if (this.contact?.id) {
+            this.setCompanyAssociationSection(this.contact.id)
+            this.setConversationThreads(this.contact.id)
+            this.setLifecycleStagesSection()
+          }
         })
     },
 
