@@ -64,7 +64,7 @@
               <label class="field-label">Operator</label>
               <q-select
                 v-model="searchCriteria.operator"
-                :options="availableOperators"
+                :options="filteredOperators"
                 outlined
                 dense
                 emit-value
@@ -157,6 +157,19 @@ export default {
       const operatorLabel = this.availableOperators.find(o => o.value === this.searchCriteria.operator)?.label || this.searchCriteria.operator
 
       return `${fieldLabel} ${operatorLabel.toLowerCase()} "${this.searchCriteria.value}"`
+    },
+
+    filteredOperators () {
+      if (!this.searchCriteria.field) {
+        return this.availableOperators
+      }
+
+      const field = this.availableFields.find(f => f.value === this.searchCriteria.field)
+      if (!field || !field.supportedOperators) {
+        return this.availableOperators
+      }
+
+      return this.availableOperators.filter(op => field.supportedOperators.includes(op.value))
     }
   },
 
@@ -168,16 +181,19 @@ export default {
         const data = response.data.data
 
         if (data.fields) {
-          this.availableFields = Object.entries(data.fields).map(([value, label]) => ({
-            label,
-            value
+          // Transform fields to include label and supported operators
+          this.availableFields = Object.entries(data.fields).map(([value, fieldData]) => ({
+            label: fieldData.label,
+            value: value,
+            supportedOperators: fieldData.supported_operators
           }))
         }
 
         if (data.operators) {
+          // Transform operators to include label
           this.availableOperators = Object.entries(data.operators).map(([value, label]) => ({
-            label,
-            value
+            label: label,
+            value: value
           }))
         }
 
@@ -212,6 +228,16 @@ export default {
         this.emitValue()
       },
       deep: true
+    },
+
+    'searchCriteria.field' (newField) {
+      // Reset operator when field changes to ensure compatibility
+      if (newField && this.searchCriteria.operator) {
+        const field = this.availableFields.find(f => f.value === newField)
+        if (field && field.supportedOperators && !field.supportedOperators.includes(this.searchCriteria.operator)) {
+          this.searchCriteria.operator = ''
+        }
+      }
     }
   }
 }
