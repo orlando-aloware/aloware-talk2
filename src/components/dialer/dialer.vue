@@ -30,6 +30,7 @@ import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
 import MicrophonePermissionModal from './microphone-permission-modal.vue'
 import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'dialer',
@@ -175,6 +176,12 @@ export default {
             this.stopParkedCallTimer()
           }
         }
+      }
+    }
+
+    this.dialerListeners.updateRecordingStatus = (data) => {
+      if (data.communication_id === this.dialer.communication.id) {
+        this.setDialerRecordingStatus(data.recording_status)
       }
     }
 
@@ -501,6 +508,7 @@ export default {
     },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.listen('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.listen('endWrapUp', this.dialerListeners.endWrapUp)
@@ -535,6 +543,7 @@ export default {
 
     stopDialerEvents () {
       this.$VueEvent.stop('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.stop('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.stop('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.stop('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.stop('endWrapUp', this.dialerListeners.endWrapUp)
@@ -892,7 +901,11 @@ export default {
       if (this.shouldIncludeRingGroupId(isFromDialer, outboundCampaignId)) {
         // RingGroupId is used to identify the current inbox
         // when making a call from an IVR line
-        params['RingGroupId'] = this.activeInboxId.toString()
+        let ringGroupId = this.activeInboxId.toString()
+        if (this.$route.params.inboxId === ALL_INBOXES_ID && !isNaN(+this.$route.query.inboxId)) {
+          ringGroupId = this.$route.query.inboxId
+        }
+        params['RingGroupId'] = ringGroupId
       }
 
       console.log(' %c Making a call to: ', 'background: #000; color: #fff000;', params)

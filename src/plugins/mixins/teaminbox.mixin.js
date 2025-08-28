@@ -1,4 +1,4 @@
-import { SEARCH_FIELDS, THREADED } from 'src/store/teaminbox/teaminbox.store'
+import { SEARCH_FIELDS, THREADED, ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 
@@ -36,6 +36,10 @@ export default {
         'Last Month': [this.$moment.tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), this.$moment.tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
         'All Time': [null, null]
       }
+    },
+
+    isAllInboxesRoute () {
+      return this.$route.params.inboxId === ALL_INBOXES_ID
     }
   },
 
@@ -244,7 +248,7 @@ export default {
       }
 
       const params = {
-        inbox_id: inboxId,
+        inbox_ids: inboxId !== ALL_INBOXES_ID ? [inboxId] : [],
         page: nextPage,
         per_page: 50,
         inbox_type: this.viewMode === THREADED ? 'threaded' : 'unthreaded',
@@ -253,6 +257,18 @@ export default {
           search_fields: SEARCH_FIELDS
         } : {}),
         ...apiFilters
+      }
+
+      if (inboxId === ALL_INBOXES_ID) {
+        params.all_inboxes = true
+
+        // apply Inboxes filter if any
+        if (filters.inboxes?.length) {
+          params.inbox_ids = filters.inboxes
+        } else {
+          // if no filtered Inboxes, send all Inboxes
+          params.inbox_ids = this.inboxes.map(inbox => inbox.id)
+        }
       }
 
       const config = {
@@ -264,6 +280,11 @@ export default {
     },
 
     async checkInboxAccess (inboxId) {
+      // "All" inbox is always accessible if user has any inboxes
+      if (inboxId === ALL_INBOXES_ID) {
+        return this.inboxes.length > 0
+      }
+
       const response = await talk2TeamInboxApi.inboxes.get({
         params: {
           inbox_ids: [inboxId]
@@ -291,26 +312,13 @@ export default {
         const { data: newData } = await talk2TeamInboxApi.inboxes.unreadCount(inboxIds, contactIds, filters)
         data = newData
 
-        switch (data.length) {
-          case 0:
-            // If a single inbox is requested and nothing is returned, set the unread count to 0
-            if (inboxIds.length === 1) {
-              this.setInboxesUnreadCountSingle(
-                {
-                  ring_group_id: inboxIds[0],
-                  unread_count: 0
-                }
-              )
-            }
-            break
-          case 1:
-            // If a single inbox is requested and one is returned, set the unread count for that inbox
-            this.setInboxesUnreadCountSingle(data[0])
-            break
-          default:
-            // If multiple inboxes are requested and one is returned, set the unread count for each inbox
-            this.setInboxesUnreadCount(data)
-        }
+        inboxIds.forEach((inboxId) => {
+          const unreadCount = {
+            ring_group_id: inboxId,
+            unread_count: (data ?? []).find((item) => item.ring_group_id === inboxId)?.unread_count ?? 0
+          }
+          this.setInboxesUnreadCountSingle(unreadCount)
+        })
       } catch (error) {
         console.error('[fetchInboxesUnreadCount] error', error)
       } finally {
@@ -322,6 +330,10 @@ export default {
     },
 
     getInboxUnreadCount (inboxId) {
+      // For "all" inbox, sum up all unread counts
+      if (inboxId === ALL_INBOXES_ID) {
+        return this.inboxesUnreadCount?.reduce((total, inbox) => total + (inbox.unread_count || 0), 0) || 0
+      }
       return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
     },
 

@@ -30,7 +30,7 @@
 
                 <div>
                     <div class="mb-3"
-                         v-if="integrationsEnabled.length > 1">
+                         v-if="filteredEnabledIntegrations.length > 1">
                         <div class="row">
                             <div class="col-6 d-flex align-items-center pl-0">
                                 <span>Select from available integrations: </span>
@@ -43,7 +43,7 @@
                                           map-options
                                           dense
                                           hide-bottom-space
-                                          :options="integrationsEnabled"
+                                          :options="filteredEnabledIntegrations"
                                           v-model="selectedIntegration">
                                 </q-select>
                             </div>
@@ -51,7 +51,7 @@
                     </div>
                     <p class="mb-2"
                        v-else>
-                        Currently enabled integration: <span class="text-bold"> {{ integrationsEnabled[0] }} </span>
+                        Currently enabled integration: <span class="text-bold"> {{ filteredEnabledIntegrations[0] }} </span>
                     </p>
                     <integration-list-selector ref="list-selector"
                                                :use-chips="false"
@@ -89,6 +89,11 @@ import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-mo
 import { integrationMixin } from 'src/plugins/mixins'
 import AlAlert from 'components/alert/index.vue'
 import { TAGS_DEPRECATION_IMPORT_CONTACTS_MESSAGE } from 'src/constants/deprecation-messages'
+import {
+  HUBSPOT_INTEGRATION,
+  PIPEDRIVE_INTEGRATION,
+  ZOHO_INTEGRATION
+} from 'src/constants/integrations'
 
 export default {
   name: 'integration-list-import-modal',
@@ -139,12 +144,17 @@ export default {
 
     shouldDisableListSelector () {
       return this.selectedIntegration === null
+    },
+
+    filteredEnabledIntegrations () {
+      // show only ready for PD import integrations
+      return this.integrationsEnabled.filter(integration => [HUBSPOT_INTEGRATION, PIPEDRIVE_INTEGRATION, ZOHO_INTEGRATION].includes(integration.toLowerCase()))
     }
   },
 
   mounted () {
-    if (this.integrationsEnabled.length === 1) {
-      this.selectedIntegration = this.integrationsEnabled[0]
+    if (this.filteredEnabledIntegrations.length === 1) {
+      this.selectedIntegration = this.filteredEnabledIntegrations[0]
       this.loadSelectionOptions()
     }
   },

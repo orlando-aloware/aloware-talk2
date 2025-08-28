@@ -53,7 +53,7 @@ import { aclMixin, TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
 import { getQueryString } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
+import { THREADED, UNTHREADED, ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
@@ -238,7 +238,13 @@ export default {
         return
       }
 
-      const queryString = getQueryString(this.$route.query)
+      // Add inboxId to query parameters when in "all" inboxes view
+      const query = { ...this.$route.query }
+      if (this.activeInboxId === ALL_INBOXES_ID) {
+        query.inboxId = item.ring_group_id
+      }
+
+      const queryString = getQueryString(query)
       this.$router.push(`${route}${queryString}`)
     },
 
@@ -262,6 +268,10 @@ export default {
       if (!this.activeInboxId) {
         return
       }
+
+      // clear selected contact when changing filters
+      const viewMode = this.viewMode === UNTHREADED ? 'Unthreaded' : 'Threaded'
+      this.$router.push(`/team-inboxes/${this.activeInboxId}?viewMode=${viewMode}`).catch(() => {})
 
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
     },
@@ -398,9 +408,19 @@ export default {
       return `${communication.id}`
     },
 
-    async getUnreadCount (ringGroupId, contactId) {
-      const response = await talk2TeamInboxApi.inboxes.unreadCount([ringGroupId], [contactId])
-      return response.data.find(item => item.ring_group_id === ringGroupId && item.contact_id === contactId)?.unread_count || 0
+    async getUnreadCount (ringGroupIds, contactId) {
+      const response = await talk2TeamInboxApi.inboxes.unreadCount(ringGroupIds, [contactId])
+
+      let unreadCount = 0
+
+      // sum up the unread counts for the ring groups
+      response.data.forEach(item => {
+        if (item.contact_id === contactId && ringGroupIds.includes(item.ring_group_id)) {
+          unreadCount += item.unread_count
+        }
+      })
+
+      return unreadCount
     },
 
     async handleThreadedCommunication (communication, isNew = false) {
@@ -431,19 +451,21 @@ export default {
         return
       }
 
-      // Update the communication in the list, by removing it first, then adding it back in the same position
-      this.itemsData.splice(index, 1)
-      this.itemsData.splice(index, 0, communication)
+      const currentCommunication = this.itemsData[index]
 
       if (isNew) {
-        // Remove the communication from the list
+        const insertIndex = isAscendingOrder ? 0 : this.itemsData.length
+        this.itemsData.splice(insertIndex, 0, communication)
+      } else if (communication.id >= currentCommunication.id) {
+        // We just want to update the latest communication of the grouped contact
+        // if the currentCommunication was updated or it is a new one
         this.itemsData.splice(index, 1)
-
-        if (isAscendingOrder) {
-          this.itemsData.push(communication)
-        } else {
-          this.itemsData.unshift(communication)
-        }
+        this.itemsData.splice(index, 0, communication)
+      } else {
+        // if an older communication is updated, update unread count
+        currentCommunication.inbox_unread_count = communication.inbox_unread_count
+        this.itemsData.splice(index, 1)
+        this.itemsData.splice(index, 0, currentCommunication)
       }
 
       this.sortItems()
@@ -455,7 +477,7 @@ export default {
       // First, group calls by their position in the list
       const groupedItems = {}
 
-      this.itemsData.forEach((item, index) => {
+      this.itemsData.forEach((item) => {
         const key = this.getGroupKey(item)
         groupedItems[key] = item
       })
@@ -491,12 +513,12 @@ export default {
       this.itemsData = sortedItems
     },
 
-    async processCommunicationInActiveInbox (communication, isNew = false) {
-      // fetch unread count for the active inbox (from the backend)
-      const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
-      const unreadCountData = unreadCount[0]
-      const isInActiveInbox = unreadCountData && unreadCountData.ring_group_id === this.activeInboxId
-      const unreadCountForContact = isInActiveInbox ? unreadCountData['unread_contact_' + communication.contact_id] : 0
+    async processCommunicationInAllInboxes (communication, isNew = false) {
+      const unreadCount = await this.fetchInboxesUnreadCount(this.inboxes.map(inbox => inbox.id), [communication.contact_id])
+      let unreadCountForContact = 0
+      unreadCount.forEach((item) => {
+        unreadCountForContact += item['unread_contact_' + communication.contact_id] ?? 0
+      })
       communication.inbox_unread_count = unreadCountForContact || 0
 
       if (this.viewMode === UNTHREADED) {
@@ -516,7 +538,33 @@ export default {
       }
     },
 
-    async processCommunicationInOtherInbox (communication, isNew = false) {
+    async processCommunicationInActiveInbox (communication, isNew = false) {
+      const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
+      const unreadCountData = unreadCount[0]
+      const isInActiveInbox = unreadCountData && unreadCountData.ring_group_id === this.activeInboxId
+      const unreadCountForContact = isInActiveInbox
+        ? unreadCountData['unread_contact_' + communication.contact_id]
+        : 0
+      communication.inbox_unread_count = unreadCountForContact || 0
+
+      if (this.viewMode === UNTHREADED) {
+        await this.handleUnthreadedCommunication(communication)
+      } else {
+        await this.handleThreadedCommunication(communication, isNew)
+      }
+
+      if (!this.activeId) {
+        return
+      }
+
+      // Emits the signal to update the unread count for the active inbox
+      const index = this.itemsData.findIndex(item => item.contact_id === this.activeId)
+      if (index >= 0) {
+        this.onItemClick(this.itemsData[index])
+      }
+    },
+
+    async processCommunicationInOtherInbox (communication) {
       const index = this.inboxes.findIndex(inbox => inbox.id === communication.ring_group_id)
 
       if (index === -1) {
@@ -532,6 +580,11 @@ export default {
         return
       }
 
+      // Visibility check for Team Inbox
+      if (!this.checkCommunicationMatchesUserAccessibility(communication, true)) {
+        return
+      }
+
       const dateRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/
       const dateMatch = communication.created_at.match(dateRegex)
 
@@ -543,6 +596,11 @@ export default {
         communication.created_at = new Date().toISOString()
       }
 
+      if (this.isAllInboxesRoute) {
+        await this.processCommunicationInAllInboxes(communication, isNew)
+        return
+      }
+
       // If the communication is in the active inbox, process it
       if (communication.ring_group_id === this.activeInboxId) {
         await this.processCommunicationInActiveInbox(communication, isNew)
@@ -550,7 +608,7 @@ export default {
       }
 
       // If the communication is not in the active inbox, process it
-      await this.processCommunicationInOtherInbox(communication, isNew)
+      await this.processCommunicationInOtherInbox(communication)
     },
 
     async newCommunicationListener (communication) {
@@ -565,7 +623,6 @@ export default {
     updateContactLastUsedLine (communication) {
       const { contact_id: contactId, ring_group_id: ringGroupId, campaign_id: campaignId } = communication
       const isCommunicationInProgress = this.communicationInProgress(communication)
-
       if (!contactId || !ringGroupId || !campaignId || !isCommunicationInProgress) {
         return
       }
@@ -764,12 +821,19 @@ export default {
         return
       }
 
+      let inboxIds = []
+      if (this.isAllInboxesRoute) {
+        inboxIds = this.inboxes.map(inbox => inbox.id)
+      } else {
+        inboxIds = [this.activeInboxId]
+      }
+
       // update the unread count for the contact
-      const unreadCount = await this.getUnreadCount(this.activeInboxId, this.activeId)
+      const unreadCount = await this.getUnreadCount(inboxIds, this.activeId)
       item.inbox_unread_count = unreadCount
 
       // fetch unread count for the active inbox (from the backend)
-      await this.fetchInboxesUnreadCount([this.activeInboxId])
+      await this.fetchInboxesUnreadCount(inboxIds)
 
       // Update all communications from this contact in the unthreaded view
       if (this.viewMode === UNTHREADED) {
@@ -945,6 +1009,10 @@ export default {
       } else if (query.date_range === 'All Time') {
         newFilters.from_date = null
         newFilters.to_date = null
+      }
+
+      if (query.inboxes) {
+        newFilters.inboxes = query.inboxes.split(',').map(id => parseInt(id))
       }
 
       // Update active filters

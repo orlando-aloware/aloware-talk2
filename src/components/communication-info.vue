@@ -5,6 +5,7 @@
 
     <q-list bordered
             class="notes-wrapper float-right"
+            :class="[communication.direction === CommunicationDirections.INBOUND ? 'inbound-note' : '']"
             data-testid="communication-info-list"
             v-if="communication.type === CommunicationTypes.NOTE">
       <q-item>
@@ -349,14 +350,14 @@
                   <span class="text-greyish">
                       <ul class="list list-unstyled inset mb-0">
                         <template v-for="(attemptingUser, index) in communication.attempting_users">
-                            <li :key="attemptingUser + '-user-' + index"
-                                v-if="getUser(attemptingUser) && getUser(attemptingUser).id"
+                            <li :key="attemptingUser.id + '-user-' + index"
+                                v-if="attemptingUser.id"
                                 class="pb-1">
                                 <div @click="onOpenUserInClassicClicked(communication?.user_id)">
                                   <span class="cursor-pointer"
-                                        :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
-                                        :title="getUserName(getUser(attemptingUser))">
-                                    <user-display :user-id="attemptingUser" />
+                                        :class="getAttemptingClass(attemptingUser.id, communication.disposition_status2, communication.user_id)"
+                                        :title="getUserName(attemptingUser)">
+                                    <user-display :user="attemptingUser" />
                                   </span>
                                 </div>
                             </li>
@@ -1402,5 +1403,14 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.inbound-note {
+  background-color: #f5f5f5 !important;
+  border-color: #e0e0e0 !important;
+}
+
+.inbound-note .q-item {
+  background-color: #f5f5f5 !important;
 }
 </style>

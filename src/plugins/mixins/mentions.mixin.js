@@ -43,32 +43,29 @@ export default {
       // Get the HTML after mention replacement
       let result = doc.body.innerHTML
 
-      // Convert <br> tags to newlines
-      result = result.replace(/<br\s*\/?>/gi, '\n')
-
-      // Convert <div> tags to newlines (contenteditable often uses divs for new lines)
-      result = result.replace(/<\/div><div>/gi, '\n')
-      result = result.replace(/<div>/gi, '\n')
+      // Convert <div> tags to <br> tags (contenteditable often uses divs for new lines)
+      result = result.replace(/<\/div><div>/gi, '<br>')
+      result = result.replace(/<div>/gi, '<br>')
       result = result.replace(/<\/div>/gi, '')
 
-      // Convert paragraph breaks to newlines
-      result = result.replace(/<\/p><p>/gi, '\n\n')
+      // Convert paragraph breaks to <br> tags
+      result = result.replace(/<\/p><p>/gi, '<br><br>')
       result = result.replace(/<p>/gi, '')
       result = result.replace(/<\/p>/gi, '')
 
-      // Remove any remaining HTML tags
-      result = result.replace(/<[^>]*>/g, '')
+      // Remove any remaining HTML tags except <br>
+      result = result.replace(/<(?!br\s*\/?>)[^>]*>/gi, '')
 
-      // Decode HTML entities
+      // Decode HTML entities (except for our mention markup)
       const textarea = document.createElement('textarea')
       textarea.innerHTML = result
       result = textarea.value
 
-      // Remove leading newline if it exists (often added by contenteditable)
-      result = result.replace(/^\n/, '')
+      // Remove leading <br> if it exists
+      result = result.replace(/^<br\s*\/?>/i, '')
 
-      // Limit consecutive newlines to maximum of 2
-      result = result.replace(/\n{3,}/g, '\n\n')
+      // Limit consecutive <br> tags to maximum of 2
+      result = result.replace(/(<br\s*\/?>){3,}/gi, '<br><br>')
 
       return result
     }
