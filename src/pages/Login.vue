@@ -4,7 +4,6 @@
       class="col-7 px-0"
       :xmasEnabled="isXmasBannerEnabled" />
     <login-form class="col-12 col-lg-5 px-0"/>
-    <user-already-have-account-dialog :show="shouldRedirectToLogin" />
   </section>
 </template>
 
@@ -20,7 +19,6 @@ import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import LoginForm from 'components/guest/login-form'
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import UserAlreadyHaveAccountDialog from 'src/components/account-registration/user-already-have-account-dialog.vue'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
@@ -34,7 +32,7 @@ export default {
     htmlMixin
   ],
 
-  components: { LoginForm, LoginLargeScreensInfo, UserAlreadyHaveAccountDialog },
+  components: { LoginForm, LoginLargeScreensInfo },
 
   computed: {
     ...mapState('auth', ['profile', 'shouldRedirectToLogin']),
