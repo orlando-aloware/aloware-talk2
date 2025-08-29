@@ -683,24 +683,6 @@ const talk2Api = {
       }
     },
 
-    accountRegistration: {
-      getPreSignupDetails (params) {
-        return window.axios.get(`/api/admin/company-registration/pre-signup-prefill/${params.verification_token}`)
-      },
-
-      getSSUData () {
-        return window.axios.get(`/api/v1/company/ssu/get`)
-      },
-
-      save (payload) {
-        return window.axios.post('/api/admin/company-registration', payload)
-      },
-
-      update (params, payload) {
-        return window.axios.patch(`/api/admin/company-registration/${params.preSignupId}`, payload)
-      }
-    },
-
     company: {
       get (params) {
         return window.axios.get(`${suffixV1}company/${params.id}`)

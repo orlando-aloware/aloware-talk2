@@ -134,7 +134,7 @@
               <b-icon class="mr-xs text-red"
                       icon="x">
               </b-icon>
-              Password must be at least 8 character length.
+              Password must be at least 12 character length.
             </b-form-invalid-feedback>
 
             <b-form-invalid-feedback v-if="!$v.user.password.passwordCases">
@@ -149,6 +149,13 @@
                       icon="x">
               </b-icon>
               Include at least one numerical digit
+            </b-form-invalid-feedback>
+
+            <b-form-invalid-feedback v-if="!$v.user.password.passwordSpecialCharacter">
+              <b-icon class="mr-xs text-red"
+                      icon="x">
+              </b-icon>
+              Include at least one special character
             </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
@@ -702,6 +709,7 @@ export default {
   validations () {
     const passwordCases = (pass) => !helpers.req(pass) || (/[a-z]/.test(pass) && /[A-Z]/.test(pass))
     const passwordDigit = (pass) => !helpers.req(pass) || /\d/.test(pass)
+    const passwordSpecialCharacter = (pass) => !helpers.req(pass) || /[!@#$%^&*(),.?":{}|<>]/.test(pass)
 
     return {
       user: {
@@ -721,9 +729,10 @@ export default {
           validPhone: (value) => this.$options.filters.fixPhone(value) !== false
         },
         password: {
-          minLength: minLength(8),
+          minLength: minLength(12),
           passwordCases,
-          passwordDigit
+          passwordDigit,
+          passwordSpecialCharacter
         },
         password_confirmation: {
           sameAsPassword: sameAs('password')
