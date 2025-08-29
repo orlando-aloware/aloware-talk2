@@ -6,12 +6,10 @@
                       v-if="usagePercentage < 100 && isTrial">
                   🎁
                 </span>
-                <span class="ai-info-box-title">
-                  {{ modalContent.title }}
+                <span class="ai-info-box-title" v-html="modalContent.title">
                 </span>
             </div>
-            <p class="ai-info-box-content text-white">
-                {{ modalContent.message }}
+            <p class="ai-info-box-content text-white" v-html="modalContent.message">
             </p>
             <div class="ai-info-box-links">
                 <strong>Guides:</strong>
@@ -123,7 +121,7 @@ export default {
         if (planType === 'iPro' || planType === 'uPro') {
           const upgradeText = planType === 'uPro' ? 'or you can upgrade to xPro+Ai to include unlimited minutes' : 'or you can upgrade your plan to include more minutes'
           return {
-            title: `You've used all ${this.includedMinutes} transcription minutes included in your ${planType}+Ai plan this month. Don't worry, your minutes will reset on the 1st, ${upgradeText} and unlock additional features by reaching out to the Aloware Team at <a href="mailto:support@aloware.com">support@aloware.com</a>`,
+            title: `You've used all ${this.includedMinutes} transcription minutes included in your ${planType}+Ai plan this month. Don't worry, your minutes will reset on the 1st, ${upgradeText} and unlock additional features by reaching out to the Aloware Team at <a href="mailto:support@aloware.com" style="color: white; text-decoration: underline;">support@aloware.com</a>`,
             message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
           }
         }
