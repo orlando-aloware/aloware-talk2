@@ -37,8 +37,7 @@ export default {
   components: { LoginForm, LoginLargeScreensInfo, UserAlreadyHaveAccountDialog },
 
   computed: {
-    ...mapState('auth', ['profile']),
-    ...mapState('accountRegistration', ['shouldRedirectToLogin']),
+    ...mapState('auth', ['profile', 'shouldRedirectToLogin']),
     ...mapState(['statics'])
   },
 
