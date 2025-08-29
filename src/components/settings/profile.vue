@@ -150,6 +150,13 @@
               </b-icon>
               Include at least one numerical digit
             </b-form-invalid-feedback>
+
+            <b-form-invalid-feedback v-if="!$v.user.password.passwordSpecialCharacter">
+              <b-icon class="mr-xs text-red"
+                      icon="x">
+              </b-icon>
+              Include at least one special character
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
         <b-col
@@ -702,6 +709,7 @@ export default {
   validations () {
     const passwordCases = (pass) => !helpers.req(pass) || (/[a-z]/.test(pass) && /[A-Z]/.test(pass))
     const passwordDigit = (pass) => !helpers.req(pass) || /\d/.test(pass)
+    const passwordSpecialCharacter = (pass) => !helpers.req(pass) || /[!@#$%^&*(),.?":{}|<>]/.test(pass)
 
     return {
       user: {
@@ -723,7 +731,8 @@ export default {
         password: {
           minLength: minLength(8),
           passwordCases,
-          passwordDigit
+          passwordDigit,
+          passwordSpecialCharacter
         },
         password_confirmation: {
           sameAsPassword: sameAs('password')

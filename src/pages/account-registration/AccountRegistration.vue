@@ -143,6 +143,13 @@
                         </q-icon>
                         Include at least one numerical digit
                       </li>
+                      <li>
+                        <q-icon class="q-mr-xs"
+                                :class="getPasswordRuleClass(validatePasswordSpecialCharacter(form.password))"
+                                :name="iconForValidation(validatePasswordSpecialCharacter(form.password))">
+                        </q-icon>
+                        Include at least one special character
+                      </li>
                     </ul>
                   </template>
                 </input-field>
@@ -479,6 +486,10 @@ export default {
 
     validatePasswordDigit (val) {
       return /\d/.test(val)
+    },
+
+    validatePasswordSpecialCharacter (val) {
+      return /[!@#$%^&*(),.?":{}|<>]/.test(val)
     },
 
     validatePasswordMatch (val) {
