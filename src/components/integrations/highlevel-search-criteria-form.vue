@@ -74,7 +74,7 @@
                         <label v-if="filterIndex === 0" class="field-label">Field</label>
                         <q-select
                           v-model="filter.field"
-                          :options="availableFields"
+                          :options="availableFieldsWithDisabled(blockIndex, filterIndex)"
                           outlined
                           dense
                           emit-value
@@ -138,7 +138,7 @@
                       <label class="field-label">Field</label>
                       <q-select
                         v-model="block.field"
-                        :options="availableFields"
+                        :options="availableFieldsWithDisabled(blockIndex, -1)"
                         outlined
                         dense
                         emit-value
@@ -325,6 +325,34 @@ export default {
 
     canAddOrBlock () {
       return this.hasCriteria && this.searchCriteria.filters.length < 5
+    },
+
+    availableFieldsWithDisabled () {
+      return (currentBlockIndex, currentFilterIndex) => {
+        const selectedFields = new Set()
+
+        // Collect all selected fields
+        this.searchCriteria.filters.forEach((block, blockIndex) => {
+          if (block.group === 'AND') {
+            block.filters.forEach((filter, filterIndex) => {
+              if (filter.field &&
+                  (blockIndex !== currentBlockIndex || filterIndex !== currentFilterIndex)) {
+                selectedFields.add(filter.field)
+              }
+            })
+          } else {
+            if (block.field && blockIndex !== currentBlockIndex) {
+              selectedFields.add(block.field)
+            }
+          }
+        })
+
+        // Return all fields with disabled property for already selected ones
+        return this.availableFields.map(field => ({
+          ...field,
+          disable: selectedFields.has(field.value)
+        }))
+      }
     }
   },
 
