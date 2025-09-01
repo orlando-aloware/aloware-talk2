@@ -9,17 +9,37 @@
 
     <div v-else class="search-criteria-summary">
       <div class="criteria-display">
-        <div class="criteria-item">
-          <div class="criteria-content">
-            <div class="criteria-text">
-              {{ getCriteriaSummary || 'No criteria set' }}
+        <div v-if="hasCriteria" class="criteria-list">
+          <div v-for="(block, blockIndex) in getCriteriaSummaryList"
+               :key="`summary-block-${blockIndex}`"
+               class="criteria-block-summary">
+            <div v-if="blockIndex > 0" class="or-separator-summary">OR</div>
+            <div v-if="block.type === 'AND'" class="and-group-summary">
+              <div v-for="(criterion, criterionIndex) in block.criteria"
+                   :key="`criterion-${blockIndex}-${criterionIndex}`"
+                   class="criterion-item">
+                <span class="criterion-text">{{ criterion }}</span>
+                <span v-if="criterionIndex < block.criteria.length - 1" class="and-separator">AND</span>
+              </div>
             </div>
-            <div class="criteria-actions">
-              <button class="btn btn-outline-primary btn-sm"
-                      @click="showEditDialog = true">
-                {{ hasCriteria ? 'Edit' : 'Add' }} Criteria
-              </button>
+            <div v-else class="single-criterion">
+              <span class="criterion-text">{{ block.criteria[0] }}</span>
             </div>
+          </div>
+          <div class="text-center mt-3">
+            <button class="btn btn-outline-primary btn-sm"
+                    @click="showEditDialog = true">
+              Edit Criteria
+            </button>
+          </div>
+        </div>
+        <div v-else class="no-criteria">
+          <div class="d-flex justify-content-between align-items-center">
+            <span>No criteria set</span>
+            <button class="btn btn-outline-primary btn-sm"
+                    @click="showEditDialog = true">
+              Add Criteria
+            </button>
           </div>
         </div>
       </div>
@@ -64,30 +84,30 @@
                         />
                       </div>
 
-                      <div class="criteria-form-field">
-                        <label v-if="filterIndex === 0" class="field-label">Operator</label>
-                        <q-select
-                          v-model="filter.operator"
-                          :options="availableOperators"
-                          outlined
-                          dense
-                          emit-value
-                          map-options
-                          placeholder="Select an operator"
-                          class="criteria-form-input"
-                        />
-                      </div>
+                    <div class="criteria-form-field">
+                      <label v-if="filterIndex === 0" class="field-label">Operator</label>
+                      <q-select
+                        v-model="filter.operator"
+                        :options="availableOperators"
+                        outlined
+                        dense
+                        emit-value
+                        map-options
+                        placeholder="Select an operator"
+                        class="criteria-form-input"
+                      />
+                    </div>
 
-                      <div class="criteria-form-field">
-                        <label v-if="filterIndex === 0" class="field-label">Value</label>
-                        <q-input
-                          v-model="filter.value"
-                          outlined
-                          dense
-                          placeholder="Enter value"
-                          class="criteria-form-input"
-                        />
-                      </div>
+                    <div class="criteria-form-field">
+                      <label v-if="filterIndex === 0" class="field-label">Value</label>
+                      <q-input
+                        v-model="filter.value"
+                        outlined
+                        dense
+                        placeholder="Enter value"
+                        class="criteria-form-input"
+                      />
+                    </div>
 
                       <div class="delete-button-container">
                         <button class="btn btn-outline-danger btn-sm delete-button"
@@ -115,7 +135,7 @@
                 <div v-else class="single-filter">
                   <div class="criteria-form-row">
                     <div class="criteria-form-field">
-                      <label v-if="blockIndex === 0" class="field-label">Field</label>
+                      <label class="field-label">Field</label>
                       <q-select
                         v-model="block.field"
                         :options="availableFields"
@@ -129,7 +149,7 @@
                     </div>
 
                     <div class="criteria-form-field">
-                      <label v-if="blockIndex === 0" class="field-label">Operator</label>
+                      <label class="field-label">Operator</label>
                       <q-select
                         v-model="block.operator"
                         :options="availableOperators"
@@ -143,7 +163,7 @@
                     </div>
 
                     <div class="criteria-form-field">
-                      <label v-if="blockIndex === 0" class="field-label">Value</label>
+                      <label class="field-label">Value</label>
                       <q-input
                         v-model="block.value"
                         outlined
@@ -273,6 +293,36 @@ export default {
       return summaries.join(' OR ')
     },
 
+    getCriteriaSummaryList () {
+      if (!this.hasCriteria) return []
+
+      const fieldCache = {}
+      const operatorCache = {}
+
+      return this.searchCriteria.filters.map((block, blockIndex) => {
+        if (block.group === 'AND') {
+          const filterSummaries = block.filters.map(filter => {
+            const fieldLabel = this.getFieldLabel(filter.field, fieldCache)
+            const operatorLabel = this.getOperatorLabel(filter.operator, operatorCache)
+            return `${fieldLabel} ${operatorLabel.toLowerCase()} "${filter.value}"`
+          })
+          return {
+            type: 'AND',
+            criteria: filterSummaries,
+            index: blockIndex
+          }
+        } else {
+          const fieldLabel = this.getFieldLabel(block.field, fieldCache)
+          const operatorLabel = this.getOperatorLabel(block.operator, operatorCache)
+          return {
+            type: 'single',
+            criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} "${block.value}"`],
+            index: blockIndex
+          }
+        }
+      })
+    },
+
     canAddOrBlock () {
       return this.hasCriteria && this.searchCriteria.filters.length < 5
     }
@@ -313,6 +363,7 @@ export default {
     },
 
     emitValue () {
+      console.log('HighLevel Search Criteria Payload:', JSON.stringify(this.searchCriteria, null, 2))
       this.$emit('input', this.searchCriteria)
     },
 
@@ -434,7 +485,74 @@ export default {
 .criteria-text {
   font-size: 14px;
   color: #495057;
-  flex-grow: 1;
+}
+
+.criteria-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.criteria-block-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.or-separator-summary {
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 12px;
+  margin: 2px 0;
+  padding: 2px 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.and-group-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #256eff;
+}
+
+.single-criterion {
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #256eff;
+}
+
+.criterion-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.criterion-text {
+  font-size: 13px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.and-separator {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6c757d;
+  background-color: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.no-criteria {
+  font-style: italic;
+  color: #6c757d;
 }
 
 .criteria-actions {
@@ -445,16 +563,16 @@ export default {
 .field-label {
   font-weight: 600;
   color: #495057;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-size: 14px;
 }
 
 .criteria-editor {
-  padding: 16px 0;
+  padding: 12px 0;
 }
 
 .search-criteria-box {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .criteria-form-row {
@@ -505,17 +623,17 @@ export default {
 .single-filter-and-button,
 .group-and-button {
   text-align: center;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .add-or-section {
   text-align: center;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .criteria-block {
-  margin-bottom: 20px;
-  padding: 16px;
+  margin-bottom: 8px;
+  padding: 12px;
   border: 1px solid #d0d0d0;
   border-radius: 8px;
   background-color: #fafbfc;
@@ -523,7 +641,7 @@ export default {
 
 .and-group,
 .single-filter {
-  padding: 16px;
+  padding: 12px;
   background-color: #fafbfc;
 }
 
@@ -532,7 +650,7 @@ export default {
 }
 
 .criteria-row {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .criteria-row:last-child {
@@ -541,7 +659,7 @@ export default {
 
 .or-separator {
   text-align: center;
-  margin: 20px 0;
+  margin: 4px 0 8px 0;
   position: relative;
 }
 
