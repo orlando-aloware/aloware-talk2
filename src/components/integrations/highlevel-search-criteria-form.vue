@@ -28,7 +28,7 @@
           </div>
           <div class="text-center mt-3">
             <button class="btn btn-outline-primary btn-sm"
-                    @click="showEditDialog = true">
+                    @click="openEditDialog">
               Edit Criteria
             </button>
           </div>
@@ -37,7 +37,7 @@
           <div class="d-flex justify-content-between align-items-center">
             <span>No criteria set</span>
             <button class="btn btn-outline-primary btn-sm"
-                    @click="showEditDialog = true">
+                    @click="openEditDialog">
               Add Criteria
             </button>
           </div>
@@ -55,7 +55,7 @@
       <div class="criteria-editor">
         <div class="search-criteria-box">
           <div class="criteria-list">
-            <template v-for="(block, blockIndex) in searchCriteria.filters">
+            <template v-for="(block, blockIndex) in (tempSearchCriteria || searchCriteria).filters">
               <!-- OR separator for all blocks except the first -->
               <div v-if="blockIndex > 0" :key="`or-separator-${blockIndex}`" class="or-separator">
                 <span class="or-text">OR</span>
@@ -213,7 +213,7 @@
       <template #modal-footer>
         <div class="d-flex align-items-center">
           <button class="btn btn-block btn-light mt-0 mr-2"
-                  @click="showEditDialog = false">
+                  @click="closeEditDialog">
             Cancel
           </button>
           <button class="btn btn-block btn-primary mt-0"
@@ -252,6 +252,11 @@ export default {
       availableFields: [],
       availableOperators: [],
       searchCriteria: {
+        filters: [
+          { field: '', operator: '', value: '' }
+        ]
+      },
+      tempSearchCriteria: {
         filters: [
           { field: '', operator: '', value: '' }
         ]
@@ -386,6 +391,7 @@ export default {
 
     // Main action methods
     applyCriteria () {
+      this.searchCriteria = JSON.parse(JSON.stringify(this.tempSearchCriteria))
       this.showEditDialog = false
       this.emitValue()
     },
@@ -395,13 +401,22 @@ export default {
       this.$emit('input', this.searchCriteria)
     },
 
+    openEditDialog () {
+      this.tempSearchCriteria = JSON.parse(JSON.stringify(this.searchCriteria))
+      this.showEditDialog = true
+    },
+
+    closeEditDialog () {
+      this.showEditDialog = false
+    },
+
     addOrCriteria () {
       const newFilter = { field: '', operator: '', value: '' }
-      this.searchCriteria.filters.push(newFilter)
+      this.tempSearchCriteria.filters.push(newFilter)
     },
 
     addAndCriteria (blockIndex) {
-      const currentBlock = this.searchCriteria.filters[blockIndex]
+      const currentBlock = this.tempSearchCriteria.filters[blockIndex]
 
       if (currentBlock.group === 'AND') {
         const newFilter = { field: '', operator: '', value: '' }
@@ -410,7 +425,7 @@ export default {
         const singleFilter = { ...currentBlock }
         const newFilter = { field: '', operator: '', value: '' }
 
-        this.$set(this.searchCriteria.filters, blockIndex, {
+        this.$set(this.tempSearchCriteria.filters, blockIndex, {
           group: 'AND',
           filters: [singleFilter, newFilter]
         })
@@ -418,18 +433,18 @@ export default {
     },
 
     removeCriteria (blockIndex) {
-      if (this.searchCriteria.filters.length > 1) {
-        this.searchCriteria.filters.splice(blockIndex, 1)
+      if (this.tempSearchCriteria.filters.length > 1) {
+        this.tempSearchCriteria.filters.splice(blockIndex, 1)
       }
     },
 
     removeFilterFromGroup (blockIndex, filterIndex) {
-      const block = this.searchCriteria.filters[blockIndex]
+      const block = this.tempSearchCriteria.filters[blockIndex]
       if (block.group === 'AND' && block.filters.length > 1) {
         block.filters.splice(filterIndex, 1)
 
         if (block.filters.length === 1) {
-          this.searchCriteria.filters[blockIndex] = block.filters[0]
+          this.tempSearchCriteria.filters[blockIndex] = block.filters[0]
         }
       }
     },
@@ -464,11 +479,13 @@ export default {
   },
 
   watch: {
-    searchCriteria: {
-      handler () {
-        this.emitValue()
+    value: {
+      handler (newValue) {
+        if (newValue && newValue.filters) {
+          this.searchCriteria = JSON.parse(JSON.stringify(newValue))
+        }
       },
-      deep: true
+      immediate: true
     }
   }
 }
