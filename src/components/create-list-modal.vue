@@ -374,7 +374,7 @@ export default {
       if (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE) {
         // HighLevel doesn't have a list ID, so we need to check if the name is valid
         if (this.getIntegration === HIGHLEVEL_INTEGRATION) {
-          return !this.isNameValid || !this.highlevelSearchCriteria.field
+          return !this.isNameValid
         }
 
         return !this.integrationList
@@ -823,15 +823,7 @@ export default {
       try {
         // For HighLevel, we use search criteria instead of a list ID
         const params = {
-          search_criteria: {
-            filters: [
-              {
-                field: this.highlevelSearchCriteria.field,
-                operator: this.highlevelSearchCriteria.operator,
-                value: this.highlevelSearchCriteria.value
-              }
-            ]
-          },
+          search_criteria: this.highlevelSearchCriteria,
           list_name: this.createList.name
         }
 
@@ -910,15 +902,7 @@ export default {
     async checkHighlevelCriteria () {
       // For HighLevel, we check if the search criteria already exists
       const params = {
-        search_criteria: {
-          filters: [
-            {
-              field: this.highlevelSearchCriteria.field,
-              operator: this.highlevelSearchCriteria.operator,
-              value: this.highlevelSearchCriteria.value
-            }
-          ]
-        },
+        search_criteria: this.highlevelSearchCriteria,
         list_name: this.createList.name
       }
 
