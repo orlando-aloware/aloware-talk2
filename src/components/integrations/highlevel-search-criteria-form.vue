@@ -75,6 +75,7 @@
                         <q-select
                           v-model="filter.field"
                           :options="availableFieldsWithDisabled(blockIndex, filterIndex)"
+                          @input="onFieldChange(filter, blockIndex, filterIndex)"
                           outlined
                           dense
                           emit-value
@@ -88,7 +89,7 @@
                       <label v-if="filterIndex === 0" class="field-label">Operator</label>
                       <q-select
                         v-model="filter.operator"
-                        :options="availableOperators"
+                        :options="availableOperatorsForField(filter.field)"
                         outlined
                         dense
                         emit-value
@@ -98,7 +99,7 @@
                       />
                     </div>
 
-                    <div class="criteria-form-field">
+                    <div v-if="!['exists', 'not_exists'].includes(filter.operator)" class="criteria-form-field">
                       <label v-if="filterIndex === 0" class="field-label">Value</label>
                       <q-input
                         v-model="filter.value"
@@ -139,6 +140,7 @@
                       <q-select
                         v-model="block.field"
                         :options="availableFieldsWithDisabled(blockIndex, -1)"
+                        @input="onSingleFieldChange(block, blockIndex)"
                         outlined
                         dense
                         emit-value
@@ -152,7 +154,7 @@
                       <label class="field-label">Operator</label>
                       <q-select
                         v-model="block.operator"
-                        :options="availableOperators"
+                        :options="availableOperatorsForField(block.field)"
                         outlined
                         dense
                         emit-value
@@ -162,7 +164,7 @@
                       />
                     </div>
 
-                    <div class="criteria-form-field">
+                    <div v-if="!['exists', 'not_exists'].includes(block.operator)" class="criteria-form-field">
                       <label class="field-label">Value</label>
                       <q-input
                         v-model="block.value"
@@ -250,7 +252,15 @@ export default {
       showEditDialog: false,
       isLoading: false,
       availableFields: [],
-      availableOperators: [],
+      availableOperators: [
+        { label: 'Is', value: 'eq' },
+        { label: 'Is Not', value: 'not_eq' },
+        { label: 'Contains', value: 'contains' },
+        { label: 'Does Not Contain', value: 'not_contains' },
+        { label: 'Is Empty', value: 'not_exists' },
+        { label: 'Is Not Empty', value: 'exists' },
+        { label: 'Range', value: 'range' }
+      ],
       searchCriteria: {
         filters: [
           { field: '', operator: '', value: '' }
@@ -260,13 +270,16 @@ export default {
         filters: [
           { field: '', operator: '', value: '' }
         ]
-      }
+      },
+      lastEmittedValue: null
     }
   },
 
   computed: {
     hasCriteria () {
-      return this.searchCriteria.filters.some(block => {
+      // Use tempSearchCriteria when modal is open, otherwise use searchCriteria
+      const criteriaToCheck = this.showEditDialog ? this.tempSearchCriteria : this.searchCriteria
+      return criteriaToCheck.filters.some(block => {
         if (block.group === 'AND') {
           return block.filters.some(filter => filter.field && filter.operator)
         }
@@ -307,9 +320,10 @@ export default {
       return this.searchCriteria.filters.map((block, blockIndex) => {
         if (block.group === 'AND') {
           const filterSummaries = block.filters.map(filter => {
-            const fieldLabel = this.getFieldLabel(filter.field, fieldCache)
-            const operatorLabel = this.getOperatorLabel(filter.operator, operatorCache)
-            return `${fieldLabel} ${operatorLabel.toLowerCase()} "${filter.value}"`
+            const fieldLabel = this.getFieldLabel(filter.field, fieldCache) || filter.field || ''
+            const operatorLabel = this.getOperatorLabel(filter.operator, operatorCache) || filter.operator || ''
+            const value = filter.value || ''
+            return `${fieldLabel} ${operatorLabel.toLowerCase()} "${value}"`
           })
           return {
             type: 'AND',
@@ -317,11 +331,12 @@ export default {
             index: blockIndex
           }
         } else {
-          const fieldLabel = this.getFieldLabel(block.field, fieldCache)
-          const operatorLabel = this.getOperatorLabel(block.operator, operatorCache)
+          const fieldLabel = this.getFieldLabel(block.field, fieldCache) || block.field || ''
+          const operatorLabel = this.getOperatorLabel(block.operator, operatorCache) || block.operator || ''
+          const value = block.value || ''
           return {
             type: 'single',
-            criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} "${block.value}"`],
+            criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} "${value}"`],
             index: blockIndex
           }
         }
@@ -329,7 +344,22 @@ export default {
     },
 
     canAddOrBlock () {
-      return this.hasCriteria && this.searchCriteria.filters.length < 5
+      // Use tempSearchCriteria when modal is open, otherwise use searchCriteria
+      const criteriaToCheck = this.showEditDialog ? this.tempSearchCriteria : this.searchCriteria
+      return this.hasCriteria && criteriaToCheck.filters.length < 5
+    },
+
+    availableOperatorsForField () {
+      return (fieldValue) => {
+        if (!fieldValue) return this.availableOperators
+
+        const field = this.availableFields.find(f => f.value === fieldValue)
+        if (!field || !field.supportedOperators) return this.availableOperators
+
+        return this.availableOperators.filter(operator =>
+          field.supportedOperators.includes(operator.value)
+        )
+      }
     },
 
     availableFieldsWithDisabled () {
@@ -363,6 +393,154 @@ export default {
 
   methods: {
     // Helper methods
+    getHighLevelOperator (uiOperator) {
+      const operatorMapping = {
+        'Is': 'eq',
+        'Is Not': 'not_eq',
+        'Contains': 'contains',
+        'Does Not Contain': 'not_contains',
+        'Is Empty': 'not_exists',
+        'Is Not Empty': 'exists',
+        'Range': 'range'
+      }
+      return operatorMapping[uiOperator] || uiOperator
+    },
+
+    processValue (value, operator, field) {
+      // Handle undefined/null values
+      if (value === undefined || value === null) {
+        return value
+      }
+
+      // Handle "Any Of" logic - convert comma-separated to array for ANY field
+      if (operator === 'Contains' && typeof value === 'string' && value.includes(',')) {
+        return value.split(',').map(v => v.trim())
+      }
+
+      // Handle case-sensitive fields
+      const caseSensitiveFields = ['firstNameLowerCase', 'lastNameLowerCase', 'tags']
+      if (caseSensitiveFields.includes(field)) {
+        if (Array.isArray(value)) {
+          return value.map(v => v ? v.toLowerCase() : v)
+        }
+        return typeof value === 'string' ? value.toLowerCase() : value
+      }
+
+      return value
+    },
+
+    isValidFieldOperatorCombination (fieldValue, operatorValue) {
+      if (!fieldValue || !operatorValue) return true
+
+      const field = this.availableFields.find(f => f.value === fieldValue)
+      if (!field) return false
+
+      return field.supportedOperators.includes(operatorValue)
+    },
+
+    onFieldChange (filter, blockIndex, filterIndex) {
+      // Reset operator if current combination is invalid
+      if (filter.operator && !this.isValidFieldOperatorCombination(filter.field, filter.operator)) {
+        this.$set(filter, 'operator', '')
+        this.$set(filter, 'value', '')
+      }
+    },
+
+    onSingleFieldChange (block, blockIndex) {
+      // Reset operator if current combination is invalid
+      if (block.operator && !this.isValidFieldOperatorCombination(block.field, block.operator)) {
+        this.$set(block, 'operator', '')
+        this.$set(block, 'value', '')
+      }
+    },
+
+    buildHighLevelPayload () {
+      // Always use searchCriteria since it's updated before emitValue is called
+      const criteriaToProcess = this.searchCriteria
+
+      // If there's only one block, don't wrap in OR
+      if (criteriaToProcess.filters.length === 1) {
+        const block = criteriaToProcess.filters[0]
+        if (block.group === 'AND') {
+          return {
+            filters: [{
+              group: 'AND',
+              filters: block.filters.map(filter => {
+                const highLevelFilter = {
+                  field: filter.field,
+                  operator: this.getHighLevelOperator(filter.operator)
+                }
+                if (!['exists', 'not_exists'].includes(highLevelFilter.operator)) {
+                  highLevelFilter.value = this.processValue(filter.value, filter.operator, filter.field)
+                }
+                return highLevelFilter
+              })
+            }]
+          }
+        } else {
+          // Single filter
+          const highLevelFilter = {
+            field: block.field,
+            operator: this.getHighLevelOperator(block.operator)
+          }
+          if (!['exists', 'not_exists'].includes(highLevelFilter.operator)) {
+            highLevelFilter.value = this.processValue(block.value, block.operator, block.field)
+          }
+          return {
+            filters: [highLevelFilter]
+          }
+        }
+      }
+
+      // Multiple blocks - wrap everything in OR group
+      const payload = {
+        filters: [{
+          group: 'OR',
+          filters: []
+        }]
+      }
+
+      criteriaToProcess.filters.forEach(block => {
+        if (block.group === 'AND') {
+          // Convert AND group to HighLevel format
+          const highLevelFilters = block.filters.map(filter => {
+            const highLevelFilter = {
+              field: filter.field,
+              operator: this.getHighLevelOperator(filter.operator)
+            }
+
+            // Only add value if operator needs it
+            if (!['exists', 'not_exists'].includes(highLevelFilter.operator)) {
+              highLevelFilter.value = this.processValue(filter.value, filter.operator, filter.field)
+            }
+
+            return highLevelFilter
+          })
+
+          // Add AND group to OR group
+          payload.filters[0].filters.push({
+            group: 'AND',
+            filters: highLevelFilters
+          })
+        } else {
+          // Single filter - add directly to OR group
+          const highLevelFilter = {
+            field: block.field,
+            operator: this.getHighLevelOperator(block.operator)
+          }
+
+          // Only add value if operator needs it
+          if (!['exists', 'not_exists'].includes(highLevelFilter.operator)) {
+            highLevelFilter.value = this.processValue(block.value, block.operator, block.field)
+          }
+
+          payload.filters[0].filters.push(highLevelFilter)
+        }
+      })
+
+      return payload
+    },
+
     getFieldLabel (fieldValue, cache) {
       if (!cache[fieldValue]) {
         cache[fieldValue] = this.availableFields.find(f => f.value === fieldValue)?.label || fieldValue
@@ -377,9 +555,44 @@ export default {
       return cache[operatorValue]
     },
 
+    isRangeValueValid (value) {
+      if (!value) return false
+      if (typeof value !== 'object') return false
+      return value.from && value.to
+    },
+
+    validateAllCombinations () {
+      const errors = []
+
+      this.tempSearchCriteria.filters.forEach((block, blockIndex) => {
+        if (block.group === 'AND') {
+          block.filters.forEach((filter, filterIndex) => {
+            if (!this.isValidFieldOperatorCombination(filter.field, filter.operator)) {
+              errors.push(`Block ${blockIndex + 1}, Filter ${filterIndex + 1}: ${filter.field} + ${filter.operator}`)
+            }
+          })
+        } else {
+          if (!this.isValidFieldOperatorCombination(block.field, block.operator)) {
+            errors.push(`Block ${blockIndex + 1}: ${block.field} + ${block.operator}`)
+          }
+        }
+      })
+
+      return errors
+    },
+
     isFilterValid (filter) {
       if (!filter.field || !filter.operator) return false
+
+      // exists/not_exists operators don't need values
       if (['exists', 'not_exists'].includes(filter.operator)) return true
+
+      // range operators need specific format
+      if (filter.operator === 'range') {
+        return this.isRangeValueValid(filter.value)
+      }
+
+      // For other operators, value is required
       return filter.value !== undefined && filter.value !== null && filter.value !== ''
     },
 
@@ -391,14 +604,26 @@ export default {
 
     // Main action methods
     applyCriteria () {
+      const validationErrors = this.validateAllCombinations()
+
+      if (validationErrors.length > 0) {
+        // Show warning but don't prevent closing
+        this.$generalNotification(
+          `Warning: ${validationErrors.length} invalid field-operator combination(s) detected. These will be ignored.`,
+          'warning'
+        )
+      }
+
       this.searchCriteria = JSON.parse(JSON.stringify(this.tempSearchCriteria))
       this.showEditDialog = false
       this.emitValue()
     },
 
     emitValue () {
-      console.log('HighLevel Search Criteria Payload:', JSON.stringify(this.searchCriteria, null, 2))
-      this.$emit('input', this.searchCriteria)
+      const highLevelPayload = this.buildHighLevelPayload()
+      this.lastEmittedValue = highLevelPayload
+      console.log('HighLevel Search Criteria Payload:', JSON.stringify(highLevelPayload, null, 2))
+      this.$emit('input', highLevelPayload)
     },
 
     openEditDialog () {
@@ -481,7 +706,10 @@ export default {
   watch: {
     value: {
       handler (newValue) {
-        if (newValue && newValue.filters) {
+        // Only update if the value is different from what we just emitted
+        // This prevents the watcher from resetting our criteria when the parent
+        // sends back the HighLevel-formatted payload
+        if (newValue && newValue.filters && newValue !== this.lastEmittedValue) {
           this.searchCriteria = JSON.parse(JSON.stringify(newValue))
         }
       },
