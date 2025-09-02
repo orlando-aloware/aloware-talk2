@@ -655,6 +655,77 @@ export default {
       return booleanFieldNames.includes(fieldValue)
     },
 
+    validateFieldValue (filter) {
+      const errors = []
+
+      if (!filter.field) {
+        errors.push('Please select a field')
+      }
+
+      if (!filter.operator) {
+        errors.push('Please select an operator')
+      }
+
+      if (['exists', 'not_exists'].includes(filter.operator)) {
+        return errors // No value needed
+      }
+
+      if (filter.operator === 'range') {
+        if (!this.isRangeValueValid(filter.value)) {
+          errors.push('Please enter a valid date range (MM/DD/YYYY - MM/DD/YYYY)')
+        }
+      } else if (filter.field === 'tags') {
+        if (!Array.isArray(filter.value) || filter.value.length === 0) {
+          errors.push('Please add at least one tag')
+        }
+      } else if (this.isBooleanField(filter.field)) {
+        if (filter.value === null || filter.value === undefined) {
+          errors.push('Please select Yes or No')
+        }
+      } else {
+        if (!filter.value || filter.value.toString().trim() === '') {
+          errors.push('Please enter a value')
+        }
+      }
+
+      return errors
+    },
+
+    validateAllFilters () {
+      const allErrors = []
+
+      this.tempSearchCriteria.filters.forEach((block, blockIndex) => {
+        if (block.group === 'AND') {
+          block.filters.forEach((filter, filterIndex) => {
+            const errors = this.validateFieldValue(filter)
+            if (errors.length > 0) {
+              allErrors.push(errors.join(', '))
+            }
+          })
+        } else {
+          const errors = this.validateFieldValue(block)
+          if (errors.length > 0) {
+            allErrors.push(errors.join(', '))
+          }
+        }
+      })
+
+      return allErrors
+    },
+
+    showValidationErrors (errors) {
+      if (errors.length > 0) {
+        const errorCount = errors.length
+        const errorText = errorCount === 1 ? 'error' : 'errors'
+
+        this.$generalNotification(
+          `Please fix ${errorCount} validation ${errorText}: ${errors.join('; ')}`,
+          'error',
+          8000
+        )
+      }
+    },
+
     initializeFieldValue (filter) {
       // Handle tags field
       if (filter.field === 'tags') {
@@ -988,12 +1059,18 @@ export default {
 
     // Main action methods
     applyCriteria () {
-      const validationErrors = this.validateAllCombinations()
-
+      // Validate all filters first
+      const validationErrors = this.validateAllFilters()
       if (validationErrors.length > 0) {
+        this.showValidationErrors(validationErrors)
+        return // Don't proceed if there are validation errors
+      }
+
+      const combinationErrors = this.validateAllCombinations()
+      if (combinationErrors.length > 0) {
         // Show warning but don't prevent closing
         this.$generalNotification(
-          `Warning: ${validationErrors.length} invalid field-operator combination(s) detected. These will be ignored.`,
+          `Warning: ${combinationErrors.length} invalid field-operator combination(s) detected. These will be ignored.`,
           'warning'
         )
       }
