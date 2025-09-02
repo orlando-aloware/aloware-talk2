@@ -93,7 +93,7 @@ export default {
     ...mapGetters('contacts', ['contact']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
     ...mapState(['campaigns']),
-    ...mapState('TeamInbox', ['activeInbox', 'teamInboxCampaigns']),
+    ...mapState('TeamInbox', ['activeInbox', 'activeInboxId', 'teamInboxCampaigns', 'inboxes']),
 
     /**
      * Returns the appropriate campaigns array based on whether we're in team inbox mode
@@ -122,11 +122,11 @@ export default {
       return this
         .teamInboxCampaigns
         .filter(campaign => {
-          if (this.$route.params.inboxId === ALL_INBOXES_ID) {
-            return campaign.active === true
-          }
+          const baseCampaigns = this.$route.params.inboxId === ALL_INBOXES_ID
+            ? this.getCampaignsByInboxId(+this.$route.query.inboxId)
+            : this.activeInboxCampaignIds
 
-          return this.activeInboxCampaignIds?.includes(campaign.id) ||
+          return baseCampaigns.includes(campaign.id) ||
             isIvrOrDeadEndCampaign(campaign)
         })
     },
@@ -210,6 +210,10 @@ export default {
     shouldLimitAgentLinesVisibility () {
       return this.hasRole(COMPANY_AGENT) &&
         this.hasCompanyTeamInboxLineManagementEnhancements
+    },
+
+    getAllInboxesSelectedInboxId () {
+      return this.$route.query.inboxId ? +this.$route.query.inboxId : null
     }
   },
 
@@ -243,6 +247,7 @@ export default {
     onShowMenu () {
       this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
     },
+
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : this.getPlaceholderText()
@@ -374,6 +379,10 @@ export default {
           this.setLineIncomingNumberLoading(false)
         })
       }
+    },
+
+    getCampaignsByInboxId (inboxId) {
+      return this.inboxes.find(inbox => inbox.id === inboxId)?.campaign_ids || []
     }
   },
 
