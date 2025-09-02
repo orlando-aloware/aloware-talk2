@@ -102,7 +102,7 @@
 
         <div class="col-12 pl-3 mb-4"
              v-show="resources.min_redials > 0">
-          <div :class="disableField('successful_call_disposition_ids') ? 'opacity-05' : ''">
+          <div :class="disableField('successful_call_disposition_ids', true) ? 'opacity-05' : ''">
             <label class="label mb-1 text-weight-bold">
               Select Successful Call Dispositions
             </label>
@@ -111,7 +111,7 @@
           <call-disposition-selector class="p-0 mt-1 dial-sessions__form__call-disposition-selector"
                                      :multiple="true"
                                      :highlighted="false"
-                                     :disable="disableField('successful_call_disposition_ids')"
+                                     :disable="disableField('successful_call_disposition_ids', true)"
                                      v-model="resources.successful_call_disposition_ids"
                                      @change="onSuccessfulCallDispositionsChange"/>
         </div>
@@ -182,7 +182,7 @@
           <call-disposition-selector class="pb-2 dial-sessions__form__call-disposition-selector"
                                      :multiple="true"
                                      :highlighted="isChanged('call_dispositions')"
-                                     :disable="disabled"
+                                     :disable="disableField('call_disposition_ids', true)"
                                      v-model="resources.call_disposition_ids"
                                      @change="(eventPayload) => onSettingsChange(eventPayload, 'call_disposition_ids')"/>
         </div>
@@ -315,7 +315,8 @@ export default {
   data () {
     return {
       selectWidth: 0,
-      resources: this.settings
+      resources: this.settings,
+      selectedSettings: null
     }
   },
 
@@ -446,8 +447,8 @@ export default {
       return value
     },
 
-    disableField (field) {
-      if (this.disabled) {
+    disableField (field, ignoreDisabledFlag = false) {
+      if (this.disabled && !ignoreDisabledFlag) {
         return true
       }
 
@@ -459,7 +460,8 @@ export default {
         case 'min_redials': return redialRequired
         case 'force_immediate_redial': return redialRequired && powerDialerSettings.force_immediate_redial
         case 'force_sms': return redialRequired && powerDialerSettings.force_sms
-        case 'successful_call_disposition_ids': return redialRequired && powerDialerSettings.successful_call_disposition_ids?.length > 0
+        case 'successful_call_disposition_ids': return redialRequired && (powerDialerSettings.successful_call_disposition_ids?.length > 0 || this.selectedSettings?.successful_call_disposition_ids?.length > 0)
+        case 'call_disposition_ids': return powerDialerSettings.call_disposition_ids?.length > 0 || this.selectedSettings?.call_disposition_ids?.length > 0
       }
 
       return false
@@ -486,8 +488,22 @@ export default {
     },
 
     settings (value) {
+      // normalize call dispositions if not set
+      if (!value.call_disposition_ids?.length) {
+        value.call_disposition_ids = []
+      }
+
+      // normalize successful call dispositions if not set
+      if (!value.successful_call_disposition_ids?.length) {
+        value.successful_call_disposition_ids = []
+      }
+
       this.applyCompanyRedialSettings(value)
       this.resources = value
+    },
+
+    'settings.id' () {
+      this.selectedSettings = { ...this.settings }
     },
 
     flagged (value) {
