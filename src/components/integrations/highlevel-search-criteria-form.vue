@@ -406,6 +406,12 @@ export default {
             const fieldLabel = this.getFieldLabel(filter.field, fieldCache) || filter.field || ''
             const operatorLabel = this.getOperatorLabel(filter.operator, operatorCache) || filter.operator || ''
             const value = filter.value || ''
+
+            // For exists/not_exists operators, don't show the value part
+            if (filter.operator === 'exists' || filter.operator === 'not_exists') {
+              return `${fieldLabel} ${operatorLabel.toLowerCase()}`
+            }
+
             return `${fieldLabel} ${operatorLabel.toLowerCase()} "${value}"`
           })
           return {
@@ -417,6 +423,16 @@ export default {
           const fieldLabel = this.getFieldLabel(block.field, fieldCache) || block.field || ''
           const operatorLabel = this.getOperatorLabel(block.operator, operatorCache) || block.operator || ''
           const value = block.value || ''
+
+          // For exists/not_exists operators, don't show the value part
+          if (block.operator === 'exists' || block.operator === 'not_exists') {
+            return {
+              type: 'single',
+              criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()}`],
+              index: blockIndex
+            }
+          }
+
           return {
             type: 'single',
             criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} "${value}"`],
