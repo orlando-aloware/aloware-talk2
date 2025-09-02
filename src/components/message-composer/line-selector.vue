@@ -122,11 +122,11 @@ export default {
       return this
         .teamInboxCampaigns
         .filter(campaign => {
-          const baseCampaigns = this.$route.params.inboxId === ALL_INBOXES_ID
-            ? this.getCampaignsByInboxId(+this.$route.query.inboxId)
+          const inboxCampaigns = this.$route.params.inboxId === ALL_INBOXES_ID
+            ? this.getCampaignIdsByInboxId(+this.$route.query.inboxId)
             : this.activeInboxCampaignIds
 
-          return baseCampaigns.includes(campaign.id) ||
+          return inboxCampaigns.includes(campaign.id) ||
             isIvrOrDeadEndCampaign(campaign)
         })
     },
@@ -381,8 +381,11 @@ export default {
       }
     },
 
-    getCampaignsByInboxId (inboxId) {
-      return this.inboxes.find(inbox => inbox.id === inboxId)?.campaign_ids || []
+    getCampaignIdsByInboxId (inboxId) {
+      const inbox = this.inboxes.find(inbox => inbox.id === inboxId)
+      const inboxCampaignIds = inbox?.campaign_ids || []
+      const inboxCallWaitingCampaignIds = inbox?.campaign_ids_as_call_waiting_ring_group || []
+      return [...inboxCampaignIds, ...inboxCallWaitingCampaignIds]
     }
   },
 
