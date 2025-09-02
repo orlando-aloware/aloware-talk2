@@ -142,6 +142,19 @@
                         </div>
                       </div>
                       <!-- End Multi-select -->
+                      <!-- Start Range Date Input Mask -->
+                      <div v-else-if="filter.operator === 'range'" class="range-date-input-container">
+                        <q-input
+                          v-model="filter.rangeDisplayValue"
+                          outlined
+                          dense
+                          placeholder="MM/DD/YYYY - MM/DD/YYYY"
+                          class="criteria-form-input"
+                          mask="##/##/#### - ##/##/####"
+                          @input="onRangeInputChange($event, filter)"
+                        />
+                      </div>
+                      <!-- End Range Date Input Mask -->
                       <!-- Regular input for other fields -->
                       <q-input
                         v-else
@@ -244,6 +257,19 @@
                         </div>
                       </div>
                       <!-- End Multi-select -->
+                      <!-- Start Range Date Input Mask -->
+                      <div v-else-if="block.operator === 'range'" class="range-date-input-container">
+                        <q-input
+                          v-model="block.rangeDisplayValue"
+                          outlined
+                          dense
+                          placeholder="MM/DD/YYYY - MM/DD/YYYY"
+                          class="criteria-form-input"
+                          mask="##/##/#### - ##/##/####"
+                          @input="onRangeInputChange($event, block)"
+                        />
+                      </div>
+                      <!-- End Range Date Input Mask -->
                       <!-- Regular input for other fields -->
                       <q-input
                         v-else
@@ -346,12 +372,12 @@ export default {
       ],
       searchCriteria: {
         filters: [
-          { field: '', operator: '', value: [], inputValue: '' }
+          { field: '', operator: '', value: '' }
         ]
       },
       tempSearchCriteria: {
         filters: [
-          { field: '', operator: '', value: [], inputValue: '' }
+          { field: '', operator: '', value: '' }
         ]
       },
       lastEmittedValue: null
@@ -412,6 +438,13 @@ export default {
               return `${fieldLabel} ${operatorLabel.toLowerCase()}`
             }
 
+            // For range operators, show formatted date range
+            if (filter.operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
+              const fromDate = new Date(value.from).toLocaleDateString()
+              const toDate = new Date(value.to).toLocaleDateString()
+              return `${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDate} to ${toDate}`
+            }
+
             return `${fieldLabel} ${operatorLabel.toLowerCase()} "${value}"`
           })
           return {
@@ -429,6 +462,17 @@ export default {
             return {
               type: 'single',
               criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()}`],
+              index: blockIndex
+            }
+          }
+
+          // For range operators, show formatted date range
+          if (block.operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
+            const fromDate = new Date(value.from).toLocaleDateString()
+            const toDate = new Date(value.to).toLocaleDateString()
+            return {
+              type: 'single',
+              criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDate} to ${toDate}`],
               index: blockIndex
             }
           }
@@ -519,6 +563,14 @@ export default {
         return []
       }
 
+      // Handle range operator - convert to gt/lt format
+      if (operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
+        return {
+          gt: value.from,
+          lt: value.to
+        }
+      }
+
       // Handle "Any Of" logic - convert comma-separated to array for ANY field
       if (operator === 'Contains' && typeof value === 'string' && value.includes(',')) {
         return value.split(',').map(v => v.trim())
@@ -551,12 +603,42 @@ export default {
         this.$set(filter, 'operator', '')
         this.$set(filter, 'value', '')
       }
+
+      // Initialize value type based on field
+      if (filter.field === 'tags') {
+        this.$set(filter, 'value', [])
+        if (filter.inputValue === undefined) {
+          this.$set(filter, 'inputValue', '')
+        }
+      } else if (filter.operator === 'range') {
+        this.$set(filter, 'value', null)
+        if (filter.rangeDisplayValue === undefined) {
+          this.$set(filter, 'rangeDisplayValue', '')
+        }
+      } else if (filter.field && filter.value === '') {
+        this.$set(filter, 'value', '')
+      }
     },
 
     onSingleFieldChange (block, blockIndex) {
       // Reset operator if current combination is invalid
       if (block.operator && !this.isValidFieldOperatorCombination(block.field, block.operator)) {
         this.$set(block, 'operator', '')
+        this.$set(block, 'value', '')
+      }
+
+      // Initialize value type based on field
+      if (block.field === 'tags') {
+        this.$set(block, 'value', [])
+        if (block.inputValue === undefined) {
+          this.$set(block, 'inputValue', '')
+        }
+      } else if (block.operator === 'range') {
+        this.$set(block, 'value', null)
+        if (block.rangeDisplayValue === undefined) {
+          this.$set(block, 'rangeDisplayValue', '')
+        }
+      } else if (block.field && block.value === '') {
         this.$set(block, 'value', '')
       }
     },
@@ -629,6 +711,66 @@ export default {
           field.value.toLowerCase().includes(val.toLowerCase())
         )
       })
+    },
+
+    // Range date picker methods
+    getRangeDisplayValue (value) {
+      if (!value || !value.from || !value.to) return ''
+      const fromDate = new Date(value.from)
+      const toDate = new Date(value.to)
+      return `${fromDate.getMonth() + 1}/${fromDate.getDate()}/${fromDate.getFullYear()} - ${toDate.getMonth() + 1}/${toDate.getDate()}/${toDate.getFullYear()}`
+    },
+
+    onRangeInputChange (inputValue, filter) {
+      // Update the display value
+      this.$set(filter, 'rangeDisplayValue', inputValue)
+
+      if (!inputValue) {
+        this.$set(filter, 'value', null)
+        return
+      }
+
+      // Parse the masked input: "MM/DD/YYYY - MM/DD/YYYY"
+      const parts = inputValue.split(' - ')
+      if (parts.length !== 2) {
+        this.$set(filter, 'value', null)
+        return
+      }
+
+      const fromPart = parts[0].trim()
+      const toPart = parts[1].trim()
+
+      // Validate date format
+      const fromMatch = fromPart.match(/(\d{2})\/(\d{2})\/(\d{4})/)
+      const toMatch = toPart.match(/(\d{2})\/(\d{2})\/(\d{4})/)
+
+      if (!fromMatch || !toMatch) {
+        this.$set(filter, 'value', null)
+        return
+      }
+
+      try {
+        // Convert MM/DD/YYYY to Date objects
+        const fromDate = new Date(fromMatch[3], fromMatch[1] - 1, fromMatch[2])
+        const toDate = new Date(toMatch[3], toMatch[1] - 1, toMatch[2])
+
+        // Validate dates
+        if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+          this.$set(filter, 'value', null)
+          return
+        }
+
+        // Convert to ISO format for API - start of day for from, end of day for to
+        fromDate.setHours(0, 0, 0, 0)
+        toDate.setHours(23, 59, 59, 999)
+
+        this.$set(filter, 'value', {
+          from: fromDate.toISOString(),
+          to: toDate.toISOString()
+        })
+      } catch (error) {
+        this.$set(filter, 'value', null)
+      }
     },
 
     buildHighLevelPayload () {
@@ -828,7 +970,7 @@ export default {
     },
 
     addOrCriteria () {
-      const newFilter = { field: '', operator: '', value: [], inputValue: '' }
+      const newFilter = { field: '', operator: '', value: '' }
       this.tempSearchCriteria.filters.push(newFilter)
     },
 
@@ -836,11 +978,11 @@ export default {
       const currentBlock = this.tempSearchCriteria.filters[blockIndex]
 
       if (currentBlock.group === 'AND') {
-        const newFilter = { field: '', operator: '', value: [], inputValue: '' }
+        const newFilter = { field: '', operator: '', value: '' }
         currentBlock.filters.push(newFilter)
       } else {
         const singleFilter = { ...currentBlock }
-        const newFilter = { field: '', operator: '', value: [], inputValue: '' }
+        const newFilter = { field: '', operator: '', value: '' }
 
         this.$set(this.tempSearchCriteria.filters, blockIndex, {
           group: 'AND',
