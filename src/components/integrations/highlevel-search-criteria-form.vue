@@ -155,6 +155,23 @@
                         />
                       </div>
                       <!-- End Range Date Input Mask -->
+                      <!-- Start Boolean Select -->
+                      <div v-else-if="isBooleanField(filter.field)" class="boolean-select-container">
+                        <q-select
+                          v-model="filter.value"
+                          :options="[
+                            { label: 'Yes', value: true },
+                            { label: 'No', value: false }
+                          ]"
+                          outlined
+                          dense
+                          emit-value
+                          map-options
+                          placeholder="Select value"
+                          class="criteria-form-input"
+                        />
+                      </div>
+                      <!-- End Boolean Select -->
                       <!-- Regular input for other fields -->
                       <q-input
                         v-else
@@ -270,6 +287,23 @@
                         />
                       </div>
                       <!-- End Range Date Input Mask -->
+                      <!-- Start Boolean Select -->
+                      <div v-else-if="isBooleanField(block.field)" class="boolean-select-container">
+                        <q-select
+                          v-model="block.value"
+                          :options="[
+                            { label: 'Yes', value: true },
+                            { label: 'No', value: false }
+                          ]"
+                          outlined
+                          dense
+                          emit-value
+                          map-options
+                          placeholder="Select value"
+                          class="criteria-form-input"
+                        />
+                      </div>
+                      <!-- End Boolean Select -->
                       <!-- Regular input for other fields -->
                       <q-input
                         v-else
@@ -445,6 +479,12 @@ export default {
               return `${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDate} to ${toDate}`
             }
 
+            // For boolean fields, show Yes/No instead of true/false
+            if (this.isBooleanField(filter.field)) {
+              const booleanValue = value === true ? 'Yes' : 'No'
+              return `${fieldLabel} ${operatorLabel.toLowerCase()} ${booleanValue}`
+            }
+
             return `${fieldLabel} ${operatorLabel.toLowerCase()} "${value}"`
           })
           return {
@@ -473,6 +513,16 @@ export default {
             return {
               type: 'single',
               criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDate} to ${toDate}`],
+              index: blockIndex
+            }
+          }
+
+          // For boolean fields, show Yes/No instead of true/false
+          if (this.isBooleanField(block.field)) {
+            const booleanValue = value === true ? 'Yes' : 'No'
+            return {
+              type: 'single',
+              criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} ${booleanValue}`],
               index: blockIndex
             }
           }
@@ -597,6 +647,45 @@ export default {
       return field.supportedOperators.includes(operatorValue)
     },
 
+    isBooleanField (fieldValue) {
+      if (!fieldValue) return false
+
+      // Check if the field name suggests it's a boolean field
+      const booleanFieldNames = ['dnd', 'isValidWhatsapp', 'validEmail', 'isValid', 'isActive', 'isVerified']
+      return booleanFieldNames.includes(fieldValue)
+    },
+
+    initializeFieldValue (filter) {
+      // Handle tags field
+      if (filter.field === 'tags') {
+        this.$set(filter, 'value', [])
+        if (filter.inputValue === undefined) {
+          this.$set(filter, 'inputValue', '')
+        }
+        return
+      }
+
+      // Handle range operator
+      if (filter.operator === 'range') {
+        this.$set(filter, 'value', null)
+        if (filter.rangeDisplayValue === undefined) {
+          this.$set(filter, 'rangeDisplayValue', '')
+        }
+        return
+      }
+
+      // Handle boolean fields
+      if (this.isBooleanField(filter.field)) {
+        this.$set(filter, 'value', null)
+        return
+      }
+
+      // Handle regular fields
+      if (filter.field && filter.value === '') {
+        this.$set(filter, 'value', '')
+      }
+    },
+
     onFieldChange (filter, blockIndex, filterIndex) {
       // Reset operator if current combination is invalid
       if (filter.operator && !this.isValidFieldOperatorCombination(filter.field, filter.operator)) {
@@ -605,19 +694,7 @@ export default {
       }
 
       // Initialize value type based on field
-      if (filter.field === 'tags') {
-        this.$set(filter, 'value', [])
-        if (filter.inputValue === undefined) {
-          this.$set(filter, 'inputValue', '')
-        }
-      } else if (filter.operator === 'range') {
-        this.$set(filter, 'value', null)
-        if (filter.rangeDisplayValue === undefined) {
-          this.$set(filter, 'rangeDisplayValue', '')
-        }
-      } else if (filter.field && filter.value === '') {
-        this.$set(filter, 'value', '')
-      }
+      this.initializeFieldValue(filter)
     },
 
     onSingleFieldChange (block, blockIndex) {
@@ -628,19 +705,7 @@ export default {
       }
 
       // Initialize value type based on field
-      if (block.field === 'tags') {
-        this.$set(block, 'value', [])
-        if (block.inputValue === undefined) {
-          this.$set(block, 'inputValue', '')
-        }
-      } else if (block.operator === 'range') {
-        this.$set(block, 'value', null)
-        if (block.rangeDisplayValue === undefined) {
-          this.$set(block, 'rangeDisplayValue', '')
-        }
-      } else if (block.field && block.value === '') {
-        this.$set(block, 'value', '')
-      }
+      this.initializeFieldValue(block)
     },
 
     // Get tags array for display
@@ -1325,5 +1390,9 @@ export default {
   gap: 2px;
   margin-top: 4px;
   min-height: 0;
+}
+
+.boolean-select-container {
+  width: 100%;
 }
 </style>
