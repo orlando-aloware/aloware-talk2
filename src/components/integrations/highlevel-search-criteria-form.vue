@@ -80,15 +80,26 @@
                         <label v-if="filterIndex === 0" class="field-label">Field</label>
                         <q-select
                           v-model="filter.field"
-                          :options="availableFieldsWithDisabled(blockIndex, filterIndex)"
+                          :options="filteredFieldOptions.length > 0 ? filteredFieldOptions : availableFieldsWithDisabled(blockIndex, filterIndex)"
                           @input="onFieldChange(filter, blockIndex, filterIndex)"
                           outlined
                           dense
                           emit-value
                           map-options
-                          placeholder="Select a field"
+                          use-input
+                          input-debounce="0"
+                          :placeholder="filter.field ? '' : 'Select a field'"
                           class="criteria-form-input"
-                        />
+                          @filter="filterFieldOptions"
+                        >
+                          <template v-slot:no-option>
+                            <q-item>
+                              <q-item-section class="text-grey">
+                                No results
+                              </q-item-section>
+                            </q-item>
+                          </template>
+                        </q-select>
                       </div>
 
                     <div class="criteria-form-field">
@@ -171,15 +182,26 @@
                       <label class="field-label">Field</label>
                       <q-select
                         v-model="block.field"
-                        :options="availableFieldsWithDisabled(blockIndex, -1)"
+                        :options="filteredFieldOptions.length > 0 ? filteredFieldOptions : availableFieldsWithDisabled(blockIndex, -1)"
                         @input="onSingleFieldChange(block, blockIndex)"
                         outlined
                         dense
                         emit-value
                         map-options
-                        placeholder="Select a field"
+                        use-input
+                        input-debounce="0"
+                        :placeholder="block.field ? '' : 'Select a field'"
                         class="criteria-form-input"
-                      />
+                        @filter="filterFieldOptions"
+                      >
+                        <template v-slot:no-option>
+                          <q-item>
+                            <q-item-section class="text-grey">
+                              No results
+                            </q-item-section>
+                          </q-item>
+                        </template>
+                      </q-select>
                     </div>
 
                     <div class="criteria-form-field">
@@ -304,6 +326,7 @@ export default {
 
   mounted () {
     this.fetchSearchOptions()
+    this.filteredFieldOptions = this.availableFields
   },
 
   data () {
@@ -311,6 +334,7 @@ export default {
       showEditDialog: false,
       isLoading: false,
       availableFields: [],
+      filteredFieldOptions: [],
       availableOperators: [
         { label: 'Is', value: 'eq' },
         { label: 'Is Not', value: 'not_eq' },
@@ -572,6 +596,23 @@ export default {
       const tags = this.getTagsArray(block.value)
       tags.splice(index, 1)
       block.value = tags
+    },
+
+    // Filter field options for searchable dropdown
+    filterFieldOptions (val, update) {
+      if (val === '') {
+        update(() => {
+          this.filteredFieldOptions = this.availableFields
+        })
+        return
+      }
+
+      update(() => {
+        this.filteredFieldOptions = this.availableFields.filter(field =>
+          field.label.toLowerCase().includes(val.toLowerCase()) ||
+          field.value.toLowerCase().includes(val.toLowerCase())
+        )
+      })
     },
 
     buildHighLevelPayload () {
@@ -847,6 +888,12 @@ export default {
         if (newValue && newValue.filters && newValue !== this.lastEmittedValue) {
           this.searchCriteria = JSON.parse(JSON.stringify(newValue))
         }
+      },
+      immediate: true
+    },
+    availableFields: {
+      handler (newFields) {
+        this.filteredFieldOptions = newFields
       },
       immediate: true
     }
