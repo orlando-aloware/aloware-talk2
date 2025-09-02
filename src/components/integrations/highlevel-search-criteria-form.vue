@@ -1,12 +1,16 @@
 <template>
   <div class="highlevel-search-criteria-form">
+
+    <!-- Start Loading State -->
     <div v-if="isLoading" class="text-center py-3">
       <div class="spinner-border text-primary" role="status">
         <span class="sr-only">Loading...</span>
       </div>
       <div class="mt-2">Loading search options...</div>
     </div>
+    <!-- End Loading State -->
 
+    <!-- Start Summary View -->
     <div v-else class="search-criteria-summary">
       <div class="criteria-display">
         <div v-if="hasCriteria" class="criteria-list">
@@ -44,7 +48,9 @@
         </div>
       </div>
     </div>
+    <!-- End Summary View -->
 
+    <!-- Start Edit Dialog -->
     <b-modal
       v-model="showEditDialog"
       title="Edit Search Criteria"
@@ -69,7 +75,7 @@
                        :key="`filter-${blockIndex}-${filterIndex}`"
                        class="criteria-row">
 
-                    <div class="criteria-form-row">
+                    <div class="criteria-form-row" :class="{ 'subsequent-row': filterIndex > 0 }">
                       <div class="criteria-form-field">
                         <label v-if="filterIndex === 0" class="field-label">Field</label>
                         <q-select
@@ -101,7 +107,33 @@
 
                     <div v-if="!['exists', 'not_exists'].includes(filter.operator)" class="criteria-form-field">
                       <label v-if="filterIndex === 0" class="field-label">Value</label>
+                      <!-- Start Multi-select -->
+                      <div v-if="filter.field === 'tags'" class="tags-input-container">
+                        <q-input
+                          v-model="filter.inputValue"
+                          outlined
+                          dense
+                          placeholder="Press 'Enter' to add"
+                          class="criteria-form-input"
+                          @keyup.enter="addTag(filter)"
+                        />
+                        <div v-if="getTagsArray(filter.value).length > 0" class="tags-display">
+                          <div v-for="(tag, index) in getTagsArray(filter.value)"
+                               :key="index"
+                               class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
+                            <div class="tag-text">{{ tag }}</div>
+                            <div role="button"
+                                 class="custom__remove d-flex align-items-center"
+                                 @click="removeTag(filter, index)">
+                              <i class="fa fa-times ml-1 remove-tag-icon"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- End Multi-select -->
+                      <!-- Regular input for other fields -->
                       <q-input
+                        v-else
                         v-model="filter.value"
                         outlined
                         dense
@@ -166,7 +198,33 @@
 
                     <div v-if="!['exists', 'not_exists'].includes(block.operator)" class="criteria-form-field">
                       <label class="field-label">Value</label>
+                      <!-- Start Multi-select -->
+                      <div v-if="block.field === 'tags'" class="tags-input-container">
+                        <q-input
+                          v-model="block.inputValue"
+                          outlined
+                          dense
+                          placeholder="Press 'Enter' to add"
+                          class="criteria-form-input"
+                          @keyup.enter="addSingleTag(block)"
+                        />
+                        <div v-if="getTagsArray(block.value).length > 0" class="tags-display">
+                          <div v-for="(tag, index) in getTagsArray(block.value)"
+                               :key="index"
+                               class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
+                            <div class="tag-text">{{ tag }}</div>
+                            <div role="button"
+                                 class="custom__remove d-flex align-items-center"
+                                 @click="removeSingleTag(block, index)">
+                              <i class="fa fa-times ml-1 remove-tag-icon"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- End Multi-select -->
+                      <!-- Regular input for other fields -->
                       <q-input
+                        v-else
                         v-model="block.value"
                         outlined
                         dense
@@ -225,6 +283,7 @@
         </div>
       </template>
     </b-modal>
+    <!-- End Edit Dialog -->
   </div>
 </template>
 
@@ -263,12 +322,12 @@ export default {
       ],
       searchCriteria: {
         filters: [
-          { field: '', operator: '', value: '' }
+          { field: '', operator: '', value: [], inputValue: '' }
         ]
       },
       tempSearchCriteria: {
         filters: [
-          { field: '', operator: '', value: '' }
+          { field: '', operator: '', value: [], inputValue: '' }
         ]
       },
       lastEmittedValue: null
@@ -412,13 +471,21 @@ export default {
         return value
       }
 
+      // Handle tags field - always return as array of lowercase strings
+      if (field === 'tags') {
+        if (Array.isArray(value)) {
+          return value.map(v => v ? v.toLowerCase() : v)
+        }
+        return []
+      }
+
       // Handle "Any Of" logic - convert comma-separated to array for ANY field
       if (operator === 'Contains' && typeof value === 'string' && value.includes(',')) {
         return value.split(',').map(v => v.trim())
       }
 
       // Handle case-sensitive fields
-      const caseSensitiveFields = ['firstNameLowerCase', 'lastNameLowerCase', 'tags']
+      const caseSensitiveFields = ['firstNameLowerCase', 'lastNameLowerCase']
       if (caseSensitiveFields.includes(field)) {
         if (Array.isArray(value)) {
           return value.map(v => v ? v.toLowerCase() : v)
@@ -452,6 +519,59 @@ export default {
         this.$set(block, 'operator', '')
         this.$set(block, 'value', '')
       }
+    },
+
+    // Get tags array for display
+    getTagsArray (value) {
+      if (!value) return []
+      if (Array.isArray(value)) {
+        return value
+      }
+      return []
+    },
+
+    // Add tag to filter
+    addTag (filter) {
+      if (!filter.inputValue || filter.inputValue.trim() === '') return
+
+      const tags = this.getTagsArray(filter.value)
+      const newTag = filter.inputValue.trim().toLowerCase()
+
+      if (!tags.includes(newTag)) {
+        tags.push(newTag)
+        filter.value = tags
+      }
+
+      filter.inputValue = ''
+    },
+
+    // Add tag to single block
+    addSingleTag (block) {
+      if (!block.inputValue || block.inputValue.trim() === '') return
+
+      const tags = this.getTagsArray(block.value)
+      const newTag = block.inputValue.trim().toLowerCase()
+
+      if (!tags.includes(newTag)) {
+        tags.push(newTag)
+        block.value = tags
+      }
+
+      block.inputValue = ''
+    },
+
+    // Remove tag from filter
+    removeTag (filter, index) {
+      const tags = this.getTagsArray(filter.value)
+      tags.splice(index, 1)
+      filter.value = tags
+    },
+
+    // Remove tag from single block
+    removeSingleTag (block, index) {
+      const tags = this.getTagsArray(block.value)
+      tags.splice(index, 1)
+      block.value = tags
     },
 
     buildHighLevelPayload () {
@@ -627,7 +747,22 @@ export default {
     },
 
     openEditDialog () {
+      // Deep copy but exclude inputValue properties
       this.tempSearchCriteria = JSON.parse(JSON.stringify(this.searchCriteria))
+
+      // Clean up inputValue properties to avoid sending them to API
+      const cleanFilters = (filters) => {
+        filters.forEach(filter => {
+          if (filter.inputValue !== undefined) {
+            delete filter.inputValue
+          }
+          if (filter.filters) {
+            cleanFilters(filter.filters)
+          }
+        })
+      }
+
+      cleanFilters(this.tempSearchCriteria.filters)
       this.showEditDialog = true
     },
 
@@ -636,7 +771,7 @@ export default {
     },
 
     addOrCriteria () {
-      const newFilter = { field: '', operator: '', value: '' }
+      const newFilter = { field: '', operator: '', value: [], inputValue: '' }
       this.tempSearchCriteria.filters.push(newFilter)
     },
 
@@ -644,11 +779,11 @@ export default {
       const currentBlock = this.tempSearchCriteria.filters[blockIndex]
 
       if (currentBlock.group === 'AND') {
-        const newFilter = { field: '', operator: '', value: '' }
+        const newFilter = { field: '', operator: '', value: [], inputValue: '' }
         currentBlock.filters.push(newFilter)
       } else {
         const singleFilter = { ...currentBlock }
-        const newFilter = { field: '', operator: '', value: '' }
+        const newFilter = { field: '', operator: '', value: [], inputValue: '' }
 
         this.$set(this.tempSearchCriteria.filters, blockIndex, {
           group: 'AND',
@@ -853,7 +988,11 @@ export default {
   gap: 16px;
   margin: 0;
   padding: 0;
-  align-items: flex-end;
+  align-items: flex-start;
+}
+
+.subsequent-row {
+  padding-top: 18px;
 }
 
 .criteria-form-field {
@@ -861,17 +1000,26 @@ export default {
   min-width: 0;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .criteria-form-input {
   width: 100%;
   height: 40px;
+  align-self: flex-start;
 }
 
 .delete-button-container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-shrink: 0;
+  padding-top: 24px;
+}
+
+.subsequent-row .delete-button-container {
+  padding-top: 0px;
 }
 
 .delete-button {
@@ -885,7 +1033,6 @@ export default {
   background-color: white;
   color: #dc3545;
   transition: all 0.2s ease;
-  transform: translateY(-8px);
 }
 
 .delete-button:hover {
@@ -923,7 +1070,7 @@ export default {
 }
 
 .criteria-row {
-  margin-bottom: 6px;
+  margin-bottom: 2px;
 }
 
 .criteria-row:last-child {
@@ -955,5 +1102,23 @@ export default {
   font-size: 14px;
   position: relative;
   z-index: 2;
+}
+
+.tags-input-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tags-input-container .q-input {
+  flex-shrink: 0;
+}
+
+.tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 4px;
+  min-height: 0;
 }
 </style>
