@@ -180,6 +180,7 @@
                         dense
                         placeholder="Enter value"
                         class="criteria-form-input"
+                        :maxlength="['eq', 'not_eq', 'contains', 'not_contains'].includes(filter.operator) ? 75 : undefined"
                       />
                     </div>
 
@@ -312,6 +313,7 @@
                         dense
                         placeholder="Enter value"
                         class="criteria-form-input"
+                        :maxlength="['eq', 'not_eq', 'contains', 'not_contains'].includes(block.operator) ? 75 : undefined"
                       />
                     </div>
 
