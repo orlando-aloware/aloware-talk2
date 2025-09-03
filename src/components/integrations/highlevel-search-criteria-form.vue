@@ -605,10 +605,11 @@ export default {
         return value
       }
 
-      // Handle tags field - always return as array of lowercase strings
+      // Handle tags field - return as string if single tag, array if multiple
       if (field === 'tags') {
         if (Array.isArray(value)) {
-          return value.map(v => v ? v.toLowerCase() : v)
+          const processedTags = value.map(v => v ? v.toLowerCase() : v).filter(v => v)
+          return processedTags.length === 1 ? processedTags[0] : processedTags
         }
         return []
       }
