@@ -372,9 +372,9 @@ export default {
       }
 
       if (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE) {
-        // HighLevel doesn't have a list ID, so we need to check if the name is valid
+        // HighLevel doesn't have a list ID, so we need to check if both name and criteria to be valid
         if (this.getIntegration === HIGHLEVEL_INTEGRATION) {
-          return !this.isNameValid
+          return !this.isNameValid || !this.hasValidHighLevelCriteria
         }
 
         return !this.integrationList
@@ -408,6 +408,25 @@ export default {
       return this.integrationsEnabled.filter(integration => [
         HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION, HIGHLEVEL_INTEGRATION
       ].includes(integration.toLowerCase()))
+    },
+
+    hasValidHighLevelCriteria () {
+      // Check if HighLevel criteria is valid (has at least one filter with field and operator)
+      if (this.getIntegration !== HIGHLEVEL_INTEGRATION) {
+        return true
+      }
+
+      if (!this.highlevelSearchCriteria || !this.highlevelSearchCriteria.filters) {
+        return false
+      }
+
+      return this.highlevelSearchCriteria.filters.some(block => {
+        if (block.group === 'AND') {
+          return block.filters && block.filters.length > 0 && block.filters.some(filter => filter.field && filter.operator)
+        } else {
+          return block.field && block.operator
+        }
+      })
     }
   },
 
