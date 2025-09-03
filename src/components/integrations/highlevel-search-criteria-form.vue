@@ -81,7 +81,7 @@
                         <q-select
                           v-model="filter.field"
                           :options="filteredFieldOptions.length > 0 ? filteredFieldOptions : availableFieldsWithDisabled(blockIndex, filterIndex)"
-                          @input="onFieldChange(filter, blockIndex, filterIndex)"
+                          @input="onFieldChange(filter)"
                           outlined
                           dense
                           emit-value
@@ -213,7 +213,7 @@
                       <q-select
                         v-model="block.field"
                         :options="filteredFieldOptions.length > 0 ? filteredFieldOptions : availableFieldsWithDisabled(blockIndex, -1)"
-                        @input="onSingleFieldChange(block, blockIndex)"
+                        @input="onSingleFieldChange(block)"
                         outlined
                         dense
                         emit-value
@@ -694,9 +694,9 @@ export default {
     validateAllFilters () {
       const allErrors = []
 
-      this.tempSearchCriteria.filters.forEach((block, blockIndex) => {
+      this.tempSearchCriteria.filters.forEach(block => {
         if (block.group === 'AND') {
-          block.filters.forEach((filter, filterIndex) => {
+          block.filters.forEach(filter => {
             const errors = this.validateFieldValue(filter)
             if (errors.length > 0) {
               allErrors.push(errors.join(', '))
@@ -757,7 +757,7 @@ export default {
       }
     },
 
-    onFieldChange (filter, blockIndex, filterIndex) {
+    onFieldChange (filter) {
       // Reset operator if current combination is invalid
       if (filter.operator && !this.isValidFieldOperatorCombination(filter.field, filter.operator)) {
         this.$set(filter, 'operator', '')
@@ -768,7 +768,7 @@ export default {
       this.initializeFieldValue(filter)
     },
 
-    onSingleFieldChange (block, blockIndex) {
+    onSingleFieldChange (block) {
       // Reset operator if current combination is invalid
       if (block.operator && !this.isValidFieldOperatorCombination(block.field, block.operator)) {
         this.$set(block, 'operator', '')

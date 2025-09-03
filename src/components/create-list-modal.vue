@@ -826,12 +826,9 @@ export default {
           search_criteria: this.highlevelSearchCriteria,
           list_name: this.createList.name
         }
-
         console.log('Importing HighLevel criteria:', params)
-
         await talk2Api.V2.integrations.highlevel.importCriteria(params)
 
-        console.log('HighLevel import successful')
         this.$generalNotification('Your HighLevel contacts are being imported based on search criteria. It can take a couple of minutes if it\'s a large result set.')
         this.createListClose()
         this.loadFolders()
@@ -839,7 +836,16 @@ export default {
       } catch (error) {
         console.error('HighLevel import failed:', error)
         this.isLoading = false
-        this.$generalNotification('Unable to import contacts from HighLevel, please try again.', 'error')
+
+        let errorMessage = 'Unable to import contacts from HighLevel, please try again.'
+
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message
+        } else if (error.message) {
+          errorMessage = error.message
+        }
+
+        this.$generalNotification(errorMessage, 'error')
       }
     },
 
@@ -919,7 +925,17 @@ export default {
       } catch (error) {
         console.error('HighLevel criteria check failed:', error)
         this.isLoading = false
-        this.$generalNotification('Unable to check if HighLevel criteria already exists. Please try again.', 'error')
+
+        // Extract error message from the response
+        let errorMessage = 'Unable to check if HighLevel criteria already exists. Please try again.'
+
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message
+        } else if (error.message) {
+          errorMessage = error.message
+        }
+
+        this.$generalNotification(errorMessage, 'error')
         throw error // Re-throw to prevent import from proceeding
       }
     },
