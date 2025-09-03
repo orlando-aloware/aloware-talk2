@@ -115,6 +115,7 @@ import {
   ZOHO_INTEGRATION,
   HIGHLEVEL_INTEGRATION
 } from 'src/constants/integrations'
+import { hasValidHighLevelData } from 'src/plugins/helpers/highlevel-validation'
 
 export default {
   name: 'integration-list-import-modal',
@@ -180,19 +181,9 @@ export default {
 
     canProceed () {
       if (this.selectedIntegration === 'HighLevel') {
-        return this.highlevelListName.trim() !== '' && this.hasValidHighLevelCriteria
+        return hasValidHighLevelData(this.highlevelListName, this.highlevelSearchCriteria)
       }
       return this.list !== null
-    },
-
-    hasValidHighLevelCriteria () {
-      return this.highlevelSearchCriteria && this.highlevelSearchCriteria.filters &&
-             this.highlevelSearchCriteria.filters.some(block => {
-               if (block.group === 'AND') {
-                 return block.filters.some(filter => filter.field && filter.operator)
-               }
-               return block.field && block.operator
-             })
     },
 
     filteredEnabledIntegrations () {

@@ -251,6 +251,7 @@ import {
   ZOHO_INTEGRATION,
   HIGHLEVEL_INTEGRATION
 } from 'src/constants/integrations'
+import { hasValidHighLevelCriteria } from 'src/plugins/helpers/highlevel-validation'
 
 export default {
   components: {
@@ -416,17 +417,7 @@ export default {
         return true
       }
 
-      if (!this.highlevelSearchCriteria || !this.highlevelSearchCriteria.filters) {
-        return false
-      }
-
-      return this.highlevelSearchCriteria.filters.some(block => {
-        if (block.group === 'AND') {
-          return block.filters && block.filters.length > 0 && block.filters.some(filter => filter.field && filter.operator)
-        } else {
-          return block.field && block.operator
-        }
-      })
+      return hasValidHighLevelCriteria(this.highlevelSearchCriteria)
     }
   },
 
