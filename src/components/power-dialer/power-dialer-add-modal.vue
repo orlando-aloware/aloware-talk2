@@ -17,7 +17,7 @@
         <b-overlay data-testid="power-dialer-add-modal-overlay"
                    :show="loading > 0">
           <div data-testid="power-dialer-add-modal-converting-message">
-            You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
+            You're converting <strong>{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
           </div>
 
           <hr>
@@ -149,7 +149,7 @@
         <b-overlay data-testid="power-dialer-add-modal-overlay"
                    :show="loading > 0">
           <div data-testid="power-dialer-add-modal-converting-message">
-            You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
+            You're converting <strong>{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
           </div>
 
           <hr>
@@ -482,6 +482,11 @@ export default {
         description += this.$options.filters.numFormat(this.count)
       }
 
+      // For HighLevel, don't show count since it's unknown until processed
+      if (this.mode === 'integration' && this.getIntegration()?.toLowerCase() === 'highlevel' && this.count === null) {
+        return 'contacts based on HighLevel search criteria'
+      }
+
       description += (this.count === 1 ? ' contact' : ' contacts')
 
       return description
@@ -599,6 +604,15 @@ export default {
         this.count = this.params.contact_ids.length
         this.loading--
 
+        return
+      }
+
+      // Handle HighLevel integration specifically
+      if (this.mode === 'integration' && this.getIntegration()?.toLowerCase() === 'highlevel') {
+        // For HighLevel, we can't know the count until the import is processed
+        // Set count to null to hide the count display
+        this.count = null
+        this.loading--
         return
       }
 
@@ -776,6 +790,8 @@ export default {
           return this.addPipedriveFilter()
         case 'zoho':
           return this.addZohoView()
+        case 'highlevel':
+          return this.importFromHighlevel()
       }
     },
 
@@ -839,6 +855,25 @@ export default {
         })
     },
 
+    importFromHighlevel () {
+      const params = {
+        list_name: this.params.list_name,
+        search_criteria: this.params.search_criteria
+      }
+
+      return talk2Api.V2.integrations.highlevel.importCriteriaToPowerDialer(params)
+        .then(response => response.data)
+        .then(data => {
+          const notification = this.$generalNotification('Your HighLevel contacts are being imported based on search criteria. We will notify you when it\'s ready.')
+          this.$emit('submit', {
+            notification: notification
+          })
+        })
+        .catch(_err => {
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
+        })
+    },
+
     reloadFolders () {
       return this.$axios
         .get('/api/v2/power-dialer-folders')
@@ -862,6 +897,8 @@ export default {
           return this.checkPipedriveFilter()
         case 'zoho':
           return this.checkZohoView()
+        case 'highlevel':
+          return this.checkHighlevelCriteria()
       }
     },
 
@@ -911,6 +948,27 @@ export default {
       }
 
       this.loading--
+    },
+
+    async checkHighlevelCriteria () {
+      this.loading++
+
+      try {
+        const res = await talk2Api.V2.integrations.highlevel.criteriaExistsForPowerDialer({
+          list_name: this.params.list_name,
+          search_criteria: this.params.search_criteria
+        })
+
+        if (res.data.exists) {
+          this.confirm_message = 'The HighLevel criteria you are trying to import already exists in another list. Would you like to proceed and update that list?'
+          this.confirm = true
+        }
+      } catch (error) {
+        // If criteria doesn't exist, continue without confirmation
+        console.log('HighLevel criteria check failed:', error)
+      } finally {
+        this.loading--
+      }
     },
 
     closeConfirmDialog () {

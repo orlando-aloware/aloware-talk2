@@ -60,12 +60,31 @@
                                                :generic-styling="false"
                                                :disable="shouldDisableListSelector"
                                                :integration="selectedIntegration ?? ''"
-                                               @change="onListSelectorChange"/>
+                                               @change="onListSelectorChange"
+                                               v-if="selectedIntegration !== 'HighLevel'"/>
+
+                    <div v-if="selectedIntegration === 'HighLevel'" class="highlevel-criteria-section">
+                      <div class="form-group">
+                        <label class="form-label">List Name</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          v-model="highlevelListName"
+                          placeholder="Enter list name"
+                        />
+                      </div>
+
+                      <highlevel-search-criteria-form
+                        class="mt-3"
+                        v-model="highlevelSearchCriteria"
+                        :available-fields="highlevelAvailableFields"
+                      />
+                    </div>
                 </div>
 
                 <div class="d-flex align-items-center pt-3">
                     <button class="btn btn-block btn-primary mt-0"
-                            :disabled="!list || isLoading"
+                            :disabled="!canProceed || isLoading"
                             @click="onSubmit">
                         Next
                     </button>
@@ -86,13 +105,15 @@
 import { mapActions, mapState } from 'vuex'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
+import HighlevelSearchCriteriaForm from 'src/components/integrations/highlevel-search-criteria-form.vue'
 import { integrationMixin } from 'src/plugins/mixins'
 import AlAlert from 'components/alert/index.vue'
 import { TAGS_DEPRECATION_IMPORT_CONTACTS_MESSAGE } from 'src/constants/deprecation-messages'
 import {
   HUBSPOT_INTEGRATION,
   PIPEDRIVE_INTEGRATION,
-  ZOHO_INTEGRATION
+  ZOHO_INTEGRATION,
+  HIGHLEVEL_INTEGRATION
 } from 'src/constants/integrations'
 
 export default {
@@ -101,6 +122,7 @@ export default {
   components: {
     IntegrationListSelector,
     PowerDialerAddModal,
+    HighlevelSearchCriteriaForm,
     AlAlert
   },
 
@@ -124,7 +146,10 @@ export default {
       list: null,
       integration: null,
       selectedIntegration: null,
-      TAGS_DEPRECATION_IMPORT_CONTACTS_MESSAGE
+      TAGS_DEPRECATION_IMPORT_CONTACTS_MESSAGE,
+      highlevelListName: '',
+      highlevelSearchCriteria: {},
+      highlevelAvailableFields: []
     }
   },
 
@@ -136,6 +161,13 @@ export default {
     },
 
     powerDialerParams () {
+      if (this.selectedIntegration === 'HighLevel') {
+        return {
+          list_name: this.highlevelListName,
+          search_criteria: this.highlevelSearchCriteria
+        }
+      }
+
       return {
         target: this.list.listId || this.list.id,
         size: this.list?.additionalProperties?.hs_list_size || null
@@ -146,9 +178,26 @@ export default {
       return this.selectedIntegration === null
     },
 
+    canProceed () {
+      if (this.selectedIntegration === 'HighLevel') {
+        return this.highlevelListName.trim() !== '' && this.hasValidHighLevelCriteria
+      }
+      return this.list !== null
+    },
+
+    hasValidHighLevelCriteria () {
+      return this.highlevelSearchCriteria && this.highlevelSearchCriteria.filters &&
+             this.highlevelSearchCriteria.filters.some(block => {
+               if (block.group === 'AND') {
+                 return block.filters.some(filter => filter.field && filter.operator)
+               }
+               return block.field && block.operator
+             })
+    },
+
     filteredEnabledIntegrations () {
       // show only ready for PD import integrations
-      return this.integrationsEnabled.filter(integration => [HUBSPOT_INTEGRATION, PIPEDRIVE_INTEGRATION, ZOHO_INTEGRATION].includes(integration.toLowerCase()))
+      return this.integrationsEnabled.filter(integration => [HUBSPOT_INTEGRATION, PIPEDRIVE_INTEGRATION, ZOHO_INTEGRATION, HIGHLEVEL_INTEGRATION].includes(integration.toLowerCase()))
     }
   },
 
@@ -156,6 +205,14 @@ export default {
     if (this.filteredEnabledIntegrations.length === 1) {
       this.selectedIntegration = this.filteredEnabledIntegrations[0]
       this.loadSelectionOptions()
+    }
+  },
+
+  watch: {
+    selectedIntegration (newValue) {
+      if (newValue === 'HighLevel') {
+        this.loadHighLevelSearchOptions()
+      }
     }
   },
 
@@ -190,6 +247,16 @@ export default {
 
       this.$refs['list-selector'].selectedId = null
       this.$refs['list-selector'].getListsOfEnabledIntegration()
+    },
+
+    async loadHighLevelSearchOptions () {
+      try {
+        const response = await this.$axios.get('/api/v2/integrations/highlevel/search-options')
+        this.highlevelAvailableFields = response.data.fields || []
+      } catch (error) {
+        console.error('Failed to load HighLevel search options:', error)
+        this.highlevelAvailableFields = []
+      }
     }
   }
 }

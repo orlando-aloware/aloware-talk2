@@ -995,6 +995,12 @@ const talk2Api = {
         },
         getSearchOptions () {
           return window.axios.get(`${suffixV2}contacts-list/highlevel-search-options`)
+        },
+        importCriteriaToPowerDialer (params) {
+          return window.axios.post(`${suffixV2}power-dialer-lists/import-highlevel-criteria`, params)
+        },
+        criteriaExistsForPowerDialer (params) {
+          return window.axios.post(`${suffixV2}power-dialer-lists/highlevel-criteria-exists`, params)
         }
       }
 
