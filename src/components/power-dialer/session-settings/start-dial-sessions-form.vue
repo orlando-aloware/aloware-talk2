@@ -448,11 +448,22 @@ export default {
     },
 
     disableField (field, ignoreDisabledFlag = false) {
+      // if not disabled, it is not needed to perform any other checks
+      if (!this.disabled) {
+        return false
+      }
+
       if (this.disabled && !ignoreDisabledFlag) {
         return true
       }
 
-      const powerDialerSettings = this.currentCompany?.power_dialer_settings ?? {}
+      // account power dialer settings
+      let powerDialerSettings = this.currentCompany?.power_dialer_settings ?? {}
+
+      // if making changes to a saved session, the settings should come from it
+      if (this.selectedSettings?.id) {
+        powerDialerSettings = this.selectedSettings
+      }
 
       const redialRequired = powerDialerSettings.min_redials > 0
 
@@ -460,8 +471,8 @@ export default {
         case 'min_redials': return redialRequired
         case 'force_immediate_redial': return redialRequired && powerDialerSettings.force_immediate_redial
         case 'force_sms': return redialRequired && powerDialerSettings.force_sms
-        case 'successful_call_disposition_ids': return redialRequired && (powerDialerSettings.successful_call_disposition_ids?.length > 0 || this.selectedSettings?.successful_call_disposition_ids?.length > 0)
-        case 'call_disposition_ids': return powerDialerSettings.call_disposition_ids?.length > 0 || this.selectedSettings?.call_disposition_ids?.length > 0
+        case 'successful_call_disposition_ids': return redialRequired && (powerDialerSettings.successful_call_disposition_ids?.length > 0)
+        case 'call_disposition_ids': return powerDialerSettings.call_disposition_ids?.length > 0
       }
 
       return false
