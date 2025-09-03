@@ -1475,4 +1475,9 @@ export default {
 .boolean-select-container {
   width: 100%;
 }
+
+/* Override modal width - this will make the select fields more consistent in height */
+:deep(.modal-dialog) {
+  max-width: 950px !important;
+}
 </style>
