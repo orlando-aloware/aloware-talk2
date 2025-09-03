@@ -452,6 +452,7 @@ export default {
         return true
       }
 
+      // account power dialer settings
       const powerDialerSettings = this.currentCompany?.power_dialer_settings ?? {}
 
       const redialRequired = powerDialerSettings.min_redials > 0
@@ -460,8 +461,13 @@ export default {
         case 'min_redials': return redialRequired
         case 'force_immediate_redial': return redialRequired && powerDialerSettings.force_immediate_redial
         case 'force_sms': return redialRequired && powerDialerSettings.force_sms
-        case 'successful_call_disposition_ids': return redialRequired && (powerDialerSettings.successful_call_disposition_ids?.length > 0 || this.selectedSettings?.successful_call_disposition_ids?.length > 0)
-        case 'call_disposition_ids': return powerDialerSettings.call_disposition_ids?.length > 0 || this.selectedSettings?.call_disposition_ids?.length > 0
+        case 'successful_call_disposition_ids':
+          return redialRequired &&
+            (powerDialerSettings.successful_call_disposition_ids?.length > 0 &&
+            // in case of editing a setting, it should enable the field if there are no items pre-selected
+            (this.selectedSettings?.id ? this.selectedSettings?.successful_call_disposition_ids?.length > 0 : true))
+        case 'call_disposition_ids':
+          return this.disabled && this.selectedSettings?.call_disposition_ids?.length > 0
       }
 
       return false
