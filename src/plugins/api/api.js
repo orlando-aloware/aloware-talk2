@@ -429,6 +429,10 @@ const talk2Api = {
          * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object>>}
          */
         getContactConversationThreads (contactId) {
+          if (!contactId) {
+            return null
+          }
+
           return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/conversation-threads/${contactId}`)
         }
       },
@@ -682,24 +686,6 @@ const talk2Api = {
     dialer: {
       sendVmDrop (params) {
         return window.axios.post(`${suffixV1}dialer/play-prerecorded-voicemail`, params)
-      }
-    },
-
-    accountRegistration: {
-      getPreSignupDetails (params) {
-        return window.axios.get(`/api/admin/company-registration/pre-signup-prefill/${params.verification_token}`)
-      },
-
-      getSSUData () {
-        return window.axios.get(`/api/v1/company/ssu/get`)
-      },
-
-      save (payload) {
-        return window.axios.post('/api/admin/company-registration', payload)
-      },
-
-      update (params, payload) {
-        return window.axios.patch(`/api/admin/company-registration/${params.preSignupId}`, payload)
       }
     },
 

@@ -55,6 +55,7 @@ export default {
   lines: (state) => state.lines,
   ringGroups: (state) => state.ringGroups,
   contactAttributes: (state) => state.contactAttributes,
+  contactAttributesClone: (state) => state.contactAttributesClone,
   contactPhoneNumbers: (state) => state.contactPhoneNumbers,
   conflictedContactPhoneNumbers: (state) => state.conflictedContactPhoneNumbers,
   contactRingGroups: (state) => state.contactRingGroups,

@@ -30,7 +30,6 @@ const Error404 = () => import('pages/Error404.vue')
 const Messenger = () => import('pages/Messenger.vue')
 const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
-const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
 const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
 const SalesforceMessageWidgetError = () => import('pages/widgets/SalesforceMessageWidgetError.vue')
 const SalesforceSoftPhone = () => import('pages/widgets/SalesforceSoftPhone.vue')
@@ -651,15 +650,6 @@ const routes = [
           title: 'Messenger'
         },
         component: Messenger
-      },
-      {
-        path: '/account-registration/:verification_token?',
-        name: 'Account Registration',
-        meta: {
-          title: 'Account Registration',
-          isGuest: true
-        },
-        component: AccountRegistration
       },
       {
         name: 'Texting Widget (known-user)',

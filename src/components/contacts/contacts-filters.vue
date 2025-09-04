@@ -525,7 +525,10 @@ export default {
         const firstKey = this.filtersMemo.keys().next().value
         this.filtersMemo.delete(firstKey)
       }
-      this.filtersMemo.set(cacheKey, filterGroups)
+
+      if (this.filters.length >= 1) {
+        this.filtersMemo.set(cacheKey, filterGroups)
+      }
       return filterGroups
     },
 
@@ -621,7 +624,9 @@ export default {
         filterFound = this._filterCache.get(key)
       } else {
         filterFound = this.filters.find(filter => filter.key === key)
-        this._filterCache.set(key, filterFound)
+        if (filterFound.options?.length > 0) {
+          this._filterCache.set(key, filterFound)
+        }
       }
 
       const isRelationType = filterFound && this.relationTypes.includes(filterFound.type)
@@ -895,7 +900,7 @@ export default {
       deep: true,
       handler: function () {
         this.visibleListFilters = this.generateListFilters()
-        if (this.visibleListFilters.length) {
+        if (this.visibleListFilters.length || Object.keys(this.visibleListFilters).length) {
           this.fetchTagsOptions()
         }
 
