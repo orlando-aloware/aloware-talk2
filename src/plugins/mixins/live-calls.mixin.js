@@ -225,7 +225,7 @@ export default {
     },
 
     isPersonalInbox () {
-      return this.communication.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled
+      return this.communication.campaign?.is_personal_inbox && this.hasCompanyTeamInboxEnabled
     }
   },
 
