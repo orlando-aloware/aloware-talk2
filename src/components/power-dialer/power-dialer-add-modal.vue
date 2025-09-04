@@ -482,9 +482,9 @@ export default {
         description += this.$options.filters.numFormat(this.count)
       }
 
-      // For HighLevel, don't show count since it's unknown until processed
-      if (this.mode === 'integration' && this.getIntegration()?.toLowerCase() === 'highlevel' && this.count === null) {
-        return 'contacts based on HighLevel search criteria'
+      // For integrations that can't determine count, show generic text
+      if (this.mode === 'integration' && this.count === null) {
+        return 'contacts'
       }
 
       description += (this.count === 1 ? ' contact' : ' contacts')
