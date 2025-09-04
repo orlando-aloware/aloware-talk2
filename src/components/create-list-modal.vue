@@ -431,6 +431,10 @@ export default {
 
     onClose () {
       if (!this.isLoading) {
+        // Reset all integration data when closing the dialog
+        this.highlevelSearchCriteria = {}
+        this.integrationList = null
+        this.selectedIntegration = null
         this.createListClose()
       }
     },
@@ -956,6 +960,13 @@ export default {
 
     onListTypeSelected (listType) {
       this.createList.type = listType
+
+      // Reset all integration data when switching away from "List from Integration"
+      if (listType !== this.IMPORT_FROM_INTEGRATION_TYPE) {
+        this.highlevelSearchCriteria = {}
+        this.integrationList = null
+        this.selectedIntegration = null
+      }
     },
 
     onHighlevelCriteriaChange (criteria) {
@@ -997,6 +1008,14 @@ export default {
       this.name = null
       this.type = this.ContactListTypes.DYNAMIC
       this.errorMsg = ''
+    },
+
+    selectedIntegration (newValue, oldValue) {
+      // Reset all integration data when integration changes
+      if (newValue !== oldValue) {
+        this.highlevelSearchCriteria = {}
+        this.integrationList = null
+      }
     }
   }
 }

@@ -476,9 +476,17 @@ export default {
 
             // For range operators, show formatted date range
             if (filter.operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
-              const fromDate = new Date(value.from).toLocaleDateString()
-              const toDate = new Date(value.to).toLocaleDateString()
-              return `${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDate} to ${toDate}`
+              const fromDate = new Date(value.from)
+              const toDate = new Date(value.to)
+
+              // Validate the date range before displaying
+              if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime()) && toDate > fromDate) {
+                const fromDateStr = fromDate.toLocaleDateString()
+                const toDateStr = toDate.toLocaleDateString()
+                return `${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDateStr} to ${toDateStr}`
+              } else {
+                return `${fieldLabel} ${operatorLabel.toLowerCase()} (Invalid date range)`
+              }
             }
 
             // For boolean fields, show Yes/No instead of true/false
@@ -510,12 +518,24 @@ export default {
 
           // For range operators, show formatted date range
           if (block.operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
-            const fromDate = new Date(value.from).toLocaleDateString()
-            const toDate = new Date(value.to).toLocaleDateString()
-            return {
-              type: 'single',
-              criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDate} to ${toDate}`],
-              index: blockIndex
+            const fromDate = new Date(value.from)
+            const toDate = new Date(value.to)
+
+            // Validate the date range before displaying
+            if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime()) && toDate > fromDate) {
+              const fromDateStr = fromDate.toLocaleDateString()
+              const toDateStr = toDate.toLocaleDateString()
+              return {
+                type: 'single',
+                criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDateStr} to ${toDateStr}`],
+                index: blockIndex
+              }
+            } else {
+              return {
+                type: 'single',
+                criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} (Invalid date range)`],
+                index: blockIndex
+              }
             }
           }
 
@@ -741,9 +761,13 @@ export default {
 
       // Handle range operator
       if (filter.operator === 'range') {
-        this.$set(filter, 'value', null)
         if (filter.rangeDisplayValue === undefined) {
-          this.$set(filter, 'rangeDisplayValue', '')
+          // If we have a valid value object, convert it to display format
+          if (filter.value && typeof filter.value === 'object' && filter.value.from && filter.value.to) {
+            this.$set(filter, 'rangeDisplayValue', this.getRangeDisplayValue(filter.value))
+          } else {
+            this.$set(filter, 'rangeDisplayValue', '')
+          }
         }
         return
       }
@@ -857,7 +881,16 @@ export default {
       if (!value || !value.from || !value.to) return ''
       const fromDate = new Date(value.from)
       const toDate = new Date(value.to)
-      return `${fromDate.getMonth() + 1}/${fromDate.getDate()}/${fromDate.getFullYear()} - ${toDate.getMonth() + 1}/${toDate.getDate()}/${toDate.getFullYear()}`
+
+      // Ensure proper MM/DD/YYYY format
+      const formatDate = (date) => {
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        const year = date.getFullYear()
+        return `${month}/${day}/${year}`
+      }
+
+      return `${formatDate(fromDate)} - ${formatDate(toDate)}`
     },
 
     onRangeInputChange (inputValue, filter) {
@@ -895,6 +928,25 @@ export default {
 
         // Validate dates
         if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+          this.$set(filter, 'value', null)
+          return
+        }
+
+        // Check if dates were rolled over (e.g., "08/32/2025" becomes "09/01/2025")
+        // This also handles leap years correctly - "02/29/2025" becomes "03/01/2025" and gets rejected
+        const fromMonth = fromDate.getMonth() + 1
+        const fromDay = fromDate.getDate()
+        const toMonth = toDate.getMonth() + 1
+        const toDay = toDate.getDate()
+
+        if (fromMonth !== parseInt(fromMatch[1]) || fromDay !== parseInt(fromMatch[2]) ||
+            toMonth !== parseInt(toMatch[1]) || toDay !== parseInt(toMatch[2])) {
+          this.$set(filter, 'value', null)
+          return
+        }
+
+        // Validate date order - to date should be after from date
+        if (toDate <= fromDate) {
           this.$set(filter, 'value', null)
           return
         }
@@ -1016,7 +1068,14 @@ export default {
     isRangeValueValid (value) {
       if (!value) return false
       if (typeof value !== 'object') return false
-      return value.from && value.to
+      if (!value.from || !value.to) return false
+
+      const fromDate = new Date(value.from)
+      const toDate = new Date(value.to)
+
+      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) return false
+
+      return toDate > fromDate
     },
 
     validateAllCombinations () {
@@ -1107,6 +1166,20 @@ export default {
       }
 
       cleanFilters(this.tempSearchCriteria.filters)
+
+      // Initialize range display values for existing range filters
+      const initializeRangeDisplays = (filters) => {
+        filters.forEach(filter => {
+          if (filter.operator === 'range' && filter.value && typeof filter.value === 'object' && filter.value.from && filter.value.to) {
+            this.$set(filter, 'rangeDisplayValue', this.getRangeDisplayValue(filter.value))
+          }
+          if (filter.filters) {
+            initializeRangeDisplays(filter.filters)
+          }
+        })
+      }
+
+      initializeRangeDisplays(this.tempSearchCriteria.filters)
       this.showEditDialog = true
     },
 
