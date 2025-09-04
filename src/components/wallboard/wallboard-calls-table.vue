@@ -653,6 +653,10 @@ export default {
         ? communication.attempting_users.slice(0, size)
         : communication.attempting_users
 
+      if (communication.attempting_users_data) {
+        return communication.attempting_users_data
+      }
+
       return users.filter(user => this.getUser(user)?.id)
     }
   }

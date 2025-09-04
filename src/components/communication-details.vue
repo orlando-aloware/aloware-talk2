@@ -625,7 +625,7 @@
                     <li
                       class="pb-1"
                       :key="attemptingUser.id + '-user-' + index"
-                      v-for="(attemptingUser, index) in communication.attempting_users"
+                      v-for="(attemptingUser, index) in communication.attempting_users_data"
                     >
                       <div
                         class="flex items-center mr-1 h-100"
