@@ -1051,7 +1051,7 @@ export default {
         console.log('Talk-Connection: Call invite canceled', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
-        this.backToDial('Talk-Connection.OnCancel')
+        this.backToDial('Talk-Connection.OnCancel', false, true)
         this.$closeActionNotification('incomingCall')
       })
 
