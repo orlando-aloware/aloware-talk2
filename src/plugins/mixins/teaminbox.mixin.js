@@ -141,10 +141,26 @@ export default {
 
         const response = await this.getItemsRequest(inboxId, 1, search, filters, sort)
 
-        this.setContactsLastUsedLines({
-          inboxId,
-          data: response.data.data
-        })
+        if (inboxId === ALL_INBOXES_ID) {
+          // For the All Inboxes, we need to set the last used line for each contact / communication of the list,
+          // as they can be part of different inboxes
+          response.data.data.forEach(item => {
+            this.setContactsLastUsedLines({
+              inboxId: item.ring_group_id,
+              data: [{
+                contact_id: item.contact_id,
+                last_line_used: item.last_line_used
+              }]
+            })
+          })
+        } else {
+          // For the regular inbox, we can set the last used line for the whole list,
+          // as they are all part of the same inbox
+          this.setContactsLastUsedLines({
+            inboxId,
+            data: response.data.data
+          })
+        }
 
         this.setItems(response.data)
         this.setIsLoadingItems(false)
