@@ -13,7 +13,7 @@ export function hasValidHighLevelCriteria (searchCriteria) {
     return false
   }
 
-  return searchCriteria.filters.some(block => {
+  const isValid = searchCriteria.filters.some(block => {
     // Handle AND groups with nested filters
     if (block.group === 'AND') {
       return block.filters && block.filters.length > 0 &&
@@ -23,12 +23,22 @@ export function hasValidHighLevelCriteria (searchCriteria) {
     // Handle OR groups with nested filters
     if (block.group === 'OR') {
       return block.filters && block.filters.length > 0 &&
-             block.filters.some(filter => filter.field && filter.operator)
+             block.filters.some(filter => {
+               // Handle nested AND groups within OR
+               if (filter.group === 'AND') {
+                 return filter.filters && filter.filters.length > 0 &&
+                        filter.filters.some(andFilter => andFilter.field && andFilter.operator)
+               }
+               // Handle direct filters within OR
+               return filter.field && filter.operator
+             })
     }
 
     // Handle direct filters (no group)
     return block.field && block.operator
   })
+
+  return isValid
 }
 
 /**

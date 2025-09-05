@@ -1235,6 +1235,7 @@ export default {
           this.searchCriteria = JSON.parse(JSON.stringify(newValue))
         }
       },
+      deep: true,
       immediate: true
     },
     availableFields: {
