@@ -618,6 +618,7 @@ export default {
       // define last call values to track useful updates if needed
       if (status) {
         if (lastCall) {
+          console.log('Setting dialer communication from Dialer', lastCall)
           this.setDialerCommunication(lastCall)
           this.setDialerContact(lastCall?.contact)
         }

@@ -396,6 +396,7 @@ export default {
             return data
           }
 
+          console.log('Setting dialer communication from live-calls.mixin', currentCommunication)
           this.setDialerCommunication(currentCommunication)
 
           data['parkFromAnotherTab'] = true

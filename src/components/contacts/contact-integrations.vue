@@ -14,7 +14,7 @@
         v-if="isHubspotEnabled"
         data-testid="contact-integrations-hubspot"
         :contact="contact"
-        :team-inbox-id="activeInboxId"
+        :team-inbox-id="teamInboxId"
         :from-team-inbox="fromTeamInbox"
         :is-read-only="isReadOnly"
     />
@@ -23,7 +23,7 @@
         v-if="isPipedriveEnabled"
         data-testid="contact-integrations-pipedrive"
         :contact="contact"
-        :team-inbox-id="activeInboxId"
+        :team-inbox-id="teamInboxId"
         :from-team-inbox="fromTeamInbox"
         :is-read-only="isReadOnly"
     />
@@ -32,7 +32,7 @@
         v-if="isGHLEnabled"
         data-testid="contact-integrations-gohighlevel"
         :contact="contact"
-        :team-inbox-id="activeInboxId"
+        :team-inbox-id="teamInboxId"
         :from-team-inbox="fromTeamInbox"
         :is-read-only="isReadOnly"
     />
@@ -41,7 +41,7 @@
         v-if="isSalesforceEnabled"
         data-testid="contact-integrations-salesforce"
         :contact="contact"
-        :team-inbox-id="activeInboxId"
+        :team-inbox-id="teamInboxId"
         :from-team-inbox="fromTeamInbox"
         :is-read-only="isReadOnly"
     />
@@ -50,7 +50,7 @@
       v-if='isGuestyEnabled'
       data-testid='contact-integrations-guesty'
       :contact='contact'
-      :team-inbox-id="activeInboxId"
+      :team-inbox-id="teamInboxId"
       :from-team-inbox="fromTeamInbox"
       :is-read-only="isReadOnly"
     />
@@ -59,7 +59,7 @@
       v-if='isZohoEnabled'
       data-testid='contact-integrations-zoho'
       :contact='contact'
-      :team-inbox-id="activeInboxId"
+      :team-inbox-id="teamInboxId"
       :from-team-inbox="fromTeamInbox"
       :is-read-only="isReadOnly"
     />
@@ -81,7 +81,6 @@ import IntegrationSalesforce from 'components/integrations/integration-salesforc
 import IntegrationGuesty from 'components/integrations/integration-guesty.vue'
 import IntegrationZoho from 'components/integrations/integration-zoho.vue'
 import { teamInboxPropsMixin } from 'src/plugins/mixins'
-import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'contact-integrations',
@@ -162,14 +161,6 @@ export default {
 
     isSalesforceEnabled () {
       return this.currentCompany && this.currentCompany.salesforce_integration_enabled
-    },
-
-    activeInboxId () {
-      if (this.$route.params.inboxId === ALL_INBOXES_ID) {
-        return +this.$route.query.inboxId
-      }
-
-      return this.teamInboxId
     }
   }
 }

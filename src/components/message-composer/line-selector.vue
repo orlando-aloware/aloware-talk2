@@ -93,7 +93,7 @@ export default {
     ...mapGetters('contacts', ['contact']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
     ...mapState(['campaigns']),
-    ...mapState('TeamInbox', ['activeInbox', 'activeInboxId', 'teamInboxCampaigns', 'inboxes']),
+    ...mapState('TeamInbox', ['activeInbox', 'teamInboxCampaigns']),
 
     /**
      * Returns the appropriate campaigns array based on whether we're in team inbox mode
@@ -122,11 +122,11 @@ export default {
       return this
         .teamInboxCampaigns
         .filter(campaign => {
-          const inboxCampaigns = this.$route.params.inboxId === ALL_INBOXES_ID
-            ? this.getCampaignIdsByInboxId(+this.$route.query.inboxId)
-            : this.activeInboxCampaignIds
+          if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+            return campaign.active === true
+          }
 
-          return inboxCampaigns.includes(campaign.id) ||
+          return this.activeInboxCampaignIds?.includes(campaign.id) ||
             isIvrOrDeadEndCampaign(campaign)
         })
     },
@@ -210,10 +210,6 @@ export default {
     shouldLimitAgentLinesVisibility () {
       return this.hasRole(COMPANY_AGENT) &&
         this.hasCompanyTeamInboxLineManagementEnhancements
-    },
-
-    getAllInboxesSelectedInboxId () {
-      return this.$route.query.inboxId ? +this.$route.query.inboxId : null
     }
   },
 
@@ -247,7 +243,6 @@ export default {
     onShowMenu () {
       this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
     },
-
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : this.getPlaceholderText()
@@ -379,13 +374,6 @@ export default {
           this.setLineIncomingNumberLoading(false)
         })
       }
-    },
-
-    getCampaignIdsByInboxId (inboxId) {
-      const inbox = this.inboxes.find(inbox => inbox.id === inboxId)
-      const inboxCampaignIds = inbox?.campaign_ids || []
-      const inboxCallWaitingCampaignIds = inbox?.campaign_ids_as_call_waiting_ring_group || []
-      return [...inboxCampaignIds, ...inboxCallWaitingCampaignIds]
     }
   },
 
