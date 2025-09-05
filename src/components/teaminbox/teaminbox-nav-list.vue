@@ -312,9 +312,11 @@ export default {
         return
       }
 
+      const isAllInboxes = inboxId === ALL_INBOXES_ID
+
       if (inboxId !== this.activeInboxId) {
         // For "all" inbox check if is filtering by a specific inbox and restrict if needed
-        if (inboxId === ALL_INBOXES_ID) {
+        if (isAllInboxes) {
           const queryInboxId = this.$route.query.inboxId
           if (queryInboxId && !this.inboxes?.find(inbox => inbox.id === +queryInboxId)) {
             contactId = null
@@ -342,7 +344,8 @@ export default {
       const search = this.$store.state.TeamInbox.currentSearch || null
       this.fetchItems(inboxId, search, filters, sort)
 
-      if (this.$route.query.inboxId) {
+      if (!isAllInboxes && this.$route.query.inboxId) {
+        // If leaving the "all inboxes" view, remove the query inboxId
         delete this.$route.query.inboxId
       }
 
