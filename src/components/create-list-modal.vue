@@ -835,12 +835,11 @@ export default {
 
     async importFromHighlevel () {
       try {
-        // For HighLevel, we use search criteria instead of a list ID
         const params = {
           search_criteria: this.highlevelSearchCriteria,
           list_name: this.createList.name
         }
-        console.log('Importing HighLevel criteria:', params)
+
         await talk2Api.V2.integrations.highlevel.importCriteria(params)
 
         this.$generalNotification('Your HighLevel contacts are being imported based on search criteria. It can take a couple of minutes if it\'s a large result set.')
@@ -926,8 +925,6 @@ export default {
         list_name: this.createList.name
       }
 
-      console.log('Checking HighLevel criteria:', params)
-
       try {
         const res = await talk2Api.V2.integrations.highlevel.criteriaExists(params)
         console.log('HighLevel criteria check response:', res)
@@ -940,7 +937,6 @@ export default {
         console.error('HighLevel criteria check failed:', error)
         this.isLoading = false
 
-        // Extract error message from the response
         let errorMessage = 'Unable to check if HighLevel criteria already exists. Please try again.'
 
         if (error.response && error.response.data && error.response.data.message) {
@@ -950,7 +946,6 @@ export default {
         }
 
         this.$generalNotification(errorMessage, 'error')
-        throw error // Re-throw to prevent import from proceeding
       }
     },
 

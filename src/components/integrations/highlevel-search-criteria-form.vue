@@ -542,7 +542,6 @@ export default {
     emitValue () {
       const highLevelPayload = this.buildHighLevelPayload()
       this.lastEmittedValue = highLevelPayload
-      console.log('HighLevel Search Criteria Payload:', JSON.stringify(highLevelPayload, null, 2))
       this.$emit('input', highLevelPayload)
     },
 

@@ -61,9 +61,9 @@
                                                :disable="shouldDisableListSelector"
                                                :integration="selectedIntegration ?? ''"
                                                @change="onListSelectorChange"
-                                               v-if="selectedIntegration !== 'HighLevel'"/>
+                                               v-if="getIntegration !== HIGHLEVEL_INTEGRATION"/>
 
-                    <div v-if="selectedIntegration === 'HighLevel'" class="highlevel-criteria-section">
+                    <div v-if="getIntegration === HIGHLEVEL_INTEGRATION" class="highlevel-criteria-section">
                       <div class="form-group">
                         <label class="form-label">List Name</label>
                         <input
@@ -150,7 +150,8 @@ export default {
       TAGS_DEPRECATION_IMPORT_CONTACTS_MESSAGE,
       highlevelListName: '',
       highlevelSearchCriteria: {},
-      highlevelAvailableFields: []
+      highlevelAvailableFields: [],
+      HIGHLEVEL_INTEGRATION
     }
   },
 
@@ -162,7 +163,7 @@ export default {
     },
 
     powerDialerParams () {
-      if (this.selectedIntegration === 'HighLevel') {
+      if (this.getIntegration === HIGHLEVEL_INTEGRATION) {
         return {
           list_name: this.highlevelListName,
           search_criteria: this.highlevelSearchCriteria
@@ -180,10 +181,14 @@ export default {
     },
 
     canProceed () {
-      if (this.selectedIntegration === 'HighLevel') {
+      if (this.getIntegration === HIGHLEVEL_INTEGRATION) {
         return hasValidHighLevelData(this.highlevelListName, this.highlevelSearchCriteria)
       }
       return this.list !== null
+    },
+
+    getIntegration () {
+      return this.selectedIntegration?.toLowerCase()
     },
 
     filteredEnabledIntegrations () {
@@ -201,7 +206,7 @@ export default {
 
   watch: {
     selectedIntegration (newValue) {
-      if (newValue === 'HighLevel') {
+      if (newValue?.toLowerCase() === HIGHLEVEL_INTEGRATION) {
         this.loadHighLevelSearchOptions()
       }
     }
