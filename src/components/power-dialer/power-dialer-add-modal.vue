@@ -479,7 +479,7 @@ export default {
       } else if (this.requestParams.selected_all) {
         description += this.selectedAllCount
       } else if (this.count !== null) {
-        description += this.$options.filters.numFormat(this.count)
+        description += '~' + this.$options.filters.numFormat(this.count)
       }
 
       // For integrations that can't determine count, show generic text
@@ -607,10 +607,8 @@ export default {
         return
       }
 
-      // Handle HighLevel integration specifically
+      // HighLevel doesn't pass params.target/size like other integrations, so we can't know the size until things are processed
       if (this.mode === 'integration' && this.getIntegration()?.toLowerCase() === 'highlevel') {
-        // For HighLevel, we can't know the count until the import is processed
-        // Set count to null to hide the count display
         this.count = null
         this.loading--
         return
@@ -964,8 +962,7 @@ export default {
           this.confirm = true
         }
       } catch (error) {
-        // If criteria doesn't exist, continue without confirmation
-        console.log('HighLevel criteria check failed:', error)
+        console.error('HighLevel criteria check failed:', error)
       } finally {
         this.loading--
       }
