@@ -406,11 +406,13 @@ export default {
         { label: 'Is Not Empty', value: 'exists' },
         { label: 'Range', value: 'range' }
       ],
+      // Committed data - displayed in summary view and emitted to parent
       searchCriteria: {
         filters: [
           { field: '', operator: '', value: '' }
         ]
       },
+      // Draft data - used while editing in modal, discarded on cancel
       tempSearchCriteria: {
         filters: [
           { field: '', operator: '', value: '' }
@@ -422,7 +424,6 @@ export default {
 
   computed: {
     hasCriteria () {
-      // Use tempSearchCriteria when modal is open, otherwise use searchCriteria
       const criteriaToCheck = this.showEditDialog ? this.tempSearchCriteria : this.searchCriteria
       return criteriaToCheck.filters.some(block => {
         if (block.group === 'AND') {
@@ -462,104 +463,12 @@ export default {
       const fieldCache = {}
       const operatorCache = {}
 
-      return this.searchCriteria.filters.map((block, blockIndex) => {
-        if (block.group === 'AND') {
-          const filterSummaries = block.filters.map(filter => {
-            const fieldLabel = this.getFieldLabel(filter.field, fieldCache) || filter.field || ''
-            const operatorLabel = this.getOperatorLabel(filter.operator, operatorCache) || filter.operator || ''
-            const value = filter.value || ''
-
-            // For exists/not_exists operators, don't show the value part
-            if (filter.operator === 'exists' || filter.operator === 'not_exists') {
-              return `${fieldLabel} ${operatorLabel.toLowerCase()}`
-            }
-
-            // For range operators, show formatted date range
-            if (filter.operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
-              const fromDate = new Date(value.from)
-              const toDate = new Date(value.to)
-
-              // Validate the date range before displaying
-              if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime()) && toDate > fromDate) {
-                const fromDateStr = fromDate.toLocaleDateString()
-                const toDateStr = toDate.toLocaleDateString()
-                return `${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDateStr} to ${toDateStr}`
-              } else {
-                return `${fieldLabel} ${operatorLabel.toLowerCase()} (Invalid date range)`
-              }
-            }
-
-            // For boolean fields, show Yes/No instead of true/false
-            if (this.isBooleanField(filter.field)) {
-              const booleanValue = value === true ? 'Yes' : 'No'
-              return `${fieldLabel} ${operatorLabel.toLowerCase()} ${booleanValue}`
-            }
-
-            return `${fieldLabel} ${operatorLabel.toLowerCase()} "${value}"`
-          })
-          return {
-            type: 'AND',
-            criteria: filterSummaries,
-            index: blockIndex
-          }
-        } else {
-          const fieldLabel = this.getFieldLabel(block.field, fieldCache) || block.field || ''
-          const operatorLabel = this.getOperatorLabel(block.operator, operatorCache) || block.operator || ''
-          const value = block.value || ''
-
-          // For exists/not_exists operators, don't show the value part
-          if (block.operator === 'exists' || block.operator === 'not_exists') {
-            return {
-              type: 'single',
-              criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()}`],
-              index: blockIndex
-            }
-          }
-
-          // For range operators, show formatted date range
-          if (block.operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
-            const fromDate = new Date(value.from)
-            const toDate = new Date(value.to)
-
-            // Validate the date range before displaying
-            if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime()) && toDate > fromDate) {
-              const fromDateStr = fromDate.toLocaleDateString()
-              const toDateStr = toDate.toLocaleDateString()
-              return {
-                type: 'single',
-                criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} ${fromDateStr} to ${toDateStr}`],
-                index: blockIndex
-              }
-            } else {
-              return {
-                type: 'single',
-                criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} (Invalid date range)`],
-                index: blockIndex
-              }
-            }
-          }
-
-          // For boolean fields, show Yes/No instead of true/false
-          if (this.isBooleanField(block.field)) {
-            const booleanValue = value === true ? 'Yes' : 'No'
-            return {
-              type: 'single',
-              criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} ${booleanValue}`],
-              index: blockIndex
-            }
-          }
-
-          return {
-            type: 'single',
-            criteria: [`${fieldLabel} ${operatorLabel.toLowerCase()} "${value}"`],
-            index: blockIndex
-          }
-        }
-      })
+      return this.searchCriteria.filters.map((block, blockIndex) =>
+        this.processCriteriaBlock(block, blockIndex, fieldCache, operatorCache)
+      )
     },
 
     canAddOrBlock () {
-      // Use tempSearchCriteria when modal is open, otherwise use searchCriteria
       const criteriaToCheck = this.showEditDialog ? this.tempSearchCriteria : this.searchCriteria
       return this.hasCriteria && criteriaToCheck.filters.length < 5
     },
@@ -607,7 +516,79 @@ export default {
   },
 
   methods: {
-    // Helper methods
+    formatFilterValue (filter, fieldLabel, operatorLabel) {
+      const value = filter.value || ''
+      const safeOperatorLabel = operatorLabel || ''
+
+      if (filter.operator === 'exists' || filter.operator === 'not_exists') {
+        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()}`
+      }
+
+      if (filter.operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
+        return this.formatRangeValue(value, fieldLabel, operatorLabel)
+      }
+
+      if (this.isBooleanField(filter.field)) {
+        return this.formatBooleanValue(value, fieldLabel, operatorLabel)
+      }
+
+      return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} "${value}"`
+    },
+
+    formatRangeValue (value, fieldLabel, operatorLabel) {
+      const fromDate = new Date(value.from)
+      const toDate = new Date(value.to)
+      const safeOperatorLabel = operatorLabel || ''
+
+      if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime()) && toDate > fromDate) {
+        const fromDateStr = fromDate.toLocaleDateString()
+        const toDateStr = toDate.toLocaleDateString()
+        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} ${fromDateStr} to ${toDateStr}`
+      } else {
+        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} (Invalid date range)`
+      }
+    },
+
+    formatBooleanValue (value, fieldLabel, operatorLabel) {
+      const booleanValue = value === true ? 'Yes' : 'No'
+      const safeOperatorLabel = operatorLabel || ''
+      return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} ${booleanValue}`
+    },
+
+    processAndGroup (block, blockIndex, fieldCache, operatorCache) {
+      const filterSummaries = block.filters.map(filter => {
+        const fieldLabel = this.getFieldLabel(filter.field, fieldCache) || filter.field || ''
+        const operatorLabel = this.getOperatorLabel(filter.operator, operatorCache) || filter.operator || ''
+        return this.formatFilterValue(filter, fieldLabel, operatorLabel)
+      })
+
+      return {
+        type: 'AND',
+        criteria: filterSummaries,
+        index: blockIndex
+      }
+    },
+
+    processSingleFilter (block, blockIndex, fieldCache, operatorCache) {
+      const fieldLabel = this.getFieldLabel(block.field, fieldCache) || block.field || ''
+      const operatorLabel = this.getOperatorLabel(block.operator, operatorCache) || block.operator || ''
+      const formattedValue = this.formatFilterValue(block, fieldLabel, operatorLabel)
+
+      return {
+        type: 'single',
+        criteria: [formattedValue],
+        index: blockIndex
+      }
+    },
+
+    processCriteriaBlock (block, blockIndex, fieldCache, operatorCache) {
+      if (block.group === 'AND') {
+        return this.processAndGroup(block, blockIndex, fieldCache, operatorCache)
+      } else {
+        return this.processSingleFilter(block, blockIndex, fieldCache, operatorCache)
+      }
+    },
+
     getHighLevelOperator (uiOperator) {
       const operatorMapping = {
         'Is': 'eq',
@@ -1052,6 +1033,8 @@ export default {
     },
 
     getFieldLabel (fieldValue, cache) {
+      if (!fieldValue) return ''
+
       if (!cache[fieldValue]) {
         cache[fieldValue] = this.availableFields.find(f => f.value === fieldValue)?.label || fieldValue
       }
@@ -1059,6 +1042,8 @@ export default {
     },
 
     getOperatorLabel (operatorValue, cache) {
+      if (!operatorValue) return ''
+
       if (!cache[operatorValue]) {
         cache[operatorValue] = this.availableOperators.find(o => o.value === operatorValue)?.label || operatorValue
       }
@@ -1150,22 +1135,7 @@ export default {
     },
 
     openEditDialog () {
-      // Deep copy but exclude inputValue properties
       this.tempSearchCriteria = JSON.parse(JSON.stringify(this.searchCriteria))
-
-      // Clean up inputValue properties to avoid sending them to API
-      const cleanFilters = (filters) => {
-        filters.forEach(filter => {
-          if (filter.inputValue !== undefined) {
-            delete filter.inputValue
-          }
-          if (filter.filters) {
-            cleanFilters(filter.filters)
-          }
-        })
-      }
-
-      cleanFilters(this.tempSearchCriteria.filters)
 
       // Initialize range display values for existing range filters
       const initializeRangeDisplays = (filters) => {

@@ -64,7 +64,6 @@
                                    v-if="source.integration.name && !isHighLevelSelected"
                                    @change="onIntegrationListChanged"/>
 
-        <!-- HighLevel specific UI -->
         <div v-if="isHighLevelSelected" class="highlevel-criteria-section">
           <highlevel-search-criteria-form
             class="mt-3"
@@ -126,7 +125,7 @@ export default {
           if (this.isHighLevelSelected) {
             return !isEmpty(this.highlevelSearchCriteria?.filters)
           }
-          return !isEmpty(this.source.integration.list)
+          return !isEmpty(this.source.integration?.list)
         default:
           return false
       }
@@ -157,14 +156,13 @@ export default {
     filteredEnabledIntegrations () {
       // show only ready for broadcast integrations
       // @see src/components/broadcasts/broadcast-add-view.vue
-      const filtered = this.integrationsEnabled.filter(integration => [
+      return this.integrationsEnabled.filter(integration => [
         HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION, HIGHLEVEL_INTEGRATION
       ].includes(integration.toLowerCase()))
-      return filtered
     },
 
     isHighLevelSelected () {
-      return this.source.integration?.name?.toLowerCase() === 'highlevel'
+      return this.source.integration?.name?.toLowerCase() === HIGHLEVEL_INTEGRATION
     }
   },
 
@@ -268,7 +266,6 @@ export default {
     },
 
     loadHighLevelFields () {
-      // Load HighLevel available fields for search criteria
       talk2Api.V2.integrations.highlevel.getSearchOptions()
         .then(response => {
           this.highlevelAvailableFields = response.data || []
@@ -283,7 +280,7 @@ export default {
       this.$set(this.source.integration, 'name', value)
 
       // Load HighLevel fields if HighLevel is selected
-      if (value.toLowerCase() === 'highlevel') {
+      if (value.toLowerCase() === HIGHLEVEL_INTEGRATION) {
         this.loadHighLevelFields()
       }
     }
