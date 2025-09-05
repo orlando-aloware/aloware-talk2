@@ -972,8 +972,8 @@ export default {
           return
         }
 
-        // Validate date order - to date should be after from date
-        if (toDate <= fromDate) {
+        // Validate date order - to date should be on or after from date
+        if (toDate < fromDate) {
           this.$set(filter, 'value', null)
           return
         }
@@ -1106,7 +1106,7 @@ export default {
 
       if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) return false
 
-      return toDate > fromDate
+      return toDate >= fromDate
     },
 
     validateAllCombinations () {
