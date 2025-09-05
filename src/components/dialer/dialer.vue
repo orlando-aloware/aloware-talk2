@@ -134,6 +134,7 @@ export default {
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
+        console.log('Setting dialer communication from dialer > updateCommunication', data)
         this.setDialerCommunication(data)
 
         const communication = this.dialer?.communication
@@ -502,6 +503,7 @@ export default {
         return
       }
 
+      console.log('Setting dialer communication from dialer > forceStartOnWrapUp', this.profile.last_call)
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
       this.startWrapUpTimer()
@@ -638,6 +640,7 @@ export default {
           return Promise.resolve()
         }
 
+        console.log('Setting dialer communication from dialer > getCommunication', res.data)
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication

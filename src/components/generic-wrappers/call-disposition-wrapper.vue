@@ -54,6 +54,7 @@ export default {
     changeCallDisposition (callDispositionId) {
       this.loadingCallDisposition = true
       this.communication.call_disposition_id = callDispositionId
+      console.log('Setting dialer communication from call-disposition-wrapper', this.communication)
       this.setDialerCommunication(this.communication)
       this.$axios.post('/api/v1/communication/' + this.communication.id + '/dispose-call', {
         call_disposition_id: callDispositionId
