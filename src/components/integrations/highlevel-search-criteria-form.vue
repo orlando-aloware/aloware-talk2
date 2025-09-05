@@ -464,7 +464,7 @@ export default {
       const operatorCache = {}
 
       return this.searchCriteria.filters.map((block, blockIndex) =>
-        this.processCriteriaBlock(block, blockIndex, fieldCache, operatorCache)
+        this.summaryProcessCriteriaBlock(block, blockIndex, fieldCache, operatorCache)
       )
     },
 
@@ -516,76 +516,123 @@ export default {
   },
 
   methods: {
-    formatFilterValue (filter, fieldLabel, operatorLabel) {
-      const value = filter.value || ''
-      const safeOperatorLabel = operatorLabel || ''
-
-      if (filter.operator === 'exists' || filter.operator === 'not_exists') {
-        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()}`
+    // Main action methods
+    applyCriteria () {
+      // Validate all filters first
+      const validationErrors = this.validateAllFilters()
+      if (validationErrors.length > 0) {
+        this.showValidationErrors(validationErrors)
+        return // Don't proceed if there are validation errors
       }
 
-      if (filter.operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
-        return this.formatRangeValue(value, fieldLabel, operatorLabel)
+      const combinationErrors = this.validateAllCombinations()
+      if (combinationErrors.length > 0) {
+        // Show warning but don't prevent closing
+        this.$generalNotification(
+          `Warning: ${combinationErrors.length} invalid field-operator combination(s) detected. These will be ignored.`,
+          'warning'
+        )
       }
 
-      if (this.isBooleanField(filter.field)) {
-        return this.formatBooleanValue(value, fieldLabel, operatorLabel)
-      }
-
-      return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} "${value}"`
+      this.searchCriteria = JSON.parse(JSON.stringify(this.tempSearchCriteria))
+      this.showEditDialog = false
+      this.emitValue()
     },
 
-    formatRangeValue (value, fieldLabel, operatorLabel) {
-      const fromDate = new Date(value.from)
-      const toDate = new Date(value.to)
-      const safeOperatorLabel = operatorLabel || ''
+    emitValue () {
+      const highLevelPayload = this.buildHighLevelPayload()
+      this.lastEmittedValue = highLevelPayload
+      console.log('HighLevel Search Criteria Payload:', JSON.stringify(highLevelPayload, null, 2))
+      this.$emit('input', highLevelPayload)
+    },
 
-      if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime()) && toDate > fromDate) {
-        const fromDateStr = fromDate.toLocaleDateString()
-        const toDateStr = toDate.toLocaleDateString()
-        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} ${fromDateStr} to ${toDateStr}`
+    openEditDialog () {
+      this.tempSearchCriteria = JSON.parse(JSON.stringify(this.searchCriteria))
+
+      // Initialize range display values for existing range filters
+      const initializeRangeDisplays = (filters) => {
+        filters.forEach(filter => {
+          if (filter.operator === 'range' && filter.value && typeof filter.value === 'object' && filter.value.from && filter.value.to) {
+            this.$set(filter, 'rangeDisplayValue', this.getRangeDisplayValue(filter.value))
+          }
+          if (filter.filters) {
+            initializeRangeDisplays(filter.filters)
+          }
+        })
+      }
+
+      initializeRangeDisplays(this.tempSearchCriteria.filters)
+      this.showEditDialog = true
+    },
+
+    closeEditDialog () {
+      this.showEditDialog = false
+    },
+
+    addOrCriteria () {
+      const newFilter = { field: '', operator: '', value: '' }
+      this.tempSearchCriteria.filters.push(newFilter)
+    },
+
+    addAndCriteria (blockIndex) {
+      const currentBlock = this.tempSearchCriteria.filters[blockIndex]
+
+      if (currentBlock.group === 'AND') {
+        const newFilter = { field: '', operator: '', value: '' }
+        currentBlock.filters.push(newFilter)
       } else {
-        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} (Invalid date range)`
+        const singleFilter = { ...currentBlock }
+        const newFilter = { field: '', operator: '', value: '' }
+
+        this.$set(this.tempSearchCriteria.filters, blockIndex, {
+          group: 'AND',
+          filters: [singleFilter, newFilter]
+        })
       }
     },
 
-    formatBooleanValue (value, fieldLabel, operatorLabel) {
-      const booleanValue = value === true ? 'Yes' : 'No'
-      const safeOperatorLabel = operatorLabel || ''
-      return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} ${booleanValue}`
-    },
-
-    processAndGroup (block, blockIndex, fieldCache, operatorCache) {
-      const filterSummaries = block.filters.map(filter => {
-        const fieldLabel = this.getFieldLabel(filter.field, fieldCache) || filter.field || ''
-        const operatorLabel = this.getOperatorLabel(filter.operator, operatorCache) || filter.operator || ''
-        return this.formatFilterValue(filter, fieldLabel, operatorLabel)
-      })
-
-      return {
-        type: 'AND',
-        criteria: filterSummaries,
-        index: blockIndex
+    removeCriteria (blockIndex) {
+      if (this.tempSearchCriteria.filters.length > 1) {
+        this.tempSearchCriteria.filters.splice(blockIndex, 1)
       }
     },
 
-    processSingleFilter (block, blockIndex, fieldCache, operatorCache) {
-      const fieldLabel = this.getFieldLabel(block.field, fieldCache) || block.field || ''
-      const operatorLabel = this.getOperatorLabel(block.operator, operatorCache) || block.operator || ''
-      const formattedValue = this.formatFilterValue(block, fieldLabel, operatorLabel)
+    removeFilterFromGroup (blockIndex, filterIndex) {
+      const block = this.tempSearchCriteria.filters[blockIndex]
+      if (block.group === 'AND' && block.filters.length > 1) {
+        block.filters.splice(filterIndex, 1)
 
-      return {
-        type: 'single',
-        criteria: [formattedValue],
-        index: blockIndex
+        if (block.filters.length === 1) {
+          this.tempSearchCriteria.filters[blockIndex] = block.filters[0]
+        }
       }
     },
 
-    processCriteriaBlock (block, blockIndex, fieldCache, operatorCache) {
-      if (block.group === 'AND') {
-        return this.processAndGroup(block, blockIndex, fieldCache, operatorCache)
-      } else {
-        return this.processSingleFilter(block, blockIndex, fieldCache, operatorCache)
+    async fetchSearchOptions () {
+      this.isLoading = true
+      try {
+        const response = await this.$axios.get('/api/v2/contacts-list/highlevel-search-options')
+        const data = response.data.data
+
+        if (data.fields) {
+          this.availableFields = Object.entries(data.fields).map(([value, fieldData]) => ({
+            label: fieldData.label,
+            value: value,
+            supportedOperators: fieldData.supported_operators
+          }))
+        }
+
+        if (data.operators) {
+          this.availableOperators = Object.entries(data.operators).map(([value, label]) => ({
+            label: label,
+            value: value
+          }))
+        }
+      } catch (error) {
+        console.error('Failed to fetch HighLevel search options:', error)
+        this.$generalNotification('Failed to load HighLevel search options. Please try again.', 'error')
+      } finally {
+        this.isLoading = false
       }
     },
 
@@ -1104,123 +1151,77 @@ export default {
       return this.isFilterValid(lastFilter)
     },
 
-    // Main action methods
-    applyCriteria () {
-      // Validate all filters first
-      const validationErrors = this.validateAllFilters()
-      if (validationErrors.length > 0) {
-        this.showValidationErrors(validationErrors)
-        return // Don't proceed if there are validation errors
+    // Summary formatting methods
+    summaryFormatFilterValue (filter, fieldLabel, operatorLabel) {
+      const value = filter.value || ''
+      const safeOperatorLabel = operatorLabel || ''
+
+      if (filter.operator === 'exists' || filter.operator === 'not_exists') {
+        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()}`
       }
 
-      const combinationErrors = this.validateAllCombinations()
-      if (combinationErrors.length > 0) {
-        // Show warning but don't prevent closing
-        this.$generalNotification(
-          `Warning: ${combinationErrors.length} invalid field-operator combination(s) detected. These will be ignored.`,
-          'warning'
-        )
+      if (filter.operator === 'range' && value && typeof value === 'object' && value.from && value.to) {
+        return this.summaryFormatRangeValue(value, fieldLabel, operatorLabel)
       }
 
-      this.searchCriteria = JSON.parse(JSON.stringify(this.tempSearchCriteria))
-      this.showEditDialog = false
-      this.emitValue()
-    },
-
-    emitValue () {
-      const highLevelPayload = this.buildHighLevelPayload()
-      this.lastEmittedValue = highLevelPayload
-      console.log('HighLevel Search Criteria Payload:', JSON.stringify(highLevelPayload, null, 2))
-      this.$emit('input', highLevelPayload)
-    },
-
-    openEditDialog () {
-      this.tempSearchCriteria = JSON.parse(JSON.stringify(this.searchCriteria))
-
-      // Initialize range display values for existing range filters
-      const initializeRangeDisplays = (filters) => {
-        filters.forEach(filter => {
-          if (filter.operator === 'range' && filter.value && typeof filter.value === 'object' && filter.value.from && filter.value.to) {
-            this.$set(filter, 'rangeDisplayValue', this.getRangeDisplayValue(filter.value))
-          }
-          if (filter.filters) {
-            initializeRangeDisplays(filter.filters)
-          }
-        })
+      if (this.isBooleanField(filter.field)) {
+        return this.summaryFormatBooleanValue(value, fieldLabel, operatorLabel)
       }
 
-      initializeRangeDisplays(this.tempSearchCriteria.filters)
-      this.showEditDialog = true
+      return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} "${value}"`
     },
 
-    closeEditDialog () {
-      this.showEditDialog = false
-    },
+    summaryFormatRangeValue (value, fieldLabel, operatorLabel) {
+      const fromDate = new Date(value.from)
+      const toDate = new Date(value.to)
+      const safeOperatorLabel = operatorLabel || ''
 
-    addOrCriteria () {
-      const newFilter = { field: '', operator: '', value: '' }
-      this.tempSearchCriteria.filters.push(newFilter)
-    },
-
-    addAndCriteria (blockIndex) {
-      const currentBlock = this.tempSearchCriteria.filters[blockIndex]
-
-      if (currentBlock.group === 'AND') {
-        const newFilter = { field: '', operator: '', value: '' }
-        currentBlock.filters.push(newFilter)
+      if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime()) && toDate > fromDate) {
+        const fromDateStr = fromDate.toLocaleDateString()
+        const toDateStr = toDate.toLocaleDateString()
+        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} ${fromDateStr} to ${toDateStr}`
       } else {
-        const singleFilter = { ...currentBlock }
-        const newFilter = { field: '', operator: '', value: '' }
-
-        this.$set(this.tempSearchCriteria.filters, blockIndex, {
-          group: 'AND',
-          filters: [singleFilter, newFilter]
-        })
+        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} (Invalid date range)`
       }
     },
 
-    removeCriteria (blockIndex) {
-      if (this.tempSearchCriteria.filters.length > 1) {
-        this.tempSearchCriteria.filters.splice(blockIndex, 1)
+    summaryFormatBooleanValue (value, fieldLabel, operatorLabel) {
+      const booleanValue = value === true ? 'Yes' : 'No'
+      const safeOperatorLabel = operatorLabel || ''
+      return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} ${booleanValue}`
+    },
+
+    summaryProcessAndGroup (block, blockIndex, fieldCache, operatorCache) {
+      const filterSummaries = block.filters.map(filter => {
+        const fieldLabel = this.getFieldLabel(filter.field, fieldCache) || filter.field || ''
+        const operatorLabel = this.getOperatorLabel(filter.operator, operatorCache) || filter.operator || ''
+        return this.summaryFormatFilterValue(filter, fieldLabel, operatorLabel)
+      })
+
+      return {
+        type: 'AND',
+        criteria: filterSummaries,
+        index: blockIndex
       }
     },
 
-    removeFilterFromGroup (blockIndex, filterIndex) {
-      const block = this.tempSearchCriteria.filters[blockIndex]
-      if (block.group === 'AND' && block.filters.length > 1) {
-        block.filters.splice(filterIndex, 1)
+    summaryProcessSingleFilter (block, blockIndex, fieldCache, operatorCache) {
+      const fieldLabel = this.getFieldLabel(block.field, fieldCache) || block.field || ''
+      const operatorLabel = this.getOperatorLabel(block.operator, operatorCache) || block.operator || ''
+      const formattedValue = this.summaryFormatFilterValue(block, fieldLabel, operatorLabel)
 
-        if (block.filters.length === 1) {
-          this.tempSearchCriteria.filters[blockIndex] = block.filters[0]
-        }
+      return {
+        type: 'single',
+        criteria: [formattedValue],
+        index: blockIndex
       }
     },
 
-    async fetchSearchOptions () {
-      this.isLoading = true
-      try {
-        const response = await this.$axios.get('/api/v2/contacts-list/highlevel-search-options')
-        const data = response.data.data
-
-        if (data.fields) {
-          this.availableFields = Object.entries(data.fields).map(([value, fieldData]) => ({
-            label: fieldData.label,
-            value: value,
-            supportedOperators: fieldData.supported_operators
-          }))
-        }
-
-        if (data.operators) {
-          this.availableOperators = Object.entries(data.operators).map(([value, label]) => ({
-            label: label,
-            value: value
-          }))
-        }
-      } catch (error) {
-        console.error('Failed to fetch HighLevel search options:', error)
-        this.$generalNotification('Failed to load HighLevel search options. Please try again.', 'error')
-      } finally {
-        this.isLoading = false
+    summaryProcessCriteriaBlock (block, blockIndex, fieldCache, operatorCache) {
+      if (block.group === 'AND') {
+        return this.summaryProcessAndGroup(block, blockIndex, fieldCache, operatorCache)
+      } else {
+        return this.summaryProcessSingleFilter(block, blockIndex, fieldCache, operatorCache)
       }
     }
   },
