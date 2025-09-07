@@ -80,7 +80,7 @@
                         <label v-if="filterIndex === 0" class="field-label">Field</label>
                         <q-select
                           v-model="filter.field"
-                          :options="filteredFieldOptions.length > 0 ? filteredFieldOptions : availableFieldsWithDisabled(blockIndex, filterIndex)"
+                          :options="filteredFieldOptions.length > 0 ? filteredFieldOptions : availableFields"
                           @input="onFieldChange(filter)"
                           outlined
                           dense
@@ -213,7 +213,7 @@
                       <label class="field-label">Field</label>
                       <q-select
                         v-model="block.field"
-                        :options="filteredFieldOptions.length > 0 ? filteredFieldOptions : availableFieldsWithDisabled(blockIndex, -1)"
+                        :options="filteredFieldOptions.length > 0 ? filteredFieldOptions : availableFields"
                         @input="onSingleFieldChange(block)"
                         outlined
                         dense
@@ -484,35 +484,8 @@ export default {
           field.supportedOperators.includes(operator.value)
         )
       }
-    },
-
-    availableFieldsWithDisabled () {
-      return (currentBlockIndex, currentFilterIndex) => {
-        const selectedFields = new Set()
-
-        // Collect all selected fields
-        this.searchCriteria.filters.forEach((block, blockIndex) => {
-          if (block.group === 'AND') {
-            block.filters.forEach((filter, filterIndex) => {
-              if (filter.field &&
-                  (blockIndex !== currentBlockIndex || filterIndex !== currentFilterIndex)) {
-                selectedFields.add(filter.field)
-              }
-            })
-          } else {
-            if (block.field && blockIndex !== currentBlockIndex) {
-              selectedFields.add(block.field)
-            }
-          }
-        })
-
-        // Return all fields with disabled property for already selected ones
-        return this.availableFields.map(field => ({
-          ...field,
-          disable: selectedFields.has(field.value)
-        }))
-      }
     }
+
   },
 
   methods: {
