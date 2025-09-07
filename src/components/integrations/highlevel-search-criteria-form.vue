@@ -650,7 +650,7 @@ export default {
       }
 
       // Handle case-sensitive fields
-      const caseSensitiveFields = ['firstNameLowerCase', 'lastNameLowerCase']
+      const caseSensitiveFields = ['firstNameLowerCase', 'lastNameLowerCase', 'type']
       if (caseSensitiveFields.includes(field)) {
         if (Array.isArray(value)) {
           return value.map(v => v ? v.toLowerCase() : v)
