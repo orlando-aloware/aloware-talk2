@@ -976,17 +976,11 @@ const talk2Api = {
         importCriteria (params) {
           return window.axios.post(`${suffixV2}contacts-list/import-highlevel-criteria`, params)
         },
-        criteriaExists (params) {
-          return window.axios.post(`${suffixV2}contacts-list/highlevel-criteria-exists`, params)
-        },
         getSearchOptions () {
           return window.axios.get(`${suffixV2}contacts-list/highlevel-search-options`)
         },
         importCriteriaToPowerDialer (params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-highlevel-criteria`, params)
-        },
-        criteriaExistsForPowerDialer (params) {
-          return window.axios.post(`${suffixV2}power-dialer-lists/highlevel-criteria-exists`, params)
         }
       }
 

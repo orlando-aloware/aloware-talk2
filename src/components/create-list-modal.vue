@@ -877,8 +877,6 @@ export default {
           return this.checkPipedriveFilter()
         case ZOHO_INTEGRATION:
           return this.checkZohoView()
-        case HIGHLEVEL_INTEGRATION:
-          return this.checkHighlevelCriteria()
       }
     },
 
@@ -915,37 +913,6 @@ export default {
       if (res.data.exists) {
         this.integrationImportConfirmMessage = 'The Pipedrive filter you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
         this.showIntegrationImportConfirmDialog = true
-      }
-    },
-
-    async checkHighlevelCriteria () {
-      // For HighLevel, we check if the search criteria already exists
-      const params = {
-        search_criteria: this.highlevelSearchCriteria,
-        list_name: this.createList.name
-      }
-
-      try {
-        const res = await talk2Api.V2.integrations.highlevel.criteriaExists(params)
-        console.log('HighLevel criteria check response:', res)
-
-        if (res.data.exists) {
-          this.integrationImportConfirmMessage = 'The HighLevel criteria you are trying to import already exists in another list. Would you like to proceed and update that list?'
-          this.showIntegrationImportConfirmDialog = true
-        }
-      } catch (error) {
-        console.error('HighLevel criteria check failed:', error)
-        this.isLoading = false
-
-        let errorMessage = 'Unable to check if HighLevel criteria already exists. Please try again.'
-
-        if (error.response && error.response.data && error.response.data.message) {
-          errorMessage = error.response.data.message
-        } else if (error.message) {
-          errorMessage = error.message
-        }
-
-        this.$generalNotification(errorMessage, 'error')
       }
     },
 

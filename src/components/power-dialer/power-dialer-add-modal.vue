@@ -895,8 +895,6 @@ export default {
           return this.checkPipedriveFilter()
         case 'zoho':
           return this.checkZohoView()
-        case 'highlevel':
-          return this.checkHighlevelCriteria()
       }
     },
 
@@ -946,26 +944,6 @@ export default {
       }
 
       this.loading--
-    },
-
-    async checkHighlevelCriteria () {
-      this.loading++
-
-      try {
-        const res = await talk2Api.V2.integrations.highlevel.criteriaExistsForPowerDialer({
-          list_name: this.params.list_name,
-          search_criteria: this.params.search_criteria
-        })
-
-        if (res.data.exists) {
-          this.confirm_message = 'The HighLevel criteria you are trying to import already exists in another list. Would you like to proceed and update that list?'
-          this.confirm = true
-        }
-      } catch (error) {
-        console.error('HighLevel criteria check failed:', error)
-      } finally {
-        this.loading--
-      }
     },
 
     closeConfirmDialog () {
