@@ -108,7 +108,6 @@ import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT } from 'src/constants/roles'
 import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
-import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'line-selector',
@@ -284,7 +283,7 @@ export default {
     ...mapState(['campaigns', 'campaignsIsLoading']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['profile']),
-    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox', 'activeInboxId', 'teamInboxCampaigns', 'loadingTeamInboxCampaigns', 'inboxes']),
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox', 'activeInboxId', 'teamInboxCampaigns', 'loadingTeamInboxCampaigns']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
 
     useTeamInboxCampaigns () {
@@ -353,15 +352,11 @@ export default {
         )
       }
 
-      const inboxCampaigns = this.$route.params.inboxId === ALL_INBOXES_ID
-        ? this.getCampaignIdsByInboxId(+this.$route.query.inboxId)
-        : this.activeInboxCampaignIds
-
       return !this.preSelectedTeamInboxLineId
         ? activeCampaigns
         : activeCampaigns.filter(
           campaign =>
-            inboxCampaigns.includes(campaign.id) ||
+            this.activeInboxCampaignIds.includes(campaign.id) ||
             isIvrOrDeadEndCampaign(campaign)
         )
     },
@@ -525,13 +520,6 @@ export default {
         this.$emit('change', null)
         this.$emit('invalid-line-selection', this.allCampaigns.find(({ id }) => id === lineId))
       }
-    },
-
-    getCampaignIdsByInboxId (inboxId) {
-      const inbox = this.inboxes.find(inbox => inbox.id === inboxId)
-      const inboxCampaignIds = inbox?.campaign_ids || []
-      const inboxCallWaitingCampaignIds = inbox?.campaign_ids_as_call_waiting_ring_group || []
-      return [...inboxCampaignIds, ...inboxCallWaitingCampaignIds]
     }
   },
 
