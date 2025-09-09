@@ -309,18 +309,6 @@
                       {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
                     </q-tooltip>
                   </q-icon>
-
-                  <!--q-tooltip class="item"
-                             content-class="bg-grey-light11"
-                             anchor="top middle"
-                             self="top middle"
-                             v-if="communication.rejected_by_app !== 0">
-                    {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
-                    <component class="status-icon d-inline-block"
-                               v-bind:is="icon"
-                               :name="rejectionToIcon(communication.rejected_by_app)">
-                    </component>
-                  </q-tooltip-->
                   <div v-else-if="communication.user_id || communication.user">
                     <div @click="onOpenUserInClassicClicked(communication?.user_id)">
                       <span class="text-black cursor-pointer"
