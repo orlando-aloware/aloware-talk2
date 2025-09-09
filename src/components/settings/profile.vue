@@ -192,10 +192,10 @@
 
           <!-- Password confirmation validation moved outside form-group -->
           <div class="password-validations" v-if="showPasswordFields">
-            <div class="validation-message" :class="getPasswordConfirmationValidationClass()">
-              <b-icon :class="getPasswordConfirmationValidationIconClass()"
-                      :icon="getPasswordConfirmationValidationIcon()"></b-icon>
-              {{ getPasswordConfirmationText() }}
+            <div class="validation-message" :class="getPasswordConfirmationValidationClass($v.user.password_confirmation.sameAsPassword)">
+              <b-icon :class="getPasswordConfirmationValidationIconClass($v.user.password_confirmation.sameAsPassword)"
+                      :icon="getPasswordConfirmationValidationIcon($v.user.password_confirmation.sameAsPassword)"></b-icon>
+              {{ getPasswordConfirmationText($v.user.password_confirmation.sameAsPassword) }}
             </div>
           </div>
         </b-col>
@@ -854,10 +854,10 @@ export default {
       }
     },
 
-    getPasswordConfirmationValidationClass () {
+    getPasswordConfirmationValidationClass (validationRule) {
       return {
-        'valid': this.$v.user.password_confirmation.sameAsPassword && this.user.password_confirmation,
-        'invalid': !this.$v.user.password_confirmation.sameAsPassword || !this.user.password_confirmation
+        'valid': validationRule && this.user.password_confirmation,
+        'invalid': !validationRule || !this.user.password_confirmation
       }
     },
 
@@ -869,16 +869,16 @@ export default {
       return (validationRule && this.user.password) ? 'mr-xs text-green' : 'mr-xs text-red'
     },
 
-    getPasswordConfirmationValidationIcon () {
-      return (this.$v.user.password_confirmation.sameAsPassword && this.user.password_confirmation) ? 'check' : 'x'
+    getPasswordConfirmationValidationIcon (validationRule) {
+      return (validationRule && this.user.password_confirmation) ? 'check' : 'x'
     },
 
-    getPasswordConfirmationValidationIconClass () {
-      return (this.$v.user.password_confirmation.sameAsPassword && this.user.password_confirmation) ? 'mr-xs text-green' : 'mr-xs text-red'
+    getPasswordConfirmationValidationIconClass (validationRule) {
+      return (validationRule && this.user.password_confirmation) ? 'mr-xs text-green' : 'mr-xs text-red'
     },
 
-    getPasswordConfirmationText () {
-      return (this.$v.user.password_confirmation.sameAsPassword && this.user.password_confirmation) ? 'The passwords match' : "The passwords don't match"
+    getPasswordConfirmationText (validationRule) {
+      return (validationRule && this.user.password_confirmation) ? 'The passwords match' : "The passwords don't match"
     }
   },
 
