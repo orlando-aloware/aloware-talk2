@@ -1,7 +1,6 @@
 const MainLayout = () => import('layouts/MainLayout.vue')
 const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
-const ResetPassword = () => import('pages/ResetPassword.vue')
 const Inbox = () => import('pages/Inbox.vue')
 const TeamInbox = () => import('pages/TeamInbox.vue')
 const CommunicationsView = () => import('src/pages/CommunicationsView.vue')
@@ -89,14 +88,6 @@ const routes = [
           isGuest: true
         },
         component: ForgotPassword
-      },
-      {
-        path: 'reset/:token',
-        name: 'Reset Password',
-        meta: {
-          isGuest: true
-        },
-        component: ResetPassword
       },
       {
         path: 'team-inboxes',
