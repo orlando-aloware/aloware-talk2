@@ -187,7 +187,7 @@
                       <div class="delete-button-container">
                         <button class="btn btn-outline-danger btn-sm delete-button"
                                 @click="removeFilterFromGroup(blockIndex, filterIndex)"
-                                :disabled="block.filters.length === 1">
+                                :disabled="block.filters.length === 1 && blockIndex === 0">
                           <i class="fa fa-trash"/>
                         </button>
                       </div>
@@ -320,7 +320,7 @@
                     <div class="delete-button-container">
                       <button class="btn btn-outline-danger btn-sm delete-button"
                               @click="removeCriteria(blockIndex)"
-                              :disabled="searchCriteria.filters.length === 1">
+                              :disabled="(tempSearchCriteria || searchCriteria).filters.length === 1 && blockIndex === 0">
                         <i class="fa fa-trash"/>
                       </button>
                     </div>
@@ -564,18 +564,22 @@ export default {
     },
 
     removeCriteria (blockIndex) {
-      if (this.tempSearchCriteria.filters.length > 1) {
+      // Allow removal if there's more than one block, OR if it's not the first block
+      if (this.tempSearchCriteria.filters.length > 1 || blockIndex > 0) {
         this.tempSearchCriteria.filters.splice(blockIndex, 1)
       }
     },
 
     removeFilterFromGroup (blockIndex, filterIndex) {
       const block = this.tempSearchCriteria.filters[blockIndex]
-      if (block.group === 'AND' && block.filters.length > 1) {
-        block.filters.splice(filterIndex, 1)
+      if (block.group === 'AND') {
+        // Allow removal if there's more than one filter, OR if it's not the first block
+        if (block.filters.length > 1 || blockIndex > 0) {
+          block.filters.splice(filterIndex, 1)
 
-        if (block.filters.length === 1) {
-          this.tempSearchCriteria.filters[blockIndex] = block.filters[0]
+          if (block.filters.length === 1) {
+            this.tempSearchCriteria.filters[blockIndex] = block.filters[0]
+          }
         }
       }
     },
