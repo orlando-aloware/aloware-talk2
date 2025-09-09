@@ -870,11 +870,11 @@ export default {
     },
 
     getPasswordValidationIconClass (validationRule) {
-      return (validationRule && this.user.password) ? 'mr-xs text-green' : 'mr-xs text-red'
+      return (validationRule && this.user.password) ? 'mr-xs text-green-500' : 'mr-xs text-red'
     },
 
     getPasswordConfirmationValidationIconClass (validationRule) {
-      return (validationRule && this.user.password_confirmation) ? 'mr-xs text-green' : 'mr-xs text-red'
+      return (validationRule && this.user.password_confirmation) ? 'mr-xs text-green-500' : 'mr-xs text-red'
     },
 
     getPasswordConfirmationText (validationRule) {
@@ -962,9 +962,5 @@ export default {
 
 .validation-message.invalid {
   color: #dc3545;
-}
-
-.text-green {
-  color: #28a745 !important;
 }
 </style>
