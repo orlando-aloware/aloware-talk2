@@ -847,34 +847,43 @@ export default {
       this.showPasswordConfirmation = !this.showPasswordConfirmation
     },
 
-    getPasswordValidationClass (validationRule) {
+    getValidationClass (validationRule, fieldValue) {
       return {
-        'valid': validationRule && this.user.password,
-        'invalid': !validationRule || !this.user.password
+        'valid': validationRule && fieldValue,
+        'invalid': !validationRule || !fieldValue
       }
+    },
+
+    getPasswordValidationClass (validationRule) {
+      return this.getValidationClass(validationRule, this.user.password)
     },
 
     getPasswordConfirmationValidationClass (validationRule) {
-      return {
-        'valid': validationRule && this.user.password_confirmation,
-        'invalid': !validationRule || !this.user.password_confirmation
-      }
+      return this.getValidationClass(validationRule, this.user.password_confirmation)
+    },
+
+    getValidationIcon (validationRule, fieldValue) {
+      return (validationRule && fieldValue) ? 'check' : 'x'
     },
 
     getPasswordValidationIcon (validationRule) {
-      return (validationRule && this.user.password) ? 'check' : 'x'
-    },
-
-    getPasswordValidationIconClass (validationRule) {
-      return (validationRule && this.user.password) ? 'mr-xs text-green' : 'mr-xs text-red'
+      return this.getValidationIcon(validationRule, this.user.password)
     },
 
     getPasswordConfirmationValidationIcon (validationRule) {
-      return (validationRule && this.user.password_confirmation) ? 'check' : 'x'
+      return this.getValidationIcon(validationRule, this.user.password_confirmation)
+    },
+
+    getValidationIconClass (validationRule, fieldValue) {
+      return (validationRule && fieldValue) ? 'mr-xs text-green' : 'mr-xs text-red'
+    },
+
+    getPasswordValidationIconClass (validationRule) {
+      return this.getValidationIconClass(validationRule, this.user.password)
     },
 
     getPasswordConfirmationValidationIconClass (validationRule) {
-      return (validationRule && this.user.password_confirmation) ? 'mr-xs text-green' : 'mr-xs text-red'
+      return this.getValidationIconClass(validationRule, this.user.password_confirmation)
     },
 
     getPasswordConfirmationText (validationRule) {
