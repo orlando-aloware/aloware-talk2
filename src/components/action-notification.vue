@@ -95,7 +95,7 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-center align-items-center call-actions"
+        <!-- <div class="d-flex justify-content-center align-items-center call-actions"
              v-if="shouldShowCallActions">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -186,7 +186,12 @@
               <hangup-icon class="icon-margin" width="13"/>Hangup Current Call & Connect
             </b-dropdown-item>
           </b-dropdown>
-        </div>
+        </div> -->
+
+        <live-call-controls :communication="communication"
+                            :contact="contact"
+                            :size="32"
+                            class="mr-2" />
       </div>
     </div>
   </b-toast>
@@ -217,6 +222,7 @@ import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../constants/agent-status'
 import talk2Api from 'src/plugins/api/api'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import LiveCallControls from 'components/shared/live-call-controls'
 
 export default {
   name: 'action-notification',
@@ -238,7 +244,8 @@ export default {
     HangupIcon,
     AcceptCallIcon,
     CancelCallIcon,
-    ParkCallIcon
+    ParkCallIcon,
+    LiveCallControls
   },
 
   props: {
@@ -570,11 +577,15 @@ export default {
     },
 
     shouldShowCallActions () {
-      return this.id === 'incomingCall' || (this.id === 'callFishing' && this.dialer && !this.isAgentOrDialerOnCall)
+      return this.id === 'incomingCall' || (this.id === 'callFishing' && this.dialer && !this.isAgentOrDialerOnCall && !this.forceFishingActions)
     },
 
     shouldShowFishingActions () {
-      return this.id === 'callFishing' && this.dialer && this.isAgentOrDialerOnCall
+      return this.id === 'callFishing' && this.dialer && (this.isAgentOrDialerOnCall || this.forceFishingActions)
+    },
+
+    forceFishingActions () {
+      return this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled
     },
 
     tooltipMessage () {
