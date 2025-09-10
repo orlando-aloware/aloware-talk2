@@ -23,7 +23,10 @@
             {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
           </q-tooltip>
           <!-- only show reject button if -->
-          <cancel-call-icon data-testid="item-cancel-call-icon" v-if="isShowCancelCallIcon" />
+          <cancel-call-icon v-if="isShowCancelCallIcon"
+                            :height="size"
+                            :width="size"
+                            data-testid="item-cancel-call-icon" />
         </b-button>
       </div>
       <div v-if="isIncomingCall"
