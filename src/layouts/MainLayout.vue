@@ -28,6 +28,7 @@
               <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"
                                     @shown="onShowMobileLiveCallBar"/>
               <app-header v-if="isShowAppHeader"
+                          :is-phone-visible="isPhoneVisible"
                           @toggleSidebar="toggleSidebar"/>
             </q-header>
             <q-page-container ref="page-container"
@@ -1748,7 +1749,7 @@ export default {
             }, 10000)
 
             // prevent showing an empty screen with a loading spinner in login page
-            const nonLoadingRoutes = ['Login', 'Account Registration']
+            const nonLoadingRoutes = ['Login']
 
             if (!nonLoadingRoutes.includes(this.$route.name)) {
               this.loading = true

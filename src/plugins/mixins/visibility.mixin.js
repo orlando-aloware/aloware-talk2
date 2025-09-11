@@ -8,6 +8,8 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_ABANDONED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_UNANSWERED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
 import userMixin from 'src/plugins/mixins/user.mixin'
+import { COMPANY_AGENT, COMPANY_REPORTER_ACCESS } from 'src/constants/roles'
+import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
 
 export default {
   mixins: [userMixin],
@@ -254,33 +256,50 @@ export default {
 
     checkCommunicationMatchesInboxFilters (filter, communication) {
       if (filter.unread_only === true &&
-        communication.inbox_unread_count === 0) {
+        communication.inbox_unread_count === 0 &&
+        !this.communicationInProgress(communication)) {
         return false
       }
 
-      if (filter.types?.length) {
-        const selectedTypesMap = {
+      if (filter.channels?.length) {
+        const selectedChannelsMap = {
           [CommunicationTypes.CALL_TYPE]: CommunicationTypes.CALL,
           [CommunicationTypes.SMS_TYPE]: CommunicationTypes.SMS,
           [CommunicationTypes.RVM_TYPE]: CommunicationTypes.RVM
         }
         // checks if communication type is present in the selected types
-        if (!filter.types.some((type) => selectedTypesMap[type] === communication.type)) {
+        if (!filter.channels.some((channel) => selectedChannelsMap[channel] === communication.type)) {
           return false
         }
       }
 
-      if (filter.direction === 'inbound' &&
-        communication.direction !== CommunicationDirections.INBOUND) {
-        return false
+      if (filter.directions?.length) {
+        if (communication.direction === CommunicationDirections.INBOUND && !filter.directions.includes('inbound')) {
+          return false
+        }
+
+        if (communication.direction === CommunicationDirections.OUTBOUND && !filter.directions.includes('outbound')) {
+          return false
+        }
       }
 
-      if (filter.direction === 'outbound' &&
-        communication.direction !== CommunicationDirections.OUTBOUND) {
+      if (filter.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
         return false
       }
 
       return true
+    },
+
+    communicationInProgress (communication) {
+      if (communication.type !== CommunicationTypes.CALL) {
+        return false
+      }
+
+      if (this.activeFilters.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
+        return false
+      }
+
+      return ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
     },
 
     checkCommunicationMatchesUserAccessibility (communication, teamInbox = false) {
@@ -289,9 +308,25 @@ export default {
         return false
       }
 
-      // if this comes from team inbox, visibility limits are not observed
+      let contactVisibility = this.profile.contacts_visibility
+
       if (teamInbox && this.hasCompanyTeamInboxEnabled) {
-        return true
+        // For Team Inbox, check if the ring group has force_agent_visibility_limits.
+        // If the ring group does not have force_agent_visibility_limits or the user is not a company agent,
+        // then the user should be able to see the communication.
+        const communicationRingGroup = this.getRingGroup(communication.ring_group_id)
+
+        if (
+          !this.hasRole(COMPANY_AGENT) ||
+          !communicationRingGroup?.force_agent_visibility_limits
+        ) {
+          return true
+        }
+
+        if (contactVisibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
+          // Fallback to owned only access for Team Inbox as CONTACTS_ACCESS_RING_GROUP is deprecated inside Team Inbox
+          contactVisibility = ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY
+        }
       }
 
       // users should always be able to see their own sent messages
@@ -300,42 +335,54 @@ export default {
       }
 
       // checks if accessible_campaigns is available and then looks for communication campaign_id in that array
-      if (this.profile.accessible_campaigns &&
+      if (
+        !teamInbox &&
+        this.profile.accessible_campaigns &&
         this.profile.line_access_limit &&
         communication.campaign_id &&
-        !this.profile.accessible_campaigns.includes(communication.campaign_id)) {
+        !this.profile.accessible_campaigns.includes(communication.campaign_id)
+      ) {
         return false
       }
 
       // checks if accessible_users is available and then looks for communication user_id in that array
-      if (this.profile.accessible_users &&
+      if (
+        !teamInbox &&
+        this.profile.accessible_users &&
         this.profile.user_access_limit &&
         communication.user_id &&
-        !this.profile.accessible_users.includes(communication.user_id)) {
+        !this.profile.accessible_users.includes(communication.user_id)
+      ) {
         return false
       }
 
       // checks if accessible_users is available and then looks for an intersection between accessible_users and attempting_users
-      if (this.profile.accessible_users &&
+      if (
+        !teamInbox &&
+        this.profile.accessible_users &&
         this.profile.user_access_limit &&
         communication.attempting_users &&
         [
           CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
         ].includes(communication.current_status2) &&
-        _.intersection(this.profile.accessible_users, communication.attempting_users).length === 0) {
+        _.intersection(this.profile.accessible_users, communication.attempting_users).length === 0
+      ) {
         return false
       }
 
       // checks if communication matches user communication visibility
-      if (this.profile.communications_visibility === CommunicationAccessTypes.COMMUNICATIONS_OWNED_ONLY &&
-        communication.user_id &&
-        communication.user_id !== this.profile.id) {
-        return false
+      if (this.profile.communications_visibility === CommunicationAccessTypes.COMMUNICATIONS_OWNED_ONLY) {
+        if (
+          communication.user_id &&
+          communication.user_id !== this.profile.id
+        ) {
+          return false
+        }
       }
 
       // ring group only access
-      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
+      if (contactVisibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
         // if user does not have unassigned access
         if (this.isUserDoesntHaveUnassignedAccess(communication, 'communication')) {
           return false
@@ -350,7 +397,7 @@ export default {
       }
 
       // ring group users only access
-      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP_USERS) {
+      if (contactVisibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP_USERS) {
         // if user does not have unassigned access
         if (this.isUserDoesntHaveUnassignedAccess(communication, 'communication')) {
           return false
@@ -379,7 +426,7 @@ export default {
       }
 
       // owned only access
-      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY) {
+      if (contactVisibility === ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY) {
         // if user does not have unassigned access
         if (this.isUserDoesntHaveUnassignedAccess(communication, 'communication')) {
           return false
@@ -399,8 +446,11 @@ export default {
       }
 
       // jon's agents has limited access to messages and contacts
-      if (this.profile.company_id === 11 &&
-        this.hasRole('Company Reporter Access')) {
+      if (
+        !teamInbox &&
+        this.profile.company_id === 11 &&
+        this.hasRole(COMPANY_REPORTER_ACCESS)
+      ) {
         // checks if communication matches contact's user visibility
         if (communication.contact.user_id &&
           communication.contact.user_id !== this.profile.id) {

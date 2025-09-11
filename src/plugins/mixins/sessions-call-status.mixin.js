@@ -156,6 +156,14 @@ export default {
       }
     },
 
+    wrapUpSeconds () {
+      if (this.profile.company.force_wrap_up) {
+        return this.profile.company.wrap_up_seconds
+      }
+
+      return this.profile.wrap_up_seconds
+    },
+
     // Should redial if min_redials is set to > 0
     // if has redialed less than min_redials
     // and if the call disposition is not a successful call disposition
@@ -207,6 +215,29 @@ export default {
       }
 
       return !this.wrapUp && !this.togglePause && !this.sessionPaused && this.countdownTimer > 0
+    },
+
+    isForcedToDisposeAndNotDisposed () {
+      return this.dialer.communication && this.isNotDisposed
+    },
+
+    // Check if the resetting call needs to be redialed
+    // then process the redial before resetting
+    shouldProcessRedial () {
+      // If not on a PD session/page or no activeTask
+      if (!this.isSessionRunning || !this.isOnPowerDialerSessionRoute || !this.activeTask) {
+        return false
+      }
+      // Redial not required, skip
+      if (!this.redialRequired) {
+        return false
+      }
+      // Skip if task already being redialed
+      if (this.redialedTask?.id || this.activeTask.forcedRedial) {
+        return false
+      }
+
+      return true
     }
   },
 

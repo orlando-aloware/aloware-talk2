@@ -380,6 +380,10 @@ export default {
           // }
           this.$VueEvent.fire('update_communication', event.communication)
         })
+        .listen('.recording_status.updated', (event) => {
+          this.dispatchToMemoryMonitor('recording_status.updated', event)
+          this.$VueEvent.fire('updated_recording_status', event)
+        })
 
         /**
          * ------------------------------------
@@ -429,6 +433,10 @@ export default {
         .listen('.power_dialer_contact.removed', event => {
           this.dispatchToMemoryMonitor('.power_dialer_contact.removed', event)
           window.VueEvent.fire('power_dialer_contact_removed', event.contact_id)
+        })
+        .listen('.colleague_status.notification', (event) => {
+          this.dispatchToMemoryMonitor('.colleague_status.notification', event)
+          this.$VueEvent.fire('colleague_status_notification', event)
         })
         /**
          * End of Power Dialer Session Tasks

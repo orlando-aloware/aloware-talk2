@@ -188,6 +188,7 @@ export default function () {
     conflictedContactPhoneNumbers: [],
     contactRingGroups: [],
     contactAttributes: [],
+    contactAttributesClone: [],
     isSidebarCollapsed: false,
     isContactNameEditOpen: false,
     contactSelectedPhone: null,

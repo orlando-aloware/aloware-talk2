@@ -30,6 +30,7 @@ import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
 import MicrophonePermissionModal from './microphone-permission-modal.vue'
 import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'dialer',
@@ -112,11 +113,11 @@ export default {
     },
 
     hasParkedAndInprogressCall () {
-      return this.dialer.parkedCall && this.dialer.call
+      return this.dialer.parkedCall && (this.dialer.call !== null)
     },
 
     hasCallInProgressNotParked () {
-      return !this.dialer.parkedCall && this.dialer.call
+      return !this.dialer.parkedCall && (this.dialer.call !== null)
     },
 
     shouldPushPhoneRoute () {
@@ -133,6 +134,7 @@ export default {
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
+        console.log('Setting dialer communication from dialer > updateCommunication', data)
         this.setDialerCommunication(data)
 
         const communication = this.dialer?.communication
@@ -175,6 +177,12 @@ export default {
             this.stopParkedCallTimer()
           }
         }
+      }
+    }
+
+    this.dialerListeners.updateRecordingStatus = (data) => {
+      if (data.communication_id === this.dialer.communication.id) {
+        this.setDialerRecordingStatus(data.recording_status)
       }
     }
 
@@ -334,6 +342,13 @@ export default {
       }
     }
 
+    this.dialerListeners.colleagueStatusNotification = (event) => {
+      // Show error notification in the dialer
+      if (event.message && event.communication_id && this.dialer.communication?.id === event.communication_id) {
+        this.$generalNotification(event.message, 'error')
+      }
+    }
+
     this.startDialerEvents()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -453,9 +468,9 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       this.removeUnownedLiveContactTask()
       console.log('Talk-Device: Call invite canceled', call)
+      this.connection = null
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial('Talk-Device.OnCancel')
-      this.connection = null
       this.$closeActionNotification('incomingCall')
     })
 
@@ -492,12 +507,14 @@ export default {
         return
       }
 
+      console.log('Setting dialer communication from dialer > forceStartOnWrapUp', this.profile.last_call)
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
       this.startWrapUpTimer()
     },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.listen('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.listen('endWrapUp', this.dialerListeners.endWrapUp)
@@ -527,10 +544,12 @@ export default {
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.listen('colleague_status_notification', this.dialerListeners.colleagueStatusNotification)
     },
 
     stopDialerEvents () {
       this.$VueEvent.stop('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.stop('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.stop('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.stop('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.stop('endWrapUp', this.dialerListeners.endWrapUp)
@@ -560,6 +579,7 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
       this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
+      this.$VueEvent.stop('colleague_status_notification', this.dialerListeners.colleagueStatusNotification)
     },
 
     forceRefreshCommunication () {
@@ -624,6 +644,7 @@ export default {
           return Promise.resolve()
         }
 
+        console.log('Setting dialer communication from dialer > getCommunication', res.data)
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
@@ -887,7 +908,11 @@ export default {
       if (this.shouldIncludeRingGroupId(isFromDialer, outboundCampaignId)) {
         // RingGroupId is used to identify the current inbox
         // when making a call from an IVR line
-        params['RingGroupId'] = this.activeInboxId.toString()
+        let ringGroupId = this.activeInboxId.toString()
+        if (this.$route.params.inboxId === ALL_INBOXES_ID && !isNaN(+this.$route.query.inboxId)) {
+          ringGroupId = this.$route.query.inboxId
+        }
+        params['RingGroupId'] = ringGroupId
       }
 
       console.log(' %c Making a call to: ', 'background: #000; color: #fff000;', params)
@@ -1009,7 +1034,7 @@ export default {
         console.log('Talk-Connection: Call invite canceled', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
-        this.backToDial('Talk-Connection.OnCancel')
+        this.backToDial('Talk-Connection.OnCancel', false, true)
         this.$closeActionNotification('incomingCall')
       })
 
@@ -1066,7 +1091,7 @@ export default {
         return
       }
 
-      this.backToDial('Talk-Device.OnDisconnect')
+      this.backToDial('Talk-Device.OnDisconnect', false, true)
     },
 
     hangupCall () {
@@ -1414,7 +1439,7 @@ export default {
       }
 
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
-        console.log('Call parked')
+        console.log('Call parked combo')
 
         if (shouldAnswer) {
           if (this.dialer.communication) {
@@ -1653,7 +1678,11 @@ export default {
     },
 
     resetCall () {
-      if (this.shouldProcessRedial()) {
+      if (this.shouldProcessRedial) {
+        // Set active task as redialed, so it won't process redial again for this task
+        this.activeTask.forcedRedial = true
+        // Trigger onNextTask to handle redialing
+        this.$VueEvent.fire('onNextTask')
         return
       }
 
@@ -1778,11 +1807,17 @@ export default {
       clearInterval(this.$options.parkedCallDurationInterval)
     },
 
-    backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
+    backToDial (signature = 'Talk-BackToDial', forceStatus = false, ignoreForceDisposition = false) {
       // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
       if (signature !== 'Talk-Connection.OnCancel') {
         this.resetAgentStatus(forceStatus, signature)
       }
+
+      // halt due to required forced dispositions
+      if (this.isForcedToDisposeAndNotDisposed && !ignoreForceDisposition) {
+        return
+      }
+
       this.resetCall(signature)
     },
 
@@ -2042,33 +2077,6 @@ export default {
       }
     },
 
-    // Check if the resetting call needs to be redialed
-    // then process the redial before resetting
-    shouldProcessRedial () {
-      // If not on a PD session/page or no activeTask
-      if (!this.isSessionRunning || !this.isOnPowerDialerSessionRoute || !this.activeTask) {
-        return false
-      }
-
-      // Redial not required, skip
-      if (!this.redialRequired) {
-        return false
-      }
-
-      // Skip if task already being redialed
-      if (this.redialedTask?.id || this.activeTask.forcedRedial) {
-        return false
-      }
-
-      // Set active task as redialed, so it won't process redial again for this task
-      this.activeTask.forcedRedial = true
-
-      // Trigger onNextTask to handle redialing
-      this.$VueEvent.fire('onNextTask')
-
-      return true
-    },
-
     fetchAndSetAiAgentCallMode (commId, type = null) {
       return talk2Api.V1.communication.get(commId)
         .then(res => {
@@ -2139,7 +2147,7 @@ export default {
         return null
       }
 
-      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId']
+      const requiredParams = ['ContactId', 'CommunicationData', 'CampaignId', 'CampaignName']
       const missingParams = requiredParams.filter(param => {
         return !customParams[param]
       })
@@ -2150,7 +2158,6 @@ export default {
       }
 
       const campaignId = parseInt(customParams.CampaignId) || null
-      const campaign = this.getCampaign(campaignId)
 
       let communicationData
       let locationData = null
@@ -2192,30 +2199,12 @@ export default {
         ring_group_id: parseInt(communicationData.RingGroupId) || null,
         campaign_id: campaignId,
         campaign: {
-          name: campaign?.name
+          name: customParams?.CampaignName
         }
       }
 
       console.log('Successfully built communication data from customParameters:', communication)
       return communication
-    },
-
-    getCampaign (campaignId) {
-      if (!campaignId) {
-        return null
-      }
-
-      if (!this.campaigns || !Array.isArray(this.campaigns)) {
-        return null
-      }
-
-      const found = this.campaigns.find(campaign => campaign.id === campaignId)
-
-      if (!found) {
-        return null
-      }
-
-      return found
     },
 
     async checkMicrophonePermission () {

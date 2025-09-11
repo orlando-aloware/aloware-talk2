@@ -59,6 +59,7 @@ import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import _ from 'lodash'
 import { agentAvailableCampaignsCallback, isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 import { COMPANY_AGENT } from 'src/constants/roles'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'line-selector',
@@ -92,39 +93,44 @@ export default {
     ...mapGetters('contacts', ['contact']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
     ...mapState(['campaigns']),
-    ...mapState('TeamInbox', ['activeInbox', 'teamInboxCampaigns']),
+    ...mapState('TeamInbox', ['activeInbox', 'activeInboxId', 'teamInboxCampaigns']),
+
+    isAllInboxes () {
+      return this.$route.params.inboxId === ALL_INBOXES_ID
+    },
 
     /**
      * Returns the appropriate campaigns array based on whether we're in team inbox mode
      */
     campaignsToUse () {
-      if (this.teamInbox) {
+      if (this.teamInbox && !this.isAllInboxes) {
         // Active Team Inbox Campaigns
-        return this.activeCampaigns
+        return this.activeTeamInboxCampaigns
       }
 
-      if (this.shouldLimitAgentLinesVisibility) {
-        // Visible Campaigns (line management enhancements)
+      if (this.shouldLimitAgentLinesVisibility || this.isAllInboxes) {
+        // Visible Campaigns (line management enhancements) or all inboxes campaigns
         return this.campaigns.filter(
           campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
         )
       }
 
       // All Campaigns (no limitations)
-      return this.campaigns
+      return this.campaigns.filter(campaign => campaign.active)
     },
 
     /**
-     * Returns the active campaigns
+     * Returns the active Team Inbox campaigns
      */
-    activeCampaigns () {
+    activeTeamInboxCampaigns () {
       return this
         .teamInboxCampaigns
-        .filter(campaign =>
-          // Active Inbox Campaigns
-          this.activeInboxCampaignIds?.includes(campaign.id) ||
-          isIvrOrDeadEndCampaign(campaign)
-        )
+        .filter(campaign => {
+          return campaign.active && (
+            this.activeInboxCampaignIds.includes(campaign.id) ||
+            isIvrOrDeadEndCampaign(campaign)
+          )
+        })
     },
 
     selectedCampaign () {
@@ -206,6 +212,10 @@ export default {
     shouldLimitAgentLinesVisibility () {
       return this.hasRole(COMPANY_AGENT) &&
         this.hasCompanyTeamInboxLineManagementEnhancements
+    },
+
+    getAllInboxesSelectedInboxId () {
+      return this.$route.query.inboxId ? +this.$route.query.inboxId : null
     }
   },
 
@@ -239,6 +249,7 @@ export default {
     onShowMenu () {
       this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
     },
+
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : this.getPlaceholderText()
@@ -299,6 +310,10 @@ export default {
     },
 
     getIncomingNumber () {
+      if (!this.selectedLine || !this.contact?.id) {
+        return
+      }
+
       this.isBusy = true
 
       let apiCall
@@ -317,9 +332,7 @@ export default {
 
     setDefaultLine () {
       this.selectedLine = this.selectedCampaign
-      if (this.selectedLine && this.contact.id) {
-        this.getIncomingNumber()
-      }
+      this.getIncomingNumber()
     },
 
     setIncomingNumber () {

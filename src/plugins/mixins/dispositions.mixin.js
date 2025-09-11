@@ -134,10 +134,10 @@ export default {
       // if force redial is enabled, force sms sending if the
       // selected call disposition is not one of the successful call dispositions
       // and the sms template has not been sent yet
-      return this.isForcedRedialEnabled &&
+      return Boolean(this.isForcedRedialEnabled &&
         this.sessionSettings?.force_sms &&
         !successfulCallDispositionSelected &&
-        !this.tasksSentSmsTemplates[this.activeTask.id]
+        !this.tasksSentSmsTemplates[this.activeTask.id])
     }
   },
 

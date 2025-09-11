@@ -1,6 +1,6 @@
 <template>
   <div data-testid="teaminbox-filter-form-wrapper">
-    <b-form class="inbox-channel-filter-form" data-testid="teaminbox-filter-form">
+    <b-form class="inbox-channel-filter-form team-inbox-filter-form" data-testid="teaminbox-filter-form">
       <b-container>
         <div>
           <h5 class="section-header">Quick Access</h5>
@@ -45,7 +45,7 @@
                                :generic-multiselect="false"
                                :highlighted="isChanged('campaigns')"
                                :disable="isLineSelectorDisabled"
-                               :pre-selected-team-inbox-line-id="activeInboxId"
+                               :pre-selected-team-inbox-line-id="parsedTeamInboxId"
                                v-model="filter.campaigns"
                                data-testid="teaminbox-filter-form-line-selector"
                                @change="eventPayload => onFilterChange(eventPayload, 'campaigns')">
@@ -108,7 +108,31 @@
               </b-form-group>
             </b-col>
 
-            <b-col sm="12" md="6" v-if="isContactStatusControlEnabled">
+            <b-col sm="12" md="6">
+              <b-form-group class="form-label mb-0" label="Direction">
+                <direction-selector :highlighted="isChanged('directions')"
+                                   data-testid="teaminbox-filter-form-comm-direction-selector"
+                                   v-model="filter.directions"
+                                   @input="eventPayload => onFilterChange(eventPayload, 'directions')">
+                </direction-selector>
+              </b-form-group>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row class="mt-2" v-if="isAllInboxesRoute">
+            <b-col sm="12" md="6">
+              <b-form-group label="Inboxes" class="form-label mb-0">
+                <inbox-selector :highlighted="isChanged('inboxes')"
+                                data-testid="teaminbox-filter-form-inbox-selector"
+                                v-model="filter.inboxes"
+                                @input="eventPayload => onFilterChange(eventPayload, 'inboxes')">
+                </inbox-selector>
+              </b-form-group>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row class="mt-2" v-if="isContactStatusControlEnabled">
+            <b-col sm="12" md="6">
               <b-form-group label="Task Status" class="form-label mb-0">
                 <q-select
                   ref="taskStatusSelect"
@@ -160,18 +184,6 @@
                 </q-select>
               </b-form-group>
             </b-col>
-
-          </b-form-row>
-          <b-form-row class="mt-2">
-            <b-col sm="6">
-              <b-form-group class="form-label" label="Direction">
-                <direction-selector :highlighted="isChanged('directions')"
-                                   data-testid="teaminbox-filter-form-comm-direction-selector"
-                                   v-model="filter.directions"
-                                   @input="eventPayload => onFilterChange(eventPayload, 'directions')">
-                </direction-selector>
-              </b-form-group>
-            </b-col>
           </b-form-row>
         </div>
       </b-container>
@@ -186,9 +198,11 @@ import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import LineSelector from 'components/generic-selectors/line-selector'
 import DirectionSelector from './direction-selector'
 import ChannelSelector from './channel-selector'
+import InboxSelector from './inbox-selector'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import moment from 'moment-timezone'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'teaminbox-filter-form',
@@ -198,12 +212,10 @@ export default {
     LineSelector,
     DirectionSelector,
     ChannelSelector,
+    InboxSelector,
     InformationCircleIcon,
     RemoveTagIcon
   },
-
-  mixins: [
-  ],
 
   props: {
     filter: {
@@ -245,6 +257,18 @@ export default {
     dateHasChanges () {
       return this.filter.from_date !== this.defaultFilter.from_date ||
         this.filter.to_date !== this.defaultFilter.to_date
+    },
+
+    parsedTeamInboxId () {
+      if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+        return null
+      }
+
+      return this.activeInboxId
+    },
+
+    isAllInboxesRoute () {
+      return this.$route.params.inboxId === ALL_INBOXES_ID
     }
   },
 
@@ -452,6 +476,15 @@ export default {
 </script>
 
 <style lang="scss">
+.team-inbox-filter-form {
+  min-height: 370px;
+
+  .calendars {
+    @media screen and (min-width: 1600px) {
+      flex-wrap: nowrap;
+    }
+  }
+}
 .teaminbox-filter-form .quick-access .vue-daterange-picker .reportrange-text {
   height: 40px;
   display: flex;

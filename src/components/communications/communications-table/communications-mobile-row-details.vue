@@ -56,7 +56,7 @@
                      :row="communication"
                      v-else-if="column.name === 'transfer_prior_user_ids'" />
 
-        <transferred prop="transfer_target_user_ids"
+        <transferred prop="transfer_target_users"
                      :row="communication"
                      v-else-if="column.name === 'transfer_target_user_ids'" />
 

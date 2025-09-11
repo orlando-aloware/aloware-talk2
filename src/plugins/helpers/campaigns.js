@@ -146,6 +146,10 @@ export function agentAvailableCampaignsCallback (campaign, userId) {
     return false
   }
 
+  if (!campaign.active) {
+    return false
+  }
+
   return campaign.user_id === userId ||
     campaign.has_direct_ring_group_access ||
     campaign.has_team_membership_access ||

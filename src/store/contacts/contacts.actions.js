@@ -157,6 +157,10 @@ export default {
   },
   setContactAttributes: ({ commit }, attributes) => {
     commit('SET_CONTACT_ATTRIBUTES', attributes)
+    commit('SET_CONTACT_ATTRIBUTES_CLONE', attributes)
+  },
+  setContactAttributesClone: ({ commit }, attributes) => {
+    commit('SET_CONTACT_ATTRIBUTES_CLONE', attributes)
   },
   addContactPhoneNumber: ({ commit }, phoneNumber) => {
     commit('ADD_CONTACT_PHONE_NUMBER', phoneNumber)

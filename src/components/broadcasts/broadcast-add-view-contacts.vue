@@ -39,7 +39,7 @@
       <template v-else-if="optionSelected === 'integration'">
         <p>Select a {{ integrationText }} list</p>
         <!-- shows the selector based on which integration is enabled  -->
-        <div v-if="integrationsEnabled.length > 1">
+        <div v-if="filteredEnabledIntegrations.length > 1">
           <q-select style="word-break: break-all;"
                     color="primary"
                     use-input
@@ -49,7 +49,7 @@
                     outlined
                     hide-bottom-space
                     :placeholder="!source.integration.name ? 'Select an integration' : ''"
-                    :options="integrationsEnabled"
+                    :options="filteredEnabledIntegrations"
                     v-model="source.integration.name">
           </q-select>
         </div>
@@ -74,6 +74,12 @@ import IntegrationListSelector from 'components/generic-selectors/integration-li
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { integrationMixin } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
+import {
+  HUBSPOT_INTEGRATION,
+  PIPEDRIVE_INTEGRATION,
+  SALESFORCE_INTEGRATION,
+  ZOHO_INTEGRATION
+} from 'src/constants/integrations'
 
 export default {
   name: 'broadcast-add-view-contacts',
@@ -118,16 +124,24 @@ export default {
         {
           value: 'integration',
           text: 'Integrations',
-          enabled: this.integrationsEnabled.length > 0,
+          enabled: this.filteredEnabledIntegrations.length > 0,
           disabledTooltip: 'You don\'t have any integration enabled'
         }
       ]
     },
 
     integrationText () {
-      return this.integrationsEnabled.length > 1
+      return this.filteredEnabledIntegrations.length > 1
         ? 'Integration'
-        : this.integrationsEnabled[0]
+        : this.filteredEnabledIntegrations[0]
+    },
+
+    filteredEnabledIntegrations () {
+      // show only ready for broadcast integrations
+      // @see src/components/broadcasts/broadcast-add-view.vue
+      return this.integrationsEnabled.filter(integration => [
+        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION
+      ].includes(integration.toLowerCase()))
     }
   },
 
@@ -167,8 +181,8 @@ export default {
       this.reset()
 
       // force integration value when there is only one enabled integration
-      if (option.value === 'integration' && this.integrationsEnabled.length === 1) {
-        this.source.integration.name = this.integrationsEnabled[0]
+      if (option.value === 'integration' && this.filteredEnabledIntegrations.length === 1) {
+        this.source.integration.name = this.filteredEnabledIntegrations[0]
 
         // use next tick to make sure ref is loaded
         this.$nextTick()

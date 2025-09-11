@@ -496,6 +496,7 @@ import { isEmpty, cloneDeep, get, debounce } from 'lodash'
 import moment from 'moment-timezone'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
 import talk2Api from 'src/plugins/api/api'
 import HangupIcon from 'components/icons/hangup-icon.vue'
 import PlayBarIcon from 'components/icons/play-bar-icon.vue'
@@ -588,18 +589,6 @@ export default {
       'listItems',
       'selectedList'
     ]),
-
-    forcedWrapUpAccount () {
-      return this.profile.company.force_wrap_up
-    },
-
-    wrapUpSeconds () {
-      if (this.forcedWrapUpAccount) {
-        return this.profile.company.wrap_up_seconds
-      }
-
-      return this.profile.wrap_up_seconds
-    },
 
     currentSessionStatus () {
       return this.dialer?.currentStatus || ''
@@ -828,9 +817,7 @@ export default {
     },
 
     canRedialNow () {
-      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
-        !this.activeTask?.redialed &&
-        !this.isRedialClicked
+      return this.dialer.currentStatus === 'CALL_CONNECTED' && !this.isRedialClicked
     },
 
     pauseButtonText () {
@@ -981,7 +968,7 @@ export default {
 
     redialDropdownTooltip () {
       if (!this.statusCallConnected) {
-        return
+        return 'Redial is only available when call is connected'
       }
 
       if (this.isForcedCallDisposition && !this.isCallDisposed) {
@@ -1025,6 +1012,7 @@ export default {
     this.$VueEvent.listen('holdFailed', this.onHoldFailed)
     this.$VueEvent.listen('unholdFailed', this.onUnholdFailed)
     this.$VueEvent.listen('onNextTask', this.onNextTask)
+    this.$VueEvent.listen('onCallBackClick', this.onCallBackClick)
 
     this.isSessionRunning = false
   },
@@ -1044,6 +1032,16 @@ export default {
       'incrementRedialedTaskCount',
       'moveContactItems'
     ]),
+
+    onCallBackClick () {
+      this.clearWarmUpCountDown()
+
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.wrapUp = false
+      }
+
+      this.onRedial(true)
+    },
 
     onDispositionsClick () {
       this.$emit('on-dispositions')
@@ -1122,6 +1120,8 @@ export default {
       const wasInWrapUpStatusAndPaused = this.dialer.currentStatus === 'WRAP_UP' &&
         this.wrapUpPaused
 
+      const wasForcedToDispose = this.dialer.communication && this.isNotDisposed
+
       this.countdownInterval = setInterval(() => {
         // if paused, we should not continue the countdown
         if (this.sessionPaused) {
@@ -1147,41 +1147,57 @@ export default {
           this.countdownTimer = 0
         }
 
-        this.countdownTimer--
-        this.onTimerIsOver()
+        if (this.countdownTimer > -1) {
+          this.countdownTimer--
+        }
+
+        if (this.timerIsOver) {
+          // halt if forced to dispose and not yet disposed
+          if (this.isForcedToDisposeAndNotDisposed) {
+            return
+          }
+
+          // trigger reset call if redial is required
+          if (this.dialer.currentStatus === 'WRAP_UP' && (this.shouldProcessRedial || wasForcedToDispose)) {
+            this.clearWarmUpCountDown()
+            this.wrapUp = false
+            this.$VueEvent.fire('resetCall')
+            return
+          }
+
+          this.onTimerIsOver()
+        }
       }, 1000)
     },
 
     onTimerIsOver () {
-      if (this.timerIsOver) {
-        this.clearWarmUpCountDown()
+      this.clearWarmUpCountDown()
 
-        const hasEnded = this.toggleEnd || !this.hasQueuedTaskLists
-        const noActiveTask = !this.hasActiveTask || !this.activeTask
+      const hasEnded = this.toggleEnd || !this.hasQueuedTaskLists
+      const noActiveTask = !this.hasActiveTask || !this.activeTask
 
-        if (hasEnded && noActiveTask) {
-          this.reRoute()
-          return
-        }
+      if (hasEnded && noActiveTask) {
+        this.reRoute()
+        return
+      }
 
-        if (!this.togglePause && !this.wrapUp) {
-          this.runTask()
-        }
+      if (!this.togglePause && !this.wrapUp) {
+        this.runTask()
+      }
 
-        if (this.wrapUp) {
-          this.initialize()
-        }
+      if (this.wrapUp) {
+        this.initialize()
+      }
 
-        // end wrap-up if wrap-up seconds
-        // is not indefinite
-        if (this.wrapUp && this.wrapUpSeconds !== 0) {
-          this.wrapUp = false
-          this.isSessionRunning = false
-        }
+      // end wrap-up if wrap-up seconds
+      // is not indefinite
+      if (this.wrapUp && this.wrapUpSeconds !== 0) {
+        this.wrapUp = false
+        this.isSessionRunning = false
+      }
 
-        if (this.togglePause) {
-          this.sessionPaused = true
-        }
+      if (this.togglePause) {
+        this.sessionPaused = true
       }
     },
 
@@ -1440,10 +1456,17 @@ export default {
           }
 
           break
+        case 'CALL_CONNECTED':
+          // clear redial state in order to properly handle it again if needed
+          if (this.activeTask.forcedRedial) {
+            this.activeTask.forcedRedial = false
+            this.redialedTask = {}
+          }
+          break
         case 'WRAP_UP':
-          // if task is manually skipped through the
-          // Next button, end the wrap up
-          if (this.skipWrapUp) {
+          // if task is manually skipped through the Next button (or no wrap up)
+          // end the wrap up
+          if (this.skipWrapUp || (this.redialRequired && this.wrapUpSeconds === -1 && !this.isForcedToDisposeAndNotDisposed)) {
             // we need to clear the wrap-up (set agent status to available)
             // after the session ended
             if (this.powerDialerTasks.in_queue.length === 0) {
@@ -1460,10 +1483,8 @@ export default {
           this.wrapUp = true
           this.countdownTimer = this.wrapUpSeconds
 
-          // if status is wrap-up and wrap-up seconds
-          // is "no wrap-up", then skip wrap-up countdown timer
-          // and proceed immediately to the next task
-          if (this.isSessionRunning && this.wrapUpSeconds === -1) {
+          // if "No Wrap-up" is set and not forced to dispose, proceed to the next task
+          if (this.isSessionRunning && this.wrapUpSeconds === -1 && !this.isForcedToDisposeAndNotDisposed) {
             this.onNextTask(true)
           }
 
@@ -1533,7 +1554,6 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      // clearInterval(this.countdownInterval)
       this.loadingNext = true
       this.clearWarmUpCountDown()
 
@@ -1569,40 +1589,33 @@ export default {
       }
 
       // hangup in-progress call
-      if (this.callInProgress && this.dialer.currentStatus !== 'WRAP_UP') {
+      if (this.dialer.currentStatus === 'CALL_CONNECTED' || (this.callInProgress && this.dialer.currentStatus !== 'WRAP_UP')) {
         this.processHangup()
       }
 
-      if (this.dialer.currentStatus !== 'CALL_CONNECTED' || forceSkip) {
-        this.wrapUp = false
+      this.wrapUp = false
+      this.hasActiveTask = false
+      const task = get(this.powerDialerTasks.in_queue, '0', null)
+
+      this.taskToCall = cloneDeep(task)
+
+      if (isEmpty(task)) {
         this.hasActiveTask = false
-        const task = get(this.powerDialerTasks.in_queue, '0', null)
-
-        this.taskToCall = cloneDeep(task)
-
-        if (isEmpty(task)) {
-          this.hasActiveTask = false
-          this.reRoute()
-          return
-        }
-
-        // move task to bottom
-        await this.moveContactItems({
-          id: this.selectedList.id,
-          params: {
-            contact_list_item_ids: [this.activeTask.contact_list_item_id],
-            direction: 2
-          }
-        })
-
-        this.processRemoveFirstInQueueTask()
-        this.processSession(noWrapUp)
+        this.reRoute()
         return
       }
 
-      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-        this.processHangup()
-      }
+      // move task to bottom
+      await this.moveContactItems({
+        id: this.selectedList.id,
+        params: {
+          contact_list_item_ids: [this.activeTask.contact_list_item_id],
+          direction: MOVE_CONTACTS_DIRECTION.bottom
+        }
+      })
+
+      this.processRemoveFirstInQueueTask()
+      this.processSession(noWrapUp)
     },
 
     hangupCall (event) {
@@ -1614,41 +1627,6 @@ export default {
       }
 
       this.$VueEvent.fire('hangupCall')
-    },
-
-    async onNextTaskWhenOnWrapUp () {
-      this.onPhoneExpansionReset()
-      this.wrapUp = false
-      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
-
-      if (this.taskToCall) {
-        this.processRemoveFirstInQueueTask()
-        this.activeTask = this.taskToCall
-        this.hasActiveTask = true
-        this.hangUpIntervalCounter = 0
-
-        this.hangUpInterval = setInterval(() => {
-          if (this.dialer.currentStatus === 'WRAP_UP') {
-            this.processSession()
-            clearInterval(this.hangUpInterval)
-          }
-
-          this.hangUpIntervalCounter++
-
-          if (this.hangUpIntervalCounter >= 120) {
-            clearInterval(this.hangUpInterval)
-          }
-        }, 500)
-
-        return
-      }
-
-      if (this.dialer.currentStatus === 'WRAP_UP') {
-        this.$VueEvent.fire('endWrapUp')
-      }
-
-      this.hasActiveTask = false
-      this.reRoute()
     },
 
     onInitiateSession (session) {
@@ -1802,7 +1780,9 @@ export default {
     startDialing () {
       this.clearWarmUpCountDown()
       this.togglePause = false
-      this.onTimerIsOver()
+      if (this.timerIsOver) {
+        this.onTimerIsOver()
+      }
     }
   },
 
@@ -1926,6 +1906,7 @@ export default {
     this.$VueEvent.stop('holdFailed', this.onHoldFailed)
     this.$VueEvent.stop('unholdFailed', this.onUnholdFailed)
     this.$VueEvent.stop('onNextTask', this.onNextTask)
+    this.$VueEvent.stop('onCallBackClick', this.onCallBackClick)
 
     window.localStorage.removeItem(PD_PAUSED_PROP_NAME)
   }

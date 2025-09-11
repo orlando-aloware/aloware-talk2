@@ -66,34 +66,34 @@
 </template>
 
 <script>
-import { debounce, get } from 'lodash'
-import { mapFields } from 'vuex-map-fields'
-import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
-import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
+import ColumnHeaders from 'components/column-headers'
+import CreateListModal from 'components/create-list-modal'
 import MoveDialog from 'components/move-dialog'
 import CreateDialog from 'components/power-dialer/custom/create-dialog'
-import CreateListModal from 'components/create-list-modal'
+import RemoveContactConfirmation from 'components/remove-contact-confirmation'
 import RemoveFolderDialog from 'components/remove-folder'
 import RemoveListModal from 'components/remove-list'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
-import RemoveContactConfirmation from 'components/remove-contact-confirmation'
 import UpgradeNowPage from 'components/upgrade-now-page.vue'
-import ColumnHeaders from 'components/column-headers'
-import {
-  powerDialerMixin,
-  contactsMixins,
-  contactV2AttributesMixin,
-  powerDialerInitMixin,
-  sessionsEngineMixin,
-  aclMixin,
-  visibilityMixin,
-  contactListCountMixin,
-  mainViewMixin
-} from 'src/plugins/mixins'
+import { debounce, get } from 'lodash'
+import qs from 'qs'
+import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
-import qs from 'qs'
 import * as TaskType from 'src/constants/task-types'
+import {
+  aclMixin,
+  contactListCountMixin,
+  contactsMixins,
+  contactV2AttributesMixin,
+  mainViewMixin,
+  powerDialerInitMixin,
+  powerDialerMixin,
+  sessionsEngineMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'PowerDialer',
@@ -486,16 +486,19 @@ export default {
 
   watch: {
     '$route.params.filter': function (id) {
+      console.log('🎯 PowerDialer: $route.params.filter watcher triggered', { id, route: this.$route.name })
       this.setFilters(id)
     },
 
     '$route.params': async function (params) {
+      console.log('🎯 PowerDialer: $route.params watcher triggered', { params, route: this.$route.name })
       this.$VueEvent.fire('clearContacts')
       await this.setFilterParams(params)
     },
 
     '$route': {
       handler (val) {
+        console.log('🎯 PowerDialer: $route watcher triggered (deep)', { route: val.name, path: val.path })
         this.isLoading = true
         this.setAllContactsSelected(false)
         this.setIsDatatableSelectedAll(false)

@@ -34,6 +34,7 @@ import { isEmpty } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import { mapFields } from 'vuex-map-fields'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'TeamInboxSide',
@@ -109,8 +110,12 @@ export default {
     activeInboxId: {
       immediate: true,
       handler (inboxId) {
-        const inbox = this.inboxes.find(item => item.id === inboxId) || {}
+        if (inboxId === ALL_INBOXES_ID) {
+          this.setActiveInbox({ id: ALL_INBOXES_ID, name: 'All Inboxes' })
+          return
+        }
 
+        const inbox = this.inboxes.find(item => item.id === inboxId) || {}
         this.setActiveInbox(inbox)
       }
     },
@@ -119,8 +124,12 @@ export default {
       immediate: true,
       handler (inboxes) {
         if (isEmpty(this.activeInbox) && inboxes.length) {
-          const inbox = inboxes.find(item => item.id === this.activeInboxId) || {}
-          this.setActiveInbox(inbox)
+          if (this.activeInboxId === ALL_INBOXES_ID) {
+            this.setActiveInbox({ id: ALL_INBOXES_ID, name: 'All Inboxes' })
+          } else {
+            const inbox = inboxes.find(item => item.id === this.activeInboxId) || {}
+            this.setActiveInbox(inbox)
+          }
         }
       }
     },

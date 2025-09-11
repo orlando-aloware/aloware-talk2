@@ -190,7 +190,7 @@
         </q-tooltip>
         <merge-contact-icon />
       </b-button>
-      <b-button v-if="isAdmin"
+      <b-button v-if="isAdmin && !isFromTeamInbox"
                 :disabled="isExportingCommunications || isReadOnly"
                 class="custom-action-button my-1"
                 data-testid="contact-info-export-button"
@@ -210,9 +210,21 @@
                         size="14px" />
       </b-button>
     </div>
-    <appointment-form-modal :contact="contact" :from-team-inbox="fromTeamInbox"
-                            :team-inbox-id="teamInboxId"
-                            data-testid="contact-info-appointment-form-modal"></appointment-form-modal>
+    <calendar-event-manager
+      modal-id="appointment-modal"
+      called-from="appointment-modal"
+      :contact="contact"
+      :from-team-inbox="fromTeamInbox"
+      :team-inbox-id="teamInboxId"
+      :hide-event-type-selector="true"
+      :hide-contact-selector="true"
+      :default-event-type="12"
+      save-button-text="Add Event"
+      saving-text="Adding Event..."
+      cancel-button-text="Close"
+      :simple-mode="true"
+      data-testid="contact-info-appointment-form-modal"
+    />
     <contact-add-reminder-modal :from-team-inbox="fromTeamInbox"
                                 data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
     <power-dialer-add-modal :params="addPowerDialerParams"
@@ -240,7 +252,7 @@ import CallIcon from 'src/components/icons/call-icon'
 import AddCallIcon from 'src/components/icons/add-call-icon'
 import CallRemoveIcon from 'src/components/icons/call-remove-icon'
 import MergeContactIcon from 'src/components/icons/merge-contact-icon'
-import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
+import CalendarEventManager from 'src/components/calendar/calendar-event-manager.vue'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
@@ -291,7 +303,7 @@ export default {
     ContactInfoTime,
     ContactDncActions,
     ContactAddReminderModal,
-    AppointmentFormModal,
+    CalendarEventManager,
     PowerDialerAddModal,
     ContactRemoveFromListsConfirmation,
     MergeContactModal,

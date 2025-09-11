@@ -42,6 +42,12 @@ export default function () {
         disabled: false
       },
       {
+        label: 'Contact',
+        value: 'contact',
+        icon: 'contact',
+        disabled: false
+      },
+      {
         label: 'Notification',
         value: 'notification',
         icon: 'notification',

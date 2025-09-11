@@ -12,7 +12,7 @@
         :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
       >
         <Contact
-          :team-inbox-id="activeInboxId"
+          :team-inbox-id="parsedTeamInboxId"
           :team-inbox-unread-count="contactInboxUnreadCount"
           :from-team-inbox="true"
         />
@@ -24,19 +24,21 @@
 <script>
 import Contact from 'pages/contacts/Contact'
 import TeamInboxSide from 'components/teaminbox/teaminbox-side'
-import { aclMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, userMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { mapFields } from 'vuex-map-fields'
 import { debounce } from 'lodash'
 import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
+import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'TeamInbox',
 
   mixins: [
     userMixin,
-    aclMixin
+    aclMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -96,6 +98,15 @@ export default {
     contactInboxUnreadCount () {
       // Return the stored unread count that was propagated up from the teaminbox-tab component
       return this.currentContactUnreadCount
+    },
+
+    parsedTeamInboxId () {
+      if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+        const inboxId = +this.$route.query.inboxId
+        return !isNaN(inboxId) ? inboxId : null
+      }
+
+      return this.activeInboxId
     }
   },
 
@@ -121,6 +132,12 @@ export default {
         this.$router.replace({ name: 'Inbox' })
       }
     }
+
+    if (this.isAllInboxesRoute && !this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)) {
+      this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
+      return
+    }
+
     this.resizeHandler()
   },
 

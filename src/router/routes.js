@@ -1,7 +1,6 @@
 const MainLayout = () => import('layouts/MainLayout.vue')
 const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
-const ResetPassword = () => import('pages/ResetPassword.vue')
 const Inbox = () => import('pages/Inbox.vue')
 const TeamInbox = () => import('pages/TeamInbox.vue')
 const CommunicationsView = () => import('src/pages/CommunicationsView.vue')
@@ -31,7 +30,6 @@ const Error404 = () => import('pages/Error404.vue')
 const Messenger = () => import('pages/Messenger.vue')
 const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
-const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
 const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
 const SalesforceMessageWidgetError = () => import('pages/widgets/SalesforceMessageWidgetError.vue')
 const SalesforceSoftPhone = () => import('pages/widgets/SalesforceSoftPhone.vue')
@@ -91,14 +89,6 @@ const routes = [
           isGuest: true
         },
         component: ForgotPassword
-      },
-      {
-        path: 'reset/:token',
-        name: 'Reset Password',
-        meta: {
-          isGuest: true
-        },
-        component: ResetPassword
       },
       {
         path: 'team-inboxes',
@@ -652,15 +642,6 @@ const routes = [
           title: 'Messenger'
         },
         component: Messenger
-      },
-      {
-        path: '/account-registration/:verification_token?',
-        name: 'Account Registration',
-        meta: {
-          title: 'Account Registration',
-          isGuest: true
-        },
-        component: AccountRegistration
       },
       {
         name: 'Texting Widget (known-user)',

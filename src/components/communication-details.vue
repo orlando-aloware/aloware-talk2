@@ -624,19 +624,19 @@
                   <ul class="list list-unstyled inset mb-0">
                     <li
                       class="pb-1"
-                      :key="attemptingUser + '-user-' + index"
+                      :key="attemptingUser.id + '-user-' + index"
                       v-for="(attemptingUser, index) in communication.attempting_users"
                     >
                       <div
                         class="flex items-center mr-1 h-100"
-                        @click="onOpenUserInClassicClicked(getUser(attemptingUser).id)"
+                        @click="onOpenUserInClassicClicked(attemptingUser.id)"
                       >
                         <span
                           class="text-blue cursor-pointer"
-                          :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
-                          :title="getUserName(getUser(attemptingUser))"
+                          :class="getAttemptingClass(attemptingUser.d, communication.disposition_status2, communication.user_id)"
+                          :title="getUserName(attemptingUser)"
                         >
-                          <user-display :user-id="attemptingUser" />
+                          <user-display :user="attemptingUser" />
                         </span>
                       </div>
                     </li>
@@ -830,6 +830,26 @@
               </b-form-row>
               <hr />
             </div>
+
+            <!--HOLD TIME-->
+            <div
+              v-if="![CommunicationTypes.SMS, CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && verbose"
+            >
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Hold Time: </q-item-label>
+                </b-col>
+                <b-col cols="7">
+                  <div class="d-flex align-items-center">
+                    <span
+                      v-if="communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW"
+                    >{{ communication.hold_time | fixDuration }}</span>
+                    <span v-else>-</span>
+                  </div>
+                </b-col>
+              </b-form-row>
+              <hr />
+            </div>
           </q-card-section>
 
           <q-card-section class="pt-0 pb-0"
@@ -1008,7 +1028,7 @@
 
             <!--TRANSFERRED TO-->
             <b-form-row
-              v-if="communication.transfer_target_user_ids"
+              v-if="communication.transfer_target_users && communication.transfer_target_users.length > 0"
               data-testid="comm-details-transferred-to-row"
             >
               <b-col
@@ -1024,14 +1044,14 @@
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
-                    :key="userId + '-user-' + index"
+                    :key="user.id + '-user-' + index"
                     data-testid="comm-details-transferred-to-open-user-in-classic"
-                    @click="onOpenUserInClassicClicked(userId)"
-                    v-for="(userId, index) in communication.transfer_target_user_ids"
+                    @click="onOpenUserInClassicClicked(user.id)"
+                    v-for="(user, index) in communication.transfer_target_users"
                   >
                     <span
                       class="text-blue cursor-pointer"
-                      :title="getUserName(getUser(userId))"
+                      :title="getUserName(user)"
                     >
                       <q-tooltip
                         class="item"
@@ -1040,9 +1060,9 @@
                         data-testid="comm-details-transferred-to-tooltip"
                         self="bottom middle"
                       >
-                        {{ getUserName(getUser(userId)) }}
+                        {{ user.name && user.name.toLowerCase().includes('_deleted_') ? 'Deleted User' : getUserName(user) }}
                       </q-tooltip>
-                      <user-display :user-id="userId" />
+                      <user-display :user="user"/>
                     </span>
                   </div>
                 </div>

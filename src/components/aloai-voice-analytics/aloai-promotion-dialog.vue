@@ -6,12 +6,10 @@
                       v-if="usagePercentage < 100 && isTrial">
                   🎁
                 </span>
-                <span class="ai-info-box-title">
-                  {{ modalContent.title }}
+                <span class="ai-info-box-title" v-html="modalContent.title">
                 </span>
             </div>
-            <p class="ai-info-box-content text-white">
-                {{ modalContent.message }}
+            <p class="ai-info-box-content text-white" v-html="modalContent.message">
             </p>
             <div class="ai-info-box-links">
                 <strong>Guides:</strong>
@@ -88,16 +86,8 @@ export default {
       return this.currentCompany?.used_transcription_min
     },
 
-    transcriptionRate () {
-      return this.profile?.rate?.transcription
-    },
-
     transcriptionEnabled () {
       return this.currentCompany?.transcription_settings?.call_transcription_enabled
-    },
-
-    overusageRestrictionEnabled () {
-      return this.currentCompany?.transcription_settings?.overusage_restriction_enabled
     },
 
     isTrial () {
@@ -127,16 +117,17 @@ export default {
       }
 
       if (this.usedMinutes >= this.includedMinutes) {
-        if (!this.overusageRestrictionEnabled) {
-          // If the plan is an AI plan, show cost-related messages.
+        const planType = this.currentCompany?.plan?.use_case
+        if (planType === 'iPro' || planType === 'uPro') {
+          const upgradeText = planType === 'uPro' ? 'or you can upgrade to xPro+Ai to include unlimited minutes' : 'or you can upgrade your plan to include more minutes'
           return {
-            title: `You’ve reached the ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. However, with Overusage Billing Restriction disabled, you can continue using the service seamlessly. Additional transcription minutes will be charged at just ${Math.round(Number(this.transcriptionRate) * 100)} cents/min.`,
+            title: `You've used all ${this.includedMinutes} transcription minutes included in your ${planType}+Ai plan this month. Don't worry, your minutes will reset on the 1st, ${upgradeText} and unlock additional features by reaching out to the Aloware Team at <a href="mailto:support@aloware.com" style="color: white; text-decoration: underline;">support@aloware.com</a>`,
             message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
           }
         }
 
         return {
-          title: `You've used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don't worry! You can easily purchase additional transcription minutes by reaching out to our CSM team. You can upgrade your plan to include more minutes and unlock additional features.`,
+          title: `You've used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. Don't worry, your minutes will reset on the 1st, or you can upgrade your plan to include more minutes and unlock additional features.`,
           message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
         }
       }

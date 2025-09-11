@@ -109,8 +109,7 @@
          v-if="communication.property === undefined">
       <div class="item d-flex flex-column"
            :class="[communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end']"
-           v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND))
-           && (communication.body || communication.attachments)">
+           v-if="communication.type === CommunicationTypes.SMS && (communication.body || communication.attachments)">
         <div v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
                :key="index">
@@ -199,9 +198,7 @@
 
       <div class="item"
            :class="[communication.type !== CommunicationTypes.NOTE ? 'max-width-380' : '']"
-           v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) &&
-           ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) ||
-           communication.direction !== CommunicationDirection.INBOUND)">
+           v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type)">
         <div class="inline r-2x message-body text-xs effect7"
              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
           <span class="arrow pull-top"
@@ -261,7 +258,7 @@
         </span>
 
         <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.INBOUND">
+              v-if="showBottomCommunicationInfo">
           <router-link
             :to="{ name: 'Communication', params: { contactId: contact.id , communicationId: communication.id }}">
             <information-circle-icon style="cursor: help;"
@@ -584,6 +581,20 @@ export default {
 
     shouldDisplayCommunication () {
       return (this.communication.property !== undefined && !this.excluded_audits.includes(this.communication.property)) || this.communication.property === undefined
+    },
+
+    showBottomCommunicationInfo () {
+      const { direction, type } = this.communication
+
+      if (direction === CommunicationDirection.OUTBOUND) {
+        return false
+      }
+
+      if (type === CommunicationTypes.NOTE) {
+        return false
+      }
+
+      return true
     }
   },
 

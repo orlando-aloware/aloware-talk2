@@ -8,7 +8,6 @@ import * as ActionNotificationsDefault from '../constants/action-notifications-d
 import * as Default from '../constants/default'
 import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
-import accountRegistration from './account-registration'
 import auth from './auth'
 import broadcast from './broadcast'
 import cache from './cache'
@@ -53,7 +52,6 @@ export default function (/* { ssrContext } */) {
       wallboard,
       cache,
       tagsModule,
-      accountRegistration,
       listsModule
     },
 

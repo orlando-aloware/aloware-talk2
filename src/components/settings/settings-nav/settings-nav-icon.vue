@@ -10,6 +10,7 @@ import mention from 'components/icons/inbox/mention-icon'
 import voicemail from 'components/icons/inbox/voicemail-icon'
 import record from 'components/icons/inbox/record-icon'
 import connection from 'components/icons/connection-test-icon'
+import contact from 'components/icons/contact-alt-icon'
 
 import inbound from 'components/icons/inbound-call-o-icon'
 import outbound from 'components/icons/outbound-call-o-icon'
@@ -41,7 +42,8 @@ export default {
     person,
     notification,
     document,
-    connection
+    connection,
+    contact
     /* eslint-enable */
   },
   props: {

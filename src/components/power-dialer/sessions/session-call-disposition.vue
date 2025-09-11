@@ -201,6 +201,7 @@ export default {
 
         if (dialerCommunication) {
           dialerCommunication.call_disposition_id = data.id
+          console.log('Setting dialer communication from session-call-disposition', dialerCommunication)
           this.setDialerCommunication(dialerCommunication)
         }
 
