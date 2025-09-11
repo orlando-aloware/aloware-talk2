@@ -129,6 +129,7 @@ import API from 'src/plugins/api/api'
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex'
 import { broadcastsMixin, companyTimezone } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
+import { HIGHLEVEL_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'broadcast-add-view',
@@ -236,7 +237,7 @@ export default {
     },
 
     footerComponent () {
-      const isIntegration = !isEmpty(this.source.integration?.list)
+      const isIntegration = !isEmpty(this.source.integration?.list) || this.source.integration?.name?.toLowerCase() === HIGHLEVEL_INTEGRATION
       const isIntegrationHubspot = isIntegration && this.source.integration.name === 'HubSpot'
 
       switch (true) {
@@ -538,6 +539,11 @@ export default {
 
             break
         }
+      }
+
+      // Handle HighLevel integration with search criteria
+      if (this.source.integration?.name.toLowerCase() === HIGHLEVEL_INTEGRATION) {
+        bulkMessage.highlevel_criteria = this.source.integration.highlevelSearchCriteria
       }
 
       API.V1.broadcasts[method](bulkMessage)
