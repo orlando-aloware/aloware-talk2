@@ -92,10 +92,12 @@ export default {
         return false
       }
 
-      const currentStatus2 = this.communication?.current_status2 || this.dialer?.communication?.current_status2
+      if (!this.communication) {
+        return false
+      }
 
       return (
-        (this.isIncomingLiveCall && this.isCallFishing && (this.isCallFishingMode || currentStatus2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW)) ||
+        (this.isIncomingLiveCall && this.isCallFishing && (this.isCallFishingMode || this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW)) ||
         (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')
       ) && !this.isParkedCall &&
         !this.isConnectedCall
@@ -141,7 +143,7 @@ export default {
     },
 
     isCallFishing () {
-      if (!this.communication.ring_group_id) {
+      if (!this.communication || !this.communication.ring_group_id) {
         return false
       }
 
@@ -150,15 +152,15 @@ export default {
       return ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
     },
     isCallFishingMode () {
-      if (this.callFishingQueue) {
-        return this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id) >= 0
+      if (!this.communication || !this.callFishingQueue) {
+        return false
       }
 
-      return false
+      return this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id) >= 0
     },
 
     isIgnored () {
-      if (_.isEmpty(this.callFishingQueue)) {
+      if (!this.communication || _.isEmpty(this.callFishingQueue)) {
         return true
       }
 
@@ -167,13 +169,13 @@ export default {
     },
 
     isIncomingLiveCall () {
-      const type = this.communication?.type || this.dialer?.communication?.type
-      const direction = this.communication?.direction || this.dialer?.communication?.direction
-      const currentStatus2 = this.communication?.current_status2 || this.dialer?.communication?.current_status2
+      if (!this.communication) {
+        return false
+      }
 
-      return type === CommunicationTypes.CALL &&
-        direction === CommunicationDirection.INBOUND &&
-        this.incomingCallStatuses.includes(currentStatus2)
+      return this.communication.type === CommunicationTypes.CALL &&
+        this.communication.direction === CommunicationDirection.INBOUND &&
+        this.incomingCallStatuses.includes(this.communication.current_status2)
     },
 
     isDialerAvailable () {
@@ -300,6 +302,10 @@ export default {
       e.stopImmediatePropagation()
     },
     onRejectCall (e) {
+      if (!this.communication) {
+        return
+      }
+
       this.isRejecting = true
       if (this.isCallFishingMode && this.isCallFishing) {
         this.removeFromCallFishingQueue(this.communication.id)
