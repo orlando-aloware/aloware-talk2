@@ -312,40 +312,7 @@ export default {
     deselectAllFields () {
       // Remove all fields
       this.$emit('change', [])
-    },
-
-    initializeDefaults () {
-      const defaultOrder = this.defaultFieldOrderWithCustomAttributes
-
-      // Only emit if current state is still using static defaults
-      const isUsingStaticDefaults = JSON.stringify(this.selectedFields) === JSON.stringify(DEFAULT_FIELD_ORDER)
-
-      if (isUsingStaticDefaults && this.attributeDictionaries.length > 0) {
-        this.$emit('change', [...defaultOrder])
-      }
     }
-  },
-
-  watch: {
-    // Watch for when custom attributes are loaded
-    attributeDictionaries: {
-      handler (newAttributes, oldAttributes) {
-        // Only initialize if we went from no attributes to having some
-        if (oldAttributes.length === 0 && newAttributes.length > 0) {
-          this.$nextTick(() => {
-            this.initializeDefaults()
-          })
-        }
-      },
-      immediate: false
-    }
-  },
-
-  mounted () {
-    // Initialize with custom attributes if using default state
-    this.$nextTick(() => {
-      this.initializeDefaults()
-    })
   }
 }
 </script>
