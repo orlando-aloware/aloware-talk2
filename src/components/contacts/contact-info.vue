@@ -190,7 +190,7 @@
         </q-tooltip>
         <merge-contact-icon />
       </b-button>
-      <b-button v-if="isAdmin"
+      <b-button v-if="isAdmin && !isFromTeamInbox"
                 :disabled="isExportingCommunications || isReadOnly"
                 class="custom-action-button my-1"
                 data-testid="contact-info-export-button"

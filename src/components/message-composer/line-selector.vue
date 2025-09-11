@@ -93,26 +93,30 @@ export default {
     ...mapGetters('contacts', ['contact']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
     ...mapState(['campaigns']),
-    ...mapState('TeamInbox', ['activeInbox', 'teamInboxCampaigns']),
+    ...mapState('TeamInbox', ['activeInbox', 'activeInboxId', 'teamInboxCampaigns']),
+
+    isAllInboxes () {
+      return this.$route.params.inboxId === ALL_INBOXES_ID
+    },
 
     /**
      * Returns the appropriate campaigns array based on whether we're in team inbox mode
      */
     campaignsToUse () {
-      if (this.teamInbox) {
+      if (this.teamInbox && !this.isAllInboxes) {
         // Active Team Inbox Campaigns
         return this.activeTeamInboxCampaigns
       }
 
-      if (this.shouldLimitAgentLinesVisibility) {
-        // Visible Campaigns (line management enhancements)
+      if (this.shouldLimitAgentLinesVisibility || this.isAllInboxes) {
+        // Visible Campaigns (line management enhancements) or all inboxes campaigns
         return this.campaigns.filter(
           campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
         )
       }
 
       // All Campaigns (no limitations)
-      return this.campaigns
+      return this.campaigns.filter(campaign => campaign.active)
     },
 
     /**
@@ -122,12 +126,10 @@ export default {
       return this
         .teamInboxCampaigns
         .filter(campaign => {
-          if (this.$route.params.inboxId === ALL_INBOXES_ID) {
-            return campaign.active === true
-          }
-
-          return this.activeInboxCampaignIds?.includes(campaign.id) ||
+          return campaign.active && (
+            this.activeInboxCampaignIds.includes(campaign.id) ||
             isIvrOrDeadEndCampaign(campaign)
+          )
         })
     },
 
@@ -210,6 +212,10 @@ export default {
     shouldLimitAgentLinesVisibility () {
       return this.hasRole(COMPANY_AGENT) &&
         this.hasCompanyTeamInboxLineManagementEnhancements
+    },
+
+    getAllInboxesSelectedInboxId () {
+      return this.$route.query.inboxId ? +this.$route.query.inboxId : null
     }
   },
 
@@ -243,6 +249,7 @@ export default {
     onShowMenu () {
       this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
     },
+
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : this.getPlaceholderText()

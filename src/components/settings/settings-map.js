@@ -291,6 +291,15 @@ const SettingsMap = {
     visible: true
   },
 
+  // CONTACT CUSTOMIZATION SETTINGS
+  'contact_customization': {
+    title: 'Contact Customization',
+    description: 'Customize the contact fields that are displayed in the About this Contact section.',
+    route: '/settings/contact',
+    hash_keyword: 'contact-customization',
+    visible: true
+  },
+
   // NOTIFICATION SETTINGS
   'my_calls': {
     title: 'Communication Notification - Calls',
