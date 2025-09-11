@@ -108,8 +108,8 @@ export default {
         return this.activeTeamInboxCampaigns
       }
 
-      if (this.shouldLimitAgentLinesVisibility) {
-        // Visible Campaigns (line management enhancements)
+      if (this.shouldLimitAgentLinesVisibility || this.isAllInboxes) {
+        // Visible Campaigns (line management enhancements) or all inboxes campaigns
         return this.campaigns.filter(
           campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
         )
