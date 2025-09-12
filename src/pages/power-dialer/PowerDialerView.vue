@@ -1348,7 +1348,7 @@ export default {
         if (this.$route.name === 'Power Dialer') {
           const hasFilters = this.filtersCount > 0
 
-          let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          const params = this.$jsonClone(typeof this.currentListFilters === 'string' ? {} : this.currentListFilters)
           console.log('🎯 PowerDialerView: calling onFetch from currentListFilters watcher')
 
           const csfFields = this.computedColumns.reduce((acc, column) => {
