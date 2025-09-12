@@ -6,6 +6,7 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { agentMixin, notificationMixin, userMixin } from 'src/plugins/mixins/index'
+import talk2Api from '../api/api'
 export default {
   mixins: [
     agentMixin,
@@ -91,6 +92,10 @@ export default {
         return false
       }
 
+      if (!this.communication) {
+        return false
+      }
+
       return (
         (this.isIncomingLiveCall && this.isCallFishing && (this.isCallFishingMode || this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW)) ||
         (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')
@@ -138,7 +143,7 @@ export default {
     },
 
     isCallFishing () {
-      if (!this.communication.ring_group_id) {
+      if (!this.communication || !this.communication.ring_group_id) {
         return false
       }
 
@@ -147,15 +152,15 @@ export default {
       return ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
     },
     isCallFishingMode () {
-      if (this.callFishingQueue) {
-        return this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id) >= 0
+      if (!this.communication || !this.callFishingQueue) {
+        return false
       }
 
-      return false
+      return this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id) >= 0
     },
 
     isIgnored () {
-      if (_.isEmpty(this.callFishingQueue)) {
+      if (!this.communication || _.isEmpty(this.callFishingQueue)) {
         return true
       }
 
@@ -164,6 +169,10 @@ export default {
     },
 
     isIncomingLiveCall () {
+      if (!this.communication) {
+        return false
+      }
+
       return this.communication.type === CommunicationTypes.CALL &&
         this.communication.direction === CommunicationDirection.INBOUND &&
         this.incomingCallStatuses.includes(this.communication.current_status2)
@@ -293,11 +302,16 @@ export default {
       e.stopImmediatePropagation()
     },
     onRejectCall (e) {
+      if (!this.communication) {
+        return
+      }
+
       this.isRejecting = true
       if (this.isCallFishingMode && this.isCallFishing) {
         this.removeFromCallFishingQueue(this.communication.id)
         this.isRejecting = false
         this.processRemoveFromNotification(this.communication)
+        this.ignoreFishing()
         e.stopImmediatePropagation()
         return
       }
@@ -313,6 +327,18 @@ export default {
       this.isRejecting = false
       this.processRemoveFromNotification(this.communication)
       e.stopImmediatePropagation()
+    },
+    async ignoreFishing () {
+      if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
+        try {
+          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
+        } catch (error) {
+          console.error('Failed to force terminate communication:', error)
+        }
+      }
+
+      this.$closeActionNotification('callFishing')
+      this.closeCallNotifications(this.id, this.communicationId)
     },
     onHangUpCall (e) {
       this.$VueEvent.fire('hangupCall')
