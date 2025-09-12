@@ -451,9 +451,13 @@
                   {{ contact[column.name] | displayBirthdate }}
                 </div>
                 <div class="ellipse"
+                     v-else-if="column.name.startsWith('csf_')">
+                  {{ getCustomFieldColumnValue(contact[column.name], column.name) }}
+                </div>
+                <div class="ellipse"
                      :class="getColumnClass(column.name, column.draggable)"
                      v-else>
-                  {{ getColumnValue(contact[column.name]) }}
+                  {{ getColumnValue(contact[column.name], contact, column.name) }}
                 </div>
               </td>
             </template>
@@ -1340,6 +1344,17 @@ export default {
           const hasFilters = this.filtersCount > 0
 
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+
+          const csfFields = this.computedColumns.reduce((acc, column) => {
+            if (column.name.startsWith('csf_')) {
+              acc.push(column.name)
+            }
+            return acc
+          }, [])
+          if (csfFields.length > 0) {
+            params.csf_fields = csfFields
+          }
+
           this.onFetch(params, hasFilters, true)
           this.$emit('onFiltersCount', this.currentListFilters)
         }

@@ -327,7 +327,8 @@ export default function (/* { ssrContext } */) {
       showAccountSelector: false,
       showAccountSelectorFullscreen: false,
       showAccountSelectorFirstLoad: false,
-      accesses: []
+      accesses: [],
+      attributeDictionaries: []
     },
 
     getters: {

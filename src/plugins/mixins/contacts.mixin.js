@@ -490,7 +490,17 @@ export default {
         this.setPreviousListId(this.id)
       }
 
-      console.log('>>> fetch firstLoad', firstLoad, 'sorts', this.sorts)
+      const csfFields = this.columns.reduce((acc, column) => {
+        if (column.name.startsWith('csf_')) {
+          acc.push(column.name)
+        }
+        return acc
+      }, [])
+
+      if (csfFields.length > 0) {
+        params.csf_fields = csfFields
+      }
+
       this.handleSortingParams(params, hasOrder, firstLoad)
 
       // add the event back
@@ -685,6 +695,18 @@ export default {
 
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
         powerQuery.task_status = this.pdFilters[this.activeFilter]
+      }
+
+      const csfFields = this.columns.reduce((acc, column) => {
+        if (column.name.startsWith('csf_')) {
+          acc.push(column.name)
+        }
+        return acc
+      }, [])
+
+      if (csfFields.length > 0) {
+        query.csf_fields = csfFields
+        powerQuery.csf_fields = csfFields
       }
 
       return this.isPowerDialer ? powerQuery : query

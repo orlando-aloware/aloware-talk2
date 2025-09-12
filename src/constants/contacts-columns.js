@@ -2,7 +2,8 @@ export const COLUMN_CATEGORIES = [
   'Default Information',
   'Contact Location',
   'Contact Relevance',
-  'Contact Communication Metadata'
+  'Contact Communication Metadata',
+  'Custom Fields'
 ]
 
 export const ALL_COLUMNS = [
