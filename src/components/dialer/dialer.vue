@@ -464,9 +464,9 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       this.removeUnownedLiveContactTask()
       console.log('Talk-Device: Call invite canceled', call)
+      this.connection = null
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial('Talk-Device.OnCancel')
-      this.connection = null
       this.$closeActionNotification('incomingCall')
     })
 
