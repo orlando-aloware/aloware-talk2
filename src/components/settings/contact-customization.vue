@@ -49,7 +49,7 @@
 <script>
 import SettingsMap from 'components/settings/settings-map'
 import ContactFieldsSelector from 'components/contacts/contact-fields-selector'
-import { DEFAULT_FIELD_ORDER } from 'src/constants/contact-fields-definitions'
+import { ContactFieldsHelper } from 'src/constants/contact-fields-definitions'
 import { mapActions, mapGetters } from 'vuex'
 import { settingsMixin } from 'src/plugins/mixins'
 
@@ -92,15 +92,20 @@ export default {
     loadAttributeDictionaries () {
       this.$axios.get('/api/v1/attribute-dictionary').then(res => {
         this.setAttributeDictionaries(res.data.data)
+        this.initializeSelectedFields(res.data.data)
       }).finally(() => {
         this.loadingAttributeDictionaries = false
       })
     },
 
-    initializeSelectedFields () {
-      this.selectedFields = this.profile.setting_contact_fields
-        ? [...this.profile.setting_contact_fields]
-        : [...DEFAULT_FIELD_ORDER]
+    initializeSelectedFields (attributes = null) {
+      if (this.profile.setting_contact_fields) {
+        this.selectedFields = [...this.profile.setting_contact_fields]
+      } else {
+        const attributesToUse = attributes || this.attributeDictionaries
+        const defaultOrder = ContactFieldsHelper.getDefaultFieldOrderWithCustomAttributes(attributesToUse)
+        this.selectedFields = [...defaultOrder]
+      }
     },
 
     onChange (newSelectedFields) {
@@ -121,7 +126,6 @@ export default {
   },
 
   created () {
-    this.initializeSelectedFields()
     this.loadAttributeDictionaries()
   }
 }

@@ -158,7 +158,7 @@
 import { mapActions, mapGetters } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
-import { CONTACT_FIELD_DEFINITIONS, ContactFieldsHelper, DEFAULT_FIELD_ORDER } from 'src/constants/contact-fields-definitions'
+import { CONTACT_FIELD_DEFINITIONS, ContactFieldsHelper } from 'src/constants/contact-fields-definitions'
 import LocationStateSelector from 'src/components/contacts/location-state-selector'
 import LocationCountrySelector from 'src/components/contacts/location-country-selector'
 import ContactInputField from 'src/components/contacts/contact-input-field'
@@ -263,7 +263,7 @@ export default {
     },
 
     visibleFields () {
-      const selectedFields = this.profile.setting_contact_fields || DEFAULT_FIELD_ORDER
+      const selectedFields = this.profile.setting_contact_fields || ContactFieldsHelper.getDefaultFieldOrderWithCustomAttributes(this.contactAttributes)
       return selectedFields.map(fieldKey => {
         // Handle custom attributes
         if (fieldKey.startsWith('custom_attribute_')) {
