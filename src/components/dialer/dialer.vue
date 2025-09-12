@@ -134,6 +134,7 @@ export default {
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
+        console.log('Setting dialer communication from dialer > updateCommunication', data)
         this.setDialerCommunication(data)
 
         const communication = this.dialer?.communication
@@ -431,7 +432,6 @@ export default {
 
       const communicationData = this.buildCommunicationFromCustomParameters()
       this.notificationShownFromCustomParams = false
-      let ringGroup = null
 
       if (communicationData) {
         if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
@@ -441,23 +441,10 @@ export default {
         } else {
           this.pendingNotificationData = communicationData
         }
-
-        if (communicationData.ring_group_id) {
-          ringGroup = this.getRingGroup(communicationData.ring_group_id)
-        }
-      }
-
-      if (ringGroup) {
-        this.checkForAutoAnswer(ringGroup)
       }
 
       this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
-          if (!ringGroup && res.data.ring_group_id) {
-            ringGroup = this.getRingGroup(res.data.ring_group_id)
-            this.checkForAutoAnswer(ringGroup)
-          }
-
           if (!this.notificationShownFromCustomParams) {
             this.$VueEvent.fire('new_in_app_call', res.data)
             this.processActionNotification(res.data, 'call')
@@ -477,9 +464,9 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       this.removeUnownedLiveContactTask()
       console.log('Talk-Device: Call invite canceled', call)
+      this.connection = null
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial('Talk-Device.OnCancel')
-      this.connection = null
       this.$closeActionNotification('incomingCall')
     })
 
@@ -494,13 +481,6 @@ export default {
   },
 
   methods: {
-    checkForAutoAnswer (ringGroup) {
-      if (ringGroup.auto_answer) {
-        this.answerCall()
-        this.$generalNotification('The call was answered automatically.', 'info')
-        this.playAudio()
-      }
-    },
     checkForcedStatus () {
       if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
         return
@@ -523,6 +503,7 @@ export default {
         return
       }
 
+      console.log('Setting dialer communication from dialer > forceStartOnWrapUp', this.profile.last_call)
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
       this.startWrapUpTimer()
@@ -659,6 +640,7 @@ export default {
           return Promise.resolve()
         }
 
+        console.log('Setting dialer communication from dialer > getCommunication', res.data)
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
@@ -1048,7 +1030,7 @@ export default {
         console.log('Talk-Connection: Call invite canceled', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
-        this.backToDial('Talk-Connection.OnCancel')
+        this.backToDial('Talk-Connection.OnCancel', false, true)
         this.$closeActionNotification('incomingCall')
       })
 

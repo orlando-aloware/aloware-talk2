@@ -812,7 +812,7 @@ export default {
 
         return res
       }).catch(err => {
-        if (err.response.status === 403) {
+        if (err.response && err.response.status === 403) {
           // No access to contact
           this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
           this.$generalNotification(err.response.data?.error || 'You do not have access to this contact', 'error')

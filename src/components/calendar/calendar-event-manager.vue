@@ -7,6 +7,7 @@
            :scrollable="!loading"
            :hide-footer="loading"
            :visible="showManager"
+           data-testid="calendar-event-manager-modal"
            @hidden="closeFiltersMenu">
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
@@ -26,7 +27,8 @@
       </h6>
     </template>
     <b-form class="p-3"
-            ref="scheduleForm">
+            ref="scheduleForm"
+            data-testid="calendar-event-manager-form">
       <b-row>
         <b-col>
           <b-form-group class="form-label"
@@ -35,7 +37,8 @@
               type="text"
               placeholder="Add title"
               v-model="schedule.text"
-              :disabled="!isEditable">
+              :disabled="!isEditable"
+              data-testid="calendar-event-manager-title-input">
             </b-form-input>
           </b-form-group>
         </b-col>
@@ -49,7 +52,8 @@
                         :state="validateState('type')">
             <communication-type-selector :from="calledFrom"
                                          :disabled="mode === 'edit'"
-                                         v-model="$v.schedule.type.$model">
+                                         v-model="$v.schedule.type.$model"
+                                         data-testid="calendar-event-manager-event-type-selector">
             </communication-type-selector>
           </b-form-group>
         </b-col>
@@ -65,6 +69,7 @@
               Type at least 3 characters to search in contacts
             </q-tooltip>
             <contact-selector v-model="$v.schedule.contact.$model.id"
+                              data-testid="calendar-event-manager-contact-selector"
                               @change="onContactChange"/>
           </b-form-group>
         </b-col>
@@ -76,7 +81,8 @@
                         label="User"
                         v-if="mode === 'edit'">
             <user-selector :disable="true"
-                           v-model="schedule.user.id">
+                           v-model="schedule.user.id"
+                           data-testid="calendar-event-manager-user-selector">
             </user-selector>
           </b-form-group>
         </b-col>
@@ -90,6 +96,7 @@
                               redirect-when-disabled
                               :contact-data="schedule.contact"
                               v-model="$v.schedule.contact.$model.id"
+                              data-testid="calendar-event-manager-contact-selector-edit"
                               @loaded="onContactsLoaded">
             </contact-selector>
           </b-form-group>
@@ -115,7 +122,8 @@
           <b-form-group class="checkbox-wrapper ml-1">
             <b-form-checkbox :value="true"
                              :unchecked-value="false"
-                             v-model="schedule.send_contact_reminder">
+                             v-model="schedule.send_contact_reminder"
+                             data-testid="calendar-event-manager-send-contact-reminder-checkbox">
               <span>Send reminder notification to the contact</span>
             </b-form-checkbox>
           </b-form-group>
@@ -129,11 +137,13 @@
             <date-selector :min-date="minDate"
                            v-model="$v.schedule.date.$model"
                            v-if="mode !== 'edit' || !schedule.is_past"
+                           data-testid="calendar-event-manager-date-selector"
                            @dateSelected="dateSelected">
             </date-selector>
             <b-form-input disabled
                           v-model="$v.schedule.date.$model"
-                          v-else>
+                          v-else
+                          data-testid="calendar-event-manager-date-input-disabled">
             </b-form-input>
           </b-form-group>
         </b-col>
@@ -145,11 +155,13 @@
                         :state="validateState('time')">
             <predefined-time-selector v-model="$v.schedule.time.$model"
                                       v-if="mode !== 'edit' || !schedule.is_past"
+                                      data-testid="calendar-event-manager-time-selector"
                                       @select="timeSelected">
             </predefined-time-selector>
             <b-form-input disabled
                           v-model="schedule.time"
-                          v-else>
+                          v-else
+                          data-testid="calendar-event-manager-time-input-disabled">
             </b-form-input>
           </b-form-group>
         </b-col>
@@ -160,11 +172,13 @@
                         label="Duration (minutes)">
             <predefined-time-duration-selector v-model="schedule.duration"
                                                v-if="mode !== 'edit' || !schedule.is_past"
+                                               data-testid="calendar-event-manager-duration-selector"
                                                @select="durationSelected">
             </predefined-time-duration-selector>
             <b-form-input disabled
                           v-model="schedule.duration"
-                          v-else>
+                          v-else
+                          data-testid="calendar-event-manager-duration-input-disabled">
             </b-form-input>
           </b-form-group>
         </b-col>
@@ -177,11 +191,13 @@
                         invalid-feedback="Please select a timezone for this event"
                         :state="validateState('timezone')">
             <timezone-selector v-model="$v.schedule.timezone.$model"
+                               data-testid="calendar-event-manager-timezone-selector"
                                @select="timezoneSelected">
             </timezone-selector>
 
             <div class="alert alert-warning px-2 py-1 mt-1 small"
-                 v-if="scheduleDateInCurrentTimezone && isEventTypeSelected && isContactSelected">
+                 v-if="scheduleDateInCurrentTimezone && isEventTypeSelected && isContactSelected"
+                 data-testid="calendar-event-manager-timezone-alert">
               <strong>In your local time:</strong> {{ scheduleDateInCurrentTimezone }}
             </div>
           </b-form-group>
@@ -194,7 +210,8 @@
                         label="Note">
             <b-form-textarea max-rows="4"
                              placeholder="Write a note for this event..."
-                             v-model="schedule.body">
+                             v-model="schedule.body"
+                             data-testid="calendar-event-manager-note-textarea">
             </b-form-textarea>
           </b-form-group>
         </b-col>
@@ -209,6 +226,7 @@
             <b-form-checkbox :value="true"
                              :unchecked-value="false"
                              v-model="sms_reminder_fields.enabled"
+                             data-testid="calendar-event-manager-sms-reminder-checkbox"
                              @change="onSmsReminderToggle">
               <span class="sms-reminder-label">Enable SMS reminder</span>
             </b-form-checkbox>
@@ -222,6 +240,7 @@
             <contact-line-selector :show-paused="false"
                                    :use-groups="false"
                                    v-model="$v.sms_reminder_fields.campaign_id.$model"
+                                   data-testid="calendar-event-manager-sms-line-selector"
                                    @select="lineSelected"
                                    @loaded="onLineComponentLoaded">
             </contact-line-selector>
@@ -229,12 +248,14 @@
 
           <b-form-group label="Time">
             <predefined-time-selector v-model="sms_reminder_fields.time"
+                                      data-testid="calendar-event-manager-sms-time-selector"
                                       @select="smsReminderTimeSelected">
             </predefined-time-selector>
           </b-form-group>
 
           <b-form-group label="Send (n) days before">
             <number-of-days-selector v-model="sms_reminder_fields.frequencies"
+                                     data-testid="calendar-event-manager-sms-days-selector"
                                      @select="smsReminderFrequencySelected">
             </number-of-days-selector>
           </b-form-group>
@@ -246,6 +267,7 @@
               <span class="text-danger sms-reminder-template-variables"
                     :key="item"
                     v-for="item in sms_reminder_fields.template_variables"
+                    data-testid="calendar-event-manager-sms-template-variable"
                     @click="appendSmsReminderTemplateVariable(item)">
                 {{ item }}
               </span>
@@ -255,7 +277,8 @@
                              rows="3"
                              max-rows="8"
                              no-auto-shrink
-                             v-model="$v.sms_reminder_fields.body.$model">
+                             v-model="$v.sms_reminder_fields.body.$model"
+                             data-testid="calendar-event-manager-sms-textarea">
             </b-form-textarea>
           </b-form-group>
         </b-col>
@@ -276,7 +299,8 @@
                             :options="appointmentOptions"
                             :disabled="!isEditable"
                             v-model="schedule.status"
-                            v-if="isAppointment"/>
+                            v-if="isAppointment"
+                            data-testid="calendar-event-manager-appointment-status-toggle"/>
               <q-btn-toggle class="border w-100"
                             no-caps
                             dense
@@ -287,7 +311,8 @@
                             :options="reminderOptions"
                             :disabled="!isEditable"
                             v-model="schedule.status"
-                            v-else/>
+                            v-else
+                            data-testid="calendar-event-manager-reminder-status-toggle"/>
             </div>
           </b-form-group>
         </b-col>
@@ -298,16 +323,19 @@
       <div class="mt-2 d-flex w-100">
         <button class="btn btn-sm bg-danger text-white"
                 v-if="isDeletable"
+                data-testid="calendar-event-manager-remove-button"
                 @click="deleteSchedule(schedule.id)">
           Remove
         </button>
         <div class="ml-auto">
             <button class="btn btn-sm btn-outline-dark mr-2"
+                    data-testid="calendar-event-manager-cancel-button"
                     @click.prevent="onCancelClicked">
               {{ cancelButtonText }}
             </button>
             <button class="btn btn-sm bg-primary text-white"
                     :disabled="isSaving || !isValid"
+                    data-testid="calendar-event-manager-save-button"
                     @click.prevent="saveSchedule">
               <q-spinner-bars color="white"
                               v-if="isSaving" />

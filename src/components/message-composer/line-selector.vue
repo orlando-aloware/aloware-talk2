@@ -93,26 +93,30 @@ export default {
     ...mapGetters('contacts', ['contact']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
     ...mapState(['campaigns']),
-    ...mapState('TeamInbox', ['activeInbox', 'activeInboxId', 'teamInboxCampaigns', 'inboxes']),
+    ...mapState('TeamInbox', ['activeInbox', 'activeInboxId', 'teamInboxCampaigns']),
+
+    isAllInboxes () {
+      return this.$route.params.inboxId === ALL_INBOXES_ID
+    },
 
     /**
      * Returns the appropriate campaigns array based on whether we're in team inbox mode
      */
     campaignsToUse () {
-      if (this.teamInbox) {
+      if (this.teamInbox && !this.isAllInboxes) {
         // Active Team Inbox Campaigns
         return this.activeTeamInboxCampaigns
       }
 
-      if (this.shouldLimitAgentLinesVisibility) {
-        // Visible Campaigns (line management enhancements)
+      if (this.shouldLimitAgentLinesVisibility || this.isAllInboxes) {
+        // Visible Campaigns (line management enhancements) or all inboxes campaigns
         return this.campaigns.filter(
           campaign => agentAvailableCampaignsCallback(campaign, this.profile.id)
         )
       }
 
       // All Campaigns (no limitations)
-      return this.campaigns
+      return this.campaigns.filter(campaign => campaign.active)
     },
 
     /**
@@ -122,12 +126,10 @@ export default {
       return this
         .teamInboxCampaigns
         .filter(campaign => {
-          const inboxCampaigns = this.$route.params.inboxId === ALL_INBOXES_ID
-            ? this.getCampaignIdsByInboxId(+this.$route.query.inboxId)
-            : this.activeInboxCampaignIds
-
-          return inboxCampaigns.includes(campaign.id) ||
+          return campaign.active && (
+            this.activeInboxCampaignIds.includes(campaign.id) ||
             isIvrOrDeadEndCampaign(campaign)
+          )
         })
     },
 
@@ -379,13 +381,6 @@ export default {
           this.setLineIncomingNumberLoading(false)
         })
       }
-    },
-
-    getCampaignIdsByInboxId (inboxId) {
-      const inbox = this.inboxes.find(inbox => inbox.id === inboxId)
-      const inboxCampaignIds = inbox?.campaign_ids || []
-      const inboxCallWaitingCampaignIds = inbox?.campaign_ids_as_call_waiting_ring_group || []
-      return [...inboxCampaignIds, ...inboxCallWaitingCampaignIds]
     }
   },
 
