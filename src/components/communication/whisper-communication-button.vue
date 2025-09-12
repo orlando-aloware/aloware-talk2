@@ -83,6 +83,9 @@ export default {
     },
 
     whisper () {
+      // Set flag to indicate this is a whisper call
+      this.$store.dispatch('setDialerIsBargeOrWhisperCall', true)
+
       this.$VueEvent.fire('make_new_call', {
         phone_number: `whisper:${this.communication.id}`
       })

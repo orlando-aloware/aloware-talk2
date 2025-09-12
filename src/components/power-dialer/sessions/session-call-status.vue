@@ -1464,6 +1464,16 @@ export default {
           }
           break
         case 'WRAP_UP':
+          // Check if this is a barge/whisper call
+          const isBargeOrWhisperCall = this.dialer?.isBargeOrWhisperCall
+
+          // Skip force disposal for barge/whisper calls
+          if (isBargeOrWhisperCall) {
+            this.wrapUp = false
+            this.$VueEvent.fire('endWrapUp')
+            return
+          }
+
           // if task is manually skipped through the Next button (or no wrap up)
           // end the wrap up
           if (this.skipWrapUp || (this.redialRequired && this.wrapUpSeconds === -1 && !this.isForcedToDisposeAndNotDisposed)) {

@@ -36,6 +36,11 @@ export default {
     },
 
     isNotDisposed () {
+      // Skip force disposal for barge/whisper calls
+      if (this.isBargeOrWhisperCall) {
+        return false
+      }
+
       const isForceCallDisposition = this.isForcedCallDisposition && !this.isCallDisposed
       const isForceContactDisposition = this.isForcedContactDisposition && !this.isContactDisposed
 
@@ -91,6 +96,11 @@ export default {
 
     // get force disposition status from current user session
     checkDialerForceDisposition () {
+      // Skip force disposition for barge/whisper calls
+      if (this.isBargeOrWhisperCall) {
+        return false
+      }
+
       const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
         !this.dialer?.contact?.disposition_status_id
       const shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
@@ -100,6 +110,11 @@ export default {
 
     // get force disposition from cached last_call
     checkForceDisposition () {
+      // Skip force disposition for barge/whisper calls
+      if (this.isBargeOrWhisperCall) {
+        return false
+      }
+
       const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
         !this.profile?.last_call?.contact?.disposition_status_id
       let shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
@@ -116,6 +131,11 @@ export default {
 
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
+    },
+
+    // Check if the current call is a barge or whisper call
+    isBargeOrWhisperCall () {
+      return this.dialer?.isBargeOrWhisperCall || false
     },
 
     isForcedSmsSending () {

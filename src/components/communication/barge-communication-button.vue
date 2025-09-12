@@ -84,6 +84,9 @@ export default {
     },
 
     barge () {
+      // Set flag to indicate this is a barge call
+      this.$store.dispatch('setDialerIsBargeOrWhisperCall', true)
+
       this.$VueEvent.fire('make_new_call', {
         phone_number: `barge:${this.communication.id}`
       })
