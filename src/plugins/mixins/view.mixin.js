@@ -5,6 +5,7 @@ import { COUNT_FIELDS } from 'src/constants/count-fields-default'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import talk2Api from 'src/plugins/api/api'
 import { mapFields } from 'vuex-map-fields'
+import { ContactAttributeTypeEnum } from 'components/contacts/contact-attributes/enums/contact-attribute-type-enum'
 
 export default {
   inject: [
@@ -28,7 +29,8 @@ export default {
       clicked: false,
       isSelectedAll: false,
       pdViewListeners: {},
-      bulkViewListeners: {}
+      bulkViewListeners: {},
+      ContactAttributeType: ContactAttributeTypeEnum
     }
   },
 
@@ -61,6 +63,10 @@ export default {
     ...mapGetters('powerDialer', [
       'myQueueId'
     ]),
+
+    ...mapGetters({
+      attributeDictionaries: 'getAttributeDictionaries'
+    }),
 
     isMainView () {
       const isListPages = this.isContacts || this.isPowerDialer
@@ -170,6 +176,15 @@ export default {
     listItemsTotalContacts () {
       const data = get(this.fixedContactsData, `data`, null)
       return data.length || 0
+    },
+
+    mappedAttributeDictionaries () {
+      return this.attributeDictionaries.reduce((acc, current) => {
+        if (current.id && !acc[`csf_${current.id}`]) {
+          acc[`csf_${current.id}`] = current
+        }
+        return acc
+      }, {})
     }
   },
 
@@ -474,13 +489,37 @@ export default {
         Object.keys(columnValue).length
     },
 
-    getColumnValue (value) {
+    getColumnValue (value, contact = null, columnName = null) {
       if (typeof value === 'boolean') {
         return value ? 'Yes' : 'No'
       }
 
       if (typeof value !== 'undefined' && value !== 0) {
         return value.toString()
+      }
+
+      return value === null
+        ? '-'
+        : value
+    },
+
+    getCustomFieldColumnValue (value, columnName = '') {
+      if (value === null || value === undefined || typeof value === 'undefined') {
+        return '-'
+      }
+
+      try {
+        const attributeType = this.mappedAttributeDictionaries[columnName]?.type ?? this.ContactAttributeType.TEXT
+
+        value = JSON.parse(value)
+
+        if (attributeType === this.ContactAttributeType.DATE_PICKER && value) {
+          value = moment(parseInt(value)).utc().format('DD/MM/YYYY')
+        }
+
+        return value
+      } catch (err) {
+        // failed to parse custom field value, do nothing
       }
 
       return value === null

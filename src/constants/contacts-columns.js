@@ -2,7 +2,8 @@ export const COLUMN_CATEGORIES = [
   'Default Information',
   'Contact Location',
   'Contact Relevance',
-  'Contact Communication Metadata'
+  'Contact Communication Metadata',
+  'Custom Fields'
 ]
 
 export const ALL_COLUMNS = [
@@ -220,7 +221,7 @@ export const ALL_COLUMNS = [
     label: 'Last Inbound Engagement',
     category: 3,
     order: 19,
-    sortable: false,
+    sortable: true,
     draggable: true,
     resizable: true,
     default: false
@@ -230,7 +231,7 @@ export const ALL_COLUMNS = [
     label: 'Last Outbound Engagement',
     category: 3,
     order: 20,
-    sortable: false,
+    sortable: true,
     draggable: true,
     resizable: true,
     default: false

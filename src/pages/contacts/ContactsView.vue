@@ -397,6 +397,7 @@
                  :last-page="fixedContactsData.last_page"
                  :useEmptySlot="canSeeAddContacts && canAddContacts && isEmpty"
                  :total-rows="totalRows"
+                 :start-order="startOrder"
                  v-if="listItemsHasData"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
@@ -676,6 +677,10 @@
                   {{ contact[column.name] | displayBirthdate }}
                 </div>
                 <div class="ellipse"
+                     v-else-if="column.name.startsWith('csf_')">
+                  {{ getCustomFieldColumnValue(contact[column.name], column.name) }}
+                </div>
+                <div class="ellipse"
                      :class="getColumnClass(column.name, column.draggable)"
                      v-else>
                   {{ getColumnValue(contact[column.name]) }}
@@ -782,6 +787,7 @@ import _ from 'lodash'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
@@ -999,6 +1005,8 @@ export default {
     ...mapState('auth', [
       'profile'
     ]),
+
+    ...mapFields('settings', ['contactsListSortPreference']),
 
     dynamicListHubSpotMessage () {
       let text = 'This is a list managed by HubSpot.'
@@ -1224,6 +1232,10 @@ export default {
         return ''
       }
       return `${user.first_name} ${user.last_name}`.trim()
+    },
+
+    startOrder () {
+      return this.contactsListSortPreference.contacts
     }
   },
 
@@ -1395,6 +1407,7 @@ export default {
     },
 
     onSortByField (sorts) {
+      this.contactsListSortPreference.contacts = sorts
       this.$emit('sort', sorts)
     },
 
