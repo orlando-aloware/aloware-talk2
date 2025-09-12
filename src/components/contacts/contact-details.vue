@@ -26,6 +26,7 @@
                                          data-testid="contact-conversation-insights"
                                          :is-read-only="isReadOnly"
                                          :from-team-inbox="fromTeamInbox"
+                                         :team-inbox-id="teamInboxId"
                                          v-if="contact && shouldSeeExperimentalXproAiFeatures" />
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"

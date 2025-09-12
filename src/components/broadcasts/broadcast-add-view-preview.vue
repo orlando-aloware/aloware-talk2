@@ -56,6 +56,7 @@ import Waveform from 'src/components/waveform.vue'
 import { companyTimezone } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import { isEmpty } from 'lodash'
+import { HIGHLEVEL_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'broadcast-add-view-preview',
@@ -125,7 +126,10 @@ export default {
         case !isEmpty(this.source.list):
           return this.source.list.name
         case !isEmpty(this.source.integration):
-          return this.source.integration.list.name
+          if (this.source.integration.name.toLowerCase() === HIGHLEVEL_INTEGRATION) {
+            return 'HighLevel Search Criteria'
+          }
+          return this.source.integration.list?.name || ''
         default:
           return ''
       }

@@ -9,6 +9,7 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_ABANDONED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_UNANSWERED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT, COMPANY_REPORTER_ACCESS } from 'src/constants/roles'
+import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
 
 export default {
   mixins: [userMixin],
@@ -255,33 +256,50 @@ export default {
 
     checkCommunicationMatchesInboxFilters (filter, communication) {
       if (filter.unread_only === true &&
-        communication.inbox_unread_count === 0) {
+        communication.inbox_unread_count === 0 &&
+        !this.communicationInProgress(communication)) {
         return false
       }
 
-      if (filter.types?.length) {
-        const selectedTypesMap = {
+      if (filter.channels?.length) {
+        const selectedChannelsMap = {
           [CommunicationTypes.CALL_TYPE]: CommunicationTypes.CALL,
           [CommunicationTypes.SMS_TYPE]: CommunicationTypes.SMS,
           [CommunicationTypes.RVM_TYPE]: CommunicationTypes.RVM
         }
         // checks if communication type is present in the selected types
-        if (!filter.types.some((type) => selectedTypesMap[type] === communication.type)) {
+        if (!filter.channels.some((channel) => selectedChannelsMap[channel] === communication.type)) {
           return false
         }
       }
 
-      if (filter.direction === 'inbound' &&
-        communication.direction !== CommunicationDirections.INBOUND) {
-        return false
+      if (filter.directions?.length) {
+        if (communication.direction === CommunicationDirections.INBOUND && !filter.directions.includes('inbound')) {
+          return false
+        }
+
+        if (communication.direction === CommunicationDirections.OUTBOUND && !filter.directions.includes('outbound')) {
+          return false
+        }
       }
 
-      if (filter.direction === 'outbound' &&
-        communication.direction !== CommunicationDirections.OUTBOUND) {
+      if (filter.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
         return false
       }
 
       return true
+    },
+
+    communicationInProgress (communication) {
+      if (communication.type !== CommunicationTypes.CALL) {
+        return false
+      }
+
+      if (this.activeFilters.my_contact && !this.communicationContactOwnedByCurrentUser(communication)) {
+        return false
+      }
+
+      return ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
     },
 
     checkCommunicationMatchesUserAccessibility (communication, teamInbox = false) {
@@ -355,10 +373,6 @@ export default {
 
       // checks if communication matches user communication visibility
       if (this.profile.communications_visibility === CommunicationAccessTypes.COMMUNICATIONS_OWNED_ONLY) {
-        if (communication.direction === CommunicationDirections.INBOUND && teamInbox) {
-          return true
-        }
-
         if (
           communication.user_id &&
           communication.user_id !== this.profile.id

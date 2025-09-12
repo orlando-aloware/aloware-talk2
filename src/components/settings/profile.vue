@@ -122,35 +122,49 @@
           <b-form-group
             label="Password"
             class="form-label">
-            <b-form-input
-              type="password"
-              placeholder="New Password"
-              autocomplete="off"
-              :state="validateState('password')"
-              v-model.trim="$v.user.password.$model"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'password')">
-            </b-form-input>
-            <b-form-invalid-feedback v-if="!$v.user.password.minLength">
-              <b-icon class="mr-xs text-red"
-                      icon="x">
+            <div class="password-input-container">
+              <b-form-input
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="New Password"
+                autocomplete="off"
+                :state="validateState('password')"
+                v-model.trim="$v.user.password.$model"
+                @input="(eventPayload) => onUpdateFields(eventPayload, 'password')">
+              </b-form-input>
+              <b-icon
+                :icon="showPassword ? 'eye-slash' : 'eye'"
+                class="password-toggle-icon"
+                @click="togglePasswordVisibility">
               </b-icon>
-              Password must be at least 8 character length.
-            </b-form-invalid-feedback>
-
-            <b-form-invalid-feedback v-if="!$v.user.password.passwordCases">
-              <b-icon class="mr-xs text-red"
-                      icon="x">
-              </b-icon>
-              Must contain upper and lower case letters
-            </b-form-invalid-feedback>
-
-            <b-form-invalid-feedback v-if="!$v.user.password.passwordDigit">
-              <b-icon class="mr-xs text-red"
-                      icon="x">
-              </b-icon>
-              Include at least one numerical digit
-            </b-form-invalid-feedback>
+            </div>
           </b-form-group>
+
+          <!-- Password validations moved outside form-group to prevent interference -->
+          <div class="password-validations" v-if="showPasswordFields">
+            <div class="validation-message" :class="getPasswordValidationClass($v.user.password.minLength)">
+              <b-icon :class="getPasswordValidationIconClass($v.user.password.minLength)"
+                      :icon="getPasswordValidationIcon($v.user.password.minLength)"></b-icon>
+              Password must be at least 12 character length.
+            </div>
+
+            <div class="validation-message" :class="getPasswordValidationClass($v.user.password.passwordCases)">
+              <b-icon :class="getPasswordValidationIconClass($v.user.password.passwordCases)"
+                      :icon="getPasswordValidationIcon($v.user.password.passwordCases)"></b-icon>
+              Must contain upper and lower case letters
+            </div>
+
+            <div class="validation-message" :class="getPasswordValidationClass($v.user.password.passwordDigit)">
+              <b-icon :class="getPasswordValidationIconClass($v.user.password.passwordDigit)"
+                      :icon="getPasswordValidationIcon($v.user.password.passwordDigit)"></b-icon>
+              Include at least one numerical digit
+            </div>
+
+            <div class="validation-message" :class="getPasswordValidationClass($v.user.password.passwordSpecialCharacter)">
+              <b-icon :class="getPasswordValidationIconClass($v.user.password.passwordSpecialCharacter)"
+                      :icon="getPasswordValidationIcon($v.user.password.passwordSpecialCharacter)"></b-icon>
+              Include at least one special character
+            </div>
+          </div>
         </b-col>
         <b-col
           sm="12"
@@ -159,21 +173,31 @@
             class="form-label"
             label="Password Confirmation"
           >
-            <b-form-input
-              type="password"
-              placeholder="Password Confirmation"
-              autocomplete="off"
-              :state="validateState('password_confirmation')"
-              v-model.trim="$v.user.password_confirmation.$model"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'password_confirmation')">
-            </b-form-input>
-            <b-form-invalid-feedback v-if="!$v.user.password_confirmation.sameAsPassword">
-              <b-icon class="mr-xs text-red"
-                      icon="x">
+            <div class="password-input-container">
+              <b-form-input
+                :type="showPasswordConfirmation ? 'text' : 'password'"
+                placeholder="Password Confirmation"
+                autocomplete="off"
+                :state="validateState('password_confirmation')"
+                v-model.trim="$v.user.password_confirmation.$model"
+                @input="(eventPayload) => onUpdateFields(eventPayload, 'password_confirmation')">
+              </b-form-input>
+              <b-icon
+                :icon="showPasswordConfirmation ? 'eye-slash' : 'eye'"
+                class="password-toggle-icon"
+                @click="togglePasswordConfirmationVisibility">
               </b-icon>
-              The passwords don't match
-            </b-form-invalid-feedback>
+            </div>
           </b-form-group>
+
+          <!-- Password confirmation validation moved outside form-group -->
+          <div class="password-validations" v-if="showPasswordFields">
+            <div class="validation-message" :class="getPasswordConfirmationValidationClass($v.user.password_confirmation.sameAsPassword)">
+              <b-icon :class="getPasswordConfirmationValidationIconClass($v.user.password_confirmation.sameAsPassword)"
+                      :icon="getPasswordConfirmationValidationIcon($v.user.password_confirmation.sameAsPassword)"></b-icon>
+              {{ getPasswordConfirmationText($v.user.password_confirmation.sameAsPassword) }}
+            </div>
+          </div>
         </b-col>
       </b-form-row>
 
@@ -702,6 +726,7 @@ export default {
   validations () {
     const passwordCases = (pass) => !helpers.req(pass) || (/[a-z]/.test(pass) && /[A-Z]/.test(pass))
     const passwordDigit = (pass) => !helpers.req(pass) || /\d/.test(pass)
+    const passwordSpecialCharacter = (pass) => !helpers.req(pass) || /[^\p{L}\p{N}\s]/u.test(pass)
 
     return {
       user: {
@@ -721,9 +746,10 @@ export default {
           validPhone: (value) => this.$options.filters.fixPhone(value) !== false
         },
         password: {
-          minLength: minLength(8),
+          minLength: minLength(12),
           passwordCases,
-          passwordDigit
+          passwordDigit,
+          passwordSpecialCharacter
         },
         password_confirmation: {
           sameAsPassword: sameAs('password')
@@ -741,6 +767,8 @@ export default {
   data () {
     return {
       showPasswordFields: false,
+      showPassword: false,
+      showPasswordConfirmation: false,
       selected: '',
       status: '',
       options: [
@@ -809,6 +837,48 @@ export default {
 
     updateSelectedNumberCompanyCard (number) {
       this.selectedNumberCompanyCard = number
+    },
+
+    togglePasswordVisibility () {
+      this.showPassword = !this.showPassword
+    },
+
+    togglePasswordConfirmationVisibility () {
+      this.showPasswordConfirmation = !this.showPasswordConfirmation
+    },
+
+    getPasswordValidationClass (validationRule) {
+      return {
+        'valid': validationRule && this.user.password,
+        'invalid': !validationRule || !this.user.password
+      }
+    },
+
+    getPasswordConfirmationValidationClass (validationRule) {
+      return {
+        'valid': validationRule && this.user.password_confirmation,
+        'invalid': !validationRule || !this.user.password_confirmation
+      }
+    },
+
+    getPasswordValidationIcon (validationRule) {
+      return (validationRule && this.user.password) ? 'check' : 'x'
+    },
+
+    getPasswordConfirmationValidationIcon (validationRule) {
+      return (validationRule && this.user.password_confirmation) ? 'check' : 'x'
+    },
+
+    getPasswordValidationIconClass (validationRule) {
+      return (validationRule && this.user.password) ? 'mr-xs text-green-500' : 'mr-xs text-red'
+    },
+
+    getPasswordConfirmationValidationIconClass (validationRule) {
+      return (validationRule && this.user.password_confirmation) ? 'mr-xs text-green-500' : 'mr-xs text-red'
+    },
+
+    getPasswordConfirmationText (validationRule) {
+      return (validationRule && this.user.password_confirmation) ? 'The passwords match' : "The passwords don't match"
     }
   },
 
@@ -817,6 +887,8 @@ export default {
       this.user.password = ''
       this.user.password_confirmation = ''
       this.showPasswordFields = false
+      this.showPassword = false
+      this.showPasswordConfirmation = false
     })
   },
 
@@ -824,6 +896,8 @@ export default {
     'showPasswordFields': function () {
       this.user.password = ''
       this.user.password_confirmation = ''
+      this.showPassword = false
+      this.showPasswordConfirmation = false
       this.updateFormValidity()
     },
 
@@ -843,5 +917,50 @@ export default {
 
 .company-card-name {
   height: 39px;
+}
+
+.password-input-container {
+  position: relative;
+  display: block;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6c757d;
+  z-index: 1;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-icon:hover {
+  color: #495057;
+}
+
+.password-input-container .form-control {
+  padding-right: 40px;
+  height: calc(1.5em + 0.75rem + 2px);
+}
+
+.password-validations {
+  margin-top: 8px;
+}
+
+.validation-message {
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.validation-message.valid {
+  color: #28a745;
+}
+
+.validation-message.invalid {
+  color: #dc3545;
 }
 </style>

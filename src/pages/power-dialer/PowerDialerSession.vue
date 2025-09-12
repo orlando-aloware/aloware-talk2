@@ -60,8 +60,18 @@
         <div>Preparing session...</div>
       </div>
     </template>
-    <appointment-form-modal :contact="contact">
-    </appointment-form-modal>
+    <calendar-event-manager
+      modal-id="appointment-modal"
+      called-from="appointment-modal"
+      :contact="contact"
+      :hide-event-type-selector="true"
+      :hide-contact-selector="true"
+      :default-event-type="12"
+      save-button-text="Add Event"
+      saving-text="Adding Event..."
+      cancel-button-text="Close"
+      :simple-mode="true"
+    />
     <contact-add-reminder-modal/>
   </b-overlay>
 </template>
@@ -74,7 +84,7 @@ import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar
 import SessionCallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
 import SessionCallStatus from 'src/components/power-dialer/sessions/session-call-status'
 import SessionContactPage from 'src/components/power-dialer/sessions/session-contact-page'
-import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
+import CalendarEventManager from 'src/components/calendar/calendar-event-manager.vue'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
@@ -92,7 +102,7 @@ export default {
     SessionCallDisposition,
     SessionCallStatus,
     SessionContactPage,
-    AppointmentFormModal,
+    CalendarEventManager,
     ContactAddReminderModal
   },
 

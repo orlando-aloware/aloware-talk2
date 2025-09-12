@@ -77,7 +77,7 @@ export default {
     },
 
     isDeletedUser () {
-      return isDeleted(this.displayUser)
+      return isDeleted(this.displayUser) || (this.displayUser.name && this.displayUser.name.toLowerCase().includes('_deleted_'))
     },
 
     isAiAgent () {

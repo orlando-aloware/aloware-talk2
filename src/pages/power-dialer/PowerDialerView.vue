@@ -565,35 +565,35 @@
 
 <script>
 
-import { mapFields } from 'vuex-map-fields'
-import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
-import ContactsScreen from 'src/components/contacts/contacts-screen'
+import ConfirmDialog from 'components/confirm-dialog'
+import ContactCreateModal from 'components/contacts/contact-create-modal'
+import RefreshIcon from 'components/icons/contacts/refresh-icon'
+import TrashOIcon from 'components/icons/trash-o-icon'
+import { get, isEmpty, isEqual } from 'lodash'
+import Breadcrumbs from 'src/components/breadcrumbs'
+import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
+import ContactsFilters from 'src/components/contacts/contacts-filters'
+import ContactsScreen from 'src/components/contacts/contacts-screen'
+import Datatable from 'src/components/datatable'
 import PowerDialerFilter from 'src/components/power-dialer/details/power-dialer-filters'
 import SummaryInfoLabels from 'src/components/power-dialer/details/summary-info-labels'
-import Datatable from 'src/components/datatable'
-import SearchList from 'src/components/search'
-import StartDialSessionSettings from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
 import PowerDialerBulkAddReportModal from 'src/components/power-dialer/power-dialer-bulk-add-report-modal'
-import ContactsFilters from 'src/components/contacts/contacts-filters'
-import Breadcrumbs from 'src/components/breadcrumbs'
-import TrashOIcon from 'components/icons/trash-o-icon'
-import ConfirmDialog from 'components/confirm-dialog'
-import BulkActionMenu from 'src/components/bulk-action-menu'
-import ContactCreateModal from 'components/contacts/contact-create-modal'
-import talk2Api from 'src/plugins/api/api'
-import RefreshIcon from 'components/icons/contacts/refresh-icon'
+import StartDialSessionSettings from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
+import SearchList from 'src/components/search'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
-import { isEqual, get, isEmpty } from 'lodash'
+import { PD_MAX_FILTER_LG } from 'src/constants/viewport-sizes'
+import talk2Api from 'src/plugins/api/api'
 import {
   aclMixin,
-  viewMixin,
   avatarMixin,
-  powerDialerMixin,
+  kycMixin,
   powerDialerInitMixin,
-  kycMixin
+  powerDialerMixin,
+  viewMixin
 } from 'src/plugins/mixins'
-import { PD_MAX_FILTER_LG } from 'src/constants/viewport-sizes'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'PowerDialerView',
@@ -1321,7 +1321,9 @@ export default {
   watch: {
     '$route.params.filter': {
       handler () {
+        console.log('🎯 PowerDialerView: $route.params.filter watcher triggered', { route: this.$route.name })
         if (!this.$route.name.includes('Contact')) {
+          console.log('🎯 PowerDialerView: calling init(false) from $route.params.filter watcher')
           this.init(false)
         }
       },
@@ -1329,7 +1331,9 @@ export default {
     },
 
     '$route.params.id': function (newId, oldId) {
+      console.log('🎯 PowerDialerView: $route.params.id watcher triggered', { newId, oldId, route: this.$route.name })
       if (!this.$route.name.includes('Contact')) {
+        console.log('🎯 PowerDialerView: calling init(true) from $route.params.id watcher')
         this.init(true)
       }
 
@@ -1340,10 +1344,12 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function (val) {
+        console.log('🎯 PowerDialerView: currentListFilters watcher triggered', { route: this.$route.name, filtersCount: this.filtersCount })
         if (this.$route.name === 'Power Dialer') {
           const hasFilters = this.filtersCount > 0
 
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          console.log('🎯 PowerDialerView: calling onFetch from currentListFilters watcher')
 
           const csfFields = this.computedColumns.reduce((acc, column) => {
             if (column.name.startsWith('csf_')) {

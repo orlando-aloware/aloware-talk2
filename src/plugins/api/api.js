@@ -429,6 +429,10 @@ const talk2Api = {
          * @returns {Promise<axios.AxiosResponse<{success: boolean, data: object>>}
          */
         getContactConversationThreads (contactId) {
+          if (!contactId) {
+            return null
+          }
+
           return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/conversation-threads/${contactId}`)
         }
       },
@@ -442,6 +446,12 @@ const talk2Api = {
       pipedrive: {
         getFilters () {
           return window.axios.get(`${suffixV1}integration/pipedrive/filters`)
+        }
+      },
+
+      highlevel: {
+        getSearchOptions () {
+          return window.axios.get(`${suffixV2}contacts-list/highlevel-search-options`)
         }
       }
 
@@ -676,24 +686,6 @@ const talk2Api = {
     dialer: {
       sendVmDrop (params) {
         return window.axios.post(`${suffixV1}dialer/play-prerecorded-voicemail`, params)
-      }
-    },
-
-    accountRegistration: {
-      getPreSignupDetails (params) {
-        return window.axios.get(`/api/admin/company-registration/pre-signup-prefill/${params.verification_token}`)
-      },
-
-      getSSUData () {
-        return window.axios.get(`/api/v1/company/ssu/get`)
-      },
-
-      save (payload) {
-        return window.axios.post('/api/admin/company-registration', payload)
-      },
-
-      update (params, payload) {
-        return window.axios.patch(`/api/admin/company-registration/${params.preSignupId}`, payload)
       }
     },
 
@@ -977,6 +969,18 @@ const talk2Api = {
         },
         importFilterToPowerDialer (target, params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-pipedrive-filter/${target}`, params)
+        }
+      },
+
+      highlevel: {
+        importCriteria (params) {
+          return window.axios.post(`${suffixV2}contacts-list/import-highlevel-criteria`, params)
+        },
+        getSearchOptions () {
+          return window.axios.get(`${suffixV2}contacts-list/highlevel-search-options`)
+        },
+        importCriteriaToPowerDialer (params) {
+          return window.axios.post(`${suffixV2}power-dialer-lists/import-highlevel-criteria`, params)
         }
       }
 

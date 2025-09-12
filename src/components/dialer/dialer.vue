@@ -113,11 +113,11 @@ export default {
     },
 
     hasParkedAndInprogressCall () {
-      return this.dialer.parkedCall && this.dialer.call
+      return this.dialer.parkedCall && (this.dialer.call !== null)
     },
 
     hasCallInProgressNotParked () {
-      return !this.dialer.parkedCall && this.dialer.call
+      return !this.dialer.parkedCall && (this.dialer.call !== null)
     },
 
     shouldPushPhoneRoute () {
@@ -134,6 +134,7 @@ export default {
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
+        console.log('Setting dialer communication from dialer > updateCommunication', data)
         this.setDialerCommunication(data)
 
         const communication = this.dialer?.communication
@@ -176,6 +177,12 @@ export default {
             this.stopParkedCallTimer()
           }
         }
+      }
+    }
+
+    this.dialerListeners.updateRecordingStatus = (data) => {
+      if (data.communication_id === this.dialer.communication.id) {
+        this.setDialerRecordingStatus(data.recording_status)
       }
     }
 
@@ -457,9 +464,9 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       this.removeUnownedLiveContactTask()
       console.log('Talk-Device: Call invite canceled', call)
+      this.connection = null
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial('Talk-Device.OnCancel')
-      this.connection = null
       this.$closeActionNotification('incomingCall')
     })
 
@@ -496,12 +503,14 @@ export default {
         return
       }
 
+      console.log('Setting dialer communication from dialer > forceStartOnWrapUp', this.profile.last_call)
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
       this.startWrapUpTimer()
     },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.listen('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.listen('endWrapUp', this.dialerListeners.endWrapUp)
@@ -536,6 +545,7 @@ export default {
 
     stopDialerEvents () {
       this.$VueEvent.stop('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.stop('updated_recording_status', this.dialerListeners.updateRecordingStatus)
       this.$VueEvent.stop('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.stop('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.stop('endWrapUp', this.dialerListeners.endWrapUp)
@@ -630,6 +640,7 @@ export default {
           return Promise.resolve()
         }
 
+        console.log('Setting dialer communication from dialer > getCommunication', res.data)
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
@@ -1019,7 +1030,7 @@ export default {
         console.log('Talk-Connection: Call invite canceled', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
-        this.backToDial('Talk-Connection.OnCancel')
+        this.backToDial('Talk-Connection.OnCancel', false, true)
         this.$closeActionNotification('incomingCall')
       })
 
@@ -1076,7 +1087,7 @@ export default {
         return
       }
 
-      this.backToDial('Talk-Device.OnDisconnect')
+      this.backToDial('Talk-Device.OnDisconnect', false, true)
     },
 
     hangupCall () {
@@ -1424,7 +1435,7 @@ export default {
       }
 
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
-        console.log('Call parked')
+        console.log('Call parked combo')
 
         if (shouldAnswer) {
           if (this.dialer.communication) {
@@ -1792,14 +1803,14 @@ export default {
       clearInterval(this.$options.parkedCallDurationInterval)
     },
 
-    backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
+    backToDial (signature = 'Talk-BackToDial', forceStatus = false, ignoreForceDisposition = false) {
       // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
       if (signature !== 'Talk-Connection.OnCancel') {
         this.resetAgentStatus(forceStatus, signature)
       }
 
       // halt due to required forced dispositions
-      if (this.isForcedToDisposeAndNotDisposed) {
+      if (this.isForcedToDisposeAndNotDisposed && !ignoreForceDisposition) {
         return
       }
 

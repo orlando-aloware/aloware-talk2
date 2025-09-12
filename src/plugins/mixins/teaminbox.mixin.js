@@ -36,6 +36,10 @@ export default {
         'Last Month': [this.$moment.tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), this.$moment.tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
         'All Time': [null, null]
       }
+    },
+
+    isAllInboxesRoute () {
+      return this.$route.params.inboxId === ALL_INBOXES_ID
     }
   },
 
@@ -137,10 +141,26 @@ export default {
 
         const response = await this.getItemsRequest(inboxId, 1, search, filters, sort)
 
-        this.setContactsLastUsedLines({
-          inboxId,
-          data: response.data.data
-        })
+        if (inboxId === ALL_INBOXES_ID) {
+          // For the All Inboxes, we need to set the last used line for each contact / communication of the list,
+          // as they can be part of different inboxes
+          response.data.data.forEach(item => {
+            this.setContactsLastUsedLines({
+              inboxId: item.ring_group_id,
+              data: [{
+                contact_id: item.contact_id,
+                last_line_used: item.last_line_used
+              }]
+            })
+          })
+        } else {
+          // For the regular inbox, we can set the last used line for the whole list,
+          // as they are all part of the same inbox
+          this.setContactsLastUsedLines({
+            inboxId,
+            data: response.data.data
+          })
+        }
 
         this.setItems(response.data)
         this.setIsLoadingItems(false)
@@ -238,19 +258,13 @@ export default {
         apiFilters.campaigns = filters.campaigns
       }
 
-      if (filters.inboxes?.length) {
-        apiFilters.inbox_ids = filters.inboxes
-      }
-
       // Map sort keys to API parameters
       if (sort.order) {
         apiFilters.order = sort.order
       }
 
       const params = {
-        ...(inboxId !== ALL_INBOXES_ID ? {
-          inbox_id: inboxId
-        } : {}),
+        inbox_ids: inboxId !== ALL_INBOXES_ID ? [inboxId] : [],
         page: nextPage,
         per_page: 50,
         inbox_type: this.viewMode === THREADED ? 'threaded' : 'unthreaded',
@@ -259,6 +273,18 @@ export default {
           search_fields: SEARCH_FIELDS
         } : {}),
         ...apiFilters
+      }
+
+      if (inboxId === ALL_INBOXES_ID) {
+        params.all_inboxes = true
+
+        // apply Inboxes filter if any
+        if (filters.inboxes?.length) {
+          params.inbox_ids = filters.inboxes
+        } else {
+          // if no filtered Inboxes, send all Inboxes
+          params.inbox_ids = this.inboxes.map(inbox => inbox.id)
+        }
       }
 
       const config = {
@@ -302,26 +328,13 @@ export default {
         const { data: newData } = await talk2TeamInboxApi.inboxes.unreadCount(inboxIds, contactIds, filters)
         data = newData
 
-        switch (data.length) {
-          case 0:
-            // If a single inbox is requested and nothing is returned, set the unread count to 0
-            if (inboxIds.length === 1) {
-              this.setInboxesUnreadCountSingle(
-                {
-                  ring_group_id: inboxIds[0],
-                  unread_count: 0
-                }
-              )
-            }
-            break
-          case 1:
-            // If a single inbox is requested and one is returned, set the unread count for that inbox
-            this.setInboxesUnreadCountSingle(data[0])
-            break
-          default:
-            // If multiple inboxes are requested and one is returned, set the unread count for each inbox
-            this.setInboxesUnreadCount(data)
-        }
+        inboxIds.forEach((inboxId) => {
+          const unreadCount = {
+            ring_group_id: inboxId,
+            unread_count: (data ?? []).find((item) => item.ring_group_id === inboxId)?.unread_count ?? 0
+          }
+          this.setInboxesUnreadCountSingle(unreadCount)
+        })
       } catch (error) {
         console.error('[fetchInboxesUnreadCount] error', error)
       } finally {

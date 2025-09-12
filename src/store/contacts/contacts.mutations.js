@@ -208,6 +208,9 @@ export default {
   SET_CONTACT_ATTRIBUTES: (state, attributes) => {
     state.contactAttributes = attributes
   },
+  SET_CONTACT_ATTRIBUTES_CLONE: (state, attributes) => {
+    state.contactAttributesClone = attributes.map(attr => ({ ...attr }))
+  },
   SET_COMMUNICATION_SUMMARY: (state, summary) => {
     state.communicationsSummary = summary
   },
@@ -363,13 +366,23 @@ export default {
   },
 
   UPDATE_CHANGED_CONTACT_ATTRIBUTES: (state, { name, value }) => {
-    const attr = state.contactAttributes.find(item => item.name === name)
+    const currentAttr = state.contactAttributes.find(item => item.name === name)
+    const originalAttr = state.contactAttributesClone?.find(item => item.name === name)
+
+    // If no clone exists, fallback to current attribute for backwards compatibility
+    const referenceAttr = originalAttr || currentAttr
+
+    if (!referenceAttr) {
+      return
+    }
+
     // need to get in sync with contact attribute values
-    if (attr.value === null && typeof value === 'string' && value.trim().length === 0) {
+    if (referenceAttr.value === null && typeof value === 'string' && value.trim().length === 0) {
       value = null
     }
 
-    if (attr && attr.value !== value) {
+    // Compare against ORIGINAL value, not current value
+    if (referenceAttr.value !== value) {
       const index = state.changedContactAttributes.findIndex(item => item.field === name)
       if (index >= 0) {
         state.changedContactAttributes[index].value = value
@@ -377,7 +390,7 @@ export default {
         state.changedContactAttributes.push({ field: name, value: value })
       }
     } else {
-      state.changedContactAttributes = state.changedContactAttributes.filter(item => item.name === name)
+      state.changedContactAttributes = state.changedContactAttributes.filter(item => item.field !== name)
     }
   },
   SET_CHANGED_CONTACT_PROPERTIES: (state, payload) => {

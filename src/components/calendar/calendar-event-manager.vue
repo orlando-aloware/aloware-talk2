@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="calendar-manager-modal"
+  <b-modal :id="modalId"
            size="lg"
            body-class="p-0"
            no-close-on-backdrop
@@ -7,6 +7,7 @@
            :scrollable="!loading"
            :hide-footer="loading"
            :visible="showManager"
+           data-testid="calendar-event-manager-modal"
            @hidden="closeFiltersMenu">
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
@@ -26,7 +27,8 @@
       </h6>
     </template>
     <b-form class="p-3"
-            ref="scheduleForm">
+            ref="scheduleForm"
+            data-testid="calendar-event-manager-form">
       <b-row>
         <b-col>
           <b-form-group class="form-label"
@@ -35,13 +37,14 @@
               type="text"
               placeholder="Add title"
               v-model="schedule.text"
-              :disabled="!isEditable">
+              :disabled="!isEditable"
+              data-testid="calendar-event-manager-title-input">
             </b-form-input>
           </b-form-group>
         </b-col>
       </b-row>
 
-      <b-row v-if="calledFrom !== 'contact'">
+      <b-row v-if="!hideEventTypeSelector">
         <b-col>
           <b-form-group class="form-label"
                         label="Event Type"
@@ -49,13 +52,14 @@
                         :state="validateState('type')">
             <communication-type-selector :from="calledFrom"
                                          :disabled="mode === 'edit'"
-                                         v-model="$v.schedule.type.$model">
+                                         v-model="$v.schedule.type.$model"
+                                         data-testid="calendar-event-manager-event-type-selector">
             </communication-type-selector>
           </b-form-group>
         </b-col>
       </b-row>
 
-      <b-row v-if="mode === 'add'">
+      <b-row v-if="mode === 'add' && !hideContactSelector">
         <b-col>
           <b-form-group class="form-label"
                         label="Contact"
@@ -65,18 +69,20 @@
               Type at least 3 characters to search in contacts
             </q-tooltip>
             <contact-selector v-model="$v.schedule.contact.$model.id"
+                              data-testid="calendar-event-manager-contact-selector"
                               @change="onContactChange"/>
           </b-form-group>
         </b-col>
       </b-row>
 
-      <b-row v-else>
+      <b-row v-else-if="mode === 'edit'">
         <b-col>
           <b-form-group class="form-label"
                         label="User"
                         v-if="mode === 'edit'">
             <user-selector :disable="true"
-                           v-model="schedule.user.id">
+                           v-model="schedule.user.id"
+                           data-testid="calendar-event-manager-user-selector">
             </user-selector>
           </b-form-group>
         </b-col>
@@ -90,6 +96,7 @@
                               redirect-when-disabled
                               :contact-data="schedule.contact"
                               v-model="$v.schedule.contact.$model.id"
+                              data-testid="calendar-event-manager-contact-selector-edit"
                               @loaded="onContactsLoaded">
             </contact-selector>
           </b-form-group>
@@ -115,7 +122,8 @@
           <b-form-group class="checkbox-wrapper ml-1">
             <b-form-checkbox :value="true"
                              :unchecked-value="false"
-                             v-model="schedule.send_contact_reminder">
+                             v-model="schedule.send_contact_reminder"
+                             data-testid="calendar-event-manager-send-contact-reminder-checkbox">
               <span>Send reminder notification to the contact</span>
             </b-form-checkbox>
           </b-form-group>
@@ -129,11 +137,13 @@
             <date-selector :min-date="minDate"
                            v-model="$v.schedule.date.$model"
                            v-if="mode !== 'edit' || !schedule.is_past"
+                           data-testid="calendar-event-manager-date-selector"
                            @dateSelected="dateSelected">
             </date-selector>
             <b-form-input disabled
                           v-model="$v.schedule.date.$model"
-                          v-else>
+                          v-else
+                          data-testid="calendar-event-manager-date-input-disabled">
             </b-form-input>
           </b-form-group>
         </b-col>
@@ -145,11 +155,13 @@
                         :state="validateState('time')">
             <predefined-time-selector v-model="$v.schedule.time.$model"
                                       v-if="mode !== 'edit' || !schedule.is_past"
+                                      data-testid="calendar-event-manager-time-selector"
                                       @select="timeSelected">
             </predefined-time-selector>
             <b-form-input disabled
                           v-model="schedule.time"
-                          v-else>
+                          v-else
+                          data-testid="calendar-event-manager-time-input-disabled">
             </b-form-input>
           </b-form-group>
         </b-col>
@@ -160,11 +172,13 @@
                         label="Duration (minutes)">
             <predefined-time-duration-selector v-model="schedule.duration"
                                                v-if="mode !== 'edit' || !schedule.is_past"
+                                               data-testid="calendar-event-manager-duration-selector"
                                                @select="durationSelected">
             </predefined-time-duration-selector>
             <b-form-input disabled
                           v-model="schedule.duration"
-                          v-else>
+                          v-else
+                          data-testid="calendar-event-manager-duration-input-disabled">
             </b-form-input>
           </b-form-group>
         </b-col>
@@ -177,11 +191,13 @@
                         invalid-feedback="Please select a timezone for this event"
                         :state="validateState('timezone')">
             <timezone-selector v-model="$v.schedule.timezone.$model"
+                               data-testid="calendar-event-manager-timezone-selector"
                                @select="timezoneSelected">
             </timezone-selector>
 
             <div class="alert alert-warning px-2 py-1 mt-1 small"
-                 v-if="scheduleDateInCurrentTimezone && isEventTypeSelected && isContactSelected">
+                 v-if="scheduleDateInCurrentTimezone && isEventTypeSelected && isContactSelected"
+                 data-testid="calendar-event-manager-timezone-alert">
               <strong>In your local time:</strong> {{ scheduleDateInCurrentTimezone }}
             </div>
           </b-form-group>
@@ -194,13 +210,14 @@
                         label="Note">
             <b-form-textarea max-rows="4"
                              placeholder="Write a note for this event..."
-                             v-model="schedule.body">
+                             v-model="schedule.body"
+                             data-testid="calendar-event-manager-note-textarea">
             </b-form-textarea>
           </b-form-group>
         </b-col>
       </b-row>
 
-      <b-row v-if="isAppointment && !schedule.is_past">
+      <b-row v-if="!hideSmsReminder && isAppointment && shouldShowSmsReminder">
         <b-col>
           <h6 class="form-title">SMS Reminder</h6>
         </b-col>
@@ -208,7 +225,9 @@
           <b-form-group class="checkbox-wrapper">
             <b-form-checkbox :value="true"
                              :unchecked-value="false"
-                             v-model="sms_reminder_fields.enabled">
+                             v-model="sms_reminder_fields.enabled"
+                             data-testid="calendar-event-manager-sms-reminder-checkbox"
+                             @change="onSmsReminderToggle">
               <span class="sms-reminder-label">Enable SMS reminder</span>
             </b-form-checkbox>
           </b-form-group>
@@ -220,20 +239,23 @@
                         :state="validateState('campaign_id', 'sms_reminder_fields')">
             <contact-line-selector :show-paused="false"
                                    :use-groups="false"
-                                   preselect-first
                                    v-model="$v.sms_reminder_fields.campaign_id.$model"
-                                   @select="lineSelected">
+                                   data-testid="calendar-event-manager-sms-line-selector"
+                                   @select="lineSelected"
+                                   @loaded="onLineComponentLoaded">
             </contact-line-selector>
           </b-form-group>
 
           <b-form-group label="Time">
             <predefined-time-selector v-model="sms_reminder_fields.time"
+                                      data-testid="calendar-event-manager-sms-time-selector"
                                       @select="smsReminderTimeSelected">
             </predefined-time-selector>
           </b-form-group>
 
           <b-form-group label="Send (n) days before">
             <number-of-days-selector v-model="sms_reminder_fields.frequencies"
+                                     data-testid="calendar-event-manager-sms-days-selector"
                                      @select="smsReminderFrequencySelected">
             </number-of-days-selector>
           </b-form-group>
@@ -245,6 +267,7 @@
               <span class="text-danger sms-reminder-template-variables"
                     :key="item"
                     v-for="item in sms_reminder_fields.template_variables"
+                    data-testid="calendar-event-manager-sms-template-variable"
                     @click="appendSmsReminderTemplateVariable(item)">
                 {{ item }}
               </span>
@@ -254,7 +277,8 @@
                              rows="3"
                              max-rows="8"
                              no-auto-shrink
-                             v-model="$v.sms_reminder_fields.body.$model">
+                             v-model="$v.sms_reminder_fields.body.$model"
+                             data-testid="calendar-event-manager-sms-textarea">
             </b-form-textarea>
           </b-form-group>
         </b-col>
@@ -275,7 +299,8 @@
                             :options="appointmentOptions"
                             :disabled="!isEditable"
                             v-model="schedule.status"
-                            v-if="isAppointment"/>
+                            v-if="isAppointment"
+                            data-testid="calendar-event-manager-appointment-status-toggle"/>
               <q-btn-toggle class="border w-100"
                             no-caps
                             dense
@@ -286,7 +311,8 @@
                             :options="reminderOptions"
                             :disabled="!isEditable"
                             v-model="schedule.status"
-                            v-else/>
+                            v-else
+                            data-testid="calendar-event-manager-reminder-status-toggle"/>
             </div>
           </b-form-group>
         </b-col>
@@ -297,17 +323,23 @@
       <div class="mt-2 d-flex w-100">
         <button class="btn btn-sm bg-danger text-white"
                 v-if="isDeletable"
+                data-testid="calendar-event-manager-remove-button"
                 @click="deleteSchedule(schedule.id)">
           Remove
         </button>
         <div class="ml-auto">
             <button class="btn btn-sm btn-outline-dark mr-2"
+                    data-testid="calendar-event-manager-cancel-button"
                     @click.prevent="onCancelClicked">
-              Cancel
+              {{ cancelButtonText }}
             </button>
             <button class="btn btn-sm bg-primary text-white"
+                    :disabled="isSaving || !isValid"
+                    data-testid="calendar-event-manager-save-button"
                     @click.prevent="saveSchedule">
-              Save Event
+              <q-spinner-bars color="white"
+                              v-if="isSaving" />
+              {{ isSaving ? savingText : saveButtonText }}
             </button>
         </div>
       </div>
@@ -319,7 +351,7 @@
 import _ from 'lodash'
 import { required, requiredIf } from 'vuelidate/lib/validators'
 import { aclMixin, dateMixin } from 'src/plugins/mixins'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationTypes from '../../constants/communication-types'
 import CommunicationTypeSelector from '../generic-selectors/communication-type-selector'
@@ -333,6 +365,8 @@ import TimezoneSelector from 'components/timezone-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
 import moment from 'moment'
 import { getDateInBrowserTimeZone } from 'src/utils'
+import talk2Api from 'src/plugins/api/api'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 require('vue-multiselect/dist/vue-multiselect.min.css')
 
 const DATE_FORMAT = 'MM/DD/YYYY'
@@ -362,50 +396,130 @@ export default {
   },
 
   props: {
+    // Modal configuration
+    modalId: {
+      type: String,
+      default: 'calendar-manager-modal'
+    },
+
+    // Context configuration
     calledFrom: {
       type: String,
       required: false,
-      default: 'calendar' // calendar, contact
+      default: 'calendar' // calendar, contact, appointment-modal
+    },
+
+    // Contact prop for appointment-form-modal compatibility
+    contact: {
+      type: Object,
+      required: false,
+      default: null
+    },
+
+    // Team inbox props
+    fromTeamInbox: {
+      type: Boolean,
+      default: false
+    },
+
+    teamInboxId: {
+      type: [String, Number],
+      default: null
+    },
+
+    teamInbox: {
+      type: Object,
+      default: null
+    },
+
+    // UI customization
+    hideEventTypeSelector: {
+      type: Boolean,
+      default: false
+    },
+
+    hideContactSelector: {
+      type: Boolean,
+      default: false
+    },
+
+    defaultEventType: {
+      type: Number,
+      default: null
+    },
+
+    // Button text customization
+    saveButtonText: {
+      type: String,
+      default: 'Save Event'
+    },
+
+    savingText: {
+      type: String,
+      default: 'Saving...'
+    },
+
+    cancelButtonText: {
+      type: String,
+      default: 'Cancel'
+    },
+
+    // For simple appointment modal mode
+    simpleMode: {
+      type: Boolean,
+      default: false
+    },
+
+    // Hide SMS reminder section
+    hideSmsReminder: {
+      type: Boolean,
+      default: false
     }
   },
 
-  validations: {
-    schedule: {
-      type: {
-        required
-      },
-      time: {
-        required
-      },
-      contact: {
-        required
-      },
-      date: {
-        required,
-        minValue (val) {
-          // date regex and higher than today
-          const regex = /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/.test(val)
+  validations () {
+    return {
+      schedule: {
+        type: {
+          required: requiredIf(function () {
+            return !this.hideEventTypeSelector
+          })
+        },
+        time: {
+          required
+        },
+        contact: {
+          required: requiredIf(function () {
+            return !this.hideContactSelector
+          })
+        },
+        date: {
+          required,
+          minValue (val) {
+            // date regex and higher than today
+            const regex = /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/.test(val)
 
-          // if in edit mode, skip higher than today check
-          return this.mode === 'edit'
-            ? regex
-            : regex && this.isFuture(val)
+            // if in edit mode, skip higher than today check
+            return this.mode === 'edit'
+              ? regex
+              : regex && this.isFuture(val)
+          }
+        },
+        timezone: {
+          required
         }
       },
-      timezone: {
-        required
-      }
-    },
-    sms_reminder_fields: {
-      campaign_id: {
-        required: requiredIf(function (model) {
-          return model.enabled && this.isAppointment && this.mode === 'add'
-        })
-      },
-      body: {
-        required: requiredIf(function (model) {
-          return model.enabled && this.isAppointment && this.mode === 'add'
-        })
+      sms_reminder_fields: {
+        campaign_id: {
+          required: requiredIf(function (model) {
+            return model.enabled && this.isAppointment && this.mode === 'add'
+          })
+        },
+        body: {
+          required: requiredIf(function (model) {
+            return model.enabled && this.isAppointment && this.mode === 'add'
+          })
+        }
       }
     }
   },
@@ -414,6 +528,7 @@ export default {
     return {
       showManager: false,
       loading: false,
+      isSaving: false,
       mode: 'add',
       date: new Date(),
       // not defined as camelCase because its used directly in API
@@ -428,7 +543,8 @@ export default {
         date: moment().format(DATE_FORMAT),
         time: DEFAULT_HOUR,
         type: null,
-        send_contact_reminder: false
+        send_contact_reminder: false,
+        duration: 15
       },
       originalSchedule: {},
       // not defined as camelCase because its used directly in API
@@ -439,9 +555,11 @@ export default {
         ],
         body: '',
         campaign_id: null,
-        frequencies: ['1'],
+        frequencies: [1], // Changed from ['1'] to [1] to match validation rule
         time: DEFAULT_HOUR_REMINDER
       },
+      // Store user's SMS reminder preference
+      userSmsReminderPreference: true,
       title: 'Add Event',
       confirmDialogParams: {
         okTitle: 'Ok',
@@ -463,6 +581,9 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['profile', 'user']),
+    ...mapState('auth', ['profile']),
+    ...mapState('cache', ['currentCompany']),
+    ...mapState('contacts', ['isAddAppointmentOpen']),
 
     appointmentOptions () {
       return [
@@ -564,6 +685,29 @@ export default {
 
     showSendContactReminderNotification () {
       return !this.isAppointment && this.mode === 'add'
+    },
+
+    shouldShowSmsReminder () {
+      // Show SMS reminder for appointments that are not in the past
+      // or for new appointments being created
+      if (this.mode === 'add') {
+        return true // Always show for new appointments
+      }
+
+      // For edit mode, check if the event is not in the past
+      return !this.schedule.is_past
+    },
+
+    isValid () {
+      if (this.simpleMode) {
+        return this.schedule.date &&
+          this.schedule.date !== 'Invalid date' &&
+          this.schedule.time &&
+          this.schedule.timezone &&
+          this.schedule.contact
+      }
+
+      return !this.$v.$invalid
     }
   },
 
@@ -571,11 +715,42 @@ export default {
     // Preset sms reminder text
     this.setDefaultSmsReminderFields()
 
-    this.sms_reminder_fields.enabled = this.profile.company.sms_reminder_enabled
+    this.sms_reminder_fields.enabled = this.profile?.company?.sms_reminder_enabled || this.currentCompany?.sms_reminder_enabled
+
+    // Handle contact prop for appointment-form-modal compatibility
+    if (this.contact) {
+      this.schedule.contact = this.contact
+      this.schedule.timezone = this.contact.timezone || this.schedule.timezone
+
+      // Set default type for appointment modal
+      if (this.defaultEventType) {
+        this.schedule.type = this.defaultEventType
+      } else if (this.calledFrom === 'contact' || this.simpleMode) {
+        this.schedule.type = CommunicationTypes.APPOINTMENT
+      }
+    }
+
+    // Watch for appointment modal open state
+    if (this.calledFrom === 'appointment-modal' || this.simpleMode) {
+      this.$watch('isAddAppointmentOpen', (newVal) => {
+        if (newVal) {
+          this.showForAppointmentModal()
+        }
+      }, { immediate: true })
+    }
+
+    // Initialize is_past status
+    this.updateIsPastStatus()
   },
 
   methods: {
+    ...mapActions('contacts', ['addAppointmentOpen']),
+
     validateState (input, prop = 'schedule') {
+      if (this.simpleMode) {
+        return null // Skip validation display in simple mode
+      }
+
       const { $dirty, $error } = this.$v[prop][input]
       return $dirty ? !$error : null
     },
@@ -618,6 +793,7 @@ export default {
       this.showManager = true
       this.title = sched.status_name + ' - Edit Event'
       this.mode = 'edit'
+      this.updateIsPastStatus()
     },
 
     addSchedule (date) {
@@ -625,14 +801,14 @@ export default {
 
       // Presets
       this.startDate = d
-      let contact = {}
-      let type = null
+      let contact = this.contact || {}
+      let type = this.defaultEventType || null
       let timezone = null
 
-      if (this.calledFrom === 'contact') {
-        contact = this.schedule.contact
-        type = CommunicationTypes.APPOINTMENT
-        timezone = this.schedule.contact.timezone
+      if (this.calledFrom === 'contact' || this.contact) {
+        contact = this.contact || this.schedule.contact
+        type = this.defaultEventType || CommunicationTypes.APPOINTMENT
+        timezone = contact.timezone || this.schedule.timezone
       }
 
       this.originalSchedule = {
@@ -642,7 +818,7 @@ export default {
         time: '06:00',
         duration: 15,
         contact: contact,
-        user: this.user.profile,
+        user: this.user?.profile || this.profile,
         status: CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW,
         body: '',
         date_time: 1,
@@ -654,10 +830,38 @@ export default {
       this.mode = 'add'
       this.title = 'Add Event'
       this.showManager = true
+      this.updateIsPastStatus()
 
-      if (this.calledFrom === 'contact') {
+      if (this.calledFrom === 'contact' || this.simpleMode) {
         this.title = 'Add Appointment'
       }
+    },
+
+    // New method for appointment-form-modal compatibility
+    showForAppointmentModal () {
+      // Don't call resetForm() here as it resets SMS reminder settings
+      this.$v.$reset()
+
+      // Reset only the schedule data, not SMS reminder fields
+      this.schedule = {
+        contact: this.contact || {},
+        user: this.profile,
+        calendar_response: 1,
+        disposition_status2: null,
+        is_past: true,
+        text: '',
+        timezone: this.contact?.timezone || this.profile?.timezone,
+        date: moment().format(DATE_FORMAT),
+        time: DEFAULT_HOUR,
+        type: this.defaultEventType || CommunicationTypes.APPOINTMENT,
+        send_contact_reminder: false,
+        duration: 15
+      }
+
+      this.mode = 'add'
+      this.title = 'Add Appointment'
+      this.showManager = true
+      this.updateIsPastStatus()
     },
 
     deleteSchedule (scheduleId) {
@@ -689,71 +893,136 @@ export default {
         })
     },
 
-    saveSchedule () {
-      this.$v.$touch()
-      if (this.$v.$invalid) {
-        return
+    async saveSchedule () {
+      if (!this.simpleMode) {
+        this.$v.$touch()
+        if (this.$v.$invalid) {
+          return
+        }
       }
 
       const contactId = this.schedule.contact.id
       const eventId = this.schedule.id
 
       if (this.mode === 'add') {
-        if (contactId !== null && this.schedule.type !== null) {
-          this.loading = true
+        if (contactId !== null && (this.schedule.type !== null || this.hideEventTypeSelector)) {
+          this.loading = !this.simpleMode
+          this.isSaving = true
 
           // If event type is APPOINTMENT and sms reminder option is enabled
           // - include sms reminder option
           if (this.isAppointment && this.sms_reminder_fields.enabled) {
             this.schedule.sms_reminder = this.sms_reminder_fields
+
+            // Debug: Log what's being sent
+            console.log('SMS Reminder Data being sent:', {
+              enabled: this.sms_reminder_fields.enabled,
+              body: this.sms_reminder_fields.body,
+              campaign_id: this.sms_reminder_fields.campaign_id,
+              frequencies: this.sms_reminder_fields.frequencies,
+              time: this.sms_reminder_fields.time,
+              frequencies_type: typeof this.sms_reminder_fields.frequencies[0]
+            })
           }
 
           let postData = _.cloneDeep(this.schedule)
-          postData.called_from = this.calledFrom
+          postData.called_from = this.calledFrom === 'appointment-modal' ? 'contact' : this.calledFrom
           postData.user_timezone = window.timezone
 
-          this.$axios.post(`/api/v1/calendar/events/contact/${contactId}/create`, postData).then(res => {
+          // Add ring_group_id when in Team Inbox context
+          if ((this.teamInbox || this.fromTeamInbox) && this.teamInboxId) {
+            postData.ring_group_id = this.teamInboxId
+          }
+
+          try {
+            let res
+            if (this.simpleMode || this.calledFrom === 'appointment-modal') {
+              // Use simpler API call for appointment modal
+              const apiCall = this.teamInbox || this.fromTeamInbox
+                ? talk2TeamInboxApi.calendar.createEvent(contactId, postData)
+                : talk2Api.V1.contact.addEngagement(contactId, postData)
+              res = await apiCall
+            } else {
+              res = await this.$axios.post(`/api/v1/calendar/events/contact/${contactId}/create`, postData)
+            }
+
             this.loading = false
+            this.isSaving = false
 
             this.$emit('render-schedule', {
               data: res.data,
               action: 'add'
             })
+
+            this.$emit('saved')
+
             this.showManager = false
             this.isSubmitted = true
 
             this.$generalNotification('Event added.')
-          }).catch(err => {
+
+            if (this.simpleMode || this.calledFrom === 'appointment-modal') {
+              this.addAppointmentOpen(false)
+            }
+          } catch (err) {
             this.loading = false
-            this.$handleErrors(err.response)
-          })
+            this.isSaving = false
+
+            if (this.simpleMode || this.calledFrom === 'appointment-modal') {
+              const separator = '<br>- '
+              const errorMessage = 'Error while adding event.'
+              const validationErrors = err.response?.data?.errors
+                ? `${separator}${Object.values(err.response.data.errors).join(separator)}`
+                : ''
+
+              this.$generalNotification(`${errorMessage}${validationErrors}`, 'error', 5000, true)
+            } else {
+              this.$handleErrors(err.response)
+            }
+          }
         }
       } else {
         if (contactId != null && eventId != null) {
           this.loading = true
+          this.isSaving = true
 
           if (this.isAppointment && this.sms_reminder_fields.enabled) {
             this.schedule.sms_reminder = this.sms_reminder_fields
+
+            // Debug: Log what's being sent
+            console.log('SMS Reminder Data being sent (update):', {
+              enabled: this.sms_reminder_fields.enabled,
+              body: this.sms_reminder_fields.body,
+              campaign_id: this.sms_reminder_fields.campaign_id,
+              frequencies: this.sms_reminder_fields.frequencies,
+              time: this.sms_reminder_fields.time,
+              frequencies_type: typeof this.sms_reminder_fields.frequencies[0]
+            })
           }
 
           let postData = _.cloneDeep(this.schedule)
-          postData.called_from = this.calledFrom
+          postData.called_from = this.calledFrom === 'appointment-modal' ? 'contact' : this.calledFrom
           postData.user_timezone = window.timezone
           postData.entity_type = 'event' // it means entity id for events table
 
           this.$axios.post(`/api/v1/calendar/events/contact/${contactId}/update/${eventId}`, postData).then(res => {
             this.loading = false
+            this.isSaving = false
 
             this.$emit('render-schedule', {
               data: res.data,
               action: 'update'
             })
+
+            this.$emit('saved')
+
             this.showManager = false
             this.isSubmitted = true
 
             this.$generalNotification('Event updated.')
           }).catch(err => {
             this.loading = false
+            this.isSaving = false
             this.$handleErrors(err.response)
           })
         }
@@ -763,13 +1032,15 @@ export default {
     resetForm () {
       this.$v.$reset()
 
-      if (this.calledFrom === 'contact') {
-        this.schedule.user = this.user.profile
+      if (this.calledFrom === 'contact' || this.contact) {
+        this.schedule.user = this.user?.profile || this.profile
         this.schedule.calendar_response = 1
+        this.schedule.contact = this.contact || {}
+        this.schedule.timezone = this.contact?.timezone || this.profile?.timezone
       } else if (this.calledFrom === 'calendar') {
         this.schedule = {
           contact: {},
-          user: this.user.profile,
+          user: this.user?.profile || this.profile,
           calendar_response: 1
         }
       }
@@ -778,6 +1049,16 @@ export default {
     },
 
     closeFiltersMenu (bvModalEvent) {
+      if (this.simpleMode || this.calledFrom === 'appointment-modal') {
+        // Don't reset SMS reminder fields for simple mode
+        this.$v.$reset()
+        this.resetSchedule()
+        this.showManager = false
+        this.addAppointmentOpen(false)
+        this.$emit('close-filters-menu')
+        return
+      }
+
       if (_.isEqual(this.schedule, this.originalSchedule) || this.isSubmitted) {
         this.resetForm()
         this.resetSchedule()
@@ -803,7 +1084,7 @@ export default {
             return this.$nextTick(() => {
               this.showManager = false
               this.$emit('close-filters-menu')
-              this.$bvModal.hide('calendar-manager-modal')
+              this.$bvModal.hide(this.modalId)
             })
           }
 
@@ -813,6 +1094,10 @@ export default {
 
     onCancelClicked () {
       this.showManager = false
+
+      if (this.simpleMode || this.calledFrom === 'appointment-modal') {
+        this.addAppointmentOpen(false)
+      }
     },
 
     updateSmsReminderVariables () {
@@ -824,22 +1109,30 @@ export default {
     },
 
     setDefaultSmsReminderFields () {
-      this.sms_reminder_fields.body = this.profile.company.sms_reminder_default_text || ''
+      const company = this.profile?.company || this.currentCompany
+
+      this.sms_reminder_fields.body = company?.sms_reminder_default_text || ''
 
       // use personal line or default campaign_id
-      this.sms_reminder_fields.campaign_id = !this.profile.company.sms_reminder_use_personal_line
-        ? this.profile.company.sms_reminder_default_campaign_id
-        : this.profile.campaign_id
+      this.sms_reminder_fields.campaign_id = !company?.sms_reminder_use_personal_line
+        ? company?.sms_reminder_default_campaign_id
+        : this.profile?.campaign_id
 
       // update time if its set in account config
-      if (this.profile.company.sms_reminder_default_time) {
-        this.sms_reminder_fields.time = this.profile.company.sms_reminder_default_time
+      if (company?.sms_reminder_default_time) {
+        this.sms_reminder_fields.time = company.sms_reminder_default_time
       }
 
       // update frequency if its set in account config
-      if (this.profile.company.sms_reminder_default_send_before_days) {
-        this.sms_reminder_fields.frequencies = this.profile.company.sms_reminder_default_send_before_days.split(',').map(v => +v)
+      if (company?.sms_reminder_default_send_before_days) {
+        this.sms_reminder_fields.frequencies = company.sms_reminder_default_send_before_days.split(',').map(v => parseInt(v, 10))
+      } else {
+        // Ensure frequencies is always an array of integers
+        this.sms_reminder_fields.frequencies = [1]
       }
+
+      // Preserve the enabled state based on user preference
+      this.sms_reminder_fields.enabled = this.userSmsReminderPreference
     },
 
     setSmsReminderFields (smsReminder) {
@@ -848,7 +1141,7 @@ export default {
         enabled: true,
         body: smsReminder.body,
         campaign_id: smsReminder.campaign_id,
-        frequencies: smsReminder.frequencies.map(frequency => +frequency),
+        frequencies: smsReminder.frequencies.map(frequency => parseInt(frequency, 10)), // Ensure integers
         time: smsReminder.time
       }
     },
@@ -864,13 +1157,13 @@ export default {
 
     resetSmsReminder () {
       this.sms_reminder_fields = {
-        enabled: true,
+        enabled: this.userSmsReminderPreference,
         template_variables: [
           '[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]'
         ],
         body: '',
         campaign_id: null,
-        frequencies: ['1'],
+        frequencies: [1], // Changed from ['1'] to [1] to match validation rule
         time: '10:00'
       }
 
@@ -879,14 +1172,17 @@ export default {
 
     dateSelected (value) {
       this.schedule.date = value ? moment(value).format(DATE_FORMAT) : null
+      this.updateIsPastStatus()
     },
 
     timeSelected (time) {
       this.schedule.time = time.value
+      this.updateIsPastStatus()
     },
 
     timezoneSelected (timezone) {
       this.schedule.timezone = timezone.value
+      this.updateIsPastStatus()
     },
 
     durationSelected (duration) {
@@ -911,9 +1207,10 @@ export default {
 
     resetSchedule () {
       this.schedule = {
-        contact: {},
-        user: this.user.profile,
-        calendar_response: 1
+        contact: this.contact || {},
+        user: this.user?.profile || this.profile,
+        calendar_response: 1,
+        timezone: this.contact?.timezone || this.profile?.timezone
       }
       this.originalSchedule = {}
     },
@@ -927,8 +1224,36 @@ export default {
       if (contact?.timezone) {
         this.schedule.timezone = contact.timezone
       }
+    },
+
+    updateIsPastStatus () {
+      if (this.schedule.date && this.schedule.time) {
+        const eventDateTime = moment.tz(`${this.schedule.date} ${this.schedule.time}`, `${DATE_FORMAT} ${HOUR_FORMAT}`, this.schedule.timezone || 'UTC')
+        this.schedule.is_past = eventDateTime.isBefore(moment())
+      }
+    },
+
+    onSmsReminderToggle (enabled) {
+      // Save user's preference for future form opens
+      this.userSmsReminderPreference = enabled
+    },
+
+    onLineComponentLoaded (lines) {
+      // When the line selector loads and preselects the first item,
+      // ensure that our data model is updated to match the displayed selection
+      if (lines && lines.length > 0 && !this.sms_reminder_fields.campaign_id) {
+        // Update the campaign_id to match what's visually displayed as selected
+        this.sms_reminder_fields.campaign_id = lines[0].id
+      }
+    }
+  },
+
+  watch: {
+    isAddAppointmentOpen (value) {
+      if (this.simpleMode || this.calledFrom === 'appointment-modal') {
+        this.showManager = value
+      }
     }
   }
 }
-
 </script>

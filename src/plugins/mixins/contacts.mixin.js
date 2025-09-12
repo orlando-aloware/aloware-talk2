@@ -1,17 +1,17 @@
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import { mapFields } from 'vuex-map-fields'
-import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
-import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { ALL_COLUMNS } from 'src/constants/contacts-columns'
-import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
-import qs from 'qs'
 import _ from 'lodash'
+import moment from 'moment'
+import qs from 'qs'
+import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
+import { ALL_COLUMNS } from 'src/constants/contacts-columns'
+import { DEFAULT_STATE } from 'src/constants/contacts-default'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { RELATIONS } from 'src/constants/contacts-list-relations'
-import moment from 'moment'
-import { DEFAULT_STATE } from 'src/constants/contacts-default'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { OPERATORS } from 'src/constants/contacts-filter-operators'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   data () {
@@ -94,6 +94,12 @@ export default {
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
 
     init: _.debounce(function (clear = false, firstLoad = false) {
+      console.log('🎯 contacts.mixin: init called', {
+        clear,
+        route: this.$route.name,
+        stack: new Error().stack.split('\n').slice(1, 3).map(line => line.trim())
+      })
+
       if (this.$route.name === 'Contact') {
         this.isLoadingMore = true
       }
@@ -114,6 +120,7 @@ export default {
 
       const params = typeof defaultFilters === 'string' ? {} : this.$jsonClone(defaultFilters)
 
+      console.log('🎯 contacts.mixin: init calling fetch', { params, clear })
       this.fetch(params, true, clear, false, false, firstLoad)
 
       this.initialListFilters = defaultFilters
@@ -291,6 +298,17 @@ export default {
     },
 
     debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false) {
+      // DEBUG: Track what's calling debouncedFetch
+      console.log('🔍 debouncedFetch called:', {
+        route: this.$route.name,
+        params,
+        isContactModule,
+        queued,
+        clear,
+        isSearch,
+        stack: new Error().stack.split('\n').slice(1, 5).map(line => line.trim())
+      })
+
       const endpoint = this.apiEndpoint(queued)
 
       if (!endpoint) {
@@ -454,6 +472,17 @@ export default {
     },
 
     fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false, firstLoad = false) {
+      console.log('🎯 contacts.mixin: fetch called', {
+        data,
+        hasOrder,
+        clear,
+        isLoading,
+        fromRefresh,
+        route: this.$route.name,
+        isPowerDialer: this.isPowerDialer,
+        stack: new Error().stack.split('\n').slice(1, 3).map(line => line.trim())
+      })
+
       let params = this.$jsonClone(data)
       const event = params?.event
 
@@ -512,14 +541,17 @@ export default {
         // the variable is defined
         switch (this.$route.meta.id) {
           case 'power-dialer-queue-filter':
+            console.log('🎯 contacts.mixin: calling processFetch for power-dialer-queue-filter')
             this.processFetch(params, false, true, clear, isSearch)
             break
 
           case 'power-dialer-list-filter':
+            console.log('🎯 contacts.mixin: calling processFetch for power-dialer-list-filter')
             this.processFetch(params, false, false, clear, isSearch)
             break
 
           default:
+            console.log('🎯 contacts.mixin: calling processFetch for default case', { metaId: this.$route.meta.id })
             this.processFetch(params, false, false, clear, isSearch)
         }
 
@@ -527,6 +559,7 @@ export default {
       }
 
       // contacts list contacts fetching
+      console.log('🎯 contacts.mixin: calling processFetch for contacts list')
       this.processFetch(params, true, false, clear, isSearch)
     },
 

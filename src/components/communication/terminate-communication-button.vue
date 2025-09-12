@@ -27,6 +27,7 @@ import { aclMixin } from 'src/plugins/mixins'
 import { DISPOSITION_STATUS_INPROGRESS_NEW } from 'src/constants/communication-disposition-status'
 import { isLiveCall, isParkedCall } from 'src/plugins/helpers/functions'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import * as CommunicationDirections from 'src/constants/communication-direction'
 
 export default {
   name: 'terminate-communication-button',
@@ -83,7 +84,8 @@ export default {
   data: () => ({
     loading: false,
     DISPOSITION_STATUS_INPROGRESS_NEW,
-    CommunicationTypes
+    CommunicationTypes,
+    CommunicationDirections
   }),
 
   methods: {
@@ -111,9 +113,14 @@ export default {
     terminate () {
       this.loading = true
 
-      const action = this.isLiveOrParkedCall
+      let action = this.isLiveOrParkedCall
         ? API.V1.communication.forceTerminate(this.communication.id)
         : API.V1.communication.forceDequeue(this.communication.id)
+
+      // outbound calls are not queued
+      if (this.communication.direction === CommunicationDirections.OUTBOUND) {
+        action = API.V1.communication.forceTerminate(this.communication.id)
+      }
 
       action
         .then(() => {

@@ -406,20 +406,23 @@
               <button class="phone-buttons btn"
                       :disabled="isDisabledPhoneButtons"
                       @click="toggleRecordingStatus">
-                <record-icon :width="iconSizes.recording.width"
-                             :height="iconSizes.recording.height"
-                             v-show="dialer.recordingStatus === 'paused' && dialer.communication.should_record === true">
-                </record-icon>
-                <pause-record-icon :width="iconSizes.recording.width"
-                                   :height="iconSizes.recording.height"
-                                   v-show="dialer.recordingStatus === 'in-progress' && dialer.communication.should_record === true">
-                </pause-record-icon>
-                <pause-record-icon pathColor="#95989E"
-                                   circle-color="#95989E"
-                                   :width="iconSizes.recording.width"
-                                   :height="iconSizes.recording.height"
-                                   v-show="dialer.communication.should_record !== true">
-                </pause-record-icon>
+                <template v-if="dialer.communication.should_record === true">
+                  <record-icon :width="iconSizes.recording.width"
+                        :height="iconSizes.recording.height"
+                        v-show="dialer.recordingStatus === 'paused'">
+                  </record-icon>
+                  <pause-record-icon :width="iconSizes.recording.width"
+                                    :height="iconSizes.recording.height"
+                                    v-show="dialer.recordingStatus === 'in-progress'">
+                  </pause-record-icon>
+                </template>
+                <template v-else>
+                  <pause-record-icon pathColor="#95989E"
+                                     circle-color="#95989E"
+                                     :width="iconSizes.recording.width"
+                                     :height="iconSizes.recording.height">
+                  </pause-record-icon>
+                </template>
                 <span>{{ recordingText }}</span>
               </button>
             </div>

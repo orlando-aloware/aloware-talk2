@@ -218,6 +218,10 @@ export default {
       }
 
       return Boolean(this.contact.is_read_only) || false
+    },
+
+    isAllInboxesRoute () {
+      return this.$route.params.inboxId === ALL_INBOXES_ID
     }
   },
 
@@ -632,7 +636,7 @@ export default {
 
       if (this.teamInbox) {
         let inboxId = this.teamInboxId
-        if (this.$route.params.inboxId === ALL_INBOXES_ID) {
+        if (this.isAllInboxesRoute) {
           inboxId = +this.$route.query.inboxId
         }
 
@@ -766,16 +770,15 @@ export default {
 
       // Add inbox_id when in Team Inbox context
       if (this.teamInbox && this.teamInboxId) {
-        params.inbox_id = this.teamInboxId
+        params.inbox_ids = [this.teamInboxId]
       }
 
-      if (this.$route.params.inboxId === ALL_INBOXES_ID) {
-        // show communications for all inboxes user has access to
-        delete params.inbox_id
+      if (this.isAllInboxesRoute) {
+        delete params.inbox_ids
 
         // send inbox_ids filter if applied
         if (this.$store.state.TeamInbox.activeFilters.inboxes?.length) {
-          params.inbox_ids = this.$store.state.TeamInbox.activeFilters.inboxes.map(item => parseInt(item.id))
+          params.inbox_ids = this.$store.state.TeamInbox.activeFilters.inboxes.map(inboxId => parseInt(inboxId))
         }
       }
 
@@ -809,7 +812,7 @@ export default {
 
         return res
       }).catch(err => {
-        if (err.response.status === 403) {
+        if (err.response && err.response.status === 403) {
           // No access to contact
           this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
           this.$generalNotification(err.response.data?.error || 'You do not have access to this contact', 'error')
@@ -924,7 +927,9 @@ export default {
 
         const params = {}
 
-        if (this.teamInbox) {
+        if (this.isAllInboxesRoute) {
+          params.all_inboxes = true
+        } else if (this.teamInbox && this.teamInboxId) {
           params.ring_group_id = this.teamInboxId
         }
 

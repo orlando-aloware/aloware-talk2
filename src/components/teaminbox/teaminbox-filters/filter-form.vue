@@ -1,6 +1,6 @@
 <template>
   <div data-testid="teaminbox-filter-form-wrapper">
-    <b-form class="inbox-channel-filter-form" data-testid="teaminbox-filter-form">
+    <b-form class="inbox-channel-filter-form team-inbox-filter-form" data-testid="teaminbox-filter-form">
       <b-container>
         <div>
           <h5 class="section-header">Quick Access</h5>
@@ -261,11 +261,10 @@ export default {
 
     parsedTeamInboxId () {
       if (this.$route.params.inboxId === ALL_INBOXES_ID) {
-        const inboxId = +this.$route.query.inboxId
-        return !isNaN(inboxId) ? inboxId : null
+        return null
       }
 
-      return this.teamInboxId
+      return this.activeInboxId
     },
 
     isAllInboxesRoute () {
@@ -477,6 +476,15 @@ export default {
 </script>
 
 <style lang="scss">
+.team-inbox-filter-form {
+  min-height: 370px;
+
+  .calendars {
+    @media screen and (min-width: 1600px) {
+      flex-wrap: nowrap;
+    }
+  }
+}
 .teaminbox-filter-form .quick-access .vue-daterange-picker .reportrange-text {
   height: 40px;
   display: flex;
