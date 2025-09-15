@@ -379,6 +379,9 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      attributeDictionaries: 'getAttributeDictionaries'
+    }),
     ...mapGetters('contacts', ['columns']),
 
     resourceId () {
@@ -391,11 +394,15 @@ export default {
       return `Manage ${String(title).toLowerCase()} columns`
     },
 
+    allColumnsCombined () {
+      return [...ALL_COLUMNS, ...this.mappedDictionaryAttributes]
+    },
+
     allColumns () {
       const columns = []
       const results = { data: 0 }
 
-      const matches = sortBy(ALL_COLUMNS, ['name']).filter((item) => {
+      const matches = sortBy(this.allColumnsCombined, ['name']).filter((item) => {
         if (this.searchText && this.searchText.trim().length > 1) {
           return (
             (item.name + item.label)
@@ -434,6 +441,20 @@ export default {
         items: columns,
         results: results.data
       }
+    },
+
+    mappedDictionaryAttributes () {
+      return (this.attributeDictionaries ?? []).map((item, index) => ({
+        name: `csf_${item.id}`,
+        label: item.name,
+        category: 4,
+        order: 50 + index,
+        sortable: true,
+        draggable: true,
+        resizable: true,
+        default: false,
+        minWidth: 225
+      }))
     },
 
     selectedColumns () {

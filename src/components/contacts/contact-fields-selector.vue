@@ -127,26 +127,7 @@ export default {
      * Default field order including custom attributes dynamically
      */
     defaultFieldOrderWithCustomAttributes () {
-      const customAttributeFields = this.attributeDictionaries.map(attr => `custom_attribute_${attr.id}`)
-
-      // Insert custom attributes after custom_field_2 (this was the default order in the ui)
-      const baseOrder = [...DEFAULT_FIELD_ORDER]
-      const custom2Index = baseOrder.indexOf('custom_field_2')
-
-      if (custom2Index !== -1) {
-        // Insert custom attributes after custom_field_2
-        baseOrder.splice(custom2Index + 1, 0, ...customAttributeFields)
-      } else {
-        // Fallback: add at the end before display-only fields
-        const displayOnlyStart = baseOrder.indexOf('tcpa_approved')
-        if (displayOnlyStart !== -1) {
-          baseOrder.splice(displayOnlyStart, 0, ...customAttributeFields)
-        } else {
-          baseOrder.push(...customAttributeFields)
-        }
-      }
-
-      return baseOrder
+      return ContactFieldsHelper.getDefaultFieldOrderWithCustomAttributes(this.attributeDictionaries)
     },
 
     /**
@@ -312,40 +293,7 @@ export default {
     deselectAllFields () {
       // Remove all fields
       this.$emit('change', [])
-    },
-
-    initializeDefaults () {
-      const defaultOrder = this.defaultFieldOrderWithCustomAttributes
-
-      // Only emit if current state is still using static defaults
-      const isUsingStaticDefaults = JSON.stringify(this.selectedFields) === JSON.stringify(DEFAULT_FIELD_ORDER)
-
-      if (isUsingStaticDefaults && this.attributeDictionaries.length > 0) {
-        this.$emit('change', [...defaultOrder])
-      }
     }
-  },
-
-  watch: {
-    // Watch for when custom attributes are loaded
-    attributeDictionaries: {
-      handler (newAttributes, oldAttributes) {
-        // Only initialize if we went from no attributes to having some
-        if (oldAttributes.length === 0 && newAttributes.length > 0) {
-          this.$nextTick(() => {
-            this.initializeDefaults()
-          })
-        }
-      },
-      immediate: false
-    }
-  },
-
-  mounted () {
-    // Initialize with custom attributes if using default state
-    this.$nextTick(() => {
-      this.initializeDefaults()
-    })
   }
 }
 </script>

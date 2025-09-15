@@ -59,7 +59,7 @@ export default {
 
   mounted () {
     if (!this.isPowerDialer) {
-      this.loadData()
+      this.loadData(true, false, true)
     }
   },
 
@@ -93,7 +93,7 @@ export default {
 
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
 
-    init: _.debounce(function (clear = false) {
+    init: _.debounce(function (clear = false, firstLoad = false) {
       console.log('🎯 contacts.mixin: init called', {
         clear,
         route: this.$route.name,
@@ -121,7 +121,7 @@ export default {
       const params = typeof defaultFilters === 'string' ? {} : this.$jsonClone(defaultFilters)
 
       console.log('🎯 contacts.mixin: init calling fetch', { params, clear })
-      this.fetch(params, true, clear)
+      this.fetch(params, true, clear, false, false, firstLoad)
 
       this.initialListFilters = defaultFilters
       this.filtersCount = this.getFiltersCount(defaultFilters)
@@ -471,7 +471,7 @@ export default {
         })
     },
 
-    fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
+    fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false, firstLoad = false) {
       console.log('🎯 contacts.mixin: fetch called', {
         data,
         hasOrder,
@@ -519,25 +519,18 @@ export default {
         this.setPreviousListId(this.id)
       }
 
-      let defaultSort = _.get(params, 'sort', this.defaultContactDateFilter)
+      const csfFields = this.columns.reduce((acc, column) => {
+        if (column.name.startsWith('csf_')) {
+          acc.push(column.name)
+        }
+        return acc
+      }, [])
 
-      if (defaultSort.constructor !== 'Function') {
-        defaultSort = this.isPowerDialer ? 'order' : this.defaultContactDateFilter
+      if (csfFields.length > 0) {
+        params.csf_fields = csfFields
       }
 
-      let order = _.get(params, 'order', 'desc')
-      const emptySortOrder = this.isPowerDialer ? 'asc' : order
-
-      order = this.sorts
-        ? this.sorts.order
-        : emptySortOrder
-
-      if (hasOrder) {
-        params.sort = _.isString(this.defaultDateFilter)
-          ? this.defaultDateFilter
-          : defaultSort
-        params.order = order
-      }
+      this.handleSortingParams(params, hasOrder, firstLoad)
 
       // add the event back
       params.event = event
@@ -568,6 +561,35 @@ export default {
       // contacts list contacts fetching
       console.log('🎯 contacts.mixin: calling processFetch for contacts list')
       this.processFetch(params, true, false, clear, isSearch)
+    },
+
+    // adjust request sorting params
+    handleSortingParams (params, hasOrder, firstLoad) {
+      if (firstLoad && this.sorts) {
+        params.sort = this.sorts.orderBy
+        params.order = this.sorts.order
+        return
+      }
+
+      let defaultSort = _.get(params, 'sort', this.defaultContactDateFilter)
+
+      if (defaultSort.constructor !== 'Function') {
+        defaultSort = this.isPowerDialer ? 'order' : this.defaultContactDateFilter
+      }
+
+      let order = _.get(params, 'order', 'desc')
+      const emptySortOrder = this.isPowerDialer ? 'asc' : order
+
+      order = this.sorts
+        ? this.sorts.order
+        : emptySortOrder
+
+      if (hasOrder) {
+        params.sort = _.isString(this.defaultDateFilter)
+          ? this.defaultDateFilter
+          : defaultSort
+        params.order = order
+      }
     },
 
     buildQueryString (params, isContactModule = true) {
@@ -706,6 +728,18 @@ export default {
 
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
         powerQuery.task_status = this.pdFilters[this.activeFilter]
+      }
+
+      const csfFields = this.columns.reduce((acc, column) => {
+        if (column.name.startsWith('csf_')) {
+          acc.push(column.name)
+        }
+        return acc
+      }, [])
+
+      if (csfFields.length > 0) {
+        query.csf_fields = csfFields
+        powerQuery.csf_fields = csfFields
       }
 
       return this.isPowerDialer ? powerQuery : query
@@ -1020,13 +1054,13 @@ export default {
         })
     },
 
-    loadData (skipCancelToken = true, clear = false) {
+    loadData (skipCancelToken = true, clear = false, firstLoad = false) {
       const isIneligibleList = !this.list || typeof this.list === 'undefined' ||
         this.list.id !== this.$route.params.id
 
       if (isIneligibleList && this.id !== 'all' && this.$route.name === 'Contacts') {
         this.getListData().then(() => {
-          this.init(clear)
+          this.init(clear, firstLoad)
         }).catch(err => {
           console.log(err)
         })
@@ -1039,7 +1073,7 @@ export default {
         this.listDataSource = this.listDataCancelToken.source()
       }
 
-      this.init(clear)
+      this.init(clear, firstLoad)
     },
 
     loadUrlFilters (filters) {
