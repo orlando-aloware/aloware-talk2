@@ -1234,8 +1234,16 @@ export default {
       return `${user.first_name} ${user.last_name}`.trim()
     },
 
+    sortKey () {
+      // if viewing a Contact List, save sorting preference per List
+      // else save sorting preferences for Contacts page
+      return this.$route.meta?.page === 'Contacts List' && this.$route.params?.id
+        ? this.$route.params.id
+        : 'contacts'
+    },
+
     startOrder () {
-      return this.contactsListSortPreference.contacts
+      return this.contactsListSortPreference[this.sortKey]
     }
   },
 
@@ -1407,7 +1415,7 @@ export default {
     },
 
     onSortByField (sorts) {
-      this.contactsListSortPreference.contacts = sorts
+      this.contactsListSortPreference[this.sortKey] = sorts
       this.$emit('sort', sorts)
     },
 

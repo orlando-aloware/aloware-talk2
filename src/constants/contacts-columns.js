@@ -194,7 +194,7 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'created_at',
-    label: 'Date Added',
+    label: 'Created At',
     category: 0,
     order: 17,
     required: true,
@@ -203,7 +203,22 @@ export const ALL_COLUMNS = [
     resizable: true,
     default: true,
     maxWidth: 140,
-    minWidth: 140
+    minWidth: 140,
+    tooltip: 'This is the time when the contact was created'
+  },
+  {
+    name: 'created_at_list',
+    label: 'Date Added to List',
+    category: 0,
+    order: 18,
+    required: false,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false,
+    maxWidth: 250,
+    minWidth: 250,
+    tooltip: 'This is the date the contact was added to this contact list'
   },
   {
     name: 'last_engagement_at',

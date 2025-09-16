@@ -1435,7 +1435,7 @@ export default {
       if (!this.isPowerDialer) {
         const isFromAddContacts = _.get(from, 'params.id', false) !== false &&
           from.path.includes('/add')
-        this.loadData(false, isFromAddContacts)
+        this.loadData(false, isFromAddContacts, true)
       }
     },
 
