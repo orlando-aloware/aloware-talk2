@@ -143,6 +143,7 @@ import DialerListeners from 'components/dialer-listeners'
 import LogoutIcon from 'components/icons/logout-icon'
 import { mapState, mapActions } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK, OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT } from 'src/constants/user-outbound-calling-modes'
 import { local as localStorageHelper } from 'src/plugins/helpers/storage'
 import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin } from 'src/plugins/mixins'
@@ -660,8 +661,26 @@ export default {
      * Handles call completion events from webrtc component
      */
     handleCallCompletedEvent (skipCallFinished = false) {
-      console.log('Call completed event received:', skipCallFinished)
-      // TODO: Implement call completion logic
+      const skippedStatuses = ['MAKING_CALL', 'RECEIVED_CALL_INVITE', 'ANSWERING_CALL', 'CALL_CONNECTED']
+
+      // some logic can send wrong status of call completed in a short time when call is just initiating
+      if (skippedStatuses.includes(this.dialer?.currentStatus)) {
+        return
+      }
+
+      if (this.extensions) {
+        this.extensions.callEnded()
+
+        if (!this.dialer.parkedCall) {
+          // Return to ready state when call is completed
+          this.displayState = DisplayState.READY_FOR_CALLS
+          this.startDialing = false
+        }
+
+        if (!this.defaultOutboundCampaignId) {
+          this.campaignId = null
+        }
+      }
     },
 
     /**
@@ -729,11 +748,82 @@ export default {
     },
 
     /**
+     * Handle inbound calls from Aloware and notify HubSpot
+     */
+    async handleIncomingCall (communication) {
+      console.log('Inbound call received:', communication)
+
+      if (!this.authenticated) {
+        console.log('User not authenticated, skipping inbound call')
+        return
+      }
+
+      if (!this.isAgentAvailable) {
+        console.log('Agent not available, skipping inbound call')
+        return
+      }
+
+      // For HubSpot inbound calls, we need to properly notify HubSpot
+      if (this.extensions) {
+        console.log('Extensions available, proceeding with HubSpot notification')
+        const phoneNumber = this.$options.filters.fixPhone(communication.contact?.phone_number)
+
+        try {
+          // Notify HubSpot about the inbound call
+          this.extensions.incomingCall({
+            phoneNumber: phoneNumber,
+            contactName: communication.contact?.name || 'Unknown Caller',
+            contactId: communication.contact?.id?.toString(),
+            callId: communication.id?.toString()
+          })
+          console.log('Successfully notified HubSpot about inbound call')
+        } catch (error) {
+          console.error('Error handling HubSpot notification:', error)
+          // Continue with the call flow even if HubSpot notification fails
+        }
+      } else {
+        console.log('No extensions available')
+      }
+
+      // Set up the dialer state for the main Aloware system to handle
+      this.displayState = DisplayState.HIDE
+      this.setDialerCommunication(communication)
+      this.setDialerContact(communication.contact)
+      this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
+
+      console.log('Set dialer state for inbound call:', {
+        communication: communication.id,
+        contact: communication.contact?.name,
+        status: 'RECEIVED_CALL_INVITE'
+      })
+
+      // Call processActionNotification to trigger the action notification system
+      // This is what shows the accept/reject buttons
+      this.processActionNotification(communication, 'call')
+
+      console.log('Inbound call handling completed successfully')
+    },
+
+    /**
      * Ends any active call when HubSpot widget becomes hidden
      */
     endActiveCall () {
-      console.log('Ending active call due to widget visibility change')
-      // TODO: Implement call ending logic
+      this.displayState = DisplayState.HIDE
+      this.isDialed = false
+
+      if (this.dialer?.currentStatus === 'WRAP_UP' && !this.checkDialerForceDisposition) {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
+        this.$VueEvent.fire('hangupCall')
+      }
+
+      if (!this.checkDialerForceDisposition) {
+        this.$VueEvent.fire('resetCall')
+      }
+
+      this.handleCallCompletedEvent(true)
     }
   },
   watch: {
@@ -766,6 +856,15 @@ export default {
       }
     }
   },
+
+  beforeDestroy () {
+    // Clean up inbound call listener
+    if (this.incomingCallHandler) {
+      this.$VueEvent.stop('new_in_app_call', this.incomingCallHandler)
+      console.log('Successfully removed new_in_app_call listener')
+    }
+  },
+
   async created () {
     this.setIsWidget(true)
     this.setIsHubSpotWidget(true)
@@ -797,6 +896,12 @@ export default {
     HubSpotCallingExtensionsClient.subscribe(this.callSdkOptions.eventHandlers)
     this.callExtensionsInitialized = true
     await this.initializeAuth()
+
+    // Set up listener for inbound calls from Aloware
+    console.log('Setting up listener for new_in_app_call events')
+    this.incomingCallHandler = this.handleIncomingCall.bind(this)
+    this.$VueEvent.listen('new_in_app_call', this.incomingCallHandler)
+    console.log('Successfully registered new_in_app_call listener')
   }
 }
 </script>
