@@ -32,7 +32,7 @@ const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
 const SalesforceMessageWidgetError = () => import('pages/widgets/SalesforceMessageWidgetError.vue')
 const SalesforceSoftPhone = () => import('pages/widgets/SalesforceSoftPhone.vue')
-const HubSpotSoftPhone = () => import('pages/widgets/HubSpotSoftPhone.vue')
+const HubSpotSoftPhone = () => import('pages/widgets/HubSpotSoftPhone2.vue')
 const AloAi = () => import('pages/AloAi.vue')
 const Apps = () => import('pages/Apps.vue')
 const HubspotSmsChannelConnect = () => import('pages/integrations/HubspotSmsChannelConnect.vue')
@@ -698,7 +698,10 @@ const routes = [
     name: 'HubSpot Call Extension',
     path: '/widgets/hubspot-call-extension',
     props: true,
-    component: HubSpotSoftPhone
+    component: HubSpotSoftPhone,
+    meta: {
+      isHubSpotWidget: true
+    }
   },
   {
     name: 'Salesforce Softphone',

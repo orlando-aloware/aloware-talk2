@@ -65,7 +65,7 @@ export default function ({ store }) {
       store.commit('SET_IS_SALESFORCE_WIDGET', true)
     }
 
-    const isHubSpotWidget = to.name === 'HubSpot Call Extension'
+    const isHubSpotWidget = to.matched.some(route => route?.meta?.isHubSpotWidget)
 
     if (isHubSpotWidget) {
       store.commit('SET_IS_HUBSPOT_WIDGET', true)
