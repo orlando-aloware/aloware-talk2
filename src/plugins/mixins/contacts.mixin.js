@@ -704,9 +704,9 @@ export default {
       powerQuery.filter_groups = query.filter_groups
 
       if (params?.order) {
-        query.sort = this.getSortByColumn(params.sort)
+        query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
-        powerQuery.sort_by = this.getSortByColumn(params.sort)
+        powerQuery.sort_by = params.sort
         powerQuery.sort_order = params.order ? params.order : 'asc'
       }
 
@@ -1099,18 +1099,6 @@ export default {
       }
 
       return filters
-    },
-
-    /**
-     * Backend columns might differ from front end names being used.
-     * This function maps this if encountered some different column
-     */
-    getSortByColumn (key) {
-      if (key in this.backendTablesDictionary) {
-        return this.backendTablesDictionary[key]
-      }
-
-      return key
     }
   },
 
@@ -1337,13 +1325,6 @@ export default {
 
     pdFilters () {
       return POWER_DIALER_FILTERS
-    },
-
-    backendTablesDictionary () {
-      return {
-        'inbound_texts_count': 'inbound_sms_count',
-        'outbound_texts_count': 'outbound_sms_count'
-      }
     },
 
     isAddContactsView () {
