@@ -2207,8 +2207,7 @@ export default {
         ring_group_id: parseInt(communicationData.RingGroupId) || null,
         campaign_id: campaignId,
         campaign: {
-          name: customParams?.CampaignName,
-          call_waiting_ring_group_id: communicationData.CallWaitingRingGroupId || null
+          name: customParams?.CampaignName
         },
         type: communicationData.Type,
         direction: communicationData.Direction,
