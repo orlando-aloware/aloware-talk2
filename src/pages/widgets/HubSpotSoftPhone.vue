@@ -447,6 +447,7 @@ export default {
 
   created () {
     this.setIsWidget(true)
+    this.setIsHubSpotWidget(true)
 
     if (this.$route.query.small) {
       this.small = true
@@ -506,6 +507,7 @@ export default {
     ...mapActions([
       'resetVuex',
       'setIsWidget',
+      'setIsHubSpotWidget',
       'setHubspotDialNumber',
       'setDialerCommunication',
       'setDialerContact',

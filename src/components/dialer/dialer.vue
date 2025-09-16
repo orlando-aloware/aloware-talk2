@@ -405,11 +405,8 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      // Check if this is a HubSpot widget that needs to handle inbound calls
-      const isHubSpotWidget = this.$route && this.$route.name === 'HubSpot Call Extension'
-
       // Only ignore calls for regular widgets (not Salesforce or HubSpot widgets)
-      const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !isHubSpotWidget
+      const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget
 
       if (shouldIgnoreCall) {
         call._connection.ignore()

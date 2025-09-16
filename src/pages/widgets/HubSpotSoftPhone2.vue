@@ -25,7 +25,7 @@
     <!-- End Dialer Listeners -->
 
     <!-- Start Default State (No call started) -->
-    <div class="p-3" v-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED">
+    <div class="p-3" v-if="widgetMessage === WidgetMessage.SHOW_ALERT_CALL_NOT_STARTED">
       <div class="status-header">
         <div class="d-flex align-items-center">
           <strong>Ready for Calls</strong>
@@ -40,7 +40,7 @@
     <!-- Start Webrtc -->
     <webrtc
       v-if="isUserAuthenticated"
-      v-show='widgetMessage === WIDGET_MSG_HIDE && !isLoadingDialer'
+      v-show='widgetMessage === WidgetMessage.HIDE && !isLoadingDialer'
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled"
@@ -61,7 +61,7 @@ import { mapState, mapActions } from 'vuex'
 import { AGENT_STATUS_ACCEPTING_CALLS, AGENT_STATUS_ON_CALL, AGENT_STATUS_ON_WRAP_UP } from 'src/constants/agent-status'
 import { OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK, OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT } from 'src/constants/user-outbound-calling-modes'
 import { local as localStorageHelper } from 'src/plugins/helpers/storage'
-import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin } from 'src/plugins/mixins'
+import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin } from 'src/plugins/mixins'
 
 const WidgetMessage = Object.freeze({
   HIDE: 1,
@@ -85,7 +85,7 @@ export default {
     DialerListeners
   },
 
-  mixins: [agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin],
+  mixins: [agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin],
 
   data () {
     return {
@@ -278,6 +278,7 @@ export default {
     ...mapActions([
       'resetVuex',
       'setIsWidget',
+      'setIsHubSpotWidget',
       'setHubspotDialNumber',
       'setDialerCommunication',
       'setDialerContact',
@@ -465,6 +466,14 @@ export default {
           sizeInfo: HUBSPOT_WIDGET_SIZE
         })
       }
+    }
+  },
+  async created () {
+    this.setIsWidget(true)
+    this.setIsHubSpotWidget(true)
+
+    if (this.$route.query.small) {
+      this.small = true
     }
   },
   async mounted () {

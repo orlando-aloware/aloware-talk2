@@ -24,7 +24,7 @@ export default {
       'notificationAudio'
     ]),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['isWidget', 'isSalesforceWidget']),
+    ...mapState(['isWidget', 'isSalesforceWidget', 'isHubSpotWidget']),
     ...mapState('powerDialer', [
       'powerDialerTasks'
     ])
@@ -213,7 +213,7 @@ export default {
     },
 
     processActionNotification (communication, type) {
-      if (this.isWidget && !this.isSalesforceWidget) {
+      if (this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget) {
         return
       }
       const name = { data: '' }

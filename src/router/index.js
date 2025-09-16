@@ -65,6 +65,12 @@ export default function ({ store }) {
       store.commit('SET_IS_SALESFORCE_WIDGET', true)
     }
 
+    const isHubSpotWidget = to.name === 'HubSpot Call Extension'
+
+    if (isHubSpotWidget) {
+      store.commit('SET_IS_HUBSPOT_WIDGET', true)
+    }
+
     const record = to.matched.find(record => record.meta.title)
     const documentTitle = { data: '' }
 
