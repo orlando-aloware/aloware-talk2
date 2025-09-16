@@ -2,7 +2,7 @@
   <div data-testid="call-timeline-wrapper" class="call-timeline-wrapper">
     <q-card class="ring-group-snapshot-card" flat bordered data-testid="call-timeline-card">
       <q-card-section data-testid="call-timeline-card-section">
-        <div class="text-h6">Call Quality</div>
+        <div class="text-h6">Call timeline</div>
       </q-card-section>
       <q-separator inset />
       <q-timeline color="primary" class="ml-3 mt-3">
