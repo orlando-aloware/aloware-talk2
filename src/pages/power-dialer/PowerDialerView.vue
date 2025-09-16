@@ -711,6 +711,12 @@ export default {
     }
 
     this.init()
+
+    // Set timeout to clear initialization flag after all watchers have had a chance to fire
+    this.initializationTimeout = setTimeout(() => {
+      this.isInitializing = false
+      console.log('🎯 PowerDialerView: initialization phase completed')
+    }, 500)
   },
 
   computed: {
@@ -936,7 +942,9 @@ export default {
       hasFilters: false,
       pdViewListeners: {},
       bulkAddStatusReport: {},
-      currentList: null
+      currentList: null,
+      isInitializing: true,
+      initializationTimeout: null
     }
   },
 
@@ -1321,8 +1329,8 @@ export default {
   watch: {
     '$route.params.filter': {
       handler () {
-        console.log('🎯 PowerDialerView: $route.params.filter watcher triggered', { route: this.$route.name })
-        if (!this.$route.name.includes('Contact')) {
+        console.log('🎯 PowerDialerView: $route.params.filter watcher triggered', { route: this.$route.name, isInitializing: this.isInitializing })
+        if (!this.$route.name.includes('Contact') && !this.isInitializing) {
           console.log('🎯 PowerDialerView: calling init(false) from $route.params.filter watcher')
           this.init(false)
         }
@@ -1331,8 +1339,8 @@ export default {
     },
 
     '$route.params.id': function (newId, oldId) {
-      console.log('🎯 PowerDialerView: $route.params.id watcher triggered', { newId, oldId, route: this.$route.name })
-      if (!this.$route.name.includes('Contact')) {
+      console.log('🎯 PowerDialerView: $route.params.id watcher triggered', { newId, oldId, route: this.$route.name, isInitializing: this.isInitializing })
+      if (!this.$route.name.includes('Contact') && !this.isInitializing) {
         console.log('🎯 PowerDialerView: calling init(true) from $route.params.id watcher')
         this.init(true)
       }
@@ -1344,12 +1352,10 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function (val) {
-        console.log('🎯 PowerDialerView: currentListFilters watcher triggered', { route: this.$route.name, filtersCount: this.filtersCount })
         if (this.$route.name === 'Power Dialer') {
           const hasFilters = this.filtersCount > 0
 
           const params = this.$jsonClone(typeof this.currentListFilters === 'string' ? {} : this.currentListFilters)
-          console.log('🎯 PowerDialerView: calling onFetch from currentListFilters watcher')
 
           const csfFields = this.computedColumns.reduce((acc, column) => {
             if (column.name.startsWith('csf_')) {
@@ -1361,8 +1367,23 @@ export default {
             params.csf_fields = csfFields
           }
 
-          this.onFetch(params, hasFilters, true)
-          this.$emit('onFiltersCount', this.currentListFilters)
+          // Only call onFetch if not in initialization phase or if this is the final initialization call
+          if (!this.isInitializing) {
+            this.onFetch(params, hasFilters, true)
+            this.$emit('onFiltersCount', this.currentListFilters)
+          } else {
+            // Schedule the fetch to happen after initialization is complete
+            if (this.initializationTimeout) {
+              clearTimeout(this.initializationTimeout)
+            }
+
+            this.initializationTimeout = setTimeout(() => {
+              this.isInitializing = false
+              console.log('🎯 PowerDialerView: initialization completed, executing final fetch')
+              this.onFetch(params, hasFilters, true)
+              this.$emit('onFiltersCount', this.currentListFilters)
+            }, 500)
+          }
         }
       }
     },
@@ -1394,6 +1415,13 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
+    this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
+
+    // Clean up initialization timeout
+    if (this.initializationTimeout) {
+      clearTimeout(this.initializationTimeout)
+      this.initializationTimeout = null
+    }
   }
 }
 </script>
