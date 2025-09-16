@@ -213,7 +213,7 @@ export default {
     },
 
     processActionNotification (communication, type) {
-      if (this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget) {
+      if (this.isWidget && !this.isSalesforceWidget) {
         return
       }
       const name = { data: '' }

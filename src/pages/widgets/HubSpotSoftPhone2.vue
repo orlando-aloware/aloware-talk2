@@ -204,12 +204,21 @@ export default {
 
       // Component initialization state
       initialized: false,
+      isInitializing: true,
 
       // HubSpot portal ID received from SDK
       hubspotPortalId: null,
 
       // HubSpot widget visibility state
       isCallingWidgetVisible: true,
+
+      // Contact details for calls
+      contactDetails: {
+        contactName: '',
+        contactTimezone: '',
+        companyName: '',
+        contactId: null
+      },
 
       // HubSpot Calling Extensions SDK configuration options
       callSdkOptions: {
@@ -598,6 +607,7 @@ export default {
           // For HubSpot widget, return to ready state instead of showing call finished
           this.displayState = DisplayState.READY_FOR_CALLS
         } else if (this.displayState !== DisplayState.SHOW_ALERT_AGENT_ON_CALL &&
+          this.isInitializing &&
           agentStatus === AgentStatus.AGENT_STATUS_ON_CALL &&
           !this.isDialed) {
           this.displayState = DisplayState.HIDE
@@ -824,6 +834,75 @@ export default {
       }
 
       this.handleCallCompletedEvent(true)
+    },
+
+    /**
+     * Validates if there's an active call status that should prevent new calls
+     */
+    validateHasActiveCallStatus () {
+      let status = false
+
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
+        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition)) {
+        status = true
+      }
+
+      const statuses = [
+        'MAKING_CALL',
+        'CALL_CONNECTED',
+        'HANGING_UP_CALL',
+        'CALL_DISCONNECTED',
+        'WRAP_UP',
+        'ANSWERING_CALL'
+      ]
+
+      if (statuses.includes(this.dialer?.currentStatus)) {
+        status = true
+      }
+
+      return status
+    },
+
+    /**
+     * Resets agent status when needed
+     */
+    resetAgentStatus () {
+      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-ResetAgentStatus')
+    },
+
+    /**
+     * Gets contact details from HubSpot API
+     */
+    async getContact () {
+      const withLastUsedCallLine = this.isAlwaysAskModeEnabled()
+
+      await this.$axios.post('/api/v1/integrations/hubspot/find-contact', {
+        params: this.hubspotDialNumber,
+        with_last_used_call_line: withLastUsedCallLine,
+        with_last_call: true
+      }).then(res => {
+        const contact = res?.data?.contact
+        this.contactDetails.contactName = this.getContactName(contact)
+        this.contactDetails.contactTimezone = contact.timezone
+        this.contactDetails.companyName = contact.company_name
+        this.contactDetails.contactId = contact.id
+
+        if (withLastUsedCallLine) {
+          this.campaignId = res?.data?.last_used_call_line
+        }
+        const profile = {
+          'last_call': res?.data?.last_call
+        }
+        this.setProfile(profile)
+      }).catch(err => {
+        this.$handleErrors(err.response)
+        this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
+        if (this.extensions) {
+          this.extensions.callEnded()
+        }
+
+        throw err
+      })
     }
   },
   watch: {
@@ -859,10 +938,8 @@ export default {
 
   beforeDestroy () {
     // Clean up inbound call listener
-    if (this.incomingCallHandler) {
-      this.$VueEvent.stop('new_in_app_call', this.incomingCallHandler)
-      console.log('Successfully removed new_in_app_call listener')
-    }
+    this.$VueEvent.stop('new_in_app_call', this.handleIncomingCall)
+    console.log('Successfully removed new_in_app_call listener')
   },
 
   async created () {
@@ -896,11 +973,11 @@ export default {
     HubSpotCallingExtensionsClient.subscribe(this.callSdkOptions.eventHandlers)
     this.callExtensionsInitialized = true
     await this.initializeAuth()
+    this.isInitializing = false
 
     // Set up listener for inbound calls from Aloware
     console.log('Setting up listener for new_in_app_call events')
-    this.incomingCallHandler = this.handleIncomingCall.bind(this)
-    this.$VueEvent.listen('new_in_app_call', this.incomingCallHandler)
+    this.$VueEvent.listen('new_in_app_call', this.handleIncomingCall)
     console.log('Successfully registered new_in_app_call listener')
   }
 }

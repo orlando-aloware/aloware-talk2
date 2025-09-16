@@ -93,7 +93,7 @@ export default {
 
     ...mapState('powerDialer', ['powerDialerTasks']),
 
-    ...mapState(['isWidget', 'isSalesforceWidget']),
+    ...mapState(['isWidget', 'isSalesforceWidget', 'isHubSpotWidget']),
 
     ...mapState('TeamInbox', ['activeInboxId']),
 
