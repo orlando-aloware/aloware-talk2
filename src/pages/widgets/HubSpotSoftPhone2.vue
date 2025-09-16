@@ -63,10 +63,12 @@ import { OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK, OUTBOUND_CALLING_MODE_ACCOUNT
 import { local as localStorageHelper } from 'src/plugins/helpers/storage'
 import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin } from 'src/plugins/mixins'
 
-const WIDGET_MSG_HIDE = 1
-const WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL = 2
-const WIDGET_MSG_SHOW_ALERT_CALL_FINISHED = 3
-const WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED = 4
+const WidgetMessage = Object.freeze({
+  HIDE: 1,
+  SHOW_ALERT_AGENT_ON_CALL: 2,
+  SHOW_ALERT_CALL_FINISHED: 3,
+  SHOW_ALERT_CALL_NOT_STARTED: 4
+})
 
 const DIALER_STATUSES = ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY', null]
 
@@ -88,8 +90,7 @@ export default {
   data () {
     return {
       // Constants
-      WIDGET_MSG_HIDE,
-      WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED,
+      WidgetMessage,
 
       campaignId: null,
 
@@ -97,7 +98,7 @@ export default {
       isDialed: false,
 
       // Widget message state - controls which UI to show
-      widgetMessage: WIDGET_MSG_HIDE,
+      widgetMessage: WidgetMessage.HIDE,
 
       // Loading and UI state
       isPreparingToCall: false,
@@ -231,7 +232,7 @@ export default {
 
       return DIALER_STATUSES.includes(this.dialer?.currentStatus) &&
         !this.dialer?.parkedCall &&
-        this.widgetMessage === WIDGET_MSG_HIDE
+        this.widgetMessage === WidgetMessage.HIDE
     },
 
     /**
@@ -329,7 +330,7 @@ export default {
        */
       // if not empty then dialer was called, and we are here after login page so we must dial the number
       if (!this.hubspotDialNumber) {
-        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED
+        this.widgetMessage = WidgetMessage.SHOW_ALERT_CALL_NOT_STARTED
         return
       }
 
@@ -358,18 +359,18 @@ export default {
         this.setAgentStatus(agentStatus)
 
         if (agentStatus === AGENT_STATUS_ACCEPTING_CALLS &&
-          this.widgetMessage === WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
+          this.widgetMessage === WidgetMessage.SHOW_ALERT_AGENT_ON_CALL &&
           !this.isDialed) {
           // For HubSpot widget, return to ready state instead of showing call finished
-          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED
-        } else if (this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
+          this.widgetMessage = WidgetMessage.SHOW_ALERT_CALL_NOT_STARTED
+        } else if (this.widgetMessage !== WidgetMessage.SHOW_ALERT_AGENT_ON_CALL &&
           agentStatus === AGENT_STATUS_ON_CALL &&
           !this.isDialed) {
-          this.widgetMessage = WIDGET_MSG_HIDE
+          this.widgetMessage = WidgetMessage.HIDE
         }
 
         // if we finished - don't need to handle dial number
-        if (this.widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_FINISHED) {
+        if (this.widgetMessage === WidgetMessage.SHOW_ALERT_CALL_FINISHED) {
           return
         }
 
