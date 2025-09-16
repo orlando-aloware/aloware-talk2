@@ -712,6 +712,12 @@ export default {
       } else {
         if (!filter.value || filter.value.toString().trim() === '') {
           errors.push('Please enter a value')
+        } else if (['contains', 'not_contains'].includes(filter.operator) && filter.field !== 'tags') {
+          // For contains/not_contains operators (except on tags), minimum 3 characters required
+          const trimmedValue = filter.value.toString().trim()
+          if (trimmedValue.length < 3) {
+            errors.push('Contains/Not Contains operator requires at least 3 characters')
+          }
         }
       }
 
