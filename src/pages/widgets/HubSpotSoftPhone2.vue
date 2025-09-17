@@ -181,14 +181,15 @@ export default {
 
       campaignId: null,
 
-      // Prevents duplicate dialing attempts
+      // Dialer states
       isDialed: false,
+      dialerRetryTimeout: null,
 
       // Display state - controls which UI to show
       displayState: DisplayState.HIDE,
 
       // Loading and UI state
-      isPreparingToCall: false,
+      isPreparingOutboundCall: false,
       startDialing: false,
       small: false,
 
@@ -257,7 +258,7 @@ export default {
 
           onDialNumber: async (data) => {
             console.log('Dial number event received from HubSpot:', data)
-            this.setHubspotDialNumber(data.phoneNumber)
+            this.setHubspotDialNumber(data)
 
             if (!this.authenticated) {
               // User needs to login first, redirect to login page
@@ -326,7 +327,7 @@ export default {
 
     // Shows loading spinner during dialer initialization
     isLoadingDialer () {
-      if (this.isPreparingToCall || !this.initialized) {
+      if (this.isPreparingOutboundCall || !this.initialized) {
         return true
       }
 
@@ -585,7 +586,108 @@ export default {
      */
     async postDialNumber () {
       this.$bvModal.hide('daytime-hours-confirmation')
-      console.log('postDialNumber called')
+      this.isPreparingOutboundCall = true
+
+      try {
+        this.displayState = DisplayState.HIDE
+
+        do {
+          if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
+            console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
+          }
+
+          if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+            console.log('waiting for agent to become available to make the call', this.dialer.currentStatus)
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
+        } while (this.dialer.currentStatus === 'GENERATING_TOKEN')
+
+        await this.getContact()
+
+        if (this.validateHasActiveCallStatus()) {
+          return
+        }
+
+        // if dialing is initiating and current profile status is on wrap-up, then means that somewhere else wrap-up screen is not closed,
+        // we need to initiate end wrap-up session to adequately tracking dialing statuses changes
+        if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          this.resetAgentStatus()
+        }
+
+        this.$VueEvent.fire('resetCall')
+      } catch (error) {
+        console.error('Error during postDialNumber:', error)
+        return
+      } finally {
+        this.isPreparingOutboundCall = false
+      }
+
+      if (!this.isAlwaysAskModeEnabled) {
+        this.defineDefaultOutboundCampaignId()
+
+        if (this.defaultOutboundCampaignId) {
+          this.campaignId = this.defaultOutboundCampaignId
+        }
+      }
+
+      await this.handleDialNumber()
+    },
+
+    async handleDialNumber () {
+      console.log('Handle')
+      console.log('CurrentStatus:', this.dialer?.currentStatus)
+
+      if (this.validateHasActiveCallStatus()) {
+        return
+      }
+
+      // stop if modal is disabled
+      if (!this.isCallingWidgetVisible) {
+        this.displayState = DisplayState.SHOW_ALERT_CALL_FINISHED
+        return
+      }
+
+      // don't allow to make a call if there's a parked call
+      if (this.dialer?.parkedCall) {
+        this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
+        return
+      }
+
+      this.displayState = DisplayState.HIDE
+      this.startDialing = true
+
+      console.log('Debugging handleDialNumber conditions:', {
+        callExtensionsInitialized: this.callExtensionsInitialized,
+        extensionsVisibility: this.extensionsVisibility,
+        initialized: this.initialized,
+        profile: !!this.profile,
+        dialerReady: this.dialer?.isReady,
+        campaignId: this.campaignId,
+        isAlwaysAskModeEnabled: this.isAlwaysAskModeEnabled,
+        agentStatus: this.agentStatus,
+        checkForceDisposition: this.checkForceDisposition
+      })
+
+      if (this.callExtensionsInitialized &&
+        this.extensionsVisibility &&
+        this.initialized &&
+        this.profile &&
+        this.dialer?.isReady &&
+        // if isAlwaysAskModeEnabled is true then dialing will be triggered from select campaign dialog component
+        (this.campaignId !== null ? !this.isAlwaysAskModeEnabled : false) &&
+        (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? !this.checkForceDisposition : true)) {
+        console.log('All conditions met, calling handleCall()')
+        this.handleCall()
+      } else if (!this.dialer?.isReady) {
+        console.log('Dialer not ready, setting retry timeout')
+        this.dialerRetryTimeout = setTimeout(() => {
+          this.handleDialNumber()
+        }, 1000)
+      } else {
+        console.log('Conditions not met, showing dialer UI')
+        // do not handle call but show dialer, it supposes to show wrap-up or other useful UI
+      }
     },
 
     /**
@@ -634,6 +736,40 @@ export default {
           this.onCancelCall()
         }
       }
+    },
+
+    makeCall () {
+      console.log('[HubSpot Widget] makeCall started')
+      console.log('[HubSpot Widget] Current state:', {
+        campaignId: this.campaignId,
+        hubspotDialNumber: this.hubspotDialNumber,
+        contactDetails: this.contactDetails
+      })
+
+      if (!this.campaignId) {
+        console.log('[HubSpot Widget] Campaign ID is null')
+        this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
+        this.$generalNotification('The dialer does not meet all the required criteria to start calling.', 'error', 5000, true)
+        return
+      }
+
+      if (this.validateHasActiveCallStatus()) {
+        console.log('[HubSpot Widget] validateHasActiveCallStatus returned true, returning early')
+        return
+      }
+
+      const callParams = {
+        currentNumber: this.$options.filters.fixPhone(this.hubspotDialNumber?.phoneNumber),
+        outboundCampaignId: this.campaignId.toString(),
+        contactName: this.contactDetails.contactName,
+        companyName: this.contactDetails.companyName,
+        contactId: this.contactDetails.contactId
+      }
+
+      console.log('[HubSpot Widget] Firing makeCall event with params:', callParams)
+      this.displayState = DisplayState.HIDE
+      this.$VueEvent.fire('makeCall', callParams)
+      console.log('[HubSpot Widget] makeCall completed')
     },
 
     /**
@@ -705,8 +841,20 @@ export default {
      * Handles call initiation
      */
     handleCall (callData) {
-      console.log('Handle call event received:', callData)
-      // TODO: Implement call handling logic
+      // if there's a call in progress or in wrap up, we omit the call
+      if (this.validateHasActiveCallStatus()) {
+        return
+      }
+
+      const params = {
+        timezone: this.contactDetails.contactTimezone,
+        name: this.contactDetails.contactName,
+        calls_notifications_open_time: this.currentCompany.calls_notifications_open_time,
+        calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
+      }
+
+      this.checkContactTimezone(params, this.makeCall, this.onCancelCall)
+      this.isDialed = true
     },
 
     /**
@@ -874,7 +1022,7 @@ export default {
      * Gets contact details from HubSpot API
      */
     async getContact () {
-      const withLastUsedCallLine = this.isAlwaysAskModeEnabled()
+      const withLastUsedCallLine = this.isAlwaysAskModeEnabled
 
       await this.$axios.post('/api/v1/integrations/hubspot/find-contact', {
         params: this.hubspotDialNumber,
