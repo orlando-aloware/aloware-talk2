@@ -44,6 +44,11 @@ export default {
     }),
 
     shouldShowIncomingCallMenu () {
+      if (this.isActionNotification) {
+        // Always show the call buttons when the action notification shows up
+        return true
+      }
+
       if (this.isIncomingLiveCall &&
         this.isCallFishing &&
         !this.isCallFishingMode &&
