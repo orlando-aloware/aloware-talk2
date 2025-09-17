@@ -575,19 +575,19 @@ export const fixCommunicationDateTime = (dt, duration = 0) => {
 }
 
 export const fixTimelineDateTime = (dt) => {
-  if (dt) {
-    if (window.timezone) {
-      if (window.timezone === 'Asia/Manila') {
-        return window.moment.utc(dt).tz(window.timezone).format('MM/DD h:mm:ssa') + ' MNL'
-      }
-
-      return window.moment.utc(dt).tz(window.timezone).format('MM/DD h:mm:ssa z')
-    } else {
-      return window.moment.utc(dt).local().format('MM/DD h:mm:ssa z')
-    }
-  } else {
+  if (!dt) {
     return '-'
   }
+
+  if (!window.timezone) {
+    return window.moment.utc(dt).local().format('MM/DD h:mm:ssa z')
+  }
+
+  if (window.timezone === 'Asia/Manila') {
+    return window.moment.utc(dt).tz(window.timezone).format('MM/DD h:mm:ssa') + ' MNL'
+  }
+
+  return window.moment.utc(dt).tz(window.timezone).format('MM/DD h:mm:ssa z')
 }
 
 export const formatTime = (time, formatTo24Hr) => {
