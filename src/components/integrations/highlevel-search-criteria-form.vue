@@ -172,6 +172,31 @@
                         />
                       </div>
                       <!-- End Boolean Select -->
+                      <!-- Start Timezone Select -->
+                      <div v-else-if="filter.field === 'timezone'" class="timezone-select-container">
+                        <q-select
+                          v-model="filter.value"
+                          :options="filteredTimezoneOptions.length > 0 ? filteredTimezoneOptions : timezoneOptions"
+                          outlined
+                          dense
+                          emit-value
+                          map-options
+                          use-input
+                          input-debounce="0"
+                          :placeholder="filter.value ? '' : 'Select timezone'"
+                          class="criteria-form-input"
+                          @filter="filterTimezoneOptions"
+                        >
+                          <template v-slot:no-option>
+                            <q-item>
+                              <q-item-section class="text-grey">
+                                No timezone found
+                              </q-item-section>
+                            </q-item>
+                          </template>
+                        </q-select>
+                      </div>
+                      <!-- End Timezone Select -->
                       <!-- Regular input for other fields -->
                       <q-input
                         v-else
@@ -305,6 +330,31 @@
                         />
                       </div>
                       <!-- End Boolean Select -->
+                      <!-- Start Timezone Select -->
+                      <div v-else-if="block.field === 'timezone'" class="timezone-select-container">
+                        <q-select
+                          v-model="block.value"
+                          :options="filteredTimezoneOptions.length > 0 ? filteredTimezoneOptions : timezoneOptions"
+                          outlined
+                          dense
+                          emit-value
+                          map-options
+                          use-input
+                          input-debounce="0"
+                          :placeholder="block.value ? '' : 'Select timezone'"
+                          class="criteria-form-input"
+                          @filter="filterTimezoneOptions"
+                        >
+                          <template v-slot:no-option>
+                            <q-item>
+                              <q-item-section class="text-grey">
+                                No timezone found
+                              </q-item-section>
+                            </q-item>
+                          </template>
+                        </q-select>
+                      </div>
+                      <!-- End Timezone Select -->
                       <!-- Regular input for other fields -->
                       <q-input
                         v-else
@@ -372,6 +422,8 @@
 </template>
 
 <script>
+import { HIGHLEVEL_VALID_TZ_VALUES } from 'src/plugins/helpers/highlevel-validation'
+
 export default {
   name: 'HighlevelSearchCriteriaForm',
 
@@ -389,6 +441,7 @@ export default {
   mounted () {
     this.fetchSearchOptions()
     this.filteredFieldOptions = this.availableFields
+    this.filteredTimezoneOptions = this.timezoneOptions
   },
 
   data () {
@@ -406,6 +459,11 @@ export default {
         { label: 'Is Not Empty', value: 'exists' },
         { label: 'Range', value: 'range' }
       ],
+      timezoneOptions: HIGHLEVEL_VALID_TZ_VALUES.map(timezone => ({
+        label: timezone,
+        value: timezone
+      })),
+      filteredTimezoneOptions: [],
       // Committed data - displayed in summary view and emitted to parent
       searchCriteria: {
         filters: [
@@ -902,6 +960,23 @@ export default {
         this.filteredFieldOptions = this.availableFields.filter(field =>
           field.label.toLowerCase().includes(val.toLowerCase()) ||
           field.value.toLowerCase().includes(val.toLowerCase())
+        )
+      })
+    },
+
+    // Filter timezone options for searchable dropdown
+    filterTimezoneOptions (val, update) {
+      if (val === '') {
+        update(() => {
+          this.filteredTimezoneOptions = this.timezoneOptions
+        })
+        return
+      }
+
+      update(() => {
+        this.filteredTimezoneOptions = this.timezoneOptions.filter(timezone =>
+          timezone.label.toLowerCase().includes(val.toLowerCase()) ||
+          timezone.value.toLowerCase().includes(val.toLowerCase())
         )
       })
     },
@@ -1532,6 +1607,10 @@ export default {
 }
 
 .range-date-input-container {
+  width: 100%;
+}
+
+.timezone-select-container {
   width: 100%;
 }
 
