@@ -1555,6 +1555,7 @@
           :call-issues="Object.values(communication?.call_quality_summary || {})"
           :user="communication.user"
         />
+        <call-timeline v-if="communication.call_timeline && communication.call_timeline.length > 0" :timeline="communication.call_timeline" />
       </b-col>
     </b-row>
   </div>
@@ -1590,6 +1591,7 @@ import * as CommunicationDispositionStatus from '../constants/communication-disp
 import * as CommunicationTypes from '../constants/communication-types'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
 import CsatScore from 'components/communications/communications-table/csat-score.vue'
+import CallTimeline from 'components/communications/call-timeline.vue'
 
 export default {
   name: 'communication-details',
@@ -1611,7 +1613,8 @@ export default {
     GenerateTranscriptionButton,
     CloseIcon,
     UserDisplay,
-    SparkleIcon
+    SparkleIcon,
+    CallTimeline
   },
 
   mixins: [
