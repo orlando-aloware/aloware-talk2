@@ -534,6 +534,12 @@ export default {
       }
 
       initializeRangeDisplays(this.tempSearchCriteria.filters)
+
+      // Force refresh of filtered field options to ensure q-select has proper options
+      this.$nextTick(() => {
+        this.filteredFieldOptions = this.availableFields
+      })
+
       this.showEditDialog = true
     },
 
