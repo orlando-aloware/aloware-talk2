@@ -265,8 +265,7 @@ export default {
       return this.currentCompany &&
         (this.currentCompany.hubspot_integration_enabled ||
           this.currentCompany.zoho_integration_enabled ||
-          this.currentCompany.pipedrive_integration_enabled ||
-          this.currentCompany.gohighlevel_integration_enabled)
+          this.currentCompany.pipedrive_integration_enabled)
     }
   },
   mounted () {
