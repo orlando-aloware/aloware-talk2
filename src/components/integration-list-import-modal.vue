@@ -60,8 +60,7 @@
                                                :generic-styling="false"
                                                :disable="shouldDisableListSelector"
                                                :integration="selectedIntegration ?? ''"
-                                               @change="onListSelectorChange"
-                                               v-if="selectedIntegration !== HIGHLEVEL_INTEGRATION" />
+                                               @change="onListSelectorChange" />
                 </div>
 
                 <div class="d-flex align-items-center pt-3">
