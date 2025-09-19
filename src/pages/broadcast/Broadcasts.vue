@@ -294,7 +294,7 @@
                     <span v-else class="text-muted">-</span>
                   </div>
                   <q-tooltip anchor="top middle"
-                             v-if="(row['notes'] || '').length > 23">
+                             v-if="(row['notes'] || '').length > 0">
                     <span v-html="$options.filters.nl2br(row.notes)" />
                   </q-tooltip>
                 </td>
