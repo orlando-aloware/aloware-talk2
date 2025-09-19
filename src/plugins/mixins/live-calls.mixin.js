@@ -6,7 +6,6 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { agentMixin, notificationMixin, userMixin } from 'src/plugins/mixins/index'
-import talk2Api from '../api/api'
 export default {
   mixins: [
     agentMixin,
@@ -43,11 +42,56 @@ export default {
       liveCalls: 'getLiveCalls'
     }),
 
+    isPersonalInboxCallWaitingCommunication () {
+      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      if (!ringGroup) {
+        return false
+      }
+
+      if (!ringGroup.call_waiting) {
+        return false
+      }
+
+      if (!this.dialer) {
+        return false
+      }
+
+      if (!this.dialer.call) {
+        return false
+      }
+
+      return true
+    },
+
     shouldShowIncomingCallMenu () {
       if (this.isActionNotification) {
         // Always show the call buttons when the action notification shows up
         return true
       }
+
+      console.log('isPersonalInboxCallWaitingCommunication', this.isPersonalInboxCallWaitingCommunication)
+
+      if (this.isPersonalInboxCallWaitingCommunication) {
+        console.log('isPersonalInboxCallWaitingCommunication is true - shouldShowIncomingCallMenu')
+        return true
+      }
+
+      // const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      // if (ringGroup?.call_waiting) {
+      //   if (this.dialer && this.dialer.call) {
+      //     console.log('Call Waiting Ring Group - Show Incoming Call Menu')
+      //     return true
+      //   }
+      // }
+
+      // if (this.communication?.campaign?.call_waiting_ring_group_id) {
+      //   if (this.dialer && this.dialer.call) {
+      //     // Call Waiting Ring Group
+      //     return true
+      //   }
+      // }
 
       if (this.isIncomingLiveCall &&
         this.isCallFishing &&
@@ -94,10 +138,6 @@ export default {
         this.dialer.communication &&
         this.dialer.communication.id !== this.communication.id
       ) {
-        return false
-      }
-
-      if (!this.communication) {
         return false
       }
 
@@ -148,7 +188,7 @@ export default {
     },
 
     isCallFishing () {
-      if (!this.communication || !this.communication.ring_group_id) {
+      if (!this.communication.ring_group_id) {
         return false
       }
 
@@ -157,15 +197,15 @@ export default {
       return ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
     },
     isCallFishingMode () {
-      if (!this.communication || !this.callFishingQueue) {
-        return false
+      if (this.callFishingQueue) {
+        return this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id) >= 0
       }
 
-      return this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id) >= 0
+      return false
     },
 
     isIgnored () {
-      if (!this.communication || _.isEmpty(this.callFishingQueue)) {
+      if (_.isEmpty(this.callFishingQueue)) {
         return true
       }
 
@@ -174,10 +214,6 @@ export default {
     },
 
     isIncomingLiveCall () {
-      if (!this.communication) {
-        return false
-      }
-
       return this.communication.type === CommunicationTypes.CALL &&
         this.communication.direction === CommunicationDirection.INBOUND &&
         this.incomingCallStatuses.includes(this.communication.current_status2)
@@ -223,6 +259,10 @@ export default {
     },
 
     isShowCancelCallIcon () {
+      if (this.isPersonalInboxCallWaitingCommunication) {
+        return true
+      }
+
       return this.isIncomingLiveCall && !this.isCallFishing
     },
 
@@ -239,7 +279,33 @@ export default {
     },
 
     isPersonalInbox () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
       return this.communication.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled
+    }
+  },
+
+  watch: {
+    isPersonalInbox (newVal) {
+      if (this.id === 'callFishing') {
+        // this.fetchCurrentCommunicationIfNeeded()
+        // console.log('isPersonalInbox changed', newVal, this.communication)
+      }
+    },
+
+    communication: {
+      handler: function (newVal, oldVal) {
+        if (this.id === 'callFishing') {
+          // this.fetchCurrentCommunicationIfNeeded()
+          // console.log('communication changed', newVal, this.communication)
+          console.log('communication changed')
+          console.trace(this.communication)
+          console.log('oldVal', oldVal)
+        }
+      },
+      immediate: true
     }
   },
 
@@ -307,16 +373,11 @@ export default {
       e.stopImmediatePropagation()
     },
     onRejectCall (e) {
-      if (!this.communication) {
-        return
-      }
-
       this.isRejecting = true
       if (this.isCallFishingMode && this.isCallFishing) {
         this.removeFromCallFishingQueue(this.communication.id)
         this.isRejecting = false
         this.processRemoveFromNotification(this.communication)
-        this.ignoreFishing()
         e.stopImmediatePropagation()
         return
       }
@@ -332,18 +393,6 @@ export default {
       this.isRejecting = false
       this.processRemoveFromNotification(this.communication)
       e.stopImmediatePropagation()
-    },
-    async ignoreFishing () {
-      if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
-        try {
-          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
-        } catch (error) {
-          console.error('Failed to force terminate communication:', error)
-        }
-      }
-
-      this.$closeActionNotification('callFishing')
-      this.closeCallNotifications(this.id, this.communicationId)
     },
     onHangUpCall (e) {
       this.$VueEvent.fire('hangupCall')

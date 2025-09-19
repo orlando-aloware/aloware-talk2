@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{ shouldShowIncomingCallMenu ? 'S' : 'N' }}
     <!-- Incoming Call-->
     <!-- only show this if call is incoming and is not a parked call-->
     <div class="text-grey-90 d-flex flex-row justify-center"
@@ -12,21 +13,18 @@
                   v-if="isShowIgnoreCallIcon || isShowCancelCallIcon"
                   data-testid="item-reject-btn"
                   @click="onRejectCall">
-          <!-- show remove icon for call fishing mode -->
-          <ignore-call-icon :height="size"
-                            :width="size"
-                            data-testid="item-ignore-call-icon"
-                            v-if="isShowIgnoreCallIcon" />
           <q-tooltip anchor="top middle"
                      self="center middle"
                      v-if="!isShowIgnoreCallIcon || tooltipMessage">
             {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
           </q-tooltip>
+          <!-- show remove icon for call fishing mode -->
+          <ignore-call-icon height="24"
+                            width="24"
+                            data-testid="item-ignore-call-icon"
+                            v-if="isShowIgnoreCallIcon" />
           <!-- only show reject button if -->
-          <cancel-call-icon v-if="isShowCancelCallIcon"
-                            :height="size"
-                            :width="size"
-                            data-testid="item-cancel-call-icon" />
+          <cancel-call-icon data-testid="item-cancel-call-icon" v-else-if="isShowCancelCallIcon" />
         </b-button>
       </div>
       <div v-if="isIncomingCall"
@@ -42,9 +40,7 @@
                      v-if="!showIncomingCallMenu">
             Answer
           </q-tooltip>
-          <accept-call-icon :height="size"
-                            :width="size"
-                            data-testid="item-accept-call-icon" />
+          <accept-call-icon data-testid="item-accept-call-icon" />
           <q-menu content-class="live-call-options"
                   anchor="top right"
                   self="top left"
@@ -88,7 +84,7 @@
 
     <!-- Answered / In Progress Call-->
     <div class="text-grey-90 d-flex flex-row justify-center"
-         v-if="shouldShowAnsweredCallMenu">
+         v-else-if="shouldShowAnsweredCallMenu">
       <div class="pl-0">
         <b-button variant="light"
                   size="sm"
@@ -99,23 +95,21 @@
                      self="center middle">
             Hang up
           </q-tooltip>
-          <cancel-call-icon :height="size"
-                            :width="size" />
+          <cancel-call-icon />
         </b-button>
       </div>
     </div>
 
     <!-- Parked Call-->
     <div class="text-grey-90 d-flex flex-row justify-center"
-         v-if="shouldShowParkedCallMenu">
+         v-else-if="shouldShowParkedCallMenu">
       <div class="pl-0">
         <b-button variant="light"
                   size="sm"
                   class="bg-transparent no-border no-box-shadow p-0"
                   data-testid="item-unpark-btn"
                   @click="onUnparkCall">
-          <parked-call-icon :height="size"
-                            :width="size" />
+          <parked-call-icon />
           <q-tooltip anchor="top middle"
                      self="center middle"
                      data-testid="item-unpark-tooltip"
@@ -172,7 +166,7 @@ import HangupIcon from 'components/icons/hangup-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import { liveCallsMixin } from 'src/plugins/mixins'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+// import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'live-call-controls',
@@ -197,25 +191,16 @@ export default {
     contact: {
       type: Object,
       default: null
-    },
-
-    size: {
-      type: Number,
-      default: 24
-    },
-
-    isActionNotification: {
-      type: Boolean,
-      default: false
     }
   },
 
   computed: {
     isIncomingCall () {
-      const isCallFishing = this.isCallFishingMode && this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-      const isIncomingCall = !this.isCallFishingMode && this.isIncomingLiveCall
+      return this.isIncomingLiveCall
+      // const isCallFishing = this.isCallFishingMode && this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+      // const isIncomingCall = !this.isCallFishingMode && this.isIncomingLiveCall
 
-      return isCallFishing || isIncomingCall
+      // return isCallFishing || isIncomingCall
     },
 
     tooltipMessage () {
