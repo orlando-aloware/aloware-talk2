@@ -6,6 +6,8 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { agentMixin, notificationMixin, userMixin } from 'src/plugins/mixins/index'
+import talk2Api from '../api/api'
+
 export default {
   mixins: [
     agentMixin,
@@ -70,28 +72,9 @@ export default {
         return true
       }
 
-      console.log('isPersonalInboxCallWaitingCommunication', this.isPersonalInboxCallWaitingCommunication)
-
-      if (this.isPersonalInboxCallWaitingCommunication) {
-        console.log('isPersonalInboxCallWaitingCommunication is true - shouldShowIncomingCallMenu')
+      if (this.isPersonalInboxCallWaitingCommunication && this.isIncomingLiveCall) {
         return true
       }
-
-      // const ringGroup = this.getRingGroup(this.communication.ring_group_id)
-
-      // if (ringGroup?.call_waiting) {
-      //   if (this.dialer && this.dialer.call) {
-      //     console.log('Call Waiting Ring Group - Show Incoming Call Menu')
-      //     return true
-      //   }
-      // }
-
-      // if (this.communication?.campaign?.call_waiting_ring_group_id) {
-      //   if (this.dialer && this.dialer.call) {
-      //     // Call Waiting Ring Group
-      //     return true
-      //   }
-      // }
 
       if (this.isIncomingLiveCall &&
         this.isCallFishing &&
@@ -147,17 +130,21 @@ export default {
       ) && !this.isParkedCall &&
         !this.isConnectedCall
     },
+
     shouldShowAnsweredCallMenu () {
       return this.isActiveCall && !this.isParkedCall && !this.shouldShowIncomingCallMenu
     },
+
     shouldShowParkedCallMenu () {
       return this.isParkedCall
     },
+
     isActiveCallOwner () {
       return this.dialer && this.dialer.state === 'open' &&
         this.dialer.communication &&
         this.dialer.communication.id === this.communication.id
     },
+
     isParkedCall () {
       if (!this.communication) {
         return false
@@ -188,7 +175,7 @@ export default {
     },
 
     isCallFishing () {
-      if (!this.communication.ring_group_id) {
+      if (!this.communication || !this.communication.ring_group_id) {
         return false
       }
 
@@ -196,7 +183,12 @@ export default {
 
       return ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
     },
+
     isCallFishingMode () {
+      if (!this.communication) {
+        return false
+      }
+
       if (this.callFishingQueue) {
         return this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id) >= 0
       }
@@ -214,6 +206,10 @@ export default {
     },
 
     isIncomingLiveCall () {
+      if (!this.communication) {
+        return false
+      }
+
       return this.communication.type === CommunicationTypes.CALL &&
         this.communication.direction === CommunicationDirection.INBOUND &&
         this.incomingCallStatuses.includes(this.communication.current_status2)
@@ -287,28 +283,6 @@ export default {
     }
   },
 
-  watch: {
-    isPersonalInbox (newVal) {
-      if (this.id === 'callFishing') {
-        // this.fetchCurrentCommunicationIfNeeded()
-        // console.log('isPersonalInbox changed', newVal, this.communication)
-      }
-    },
-
-    communication: {
-      handler: function (newVal, oldVal) {
-        if (this.id === 'callFishing') {
-          // this.fetchCurrentCommunicationIfNeeded()
-          // console.log('communication changed', newVal, this.communication)
-          console.log('communication changed')
-          console.trace(this.communication)
-          console.log('oldVal', oldVal)
-        }
-      },
-      immediate: true
-    }
-  },
-
   methods: {
     ...mapActions([
       'setShowPhone',
@@ -323,6 +297,7 @@ export default {
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
     },
+
     onAcceptCall (e) {
       if ((this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') || this.isAgentOnCall) {
         this.showIncomingCallMenu = true
@@ -372,32 +347,54 @@ export default {
       this.setShowPhone(true)
       e.stopImmediatePropagation()
     },
-    onRejectCall (e) {
+
+    async onRejectCall (e) {
+      if (!this.communication) {
+        return
+      }
+
       this.isRejecting = true
+
       if (this.isCallFishingMode && this.isCallFishing) {
         this.removeFromCallFishingQueue(this.communication.id)
-        this.isRejecting = false
         this.processRemoveFromNotification(this.communication)
+        await this.ignoreFishing()
         e.stopImmediatePropagation()
+        this.isRejecting = false
         return
       }
 
       // handle active call
-      if (this.dialer && this.dialer.state === 'open') {
+      if (this.dialer?.state === 'open' || this.isAgentOnCall) {
         this.$VueEvent.fire('hangupCall')
         this.isRejecting = false
         return
       }
 
       this.$VueEvent.fire('rejectCall')
-      this.isRejecting = false
       this.processRemoveFromNotification(this.communication)
+      this.isRejecting = false
       e.stopImmediatePropagation()
     },
+
+    async ignoreFishing () {
+      if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
+        try {
+          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
+        } catch (error) {
+          console.error('Failed to force terminate communication:', error)
+        }
+      }
+
+      this.$closeActionNotification('callFishing')
+      this.closeCallNotifications(this.id, this.communicationId)
+    },
+
     onHangUpCall (e) {
       this.$VueEvent.fire('hangupCall')
       e.stopImmediatePropagation()
     },
+
     onUnparkCall (e) {
       if ((this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') || this.isAgentOnCall) {
         this.showParkedCallMenu = true
@@ -423,6 +420,7 @@ export default {
 
       this.answerCommunication(true, true)
     },
+
     onHangupCurrentCallAndConnect () {
       this.showParkedCallMenu = false
 
@@ -432,14 +430,17 @@ export default {
 
       this.answerCommunication(false, true)
     },
+
     onParkCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
       this.answerCommunication(true, false)
     },
+
     onHangUpCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
       this.answerCommunication(false, true)
     },
+
     async answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
