@@ -117,7 +117,7 @@ export default {
     isValid () {
       switch (this.optionSelected) {
         case 'list':
-          return (!!this.source.list.id || !isEmpty(this.source.list.filters)) && this.contactsCount > 0
+          return (!!this.source.list.id || !isEmpty(this.source.filters)) && this.contactsCount > 0
         case 'integration':
           return !isEmpty(this.source.integration?.list) && this.contactsCount > 0
         default:
