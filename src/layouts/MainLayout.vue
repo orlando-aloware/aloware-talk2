@@ -1244,8 +1244,6 @@ export default {
 
   methods: {
     updateLocalCommunication (communication) {
-      console.log('updateLocalCommunication', communication)
-
       const parkedCall = _.get(this.dialer, 'parkedCall', null)
       const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
       const parkedCallFound = this.parkedCalls.find(comm => comm.id === communication.id)
