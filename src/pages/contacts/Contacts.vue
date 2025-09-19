@@ -70,6 +70,7 @@ import {
   mainViewMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import Contact from 'pages/contacts/Contact'
 
 export default {
@@ -120,6 +121,8 @@ export default {
       'isAllContactsSelected'
     ]),
 
+    ...mapFields('settings', ['contactsListSortPreference']),
+
     mainClass () {
       if (this.$route.name === 'Contact') {
         return 'w-100'
@@ -164,6 +167,7 @@ export default {
     }
 
     this.setAllContactsSelected(false)
+    this.setInitialSorting()
   },
 
   methods: {
@@ -219,6 +223,18 @@ export default {
     onRemoveContacts () {
       if (!this.isAllContactsSelected) {
         this.$VueEvent.fire('fetchContacts', { clear: true })
+      }
+    },
+
+    setInitialSorting () {
+      // if viewing a Contact List, save sorting preference per List
+      // else save sorting preferences for Contacts page
+      const sortKey = this.$route.meta?.page === 'Contacts List' && this.$route.params?.id
+        ? this.$route.params.id
+        : 'contacts'
+
+      if (this.contactsListSortPreference[sortKey]) {
+        this.sorts = { ...this.contactsListSortPreference[sortKey] }
       }
     }
   },

@@ -354,6 +354,43 @@ export const ContactFieldsHelper = {
     return attributeType === ContactAttributeTypeEnum.DATE_PICKER
       ? 'attribute-type-date-picker'
       : 'attribute-type-text'
+  },
+
+  /**
+   * Get default field order with custom attributes inserted
+   * @param {Array} attributes - Array of custom attributes
+   * @returns {Array} Field order with custom attributes included
+   */
+  getDefaultFieldOrderWithCustomAttributes (attributes = []) {
+    // Guard against undefined or empty attributes
+    if (!attributes || attributes.length === 0) {
+      return [...DEFAULT_FIELD_ORDER]
+    }
+
+    const customAttributeFields = attributes.map(attr => {
+      // Handle both id and attribute_id properties for compatibility
+      const attributeId = attr.id || attr.attribute_id
+      return `custom_attribute_${attributeId}`
+    })
+
+    // Insert custom attributes after custom_field_2 (this was the default order in the UI)
+    const baseOrder = [...DEFAULT_FIELD_ORDER]
+    const custom2Index = baseOrder.indexOf('custom_field_2')
+
+    if (custom2Index !== -1) {
+      // Insert custom attributes after custom_field_2
+      baseOrder.splice(custom2Index + 1, 0, ...customAttributeFields)
+    } else {
+      // Fallback: add at the end before display-only fields
+      const displayOnlyStart = baseOrder.indexOf('tcpa_approved')
+      if (displayOnlyStart !== -1) {
+        baseOrder.splice(displayOnlyStart, 0, ...customAttributeFields)
+      } else {
+        baseOrder.push(...customAttributeFields)
+      }
+    }
+
+    return baseOrder
   }
 }
 

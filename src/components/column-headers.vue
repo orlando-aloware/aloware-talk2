@@ -379,6 +379,9 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      attributeDictionaries: 'getAttributeDictionaries'
+    }),
     ...mapGetters('contacts', ['columns']),
 
     resourceId () {
@@ -391,11 +394,31 @@ export default {
       return `Manage ${String(title).toLowerCase()} columns`
     },
 
+    allColumnsCombined () {
+      return [...ALL_COLUMNS, ...this.mappedDictionaryAttributes]
+    },
+
     allColumns () {
       const columns = []
       const results = { data: 0 }
 
-      const matches = sortBy(ALL_COLUMNS, ['name']).filter((item) => {
+      const matches = sortBy(this.allColumnsCombined, ['name']).filter((item) => {
+        // Date Added to List adjustments
+        if (item.name === 'created_at_list') {
+          if (!this.isContactsListOrPowerDialerList) {
+            return false
+          }
+
+          // adjust Date Added to List column based on the current page
+          if (this.endpointUrl === 'power-dialer-lists') {
+            item.label = 'Date Added to Power Dialer'
+            item.tooltip = 'This is the date the contact was added to a Power Dialer session or queue'
+          } else {
+            item.label = 'Date Added to List'
+            item.tooltip = 'This is the date the contact was added to this contact list'
+          }
+        }
+
         if (this.searchText && this.searchText.trim().length > 1) {
           return (
             (item.name + item.label)
@@ -436,6 +459,20 @@ export default {
       }
     },
 
+    mappedDictionaryAttributes () {
+      return (this.attributeDictionaries ?? []).map((item, index) => ({
+        name: `csf_${item.id}`,
+        label: item.name,
+        category: 4,
+        order: 50 + index,
+        sortable: true,
+        draggable: true,
+        resizable: true,
+        default: false,
+        minWidth: 225
+      }))
+    },
+
     selectedColumns () {
       if (Array.isArray(this.currentColumns) && this.currentColumns.length) {
         return new Set([...this.currentColumns.map((i) => i.name)])
@@ -473,6 +510,10 @@ export default {
 
     powerDialerDefaultColumns () {
       return POWER_DIALER_DEFAULT_COLUMNS
+    },
+
+    isContactsListOrPowerDialerList () {
+      return this.$route.meta?.page === 'Contacts List' || this.$route.meta?.title === 'Power Dialer'
     }
   },
   watch: {
