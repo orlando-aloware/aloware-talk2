@@ -64,6 +64,11 @@
                                    v-if="source.integration.name"
                                    @change="onIntegrationListChanged"/>
       </template>
+
+      <div v-if="showEmptyListError"
+           class="text-negative text-caption q-mt-sm">
+        This list contains no contacts. Please select a valid list with contacts to proceed
+      </div>
     </div>
   </div>
 </template>
@@ -100,6 +105,11 @@ export default {
       type: Object,
       required: false,
       default: () => ({})
+    },
+
+    contactsCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -107,9 +117,9 @@ export default {
     isValid () {
       switch (this.optionSelected) {
         case 'list':
-          return !!this.source.list.id || !isEmpty(this.source.filters)
+          return (!!this.source.list.id || !isEmpty(this.source.filters)) && this.contactsCount > 0
         case 'integration':
-          return !isEmpty(this.source.integration?.list)
+          return !isEmpty(this.source.integration?.list) && this.contactsCount > 0
         default:
           return false
       }
@@ -143,6 +153,15 @@ export default {
       return this.integrationsEnabled.filter(integration => [
         HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION
       ].includes(integration.toLowerCase()))
+    },
+
+    showEmptyListError () {
+      const hasListSelection = this.optionSelected === 'list' &&
+        (this.source.list.id || !isEmpty(this.source.list.filters))
+      const hasIntegrationSelection = this.optionSelected === 'integration' &&
+        !isEmpty(this.source.integration?.list)
+
+      return (hasListSelection || hasIntegrationSelection) && this.contactsCount === 0
     }
   },
 
