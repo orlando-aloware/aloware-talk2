@@ -509,7 +509,6 @@ export default {
   },
 
   mounted () {
-    console.log('action-notification mounted', this.id)
     // Initialize teamInboxLink if ringGroupId is available on mount
     if (this.ringGroupId && this.ringGroupId !== '') {
       this.updateTeamInboxLink(this.ringGroupId)
