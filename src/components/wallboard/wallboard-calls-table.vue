@@ -230,7 +230,7 @@
                         <a target="_blank"
                            :href="getUserActivityURL(attemptingUser)"
                            v-if="hasRole('Company Admin')">
-                          <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
+                          <span :class="getAttemptingClass(attemptingUser.id, call.disposition_status2, call.user_id)"
                                 :title="getUserName(attemptingUser)">
                             <user-display :user="attemptingUser" />
                           </span>
