@@ -1,6 +1,7 @@
 import { SEARCH_FIELDS, THREADED, ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
+import { debounce } from 'lodash'
 
 export default {
   computed: {
@@ -317,7 +318,7 @@ export default {
       return hasAccess
     },
 
-    async fetchInboxesUnreadCount (inboxIds, contactIds = null) {
+    fetchInboxesUnreadCount: debounce(async function (inboxIds, contactIds = null) {
       let data = []
 
       this.setIsLoadingInboxesUnreadCount(true)
@@ -343,7 +344,7 @@ export default {
       }
 
       return data
-    },
+    }, 3000),
 
     getInboxUnreadCount (inboxId) {
       // For "all" inbox, sum up all unread counts
