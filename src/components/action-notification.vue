@@ -95,109 +95,17 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-center align-items-center call-actions"
-             v-if="shouldShowCallActions">
-          <q-btn class="height-32 mr-2"
-                 ripple
-                 round
-                 no-caps
-                 @click="rejectCall">
-            <cancel-call-icon width="32"
-                              height="32"
-                              v-if="id === 'incomingCall'"/>
-            <ignore-call-icon v-if="id === 'callFishing'"/>
-            <q-tooltip anchor="top middle"
-                       self="center middle">
-              {{ id === 'incomingCall' ? 'Decline' : tooltipMessage }}
-            </q-tooltip>
-          </q-btn>
-          <q-btn class="height-32"
-                 ripple
-                 round
-                 no-caps
-                 @click="answerCall">
-            <q-tooltip anchor="top middle"
-                       self="center middle">
-              Answer
-            </q-tooltip>
-            <accept-call-icon width="32" height="32"/>
-          </q-btn>
-        </div>
-        <div class="d-flex justify-content-center align-items-center call-fishing-actions"
-             :class="id === 'callFishing' && getSource ? 'mt-2' : ''"
-             v-if="shouldShowFishingActions">
-          <q-btn class="height-32 mr-2"
-                 ripple
-                 round
-                 no-caps
-                 @click="ignoreFishing">
-            <ignore-call-icon/>
-            <q-tooltip anchor="top middle"
-                       self="center middle"
-                       v-if="tooltipMessage">
-              {{ tooltipMessage }}
-            </q-tooltip>
-          </q-btn>
-
-          <q-btn class="height-32"
-                 ripple
-                 round
-                 no-caps
-                 @click="answerCall"
-                 v-if="dialer.currentStatus === 'WRAP_UP'">
-            <q-tooltip anchor="top middle"
-                       self="center middle">
-              Answer
-            </q-tooltip>
-            <accept-call-icon width="32" height="32"/>
-          </q-btn>
-
-          <q-btn class="height-32"
-                 ripple
-                 no-caps
-                 @click="answerCall"
-                 v-if="dialer.currentStatus !== 'WRAP_UP' && agentStatus === AgentStatus.AGENT_STATUS_RINGING">
-            <q-tooltip anchor="top middle"
-                       self="center middle">
-              Answer
-            </q-tooltip>
-            <accept-call-icon width="32" height="32"/>
-          </q-btn>
-
-          <b-dropdown no-caret
-                      :right="$q.screen.lt.lg"
-                      :dropright="!$q.screen.lt.lg"
-                      variant="transparent"
-                      class="m-2 b-compact-dropdown-button text-bold height-32"
-                      v-else-if="dialer.currentStatus !== 'WRAP_UP'">
-            <template #button-content>
-              <accept-call-icon width="32" height="32"/>
-            </template>
-            <b-dropdown-item href=""
-                             link-class="d-flex align-items-center"
-                             @click="handleAnswerCommunication(true, false)">
-              <park-call-icon class="icon-margin"
-                              width="13"
-                              height="13"
-                              color="#9B51E0"/>Park Current Call & Connect
-            </b-dropdown-item>
-            <b-dropdown-item href=""
-                             @click="handleAnswerCommunication(false, true)">
-              <hangup-icon class="icon-margin" width="13"/>Hangup Current Call & Connect
-            </b-dropdown-item>
-          </b-dropdown>
-        </div>
+        <live-call-controls :communication="communication"
+                            :contact="contact"
+                            :size="32"
+                            is-action-notification
+                            class="mr-2" />
       </div>
     </div>
   </b-toast>
 </template>
 
 <script>
-import AcceptCallIcon from 'components/icons/accept-call-icon'
-import CancelCallIcon from 'components/icons/cancel-call-icon'
-import HangupIcon from 'components/icons/hangup-icon'
-import IgnoreCallIcon from 'components/icons/ignore-call-icon'
-import ParkCallIcon from 'components/icons/park-call-icon'
 import { get, isEmpty } from 'lodash'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 import { getQueryString } from 'src/plugins/helpers/functions'
@@ -215,8 +123,8 @@ import {
 import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../constants/agent-status'
-import talk2Api from 'src/plugins/api/api'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import LiveCallControls from 'components/shared/live-call-controls'
 
 export default {
   name: 'action-notification',
@@ -234,11 +142,7 @@ export default {
   ],
 
   components: {
-    IgnoreCallIcon,
-    HangupIcon,
-    AcceptCallIcon,
-    CancelCallIcon,
-    ParkCallIcon
+    LiveCallControls
   },
 
   props: {
@@ -567,21 +471,6 @@ export default {
 
     isAgentOrDialerOnCall () {
       return this.dialer.call || this.isAgentOnCall
-    },
-
-    shouldShowCallActions () {
-      return this.id === 'incomingCall' || (this.id === 'callFishing' && this.dialer && !this.isAgentOrDialerOnCall)
-    },
-
-    shouldShowFishingActions () {
-      return this.id === 'callFishing' && this.dialer && this.isAgentOrDialerOnCall
-    },
-
-    tooltipMessage () {
-      if (!this.communication) {
-        return ''
-      }
-      return this.isPersonalInbox ? 'Reject' : 'Ignore'
     }
   },
 
@@ -754,65 +643,6 @@ export default {
           return 'mentions'
       }
       return 'sms'
-    },
-
-    answerCall () {
-      if (this.dialer.currentStatus === 'WRAP_UP') {
-        this.$VueEvent.fire('endWrapUp')
-      }
-
-      if (this.id === 'callFishing') {
-        this.handleAnswerCommunication()
-        return
-      }
-
-      this.$VueEvent.fire('answerCall')
-      this.setShowPhone(true)
-    },
-
-    async ignoreFishing () {
-      if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
-        try {
-          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
-        } catch (error) {
-          console.error('Failed to force terminate communication:', error)
-        }
-      }
-
-      this.$closeActionNotification('callFishing')
-      // console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
-      this.closeCallNotifications(this.id, this.communicationId)
-    },
-
-    async handleAnswerCommunication (shouldPark = false, shouldHangup = false) {
-      await this.answerCommunication(shouldPark, shouldHangup)
-      this.$closeActionNotification('callFishing')
-    },
-
-    rejectCall () {
-      if (this.id !== 'callFishing' ||
-        (this.id === 'callFishing' &&
-          (!this.queue ||
-            (this.queue && !this.queue.length))
-        )
-      ) {
-        // console.log('[Action 2] Communication when event closeCallNotifications : ', this.communication)
-        this.closeCallNotifications(this.id, this.communicationId, true)
-      }
-
-      this.$VueEvent.fire('rejectCall')
-
-      if (this.id === 'callFishing') {
-        this.$VueEvent.fire('hidePhone')
-      }
-
-      if (this.id === 'callFishing') {
-        if (this.queue && this.queue.length) {
-          this.switchCallFishingFromQueue()
-        } else {
-          this.removeFromCallFishingQueue(this.communicationId)
-        }
-      }
     },
 
     onNotificationClick (event) {

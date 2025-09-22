@@ -122,8 +122,6 @@ export default {
     this.$cookies = VueCookies
     this.visits = parseInt(this.$cookies.get(this.cookieName) || 0)
 
-    console.log('visits', this.visits)
-
     if (this.visits < this.maxShows && this.shouldShowInFirstVisit) {
       this.showModal = true
     }

@@ -57,6 +57,9 @@
                 </div>
                 <span class="handle-label"
                       :class="{ 'pl-2': column.label === 'Actions' }">
+                  <q-tooltip v-if="column.tooltip">
+                    {{ column.tooltip }}
+                  </q-tooltip>
                   {{ column.label }}
                 </span>
                 <div class="sorter-container"

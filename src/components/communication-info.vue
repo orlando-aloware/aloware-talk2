@@ -309,18 +309,6 @@
                       {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
                     </q-tooltip>
                   </q-icon>
-
-                  <!--q-tooltip class="item"
-                             content-class="bg-grey-light11"
-                             anchor="top middle"
-                             self="top middle"
-                             v-if="communication.rejected_by_app !== 0">
-                    {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
-                    <component class="status-icon d-inline-block"
-                               v-bind:is="icon"
-                               :name="rejectionToIcon(communication.rejected_by_app)">
-                    </component>
-                  </q-tooltip-->
                   <div v-else-if="communication.user_id || communication.user">
                     <div @click="onOpenUserInClassicClicked(communication?.user_id)">
                       <span class="text-black cursor-pointer"
@@ -847,15 +835,9 @@ import DownloadButton from 'components/download-button'
 import GenerateTranscriptionButton from 'components/generate-transcription-button'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
-import AcceptCallIcon from 'components/icons/accept-call-icon'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import CalendarIcon from 'components/icons/calendar-icon'
-import CancelCallIcon from 'components/icons/cancel-call-icon'
 import ChevronRight from 'components/icons/contact-activity/chevron-right'
-import HangupIcon from 'components/icons/hangup-icon'
-import IgnoreCallIcon from 'components/icons/ignore-call-icon'
-import ParkCallIcon from 'components/icons/park-call-icon'
-import ParkedCallIcon from 'components/icons/parked-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
 import DOMPurify from 'dompurify'
 import _ from 'lodash'
@@ -914,12 +896,6 @@ export default {
     SparkleIcon,
     HubspotActivityTypeSelector,
     OpenCalendarButton,
-    IgnoreCallIcon,
-    HangupIcon,
-    ParkCallIcon,
-    ParkedCallIcon,
-    AcceptCallIcon,
-    CancelCallIcon,
     CalendarIcon,
     ChevronRight,
     CallDispositionSelector,

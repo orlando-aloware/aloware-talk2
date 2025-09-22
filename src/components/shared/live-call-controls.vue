@@ -13,8 +13,8 @@
                   data-testid="item-reject-btn"
                   @click="onRejectCall">
           <!-- show remove icon for call fishing mode -->
-          <ignore-call-icon height="24"
-                            width="24"
+          <ignore-call-icon :height="size"
+                            :width="size"
                             data-testid="item-ignore-call-icon"
                             v-if="isShowIgnoreCallIcon" />
           <q-tooltip anchor="top middle"
@@ -23,7 +23,10 @@
             {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
           </q-tooltip>
           <!-- only show reject button if -->
-          <cancel-call-icon data-testid="item-cancel-call-icon" v-if="isShowCancelCallIcon" />
+          <cancel-call-icon v-if="isShowCancelCallIcon"
+                            :height="size"
+                            :width="size"
+                            data-testid="item-cancel-call-icon" />
         </b-button>
       </div>
       <div v-if="isIncomingCall"
@@ -39,7 +42,9 @@
                      v-if="!showIncomingCallMenu">
             Answer
           </q-tooltip>
-          <accept-call-icon data-testid="item-accept-call-icon" />
+          <accept-call-icon :height="size"
+                            :width="size"
+                            data-testid="item-accept-call-icon" />
           <q-menu content-class="live-call-options"
                   anchor="top right"
                   self="top left"
@@ -94,7 +99,8 @@
                      self="center middle">
             Hang up
           </q-tooltip>
-          <cancel-call-icon />
+          <cancel-call-icon :height="size"
+                            :width="size" />
         </b-button>
       </div>
     </div>
@@ -108,7 +114,8 @@
                   class="bg-transparent no-border no-box-shadow p-0"
                   data-testid="item-unpark-btn"
                   @click="onUnparkCall">
-          <parked-call-icon />
+          <parked-call-icon :height="size"
+                            :width="size" />
           <q-tooltip anchor="top middle"
                      self="center middle"
                      data-testid="item-unpark-tooltip"
@@ -190,6 +197,16 @@ export default {
     contact: {
       type: Object,
       default: null
+    },
+
+    size: {
+      type: Number,
+      default: 24
+    },
+
+    isActionNotification: {
+      type: Boolean,
+      default: false
     }
   },
 
