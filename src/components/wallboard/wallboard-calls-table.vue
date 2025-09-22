@@ -204,7 +204,7 @@
               <!-- attempting -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'attempting_users'">
-                <span v-if="call.attempting_users && call.attempting_users.length > 0">
+                <span v-if="call.attempting_users_data && call.attempting_users_data.length > 0">
                   <ul class="list list-unstyled inset mb-0">
                     <div v-if="!showMoreList.includes(call.id)">
                       <li class="pb-1"
@@ -652,6 +652,12 @@ export default {
       const users = size
         ? communication.attempting_users.slice(0, size)
         : communication.attempting_users
+
+      if (communication.attempting_users_data) {
+        return size
+          ? communication.attempting_users_data.slice(0, size)
+          : communication.attempting_users_data
+      }
 
       return users.filter(user => this.getUser(user)?.id)
     }
