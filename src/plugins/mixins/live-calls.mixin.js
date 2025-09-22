@@ -45,6 +45,10 @@ export default {
     }),
 
     isPersonalInboxCallWaitingCommunication () {
+      if (!this.communication) {
+        return false
+      }
+
       const ringGroup = this.getRingGroup(this.communication.ring_group_id)
 
       if (!ringGroup) {
