@@ -61,17 +61,14 @@
                                    :clearable="true"
                                    :generic-styling="false"
                                    :integration="source.integration.name"
-                                   v-if="source.integration.name && !isHighLevelSelected"
+                                   v-if="source.integration.name"
                                    @change="onIntegrationListChanged"/>
-
-        <div v-if="isHighLevelSelected" class="highlevel-criteria-section">
-          <highlevel-search-criteria-form
-            class="mt-3"
-            v-model="highlevelSearchCriteria"
-            :available-fields="highlevelAvailableFields"
-          />
-        </div>
       </template>
+
+      <div v-if="showEmptyListError"
+           class="text-negative text-caption q-mt-sm">
+        This list contains no contacts. Please select a valid list with contacts to proceed
+      </div>
     </div>
   </div>
 </template>
@@ -80,17 +77,14 @@
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
 import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
-import HighlevelSearchCriteriaForm from 'src/components/integrations/highlevel-search-criteria-form.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { integrationMixin } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
-import talk2Api from 'src/plugins/api/api'
 import {
   HUBSPOT_INTEGRATION,
   PIPEDRIVE_INTEGRATION,
   SALESFORCE_INTEGRATION,
-  ZOHO_INTEGRATION,
-  HIGHLEVEL_INTEGRATION
+  ZOHO_INTEGRATION
 } from 'src/constants/integrations'
 
 export default {
@@ -103,8 +97,7 @@ export default {
   components: {
     CheckOIcon,
     ContactsListSelector,
-    IntegrationListSelector,
-    HighlevelSearchCriteriaForm
+    IntegrationListSelector
   },
 
   props: {
@@ -112,6 +105,11 @@ export default {
       type: Object,
       required: false,
       default: () => ({})
+    },
+
+    contactsCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -119,13 +117,9 @@ export default {
     isValid () {
       switch (this.optionSelected) {
         case 'list':
-          return !!this.source.list.id || !isEmpty(this.source.filters)
+          return (!!this.source.list.id || !isEmpty(this.source.filters)) && this.contactsCount > 0
         case 'integration':
-          // HighLevel uses search criteria instead of a predefined list
-          if (this.isHighLevelSelected) {
-            return !isEmpty(this.highlevelSearchCriteria?.filters)
-          }
-          return !isEmpty(this.source.integration?.list)
+          return !isEmpty(this.source.integration?.list) && this.contactsCount > 0
         default:
           return false
       }
@@ -157,12 +151,17 @@ export default {
       // show only ready for broadcast integrations
       // @see src/components/broadcasts/broadcast-add-view.vue
       return this.integrationsEnabled.filter(integration => [
-        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION, HIGHLEVEL_INTEGRATION
+        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION
       ].includes(integration.toLowerCase()))
     },
 
-    isHighLevelSelected () {
-      return this.source.integration?.name?.toLowerCase() === HIGHLEVEL_INTEGRATION
+    showEmptyListError () {
+      const hasListSelection = this.optionSelected === 'list' &&
+        (this.source.list.id || !isEmpty(this.source.list.filters))
+      const hasIntegrationSelection = this.optionSelected === 'integration' &&
+        !isEmpty(this.source.integration?.list)
+
+      return (hasListSelection || hasIntegrationSelection) && this.contactsCount === 0
     }
   },
 
@@ -171,9 +170,7 @@ export default {
     source: {
       list: {},
       integration: {}
-    },
-    highlevelSearchCriteria: {},
-    highlevelAvailableFields: []
+    }
   }),
 
   mounted () {
@@ -210,11 +207,7 @@ export default {
         // use next tick to make sure ref is loaded
         this.$nextTick()
           .then(() => {
-            if (this.isHighLevelSelected) {
-              this.loadHighLevelFields()
-            } else {
-              this.$refs.integrationListSelector.getListsOfEnabledIntegration()
-            }
+            this.$refs.integrationListSelector.getListsOfEnabledIntegration()
           })
       }
     },
@@ -262,27 +255,10 @@ export default {
         list: {},
         integration: {}
       }
-      this.highlevelSearchCriteria = {}
-    },
-
-    loadHighLevelFields () {
-      talk2Api.V2.integrations.highlevel.getSearchOptions()
-        .then(response => {
-          this.highlevelAvailableFields = response.data || []
-        })
-        .catch(error => {
-          console.error('Failed to load HighLevel fields:', error)
-          this.highlevelAvailableFields = []
-        })
     },
 
     onIntegrationNameInput (value) {
       this.$set(this.source.integration, 'name', value)
-
-      // Load HighLevel fields if HighLevel is selected
-      if (value.toLowerCase() === HIGHLEVEL_INTEGRATION) {
-        this.loadHighLevelFields()
-      }
     }
   },
 
@@ -294,24 +270,9 @@ export default {
     source: {
       deep: true,
       handler (value) {
-        // Add HighLevel data to the source object
-        if (this.isHighLevelSelected) {
-          value.integration.highlevelSearchCriteria = this.highlevelSearchCriteria
-        }
-
         // Only emit if we have meaningful data
         if (this.source.integration?.name || this.source.list?.id || this.source.list?.filters) {
           this.$emit('source-updated', value)
-        }
-      }
-    },
-
-    highlevelSearchCriteria: {
-      deep: true,
-      handler (newValue) {
-        // Update source.integration when search criteria changes
-        if (this.isHighLevelSelected) {
-          this.$set(this.source.integration, 'highlevelSearchCriteria', newValue)
         }
       }
     }

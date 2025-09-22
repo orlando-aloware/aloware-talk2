@@ -10,6 +10,7 @@
                     :name="`horizontal-slide-${direction}`">
           <component ref="mainComponent"
                      :is="mainComponent"
+                     :contacts-count="this.currentStep.id === 1 && contactsCount"
                      v-bind="mainComponentProps"
                      @input="mainComponentChanged"
                      @source-updated="onSourceUpdated"
@@ -129,7 +130,6 @@ import API from 'src/plugins/api/api'
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex'
 import { broadcastsMixin, companyTimezone } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
-import { HIGHLEVEL_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'broadcast-add-view',
@@ -237,7 +237,7 @@ export default {
     },
 
     footerComponent () {
-      const isIntegration = !isEmpty(this.source.integration?.list) || this.source.integration?.name?.toLowerCase() === HIGHLEVEL_INTEGRATION
+      const isIntegration = !isEmpty(this.source.integration?.list)
       const isIntegrationHubspot = isIntegration && this.source.integration.name === 'HubSpot'
 
       switch (true) {
@@ -325,7 +325,8 @@ export default {
       },
       sendWarningDialog: {
         open: false
-      }
+      },
+      contactsCount: 0
     }
   },
 
@@ -473,6 +474,7 @@ export default {
 
     onContactsLength (count) {
       this.SET_CONTACTS_LENGTH(count)
+      this.contactsCount = count
     },
 
     send () {
@@ -539,11 +541,6 @@ export default {
 
             break
         }
-      }
-
-      // Handle HighLevel integration with search criteria
-      if (this.source.integration?.name.toLowerCase() === HIGHLEVEL_INTEGRATION) {
-        bulkMessage.highlevel_criteria = this.source.integration.highlevelSearchCriteria
       }
 
       API.V1.broadcasts[method](bulkMessage)

@@ -119,23 +119,23 @@
                     <div v-if="!['exists', 'not_exists'].includes(filter.operator)" class="criteria-form-field">
                       <label v-if="filterIndex === 0" class="field-label">Value</label>
                       <!-- Start Multi-select -->
-                      <div v-if="filter.field === 'tags'" class="tags-input-container">
+                      <div v-if="['tags', 'followers'].includes(filter.field)" class="multi-value-input-container">
                         <q-input
                           v-model="filter.inputValue"
                           outlined
                           dense
                           placeholder="Press 'Enter' to add"
                           class="criteria-form-input"
-                          @keyup.enter="addTag(filter)"
+                          @keyup.enter="addValue(filter)"
                         />
-                        <div v-if="getTagsArray(filter.value).length > 0" class="tags-display">
-                          <div v-for="(tag, index) in getTagsArray(filter.value)"
+                        <div v-if="getValuesArray(filter.value).length > 0" class="multi-value-display">
+                          <div v-for="(val, index) in getValuesArray(filter.value)"
                                :key="index"
                                class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
-                            <div class="tag-text">{{ tag }}</div>
+                            <div class="tag-text">{{ val }}</div>
                             <div role="button"
                                  class="custom__remove d-flex align-items-center"
-                                 @click="removeTag(filter, index)">
+                                 @click="removeValue(filter, index)">
                               <i class="fa fa-times ml-1 remove-tag-icon"></i>
                             </div>
                           </div>
@@ -252,23 +252,23 @@
                     <div v-if="!['exists', 'not_exists'].includes(block.operator)" class="criteria-form-field">
                       <label class="field-label">Value</label>
                       <!-- Start Multi-select -->
-                      <div v-if="block.field === 'tags'" class="tags-input-container">
+                      <div v-if="['tags', 'followers'].includes(block.field)" class="multi-value-input-container">
                         <q-input
                           v-model="block.inputValue"
                           outlined
                           dense
                           placeholder="Press 'Enter' to add"
                           class="criteria-form-input"
-                          @keyup.enter="addSingleTag(block)"
+                          @keyup.enter="addSingleValue(block)"
                         />
-                        <div v-if="getTagsArray(block.value).length > 0" class="tags-display">
-                          <div v-for="(tag, index) in getTagsArray(block.value)"
+                        <div v-if="getValuesArray(block.value).length > 0" class="multi-value-display">
+                          <div v-for="(val, index) in getValuesArray(block.value)"
                                :key="index"
                                class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
-                            <div class="tag-text">{{ tag }}</div>
+                            <div class="tag-text">{{ val }}</div>
                             <div role="button"
                                  class="custom__remove d-flex align-items-center"
-                                 @click="removeSingleTag(block, index)">
+                                 @click="removeSingleValue(block, index)">
                               <i class="fa fa-times ml-1 remove-tag-icon"></i>
                             </div>
                           </div>
@@ -372,6 +372,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'HighlevelSearchCriteriaForm',
 
@@ -534,6 +535,12 @@ export default {
       }
 
       initializeRangeDisplays(this.tempSearchCriteria.filters)
+
+      // Force refresh of filtered field options to ensure q-select has proper options
+      this.$nextTick(() => {
+        this.filteredFieldOptions = this.availableFields
+      })
+
       this.showEditDialog = true
     },
 
@@ -631,11 +638,20 @@ export default {
         return value
       }
 
-      // Handle tags field - return as string if single tag, array if multiple
+      // Handle tags field - return as string if single tag, array if multiple (lowercase)
       if (field === 'tags') {
         if (Array.isArray(value)) {
           const processedTags = value.map(v => v ? v.toLowerCase() : v).filter(v => v)
           return processedTags.length === 1 ? processedTags[0] : processedTags
+        }
+        return []
+      }
+
+      // Handle followers field - return as string if single value, array if multiple
+      if (field === 'followers') {
+        if (Array.isArray(value)) {
+          const processedFollowers = value.filter(v => v)
+          return processedFollowers.length === 1 ? processedFollowers[0] : processedFollowers
         }
         return []
       }
@@ -701,9 +717,10 @@ export default {
         if (!this.isRangeValueValid(filter.value)) {
           errors.push('Please enter a valid date range (MM/DD/YYYY - MM/DD/YYYY)')
         }
-      } else if (filter.field === 'tags') {
+      } else if (['tags', 'followers'].includes(filter.field)) {
         if (!Array.isArray(filter.value) || filter.value.length === 0) {
-          errors.push('Please add at least one tag')
+          const fieldName = filter.field === 'tags' ? 'tag' : 'follower'
+          errors.push(`Please add at least one ${fieldName}`)
         }
       } else if (this.isBooleanField(filter.field)) {
         if (filter.value === null || filter.value === undefined) {
@@ -712,7 +729,7 @@ export default {
       } else {
         if (!filter.value || filter.value.toString().trim() === '') {
           errors.push('Please enter a value')
-        } else if (['contains', 'not_contains'].includes(filter.operator) && filter.field !== 'tags') {
+        } else if (['contains', 'not_contains'].includes(filter.operator) && !['tags', 'followers'].includes(filter.field)) {
           // For contains/not_contains operators (except on tags), minimum 3 characters required
           const trimmedValue = filter.value.toString().trim()
           if (trimmedValue.length < 3) {
@@ -760,8 +777,8 @@ export default {
     },
 
     initializeFieldValue (filter) {
-      // Handle tags field
-      if (filter.field === 'tags') {
+      // Handle tags and followers fields
+      if (['tags', 'followers'].includes(filter.field)) {
         this.$set(filter, 'value', [])
         if (filter.inputValue === undefined) {
           this.$set(filter, 'inputValue', '')
@@ -816,8 +833,8 @@ export default {
       this.initializeFieldValue(block)
     },
 
-    // Get tags array for display
-    getTagsArray (value) {
+    // Get values array for display
+    getValuesArray (value) {
       if (!value) return []
       if (Array.isArray(value)) {
         return value
@@ -825,12 +842,14 @@ export default {
       return []
     },
 
-    // Add tag to filter
-    addTag (filter) {
+    // Add value to filter
+    addValue (filter) {
       if (!filter.inputValue || filter.inputValue.trim() === '') return
 
-      const tags = this.getTagsArray(filter.value)
-      const newTag = filter.inputValue.trim().toLowerCase()
+      const tags = this.getValuesArray(filter.value)
+      const newTag = filter.field === 'tags'
+        ? filter.inputValue.trim().toLowerCase()
+        : filter.inputValue.trim()
 
       if (!tags.includes(newTag)) {
         tags.push(newTag)
@@ -840,12 +859,14 @@ export default {
       filter.inputValue = ''
     },
 
-    // Add tag to single block
-    addSingleTag (block) {
+    // Add value to single block
+    addSingleValue (block) {
       if (!block.inputValue || block.inputValue.trim() === '') return
 
-      const tags = this.getTagsArray(block.value)
-      const newTag = block.inputValue.trim().toLowerCase()
+      const tags = this.getValuesArray(block.value)
+      const newTag = block.field === 'tags'
+        ? block.inputValue.trim().toLowerCase()
+        : block.inputValue.trim()
 
       if (!tags.includes(newTag)) {
         tags.push(newTag)
@@ -855,16 +876,16 @@ export default {
       block.inputValue = ''
     },
 
-    // Remove tag from filter
-    removeTag (filter, index) {
-      const tags = this.getTagsArray(filter.value)
+    // Remove value from filter
+    removeValue (filter, index) {
+      const tags = this.getValuesArray(filter.value)
       tags.splice(index, 1)
       filter.value = tags
     },
 
-    // Remove tag from single block
-    removeSingleTag (block, index) {
-      const tags = this.getTagsArray(block.value)
+    // Remove value from single block
+    removeSingleValue (block, index) {
+      const tags = this.getValuesArray(block.value)
       tags.splice(index, 1)
       block.value = tags
     },
@@ -1148,6 +1169,14 @@ export default {
 
       if (this.isBooleanField(filter.field)) {
         return this.summaryFormatBooleanValue(value, fieldLabel, operatorLabel)
+      }
+
+      // Handle tags and followers fields (arrays)
+      if (['tags', 'followers'].includes(filter.field) && Array.isArray(value)) {
+        const displayValue = value.length > 3
+          ? `${value.slice(0, 3).join(', ')}... (+${value.length - 3} more)`
+          : value.join(', ')
+        return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} "${displayValue}"`
       }
 
       return `${fieldLabel} ${safeOperatorLabel.toLowerCase()} "${value}"`
@@ -1481,17 +1510,17 @@ export default {
   z-index: 2;
 }
 
-.tags-input-container {
+.multi-value-input-container {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
 
-.tags-input-container .q-input {
+.multi-value-input-container .q-input {
   flex-shrink: 0;
 }
 
-.tags-display {
+.multi-value-display {
   display: flex;
   flex-wrap: wrap;
   gap: 2px;
