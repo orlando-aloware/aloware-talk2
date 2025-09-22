@@ -497,15 +497,19 @@ export default {
       return !urlInboxId || this.findInboxById(urlInboxId)
     },
 
-    loadInboxesUnreadCount () {
-      const inboxIds = Object.keys(this.parsedInboxes ?? {}).flatMap((parsedInbox) => this.parsedInboxes[parsedInbox].map((inbox) => inbox.id))
+    findRealInboxIds (inboxList) {
+      const inboxIds = Object.keys(inboxList ?? {}).flatMap((parsedInbox) => inboxList[parsedInbox].map((inbox) => inbox.id))
 
       if (!inboxIds.length) {
         return
       }
 
       // Filter out the "all" inbox ID since it's virtual
-      const realInboxIds = inboxIds.filter(id => id !== ALL_INBOXES_ID)
+      return inboxIds.filter(id => id !== ALL_INBOXES_ID)
+    },
+
+    loadInboxesUnreadCount () {
+      const realInboxIds = this.findRealInboxIds(this.parsedInboxes)
 
       if (realInboxIds.length > 0) {
         this.fetchInboxesUnreadCount(realInboxIds)
@@ -574,7 +578,11 @@ export default {
       }
     },
 
-    parsedInboxes () {
+    parsedInboxes (newInboxes, oldInboxes) {
+      if (this.findRealInboxIds(newInboxes) === this.findRealInboxIds(oldInboxes)) {
+        return
+      }
+
       this.loadInboxesUnreadCount()
     },
 
