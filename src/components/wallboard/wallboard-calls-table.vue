@@ -204,39 +204,39 @@
               <!-- attempting -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'attempting_users'">
-                <span v-if="call.attempting_users && call.attempting_users.length > 0">
+                <span v-if="call.attempting_users_data && call.attempting_users_data.length > 0">
                   <ul class="list list-unstyled inset mb-0">
                     <div v-if="!showMoreList.includes(call.id)">
                       <li class="pb-1"
-                          :key="attemptingUser"
+                          :key="attemptingUser.id"
                           v-for="attemptingUser in getAttemptingUsers(call, 3)">
                         <a target="_blank"
                            :href="getUserActivityURL(attemptingUser)"
                            v-if="hasRole('Company Admin')">
-                          <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
-                                :title="getUserName(getUser(attemptingUser))">
-                            <user-display :user-id="attemptingUser" />
+                          <span :class="getAttemptingClass(attemptingUser.id, call.disposition_status2, call.user_id)"
+                                :title="getUserName(attemptingUser)">
+                            <user-display :user="attemptingUser" />
                           </span>
                         </a>
                         <span v-else>
-                          <user-display :user-id="attemptingUser" />
+                          <user-display :user="attemptingUser" />
                         </span>
                       </li>
                     </div>
                     <div v-else>
                       <li class="pb-1"
-                          :key="attemptingUser"
+                          :key="attemptingUser.id"
                           v-for="attemptingUser in getAttemptingUsers(call)">
                         <a target="_blank"
                            :href="getUserActivityURL(attemptingUser)"
                            v-if="hasRole('Company Admin')">
-                          <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
-                                :title="getUserName(getUser(attemptingUser))">
-                            <user-display :user-id="attemptingUser" />
+                          <span :class="getAttemptingClass(attemptingUser.id, call.disposition_status2, call.user_id)"
+                                :title="getUserName(attemptingUser)">
+                            <user-display :user="attemptingUser" />
                           </span>
                         </a>
                         <span v-else>
-                          <user-display :user-id="attemptingUser" />
+                          <user-display :user="attemptingUser" />
                         </span>
                       </li>
                     </div>
@@ -654,7 +654,9 @@ export default {
         : communication.attempting_users
 
       if (communication.attempting_users_data) {
-        return communication.attempting_users_data
+        return size
+          ? communication.attempting_users_data.slice(0, size)
+          : communication.attempting_users_data
       }
 
       return users.filter(user => this.getUser(user)?.id)

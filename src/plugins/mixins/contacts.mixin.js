@@ -96,6 +96,7 @@ export default {
     init: _.debounce(function (clear = false, firstLoad = false) {
       console.log('🎯 contacts.mixin: init called', {
         clear,
+        firstLoad,
         route: this.$route.name,
         stack: new Error().stack.split('\n').slice(1, 3).map(line => line.trim())
       })
@@ -234,7 +235,7 @@ export default {
         my_contacts: checked,
         search: this.search,
         page: this.contactsData.page
-      }, true, true)
+      }, true, true, false, false, true)
     },
 
     onSearch (searchText) {
@@ -478,6 +479,7 @@ export default {
         clear,
         isLoading,
         fromRefresh,
+        firstLoad,
         route: this.$route.name,
         isPowerDialer: this.isPowerDialer,
         stack: new Error().stack.split('\n').slice(1, 3).map(line => line.trim())
@@ -560,15 +562,24 @@ export default {
 
       // contacts list contacts fetching
       console.log('🎯 contacts.mixin: calling processFetch for contacts list')
-      this.processFetch(params, true, false, clear, isSearch)
+      this.processFetch(params, true, false, clear, isSearch, firstLoad)
     },
 
     // adjust request sorting params
     handleSortingParams (params, hasOrder, firstLoad) {
-      if (firstLoad && this.sorts) {
-        params.sort = this.sorts.orderBy
-        params.order = this.sorts.order
-        return
+      if (firstLoad) {
+        if (this.sorts && this.isSortFieldAvailable(this.sorts)) {
+          params.sort = this.sorts.orderBy
+          params.order = this.sorts.order
+          return
+        }
+
+        // use sorts from query if available
+        if (this.isAddContactsView && this.$route.query?.orderBy && this.isSortFieldAvailable({ orderBy: this.$route.query.orderBy })) {
+          params.sort = this.$route.query.orderBy
+          params.order = this.$route.query.order ?? 'asc'
+          return
+        }
       }
 
       let defaultSort = _.get(params, 'sort', this.defaultContactDateFilter)
@@ -590,6 +601,11 @@ export default {
           : defaultSort
         params.order = order
       }
+    },
+
+    // check if sort field is in available columns
+    isSortFieldAvailable (sorts) {
+      return this.columns?.some(column => column.name === sorts?.orderBy)
     },
 
     buildQueryString (params, isContactModule = true) {
