@@ -633,7 +633,7 @@
                       >
                         <span
                           class="text-blue cursor-pointer"
-                          :class="getAttemptingClass(attemptingUser.d, communication.disposition_status2, communication.user_id)"
+                          :class="getAttemptingClass(attemptingUser.id, communication.disposition_status2, communication.user_id)"
                           :title="getUserName(attemptingUser)"
                         >
                           <user-display :user="attemptingUser" />
