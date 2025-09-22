@@ -344,7 +344,7 @@ export default {
       }
 
       return data
-    }, 3000),
+    }, 2000),
 
     getInboxUnreadCount (inboxId) {
       // For "all" inbox, sum up all unread counts
