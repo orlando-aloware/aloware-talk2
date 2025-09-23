@@ -3,6 +3,8 @@
  * Centralized validation logic for HighLevel integration
  */
 
+import { COUNTRIES } from 'src/constants/countries'
+
 /**
  * Validates if HighLevel search criteria has valid filters
  * @param {Object} searchCriteria - The HighLevel search criteria object
@@ -58,4 +60,15 @@ export function hasValidHighLevelListName (listName) {
  */
 export function hasValidHighLevelData (listName, searchCriteria) {
   return hasValidHighLevelListName(listName) && hasValidHighLevelCriteria(searchCriteria)
+}
+
+/**
+ * Get valid country options for HighLevel form selection
+ * @returns {Array} Array of country objects with value and label
+ */
+export function getValidCountryOptions () {
+  return COUNTRIES.map(country => ({
+    value: country.code,
+    label: country.name
+  }))
 }
