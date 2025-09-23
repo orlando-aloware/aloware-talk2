@@ -968,7 +968,8 @@ export default {
       openAloAiEnrollmentModal: false,
       showAssignContacts: false,
       showLimitCharactersError: false,
-      CONTACTS_STRING_KEYS
+      CONTACTS_STRING_KEYS,
+      currentDatatableSorts: null
     }
   },
 
@@ -1342,6 +1343,10 @@ export default {
       this.openAloAiBotContactsEnrollmentModal(mode)
     }
 
+    this.viewListeners.datatableSortsUpdated = (sorts) => {
+      this.currentDatatableSorts = sorts
+    }
+
     this.$VueEvent.listen('contact_list_import_hubspot', this.viewListeners.listenDynamicListUpdate)
     this.$VueEvent.listen('contact_list_import_salesforce', this.viewListeners.listenDynamicListUpdate)
     this.$VueEvent.listen('contact_list_import_failed', this.viewListeners.listenDynamicListUpdateFailed)
@@ -1352,6 +1357,8 @@ export default {
     // Listeners for "more" options on contact selection
     this.$VueEvent.listen('addToPowerDialer', this.viewListeners.addToPowerDialer)
     this.$VueEvent.listen('addToAloAi', this.viewListeners.addToAloAi)
+
+    this.$VueEvent.listen('datatable_sorts_updated', this.viewListeners.datatableSortsUpdated)
   },
 
   methods: {
@@ -1733,7 +1740,16 @@ export default {
     },
 
     onAddContactsToList () {
-      this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
+      // if sort was updated in datatable, use the updated sort
+      let query
+      if (this.currentDatatableSorts) {
+        query = {
+          orderBy: this.currentDatatableSorts.orderBy,
+          order: this.currentDatatableSorts.order
+        }
+      }
+
+      this.$router.push({ path: `/contacts/list/${this.$route.params.id}/add`, query: query })
     },
 
     discardList () {
@@ -2149,6 +2165,7 @@ export default {
     this.$VueEvent.stop('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
     this.$VueEvent.stop('addToPowerDialer', this.viewListeners.addToPowerDialer)
     this.$VueEvent.stop('addToAloAi', this.viewListeners.addToAloAi)
+    this.$VueEvent.stop('datatable_sorts_updated', this.viewListeners.datatableSortsUpdated)
   }
 }
 </script>
