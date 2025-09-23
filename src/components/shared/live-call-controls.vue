@@ -202,6 +202,11 @@ export default {
     size: {
       type: Number,
       default: 24
+    },
+
+    isActionNotification: {
+      type: Boolean,
+      default: false
     }
   },
 

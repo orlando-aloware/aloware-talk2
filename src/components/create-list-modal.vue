@@ -843,6 +843,12 @@ export default {
         await talk2Api.V2.integrations.highlevel.importCriteria(params)
 
         this.$generalNotification('Your HighLevel contacts are being imported based on search criteria. It can take a couple of minutes if it\'s a large result set.')
+
+        // Reset all integration data after successful import
+        this.highlevelSearchCriteria = {}
+        this.integrationList = null
+        this.selectedIntegration = null
+
         this.createListClose()
         this.loadFolders()
         this.loadPublicLists()

@@ -337,7 +337,7 @@
                 <div class="d-flex align-items-center w-100">
                   <span class="text-greyish">
                       <ul class="list list-unstyled inset mb-0">
-                        <template v-for="(attemptingUser, index) in communication.attempting_users">
+                        <template v-for="(attemptingUser, index) in communication.attempting_users_data">
                             <li :key="attemptingUser.id + '-user-' + index"
                                 v-if="attemptingUser.id"
                                 class="pb-1">

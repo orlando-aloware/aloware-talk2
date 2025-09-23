@@ -96,6 +96,7 @@ export default {
     init: _.debounce(function (clear = false, firstLoad = false) {
       console.log('🎯 contacts.mixin: init called', {
         clear,
+        firstLoad,
         route: this.$route.name,
         stack: new Error().stack.split('\n').slice(1, 3).map(line => line.trim())
       })
@@ -234,7 +235,7 @@ export default {
         my_contacts: checked,
         search: this.search,
         page: this.contactsData.page
-      }, true, true)
+      }, true, true, false, false, true)
     },
 
     onSearch (searchText) {
@@ -478,6 +479,7 @@ export default {
         clear,
         isLoading,
         fromRefresh,
+        firstLoad,
         route: this.$route.name,
         isPowerDialer: this.isPowerDialer,
         stack: new Error().stack.split('\n').slice(1, 3).map(line => line.trim())
@@ -560,15 +562,24 @@ export default {
 
       // contacts list contacts fetching
       console.log('🎯 contacts.mixin: calling processFetch for contacts list')
-      this.processFetch(params, true, false, clear, isSearch)
+      this.processFetch(params, true, false, clear, isSearch, firstLoad)
     },
 
     // adjust request sorting params
     handleSortingParams (params, hasOrder, firstLoad) {
-      if (firstLoad && this.sorts) {
-        params.sort = this.sorts.orderBy
-        params.order = this.sorts.order
-        return
+      if (firstLoad) {
+        if (this.sorts && this.isSortFieldAvailable(this.sorts)) {
+          params.sort = this.sorts.orderBy
+          params.order = this.sorts.order
+          return
+        }
+
+        // use sorts from query if available
+        if (this.isAddContactsView && this.$route.query?.orderBy && this.isSortFieldAvailable({ orderBy: this.$route.query.orderBy })) {
+          params.sort = this.$route.query.orderBy
+          params.order = this.$route.query.order ?? 'asc'
+          return
+        }
       }
 
       let defaultSort = _.get(params, 'sort', this.defaultContactDateFilter)
@@ -590,6 +601,11 @@ export default {
           : defaultSort
         params.order = order
       }
+    },
+
+    // check if sort field is in available columns
+    isSortFieldAvailable (sorts) {
+      return this.columns?.some(column => column.name === sorts?.orderBy)
     },
 
     buildQueryString (params, isContactModule = true) {
@@ -704,9 +720,9 @@ export default {
       powerQuery.filter_groups = query.filter_groups
 
       if (params?.order) {
-        query.sort = this.getSortByColumn(params.sort)
+        query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
-        powerQuery.sort_by = this.getSortByColumn(params.sort)
+        powerQuery.sort_by = params.sort
         powerQuery.sort_order = params.order ? params.order : 'asc'
       }
 
@@ -1099,18 +1115,6 @@ export default {
       }
 
       return filters
-    },
-
-    /**
-     * Backend columns might differ from front end names being used.
-     * This function maps this if encountered some different column
-     */
-    getSortByColumn (key) {
-      if (key in this.backendTablesDictionary) {
-        return this.backendTablesDictionary[key]
-      }
-
-      return key
     }
   },
 
@@ -1337,13 +1341,6 @@ export default {
 
     pdFilters () {
       return POWER_DIALER_FILTERS
-    },
-
-    backendTablesDictionary () {
-      return {
-        'inbound_texts_count': 'inbound_sms_count',
-        'outbound_texts_count': 'outbound_sms_count'
-      }
     },
 
     isAddContactsView () {

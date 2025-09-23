@@ -98,6 +98,7 @@
         <live-call-controls :communication="communication"
                             :contact="contact"
                             :size="32"
+                            is-action-notification
                             class="mr-2" />
       </div>
     </div>

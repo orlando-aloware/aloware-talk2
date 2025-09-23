@@ -44,6 +44,11 @@ export default {
     }),
 
     shouldShowIncomingCallMenu () {
+      if (this.isActionNotification) {
+        // Always show the call buttons when the action notification shows up
+        return true
+      }
+
       if (this.isIncomingLiveCall &&
         this.isCallFishing &&
         !this.isCallFishingMode &&
@@ -234,7 +239,7 @@ export default {
     },
 
     isPersonalInbox () {
-      return this.communication.campaign?.is_personal_inbox && this.hasCompanyTeamInboxEnabled
+      return this.communication.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled
     }
   },
 

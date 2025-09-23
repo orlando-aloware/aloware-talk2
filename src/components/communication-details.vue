@@ -625,7 +625,7 @@
                     <li
                       class="pb-1"
                       :key="attemptingUser.id + '-user-' + index"
-                      v-for="(attemptingUser, index) in communication.attempting_users"
+                      v-for="(attemptingUser, index) in communication.attempting_users_data"
                     >
                       <div
                         class="flex items-center mr-1 h-100"
@@ -633,7 +633,7 @@
                       >
                         <span
                           class="text-blue cursor-pointer"
-                          :class="getAttemptingClass(attemptingUser.d, communication.disposition_status2, communication.user_id)"
+                          :class="getAttemptingClass(attemptingUser.id, communication.disposition_status2, communication.user_id)"
                           :title="getUserName(attemptingUser)"
                         >
                           <user-display :user="attemptingUser" />
@@ -1555,6 +1555,7 @@
           :call-issues="Object.values(communication?.call_quality_summary || {})"
           :user="communication.user"
         />
+        <call-timeline v-if="communication.call_timeline && communication.call_timeline.length > 0" :timeline="communication.call_timeline" />
       </b-col>
     </b-row>
   </div>
@@ -1590,6 +1591,7 @@ import * as CommunicationDispositionStatus from '../constants/communication-disp
 import * as CommunicationTypes from '../constants/communication-types'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
 import CsatScore from 'components/communications/communications-table/csat-score.vue'
+import CallTimeline from 'components/communications/call-timeline.vue'
 
 export default {
   name: 'communication-details',
@@ -1611,7 +1613,8 @@ export default {
     GenerateTranscriptionButton,
     CloseIcon,
     UserDisplay,
-    SparkleIcon
+    SparkleIcon,
+    CallTimeline
   },
 
   mixins: [
