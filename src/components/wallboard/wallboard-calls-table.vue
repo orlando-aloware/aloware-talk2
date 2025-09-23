@@ -270,10 +270,10 @@
                   <a target="_blank"
                      :href="getUserURL(call.user_id)"
                      v-if="hasRole('Company Admin')">
-                    <user-display :user-id="call.user_id" />
+                    <user-display :user-id="call.user_id" :user="call.user"/>
                   </a>
                   <span v-else>
-                    <user-display :user-id="call.user_id" />
+                    <user-display :user-id="call.user_id" :user="call.user"/>
                   </span>
                 </div>
                 <div v-else>
