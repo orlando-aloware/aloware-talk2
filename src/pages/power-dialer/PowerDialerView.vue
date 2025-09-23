@@ -1446,16 +1446,14 @@ export default {
   beforeDestroy () {
     this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
     this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
-<<<<<<< HEAD
 
     // Clean up initialization timeout
     if (this.initializationTimeout) {
       clearTimeout(this.initializationTimeout)
       this.initializationTimeout = null
     }
-=======
+
     this.$VueEvent.stop('datatable_sorts_updated', this.pdViewListeners.datatableSortsUpdated)
->>>>>>> origin/develop
   }
 }
 </script>
