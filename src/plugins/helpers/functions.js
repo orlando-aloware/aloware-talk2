@@ -26,7 +26,7 @@ export function filterCalls (calls, state, rootState) {
         return false
       }
 
-      const agent = rootState.users.find(agent => agent.id === call.user_id || agent.id === call.user?.id)
+      const agent = call.user ? call.user : rootState.users.find(agent => agent.id === call.user_id)
 
       // checks if agent name contains the term searched
       if (!agent.name.toUpperCase().includes(state.filters.agent.toUpperCase())) {
