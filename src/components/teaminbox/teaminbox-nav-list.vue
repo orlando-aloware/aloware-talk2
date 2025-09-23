@@ -176,7 +176,7 @@ export default {
       this.inboxes.forEach(inbox => {
         const {
           teams,
-          is_personal_inbox: isPersonalInbox,
+          call_waiting: callWaiting,
           user_ids: userIds,
           team_ids: teamIds,
           watcher_user_ids: watcherUserIds,
@@ -192,9 +192,9 @@ export default {
           watcherTeamUserIds?.includes(this.profile.id) ||
           watcherTeamIds?.some(id => this.teamsIds.includes(id))
 
-        if (isPersonalInbox && isConnected) {
+        if (callWaiting && isConnected) {
           personal.push(inbox)
-        } else if (!isPersonalInbox && isConnected) {
+        } else if (!callWaiting && isConnected) {
           connected.push(inbox)
         } else if (isWatching) {
           watching.push(inbox)
@@ -497,15 +497,19 @@ export default {
       return !urlInboxId || this.findInboxById(urlInboxId)
     },
 
-    loadInboxesUnreadCount () {
-      const inboxIds = Object.keys(this.parsedInboxes ?? {}).flatMap((parsedInbox) => this.parsedInboxes[parsedInbox].map((inbox) => inbox.id))
+    findRealInboxIds (inboxList) {
+      const inboxIds = Object.keys(inboxList ?? {}).flatMap((parsedInbox) => inboxList[parsedInbox].map((inbox) => inbox.id))
 
       if (!inboxIds.length) {
         return
       }
 
       // Filter out the "all" inbox ID since it's virtual
-      const realInboxIds = inboxIds.filter(id => id !== ALL_INBOXES_ID)
+      return inboxIds.filter(id => id !== ALL_INBOXES_ID)
+    },
+
+    loadInboxesUnreadCount () {
+      const realInboxIds = this.findRealInboxIds(this.parsedInboxes)
 
       if (realInboxIds.length > 0) {
         this.fetchInboxesUnreadCount(realInboxIds)
@@ -574,7 +578,11 @@ export default {
       }
     },
 
-    parsedInboxes () {
+    parsedInboxes (newInboxes, oldInboxes) {
+      if (this.findRealInboxIds(newInboxes) === this.findRealInboxIds(oldInboxes)) {
+        return
+      }
+
       this.loadInboxesUnreadCount()
     },
 

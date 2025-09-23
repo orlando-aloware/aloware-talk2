@@ -2171,6 +2171,18 @@ export default {
         return null
       }
 
+      // Check if essential fields are present in CommunicationData
+      // These fields are needed for the action-notification to be correctly displayed
+      const essentialFields = ['Type', 'Direction', 'CurrentStatus2', 'DispositionStatus2']
+      const missingEssentialFields = essentialFields.filter(field => {
+        return communicationData[field] === undefined || communicationData[field] === null
+      })
+
+      if (missingEssentialFields.length > 0) {
+        console.error('Missing essential fields in communicationData:', missingEssentialFields)
+        return null
+      }
+
       if (customParams.LocationData) {
         try {
           locationData = JSON.parse(customParams.LocationData)
@@ -2197,7 +2209,11 @@ export default {
         campaign_id: campaignId,
         campaign: {
           name: customParams?.CampaignName
-        }
+        },
+        type: communicationData.Type,
+        direction: communicationData.Direction,
+        current_status2: communicationData.CurrentStatus2,
+        disposition_status2: communicationData.DispositionStatus2
       }
 
       console.log('Successfully built communication data from customParameters:', communication)

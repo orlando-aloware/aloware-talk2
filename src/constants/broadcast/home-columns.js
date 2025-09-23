@@ -96,6 +96,15 @@ export const COLUMNS = [
     draggable: true
   },
   {
+    name: 'notes',
+    label: 'Notes',
+    field: 'notes',
+    sortable: false,
+    draggable: true,
+    minWidth: 150,
+    resizable: true
+  },
+  {
     name: '',
     label: '',
     field: 'actions',

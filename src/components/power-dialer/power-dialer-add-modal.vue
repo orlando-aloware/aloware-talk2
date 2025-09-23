@@ -312,7 +312,6 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { HIGHLEVEL_INTEGRATION } from 'src/constants/integrations'
 import { integrationMixin, aclMixin, userMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import { get, isEmpty } from 'lodash'
@@ -608,13 +607,6 @@ export default {
         return
       }
 
-      // HighLevel doesn't pass params.target/size like other integrations, so we can't know the size until things are processed
-      if (this.mode === 'integration' && this.getIntegration()?.toLowerCase() === HIGHLEVEL_INTEGRATION) {
-        this.count = null
-        this.loading--
-        return
-      }
-
       if (this.params.target && this.mode === 'integration') {
         this.count = this.params.size
         this.loading--
@@ -789,8 +781,6 @@ export default {
           return this.addPipedriveFilter()
         case 'zoho':
           return this.addZohoView()
-        case HIGHLEVEL_INTEGRATION:
-          return this.importFromHighlevel()
       }
     },
 
@@ -845,25 +835,6 @@ export default {
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your Pipedrive filter is being imported. We will notify you when it\'s ready.')
-          this.$emit('submit', {
-            notification: notification
-          })
-        })
-        .catch(_err => {
-          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
-        })
-    },
-
-    importFromHighlevel () {
-      const params = {
-        list_name: this.params.list_name,
-        search_criteria: this.params.search_criteria
-      }
-
-      return talk2Api.V2.integrations.highlevel.importCriteriaToPowerDialer(params)
-        .then(response => response.data)
-        .then(data => {
-          const notification = this.$generalNotification('Your HighLevel contacts are being imported based on search criteria. We will notify you when it\'s ready.')
           this.$emit('submit', {
             notification: notification
           })

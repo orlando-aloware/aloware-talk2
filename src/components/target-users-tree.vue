@@ -92,14 +92,14 @@ export default {
         return []
       }
 
-      if (!this.communication.target_users) {
+      if (!this.communication.target_users_data) {
         return []
       }
 
       const data = []
       const layerNumber = { data: 0 }
       const users = { user: null }
-      for (users.user of this.communication.target_users) {
+      for (users.user of this.communication.target_users_data) {
         layerNumber.data++
         const entry = {
           id: layerNumber.data,

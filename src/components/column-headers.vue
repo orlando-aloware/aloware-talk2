@@ -181,6 +181,8 @@ import draggable from 'vuedraggable'
 import Search from 'src/components/search.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import ConfirmDialog from 'src/components/confirm-dialog'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
+
 const DEFAULT_PINNED_LIST_IDS = Object.keys(DEFAULT_PINNED_LIST).map(
   (i) => DEFAULT_PINNED_LIST[i].id
 )
@@ -364,7 +366,12 @@ export default {
         return columns
       }
 
-      return headers
+      return headers.map((header) => {
+        if (header.label === 'Date Added') {
+          header.label = 'Created At'
+        }
+        return header
+      })
     },
 
     onModalShow () {
@@ -382,7 +389,10 @@ export default {
     ...mapGetters({
       attributeDictionaries: 'getAttributeDictionaries'
     }),
-    ...mapGetters('contacts', ['columns']),
+    ...mapGetters('contacts', [
+      'columns',
+      'selectedList'
+    ]),
 
     resourceId () {
       const columnsId = _.get(this.columns, 'id', '')
@@ -403,6 +413,22 @@ export default {
       const results = { data: 0 }
 
       const matches = sortBy(this.allColumnsCombined, ['name']).filter((item) => {
+        // Date Added to List adjustments
+        if (item.name === 'created_at_list') {
+          if (!this.isContactsListOrPowerDialerList || [ContactListTypes.DYNAMIC, ContactListTypes.DYNAMIC_REMOTE_LIST].includes(this.selectedList?.type)) {
+            return false
+          }
+
+          // adjust Date Added to List column based on the current page
+          if (this.endpointUrl === 'power-dialer-lists') {
+            item.label = 'Date Added to Power Dialer'
+            item.tooltip = 'This is the date the contact was added to a Power Dialer session or queue'
+          } else {
+            item.label = 'Date Added to List'
+            item.tooltip = 'This is the date the contact was added to this contact list'
+          }
+        }
+
         if (this.searchText && this.searchText.trim().length > 1) {
           return (
             (item.name + item.label)
@@ -494,6 +520,10 @@ export default {
 
     powerDialerDefaultColumns () {
       return POWER_DIALER_DEFAULT_COLUMNS
+    },
+
+    isContactsListOrPowerDialerList () {
+      return this.$route.meta?.page === 'Contacts List' || this.$route.meta?.title === 'Power Dialer'
     }
   },
   watch: {

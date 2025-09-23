@@ -167,10 +167,7 @@ export default {
     }
 
     this.setAllContactsSelected(false)
-
-    if (this.contactsListSortPreference.contacts) {
-      this.sorts = { ...this.contactsListSortPreference.contacts }
-    }
+    this.setInitialSorting()
   },
 
   methods: {
@@ -226,6 +223,18 @@ export default {
     onRemoveContacts () {
       if (!this.isAllContactsSelected) {
         this.$VueEvent.fire('fetchContacts', { clear: true })
+      }
+    },
+
+    setInitialSorting () {
+      // if viewing a Contact List, save sorting preference per List
+      // else save sorting preferences for Contacts page
+      const sortKey = this.$route.meta?.page === 'Contacts List' && this.$route.params?.id
+        ? this.$route.params.id
+        : 'contacts'
+
+      if (this.contactsListSortPreference[sortKey]) {
+        this.sorts = { ...this.contactsListSortPreference[sortKey] }
       }
     }
   },
