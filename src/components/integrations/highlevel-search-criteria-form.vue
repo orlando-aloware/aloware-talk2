@@ -207,6 +207,9 @@
                         class="criteria-form-input"
                         :maxlength="['eq', 'not_eq', 'contains', 'not_contains'].includes(filter.operator) ? 75 : undefined"
                       />
+                      <div v-if="shouldShowCaseInsensitiveHelper(filter.field, filter.value)" class="helper-text">
+                        Text case is ignored
+                      </div>
                     </div>
 
                       <div class="delete-button-container">
@@ -365,6 +368,9 @@
                         class="criteria-form-input"
                         :maxlength="['eq', 'not_eq', 'contains', 'not_contains'].includes(block.operator) ? 75 : undefined"
                       />
+                      <div v-if="shouldShowCaseInsensitiveHelper(block.field, block.value)" class="helper-text">
+                        Text case is ignored
+                      </div>
                     </div>
 
                     <div class="delete-button-container">
@@ -759,6 +765,11 @@ export default {
       if (!fieldValue) return false
 
       return fieldValue === 'country'
+    },
+
+    shouldShowCaseInsensitiveHelper (field, value) {
+      return (['firstNameLowerCase', 'lastNameLowerCase', 'type'].includes(field)) ||
+             (field === 'tags' && this.getValuesArray(value).length === 0)
     },
 
     validateFieldValue (filter) {
@@ -1628,6 +1639,12 @@ export default {
 
 .range-date-input-container {
   width: 100%;
+}
+
+.helper-text {
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
 }
 
 /* Override modal width - this will make the select fields more consistent in height */
