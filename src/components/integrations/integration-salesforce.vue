@@ -22,6 +22,20 @@
                   <i class="fa fa-external-link" aria-hidden="true"/>
                 </a>
                 <p class="mb-0"
+                   data-testid="integration-salesforce-name"
+                   v-if="integrationData.name !== undefined">
+                  <span class="data-icon-label">Name: </span>
+                  <span class="data-value">
+                        <q-tooltip
+                          anchor="top middle"
+                          self="center middle"
+                        >
+                          {{ integrationData.name }}
+                        </q-tooltip>
+                        {{ integrationData.name }}
+                      </span>
+                </p>
+                <p class="mb-0"
                     data-testid="integration-salesforce-first-name"
                     v-if="integrationData.first_name !== undefined">
                     <span class="data-icon-label">First Name: </span>
@@ -50,10 +64,16 @@
                     </span>
                 </p>
                 <p class="mb-0"
+                   data-testid="integration-salesforce-email"
+                   v-if="integrationData.account_number">
+                  <span class="data-icon-label">Account Number: </span>
+                  <span class="data-value">{{ integrationData.account_number }}</span>
+                </p>
+                <p class="mb-0"
                     data-testid="integration-salesforce-email"
-                    v-if="integrationData.email">
-                    <span class="data-icon-label">Email: </span>
-                    <span class="data-value">{{ integrationData.email }}</span>
+                    v-if="integrationData.industry">
+                    <span class="data-icon-label">Industry: </span>
+                    <span class="data-value">{{ integrationData.industry }}</span>
                 </p>
                 <p class="mb-0"
                     data-testid="integration-salesforce-phone"
