@@ -404,11 +404,25 @@ export default {
       return this.isLoading || (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE && this.getIntegration !== HIGHLEVEL_INTEGRATION)
     },
 
+    // Temporary hide HL import list
+    hideHighLevelImport () {
+      return true
+    },
+
     filteredEnabledIntegrations () {
       // show only ready for contact list integrations
-      return this.integrationsEnabled.filter(integration => [
-        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION, HIGHLEVEL_INTEGRATION
-      ].includes(integration.toLowerCase()))
+      const availableIntegrations = [
+        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION
+      ]
+
+      // Add HighLevel only if not temporarily hidden
+      if (!this.hideHighLevelImport) {
+        availableIntegrations.push(HIGHLEVEL_INTEGRATION)
+      }
+
+      return this.integrationsEnabled.filter(integration =>
+        availableIntegrations.includes(integration.toLowerCase())
+      )
     },
 
     hasValidHighLevelCriteria () {
