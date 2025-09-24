@@ -10,7 +10,7 @@ export default {
         currentStatus === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
     },
 
-    userCanBargeAndWhisper (communication) {
+    canBargeAndWhisper (communication) {
       const hasPermission = this.hasRole('Company Admin') || this.hasPermissionTo('barge and whisper on call')
       const isCall = communication.type === CommunicationTypes.CALL
       const isCallInProgress = this.isCallInProgress(communication.disposition_status2, communication.current_status2)
