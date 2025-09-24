@@ -1275,8 +1275,11 @@ export default {
         communication.legc_uuid &&
         [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
 
+      // Check if this is a call waiting communication with specific statuses that should keep notification open
+      const isCallWaitingWithIncomingStatus = this.isCallWaitingWithIncomingStatus(communication)
+
       if ((communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
-        !INCOMING_STATUSES.includes(communication.current_status2)) && !isAddOrIntroduceOperation) {
+        !INCOMING_STATUSES.includes(communication.current_status2)) && !isAddOrIntroduceOperation && !isCallWaitingWithIncomingStatus) {
         console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
       }

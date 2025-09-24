@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { CALL_WAITING_INCOMING_STATUSES } from 'src/constants/communication-current-status'
 import * as RingGroupRepeatContactTo from 'src/constants/ring-group-repeat-calls'
 import { mapActions, mapState } from 'vuex'
 
@@ -401,6 +402,15 @@ export default {
           }
         }, 500)
       }
+    },
+
+    isCallWaitingWithIncomingStatus (communication) {
+      return CALL_WAITING_INCOMING_STATUSES.includes(communication.current_status2) &&
+      this.getRingGroupById(communication.campaign?.call_waiting_ring_group_id)?.call_waiting
+    },
+
+    getRingGroupById (id) {
+      return id ? this.ringGroups.find(item => item.id === id) : null
     }
   },
 
