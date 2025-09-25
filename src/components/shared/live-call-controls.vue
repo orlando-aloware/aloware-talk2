@@ -11,20 +11,19 @@
                   class="bg-transparent no-border no-box-shadow p-0"
                   v-if="isShowIgnoreCallIcon || isShowCancelCallIcon"
                   data-testid="item-reject-btn"
-                  :disabled="isRejecting"
                   @click="onRejectCall">
-          <q-tooltip anchor="top middle"
-                     self="center middle"
-                     v-if="!isShowIgnoreCallIcon || tooltipMessage">
-            {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
-          </q-tooltip>
           <!-- show remove icon for call fishing mode -->
           <ignore-call-icon :height="size"
                             :width="size"
                             data-testid="item-ignore-call-icon"
                             v-if="isShowIgnoreCallIcon" />
+          <q-tooltip anchor="top middle"
+                     self="center middle"
+                     v-if="!isShowIgnoreCallIcon || tooltipMessage">
+            {{ isShowIgnoreCallIcon ? tooltipMessage : 'Decline' }}
+          </q-tooltip>
           <!-- only show reject button if -->
-          <cancel-call-icon v-else-if="isShowCancelCallIcon"
+          <cancel-call-icon v-if="isShowCancelCallIcon"
                             :height="size"
                             :width="size"
                             data-testid="item-cancel-call-icon" />
@@ -36,7 +35,6 @@
                   size="sm"
                   class="bg-transparent no-border no-box-shadow p-0"
                   data-testid="item-answer-btn"
-                  :disabled="isAnsweringCall"
                   @click="onAcceptCall">
           <q-tooltip anchor="top middle"
                      self="center middle"
@@ -90,7 +88,7 @@
 
     <!-- Answered / In Progress Call-->
     <div class="text-grey-90 d-flex flex-row justify-center"
-         v-else-if="shouldShowAnsweredCallMenu">
+         v-if="shouldShowAnsweredCallMenu">
       <div class="pl-0">
         <b-button variant="light"
                   size="sm"
@@ -109,7 +107,7 @@
 
     <!-- Parked Call-->
     <div class="text-grey-90 d-flex flex-row justify-center"
-         v-else-if="shouldShowParkedCallMenu">
+         v-if="shouldShowParkedCallMenu">
       <div class="pl-0">
         <b-button variant="light"
                   size="sm"
@@ -174,6 +172,7 @@ import HangupIcon from 'components/icons/hangup-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import { liveCallsMixin } from 'src/plugins/mixins'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'live-call-controls',
@@ -213,12 +212,10 @@ export default {
 
   computed: {
     isIncomingCall () {
-      if (this.isActionNotification) {
-        // Always shown in action notification
-        return true
-      }
+      const isCallFishing = this.isCallFishingMode && this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+      const isIncomingCall = !this.isCallFishingMode && this.isIncomingLiveCall
 
-      return this.isIncomingLiveCall
+      return isCallFishing || isIncomingCall
     },
 
     tooltipMessage () {

@@ -95,14 +95,11 @@
           </div>
         </div>
 
-        <live-call-controls
-          v-if="isCall"
-          :communication="communication"
-          :contact="contact"
-          :size="32"
-          is-action-notification
-          class="mr-2"
-        />
+        <live-call-controls :communication="communication"
+                            :contact="contact"
+                            :size="32"
+                            is-action-notification
+                            class="mr-2" />
       </div>
     </div>
   </b-toast>
@@ -112,7 +109,6 @@
 import { get, isEmpty } from 'lodash'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 import { getQueryString } from 'src/plugins/helpers/functions'
-import LiveCallControls from 'components/shared/live-call-controls'
 import {
   TeamInboxMixin,
   aclMixin,
@@ -128,6 +124,7 @@ import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import LiveCallControls from 'components/shared/live-call-controls'
 
 export default {
   name: 'action-notification',
@@ -498,10 +495,7 @@ export default {
           communication.legc_uuid &&
           [CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.legc_status)
 
-        // Check if this is a call waiting communication with specific statuses that should keep notification open
-        const isCallWaitingWithIncomingStatus = this.isCallWaitingWithIncomingStatus(communication)
-
-        if (isCallNotInProgressOrIncoming && this.communicationId === communication.id && !isAddOrIntroduceOperation && !isCallWaitingWithIncomingStatus) {
+        if (isCallNotInProgressOrIncoming && this.communicationId === communication.id && !isAddOrIntroduceOperation) {
           this.processRemoveFromNotification(communication)
         }
       }
