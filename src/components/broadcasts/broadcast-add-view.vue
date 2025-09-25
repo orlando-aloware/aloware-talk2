@@ -10,7 +10,7 @@
                     :name="`horizontal-slide-${direction}`">
           <component ref="mainComponent"
                      :is="mainComponent"
-                     :contacts-count="this.currentStep.id === 1 && contactsCount"
+                     :contacts-count-valid="currentStep.id === 1 && (contactsCount > 0 || integrationsWithoutContactCount.includes(source.integration?.name))"
                      v-bind="mainComponentProps"
                      @input="mainComponentChanged"
                      @source-updated="onSourceUpdated"
@@ -326,7 +326,9 @@ export default {
       sendWarningDialog: {
         open: false
       },
-      contactsCount: 0
+      contactsCount: 0,
+      // Zoho and Pipedrive don't send back the count of contacts in views/filters
+      integrationsWithoutContactCount: ['Zoho', 'Pipedrive']
     }
   },
 
