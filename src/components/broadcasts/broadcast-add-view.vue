@@ -327,8 +327,8 @@ export default {
         open: false
       },
       contactsCount: 0,
-      // Zoho and Pipedrive don't send back the count of contacts in views/filters
-      integrationsWithoutContactCount: ['Zoho', 'Pipedrive']
+      // Zoho,Pipedrive and Salesforce don't send back the count of contacts in views/filters
+      integrationsWithoutContactCount: ['Zoho', 'Pipedrive', 'Salesforce']
     }
   },
 
