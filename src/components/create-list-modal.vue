@@ -405,9 +405,10 @@ export default {
       return this.isLoading || (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE && this.getIntegration !== HIGHLEVEL_INTEGRATION)
     },
 
-    // Temporary hide HL import list
+    // Hide HL import list for all companies except internal ones
     hideHighLevelImport () {
-      return true
+      const allowedCompanyIds = [7, 47, 1649]
+      return !allowedCompanyIds.includes(this.currentCompany?.id)
     },
 
     filteredEnabledIntegrations () {
