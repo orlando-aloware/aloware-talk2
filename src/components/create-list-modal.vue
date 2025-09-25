@@ -407,7 +407,7 @@ export default {
 
     // Hide HL import list for all companies except internal ones
     hideHighLevelImport () {
-      const allowedCompanyIds = [7, 47, 1649]
+      const allowedCompanyIds = [7, 47, 1659]
       return !allowedCompanyIds.includes(this.currentCompany?.id)
     },
 
