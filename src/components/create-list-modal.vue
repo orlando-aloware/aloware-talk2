@@ -64,6 +64,7 @@
             </label>
           </div>
           <div class="form-check mt-2"
+               v-if="filteredEnabledIntegrations.length > 0"
                @click="onListTypeSelected(IMPORT_FROM_INTEGRATION_TYPE)">
             <input class="form-check-input"
                    type="radio"
