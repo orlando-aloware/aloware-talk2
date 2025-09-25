@@ -65,7 +65,7 @@
                                    @change="onIntegrationListChanged"/>
       </template>
 
-      <div v-if="showEmptyListError"
+      <div v-if="!contactsCountValid && this.optionSelected"
            class="text-negative text-caption q-mt-sm">
         This list contains no contacts. Please select a valid list with contacts to proceed
       </div>
@@ -107,9 +107,9 @@ export default {
       default: () => ({})
     },
 
-    contactsCount: {
-      type: Number,
-      default: 0
+    contactsCountValid: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -117,9 +117,9 @@ export default {
     isValid () {
       switch (this.optionSelected) {
         case 'list':
-          return (!!this.source.list.id || !isEmpty(this.source.filters)) && this.contactsCount > 0
+          return (!!this.source.list.id || !isEmpty(this.source.filters)) && this.contactsCountValid
         case 'integration':
-          return !isEmpty(this.source.integration?.list) && this.contactsCount > 0
+          return !isEmpty(this.source.integration?.list) && this.contactsCountValid
         default:
           return false
       }
@@ -153,15 +153,6 @@ export default {
       return this.integrationsEnabled.filter(integration => [
         HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION
       ].includes(integration.toLowerCase()))
-    },
-
-    showEmptyListError () {
-      const hasListSelection = this.optionSelected === 'list' &&
-        (this.source.list.id || !isEmpty(this.source.list.filters))
-      const hasIntegrationSelection = this.optionSelected === 'integration' &&
-        !isEmpty(this.source.integration?.list)
-
-      return (hasListSelection || hasIntegrationSelection) && this.contactsCount === 0
     }
   },
 
