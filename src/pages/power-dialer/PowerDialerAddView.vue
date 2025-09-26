@@ -133,6 +133,7 @@
                        :total-rows="fixedContactsData.total"
                        :current-page="fixedContactsData.current_page"
                        :last-page="fixedContactsData.last_page"
+                       :start-order="startOrder"
                        @onMouseMove="datatableOnMouseMove"
                        @onMouseLeave="datatableOnMouseMove"
                        @reordered="onColumnsReordered"
@@ -385,6 +386,10 @@
                   {{ contact[column.name] | displayBirthdate }}
                 </div>
                 <div class="ellipse"
+                     v-else-if="column.name.startsWith('csf_')">
+                  {{ getCustomFieldColumnValue(contact[column.name], column.name) }}
+                </div>
+                <div class="ellipse"
                      :class="getColumnClass(column.name, column.draggable)"
                      v-else>
                   {{ getColumnValue(contact[column.name]) }}
@@ -591,6 +596,13 @@ export default {
     this.listName = ''
 
     this.setAddViewShowMyContacts(this.myContacts)
+
+    if (this.$route.query?.orderBy) {
+      this.startOrder = {
+        orderBy: this.$route.query.orderBy,
+        order: this.$route.query.order
+      }
+    }
   },
 
   computed: {
@@ -643,7 +655,9 @@ export default {
     },
 
     validColumns () {
-      return this.columns.filter(column => column.label !== 'Actions' && !(column.name === 'task_status_name' || column.name === 'task_status'))
+      return this.columns.filter(column => column.label !== 'Actions' &&
+        column.name !== 'created_at_list' &&
+        !(column.name === 'task_status_name' || column.name === 'task_status'))
     },
 
     urlRoutePath () {
@@ -707,7 +721,8 @@ export default {
       myContacts: false,
       openPDModal: false,
       contactCount: 0,
-      contactDCNCount: 0
+      contactDCNCount: 0,
+      startOrder: null
     }
   },
 

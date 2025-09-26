@@ -17,7 +17,7 @@
         cta-text="Open Team Inbox"
         cookie-name="team-inbox-announcement"
         :max-shows="maxShows"
-        v-if="hasCompanyTeamInboxEnabled"
+        v-if="hasCompanyLegacyInboxEnabled"
         :destination-route="{ name: 'Team Inboxes' }"
         :should-show-in-first-visit="true" />
     </div>

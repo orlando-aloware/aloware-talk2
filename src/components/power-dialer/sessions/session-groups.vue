@@ -6,7 +6,8 @@
         <div>
           <q-expansion-item class="t-expansion-panels px-0"
                             header-class="text-black"
-                            default-opened>
+                            default-opened
+                            data-testid="in-progress-expansion-panel">
             <template v-slot:header>
               <q-item-section class="px-3 inline gt-sm text-uppercase text-grey-90 text-weight-medium">
                 <div class="text-13">
@@ -25,7 +26,8 @@
              v-for="(group, key) in filteredTasks">
           <q-expansion-item class="t-expansion-panels px-0"
                             header-class="text-black"
-                            :default-opened="key === 'in_queue'">
+                            :default-opened="key === 'in_queue'"
+                            :data-testid="`${key}-expansion-panel`">
             <template v-slot:header>
               <q-item-section class="px-3 inline gt-sm text-uppercase text-grey-90 text-weight-medium">
                 <div class="text-13">
@@ -34,7 +36,8 @@
                   </span>
                   <q-chip class="p-0"
                           size="xs"
-                          square>
+                          square
+                          :data-testid="`${key}-count-chip`">
                     <span v-if="key === 'in_queue'">
                       {{ totalQueued }}
                     </span>
@@ -70,26 +73,29 @@
                             {'has-communication bg-blue-60-opaque border-full-rounded call-hover': taskItem.communication_id}
                           ]"
                           :key="`acc-item-${i}`"
+                          :data-testid="`task-item-${taskItem.id || i}`"
                           v-if="taskItem">
-                    <div class="communication-label" v-if="taskItem.communication_id">
+                    <div class="communication-label" v-if="taskItem.communication_id" data-testid="inbound-call-label">
                       <span>New Inbound Call</span>
                     </div>
 
                     <div :class="taskItem.communication_id ? 'avatar-column' : 'py-2'">
                       <template v-if="taskItem.communication_id">
-                        <q-avatar size="30px" class="incoming-call-avatar">
+                        <q-avatar size="30px" class="incoming-call-avatar" data-testid="incoming-call-avatar">
                           <call-incoming-icon/>
                         </q-avatar>
                       </template>
                       <template v-else>
                         <q-avatar size="30px"
                                   color="grey"
-                                  v-if="getInitials(taskItem.name)">
+                                  v-if="getInitials(taskItem.name)"
+                                  data-testid="contact-avatar-with-initials">
                           {{ getInitials(taskItem.name) }}
                         </q-avatar>
                         <q-avatar size="30px"
                                   color="grey"
-                                  v-else>
+                                  v-else
+                                  data-testid="contact-avatar-default">
                           <i class="fa fa-user"
                              aria-hidden="true">
                           </i>
@@ -97,22 +103,25 @@
                       </template>
                     </div>
                     <q-item-section class="pl-2">
-                      <q-item-label :class="{'text-white':taskItem.communication_id}">
+                      <q-item-label :class="{'text-white':taskItem.communication_id}" data-testid="contact-name">
                         {{ fetchName(taskItem) }}
                       </q-item-label >
                       <q-item-label lines="2"
                                     caption
-                                    :class="{'text-white':taskItem.communication_id}">
+                                    :class="{'text-white':taskItem.communication_id}"
+                                    data-testid="contact-phone">
                         {{ taskItem.phone_number | fixPhone('NATIONAL', true) }}
                       </q-item-label>
                       <q-item-label lines="2"
                                     caption
-                                    :class="{'text-white':taskItem.communication_id}">
+                                    :class="{'text-white':taskItem.communication_id}"
+                                    data-testid="contact-company">
                         {{ taskItem.company_name }}
                       </q-item-label>
                       <q-item-label lines="2"
                                     caption
-                                    :class="{'text-white':taskItem.communication_id}">
+                                    :class="{'text-white':taskItem.communication_id}"
+                                    data-testid="contact-timezone">
                         <span>
                           <i class="fa fa-globe"></i>
                           {{ taskItem.timezone }}
@@ -124,7 +133,8 @@
                                     top
                                     v-if="!taskItem.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'">
                       <q-avatar color="red"
-                                size="md">
+                                size="md"
+                                data-testid="active-phone-avatar">
                         <PhoneIcon color="white"/>
                       </q-avatar>
                     </q-item-section>
@@ -134,6 +144,7 @@
                                 variant="white"
                                 no-caret
                                 :disabled="isMoving || isDeleting"
+                                :data-testid="`task-options-dropdown-${taskItem.id || i}`"
                                 @mouseover="onOver"
                                 @mouseleave="onLeave">
 
@@ -145,6 +156,7 @@
                       <template>
                         <b-dropdown-item href="#"
                                          v-if="key === 'in_queue'"
+                                         data-testid="move-to-top-option"
                                          @click="moveTask(taskItem, moveDirection.top)">
                           <ArrowUpIcon height="16px"
                                        width="16px" />
@@ -152,6 +164,7 @@
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key === 'in_queue'"
+                                         data-testid="move-to-bottom-option"
                                          @click="moveTask(taskItem, moveDirection.bottom)">
                           <ArrowDownIcon height="15px"
                                          width="15px" />
@@ -159,6 +172,7 @@
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key !== 'in_queue'"
+                                         data-testid="add-to-top-option"
                                          @click="addTask(taskItem, moveDirection.top)">
                           <ArrowUpIcon height="16px"
                                        width="16px" />
@@ -166,6 +180,7 @@
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key !== 'in_queue'"
+                                         data-testid="add-to-bottom-option"
                                          @click="addTask(taskItem, moveDirection.bottom)">
                           <ArrowDownIcon height="15px"
                                          width="15px" />
@@ -173,6 +188,7 @@
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key === 'in_queue'"
+                                         data-testid="remove-from-list-option"
                                          @click="onDeleteTask(taskItem)">
                           <TrashIcon />
                           Remove from List
@@ -188,6 +204,7 @@
                              flat
                              round
                              :disabled="isMoving || isDeleting"
+                             :data-testid="`return-to-queue-button-${taskItem.id || i}`"
                              @click="moveTask(taskItem, moveDirection.top)">
                         <q-avatar size="15px">
                           <ContactInQueueIcon />
@@ -218,6 +235,7 @@
                            size="sm"
                            color="primary"
                            flat
+                           :data-testid="`load-more-${key}-button`"
                            @click="loadMore(key)">
                       Load More
                     </q-btn>
@@ -658,7 +676,8 @@ export default {
 
 <style lang="scss" scoped>
 .has-communication {
-  padding-y: 8px !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
   color: white !important;
 }
 

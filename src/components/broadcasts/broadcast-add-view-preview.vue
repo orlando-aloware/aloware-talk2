@@ -125,7 +125,7 @@ export default {
         case !isEmpty(this.source.list):
           return this.source.list.name
         case !isEmpty(this.source.integration):
-          return this.source.integration.list.name
+          return this.source.integration.list?.name || ''
         default:
           return ''
       }

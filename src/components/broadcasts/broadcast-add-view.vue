@@ -10,6 +10,7 @@
                     :name="`horizontal-slide-${direction}`">
           <component ref="mainComponent"
                      :is="mainComponent"
+                     :contacts-count-valid="currentStep.id === 1 && (contactsCount > 0 || integrationsWithoutContactCount.includes(source.integration?.name))"
                      v-bind="mainComponentProps"
                      @input="mainComponentChanged"
                      @source-updated="onSourceUpdated"
@@ -324,7 +325,10 @@ export default {
       },
       sendWarningDialog: {
         open: false
-      }
+      },
+      contactsCount: 0,
+      // Zoho,Pipedrive and Salesforce don't send back the count of contacts in views/filters
+      integrationsWithoutContactCount: ['Zoho', 'Pipedrive', 'Salesforce']
     }
   },
 
@@ -472,6 +476,7 @@ export default {
 
     onContactsLength (count) {
       this.SET_CONTACTS_LENGTH(count)
+      this.contactsCount = count
     },
 
     send () {

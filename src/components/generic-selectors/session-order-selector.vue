@@ -71,7 +71,7 @@ export default {
       return [
         {
           id: POWER_DIALER_ORDER.default,
-          text: 'Default'
+          text: 'List Order'
         },
         {
           id: POWER_DIALER_ORDER.timezone,

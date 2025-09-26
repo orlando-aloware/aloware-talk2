@@ -451,9 +451,13 @@
                   {{ contact[column.name] | displayBirthdate }}
                 </div>
                 <div class="ellipse"
+                     v-else-if="column.name.startsWith('csf_')">
+                  {{ getCustomFieldColumnValue(contact[column.name], column.name) }}
+                </div>
+                <div class="ellipse"
                      :class="getColumnClass(column.name, column.draggable)"
                      v-else>
-                  {{ getColumnValue(contact[column.name]) }}
+                  {{ getColumnValue(contact[column.name], contact, column.name) }}
                 </div>
               </td>
             </template>
@@ -932,7 +936,8 @@ export default {
       hasFilters: false,
       pdViewListeners: {},
       bulkAddStatusReport: {},
-      currentList: null
+      currentList: null,
+      currentDatatableSorts: null
     }
   },
 
@@ -963,10 +968,13 @@ export default {
       }
     }
 
-    this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
+    this.pdViewListeners.datatableSortsUpdated = (sorts) => {
+      this.currentDatatableSorts = sorts
+    }
+
     this.$VueEvent.listen('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
-    this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
     this.$VueEvent.listen('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
+    this.$VueEvent.listen('datatable_sorts_updated', this.pdViewListeners.datatableSortsUpdated)
 
     // clean filters every time that this page is loaded
     window.localStorage.removeItem('current_pd_filters')
@@ -1052,13 +1060,34 @@ export default {
     },
 
     onAddContactsToList () {
+      let query
+
+      // if sort was updated in datatable, use the updated sort
+      if (this.currentDatatableSorts) {
+        query = {
+          orderBy: this.currentDatatableSorts.orderBy,
+          order: this.currentDatatableSorts.order
+        }
+      } else if (this.currentListSorts) {
+        query = {
+          orderBy: this.currentListSorts.orderBy,
+          order: this.currentListSorts.order
+        }
+      }
+
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
-        this.$router.push(`/power-dialer/list/add`)
+        this.$router.push({
+          path: `/power-dialer/list/add`,
+          query
+        })
 
         return
       }
 
-      this.$router.push(`/power-dialer/list/${this.$route.params.id}/add`)
+      this.$router.push({
+        path: `/power-dialer/list/${this.$route.params.id}/add`,
+        query
+      })
     },
 
     onColumnsReordered (nextColumns) {
@@ -1344,8 +1373,19 @@ export default {
         if (this.$route.name === 'Power Dialer') {
           const hasFilters = this.filtersCount > 0
 
-          let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          const params = this.$jsonClone(typeof this.currentListFilters === 'string' ? {} : this.currentListFilters)
           console.log('🎯 PowerDialerView: calling onFetch from currentListFilters watcher')
+
+          const csfFields = this.computedColumns.reduce((acc, column) => {
+            if (column.name.startsWith('csf_')) {
+              acc.push(column.name)
+            }
+            return acc
+          }, [])
+          if (csfFields.length > 0) {
+            params.csf_fields = csfFields
+          }
+
           this.onFetch(params, hasFilters, true)
           this.$emit('onFiltersCount', this.currentListFilters)
         }
@@ -1373,12 +1413,19 @@ export default {
     filteredList () {
       if (this.filteredList?.id !== this.currentList?.id) {
         this.currentList = { ...this.filteredList }
+
+        this.sorts = this.currentList.sort_by ? {
+          orderBy: this.currentList.sort_by,
+          order: this.currentList.sort_order
+        } : null
       }
     }
   },
 
   beforeDestroy () {
     this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
+    this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
+    this.$VueEvent.stop('datatable_sorts_updated', this.pdViewListeners.datatableSortsUpdated)
   }
 }
 </script>
