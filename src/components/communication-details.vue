@@ -535,6 +535,19 @@
               </b-col>
             </b-form-row>
             <hr />
+            <b-form-row
+              v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
+            >
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Traffic Type:</q-item-label>
+              </b-col>
+              <b-col cols="7">
+                <div class="d-flex align-items-center">
+                  {{ communication.is_international ? 'International' : 'Local' }}
+                </div>
+              </b-col>
+            </b-form-row>
+            <hr />
             <div v-if="[CommunicationTypes.CALL].includes(communication.type)">
               <b-form-row data-testid="comm-details-disposition-row">
                 <b-col
