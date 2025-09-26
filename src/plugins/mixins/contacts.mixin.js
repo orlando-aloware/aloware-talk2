@@ -143,6 +143,10 @@ export default {
         params.order = sorts.order
       }
 
+      if (this.isPowerDialer) {
+        params.update_sorts = true
+      }
+
       this.fetch(params, true, true)
 
       document.getElementsByClassName('scrollableArea')[0].scrollTop = 0
@@ -744,6 +748,10 @@ export default {
 
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
         powerQuery.task_status = this.pdFilters[this.activeFilter]
+      }
+
+      if (params?.update_sorts && this.isPowerDialer) {
+        powerQuery.update_sorts = true
       }
 
       const csfFields = this.columns.reduce((acc, column) => {
