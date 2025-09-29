@@ -231,6 +231,7 @@ export default _.merge({
     isAdminOrBillingAdmin () {
       return this.isAdmin || this.isBillingAdmin
     },
+
     /**
      * Decides if the Broadcast should be shown.
      *
