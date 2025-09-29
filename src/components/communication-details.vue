@@ -553,7 +553,7 @@
                 <div class="d-flex align-items-center">
                   {{ communication.is_international ? 'International' : 'Local' }}
                   <q-icon
-                    v-if="communication.is_international && isAdminOrBillingAdmin()"
+                    v-if="communication.is_international && isAdminOrBillingAdmin"
                     class="ml-1 text-primary cursor-pointer"
                     name="info"
                     size="16px"
