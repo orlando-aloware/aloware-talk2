@@ -535,15 +535,39 @@
               </b-col>
             </b-form-row>
             <hr />
+            <!--TRAFFIC TYPE-->
             <b-form-row
               v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
+              data-testid="comm-details-traffic-type-row"
             >
-              <b-col class="pl-0 pr-0">
-                <q-item-label>Traffic Type:</q-item-label>
+              <b-col
+                class="pl-0 pr-0"
+                data-testid="comm-details-traffic-type-col"
+              >
+                <q-item-label>Traffic Type: </q-item-label>
               </b-col>
-              <b-col cols="7">
+              <b-col
+                cols="7"
+                data-testid="comm-details-traffic-type-col"
+              >
                 <div class="d-flex align-items-center">
                   {{ communication.is_international ? 'International' : 'Local' }}
+                  <q-icon
+                    v-if="communication.is_international && isAdminOrBillingAdmin"
+                    class="ml-1 text-primary cursor-pointer"
+                    name="info"
+                    size="16px"
+                    @click="onOpenInternationalPricingInClassicClicked"
+                  >
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      max-width="200px"
+                      data-testid="comm-details-traffic-type-tooltip"
+                    >
+                      Click to view international pricing
+                    </q-tooltip>
+                  </q-icon>
                 </div>
               </b-col>
             </b-form-row>
@@ -1936,6 +1960,10 @@ export default {
 
     onOpenBroadcastInClassicClicked (broadcastId) {
       window.open(this.getClassicUrlBroadcastActivity(broadcastId), '_blank')
+    },
+
+    onOpenInternationalPricingInClassicClicked () {
+      window.open(this.getInternationalPricingURL(), '_blank')
     },
 
     isAttachmentImage (mimeType) {
