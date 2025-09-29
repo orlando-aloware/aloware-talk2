@@ -520,9 +520,13 @@ export default {
      * Get formatted field value with appropriate filter
      */
     getFormattedFieldValue (field) {
-      const value = this.getFieldValue(field)
+      let value = this.getFieldValue(field)
 
       if (field.filter && this.$options.filters[field.filter]) {
+        if (field.key === CONTACT_FIELD_DEFINITIONS.intake_source.key) {
+          value = value?.toLowerCase() === 'web' ? 'Extension' : value
+        }
+
         return this.$options.filters[field.filter](value)
       }
 
