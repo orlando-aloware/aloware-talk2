@@ -19,7 +19,6 @@
           :nodes="generateTargetUsersTree"
           node-key="label"
           selected-color="primary"
-          :expanded="[]"
           data-testid="target-users-tree">
         </q-tree>
       </template>
@@ -148,7 +147,7 @@ export default {
   methods: {
     generateAttemptingUsersTree (attemptingUsers) {
       if (!attemptingUsers) {
-        return
+        return []
       }
 
       const data = []
@@ -164,7 +163,6 @@ export default {
           label: this.getUserName(user.data)
         })
       }
-
       // return the tree
       return data
     }
