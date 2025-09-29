@@ -173,6 +173,7 @@ import { ContactAttributeTypeEnum } from 'components/contacts/contact-attributes
 import LeadSourceSelector from 'components/generic-selectors/lead-source-selector.vue'
 import SettingIcon from 'components/icons/setting-o-icon'
 import SettingsMap from 'components/settings/settings-map'
+import { INTAKE_SOURCE } from 'src/constants/contacts-intake-source'
 
 export default {
   name: 'contact-information',
@@ -524,7 +525,7 @@ export default {
 
       if (field.filter && this.$options.filters[field.filter]) {
         if (field.key === CONTACT_FIELD_DEFINITIONS.intake_source.key) {
-          value = value?.toLowerCase() === 'web' ? 'Extension' : value
+          value = INTAKE_SOURCE[value?.toLowerCase()] || value
         }
 
         return this.$options.filters[field.filter](value)
