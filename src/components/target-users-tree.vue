@@ -163,7 +163,6 @@ export default {
           label: this.getUserName(user.data)
         })
       }
-      console.log('generateAttemptingUsersTree', data)
       // return the tree
       return data
     }
