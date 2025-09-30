@@ -23,7 +23,7 @@
                 </a>
                 <p class="mb-0"
                    data-testid="integration-salesforce-name"
-                   v-if="integrationData.name !== undefined">
+                   v-if="!!integrationData.name">
                   <span class="data-icon-label">Name: </span>
                   <span class="data-value">
                         <q-tooltip
