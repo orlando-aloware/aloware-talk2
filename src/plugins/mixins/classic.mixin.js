@@ -32,6 +32,10 @@ export default {
       return process.env.API_URL + '/account?tab=compliance'
     },
 
+    getInternationalPricingURL () {
+      return process.env.API_URL + '/account?tab=international_pricing'
+    },
+
     getClassicURL () {
       return process.env.API_URL
     }
