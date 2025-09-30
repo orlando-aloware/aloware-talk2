@@ -482,5 +482,5 @@ export const STATIC_COLUMNS = ALL_COLUMNS.filter(
 )
 
 export const POWER_DIALER_DEFAULT_COLUMNS = ALL_COLUMNS.filter(
-  (c) => ['checkbox', 'name', 'phone_number', 'created_at', 'tags', 'task_status_name', 'actions'].includes(c.name)
+  (c) => ['checkbox', 'name', 'phone_number', 'created_at', 'timezone', 'tags', 'task_status_name', 'actions'].includes(c.name)
 )
