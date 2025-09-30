@@ -4,6 +4,7 @@ import path from 'path'
 import { Registry } from 'rage-edit'
 import { template } from './menu'
 import { clone } from 'lodash'
+import { setupContextMenu } from './context-menu-actions'
 
 let isSilent = true
 let updateDownloaded = false
@@ -103,6 +104,9 @@ function createWindow () {
 
   // set title
   mainWindow.setTitle(require('../../package.json').productName)
+
+  // Add context menu support for right-click actions
+  setupContextMenu(mainWindow)
 
   // Protocol handler for win32
   if (process.platform === 'win32') {
