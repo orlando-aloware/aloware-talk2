@@ -405,22 +405,10 @@ export default {
       return this.isLoading || (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE && this.getIntegration !== HIGHLEVEL_INTEGRATION)
     },
 
-    // Hide HL import list for all companies except internal ones
-    hideHighLevelImport () {
-      const allowedCompanyIds = [7, 47, 1659]
-      return !allowedCompanyIds.includes(this.currentCompany?.id)
-    },
-
     filteredEnabledIntegrations () {
-      // show only ready for contact list integrations
       const availableIntegrations = [
-        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION
+        HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION, HIGHLEVEL_INTEGRATION
       ]
-
-      // Add HighLevel only if not temporarily hidden
-      if (!this.hideHighLevelImport) {
-        availableIntegrations.push(HIGHLEVEL_INTEGRATION)
-      }
 
       return this.integrationsEnabled.filter(integration =>
         availableIntegrations.includes(integration.toLowerCase())
