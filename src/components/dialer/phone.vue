@@ -66,7 +66,8 @@
                    icon="img:app-icons/dialer/phone_settings.svg"
                    size="12px"
                    padding="none"
-                   flat>
+                   flat
+                   data-testid="phone-settings-icon">
             </q-btn>
           </template>
 
@@ -87,10 +88,12 @@
                    label="Speaker Test"
                    no-caps
                    unelevated
+                   data-testid="phone-speaker-test-button"
                    @click="testOutputDevice">
             </q-btn>
 
             <button class="btn text-size-sm _400 text-grey-100 p-0 mt-2 d-flex align-items-center"
+                    data-testid="phone-refresh-button"
                     @click="forceRefreshCommunication">
               <i class="material-icons">refresh</i>
               <span class="ml-2">Refresh</span>
@@ -105,6 +108,7 @@
                padding="none"
                flat
                :disabled="isClosePhoneDisabled"
+               data-testid="phone-close-button"
                @click="closePhone">
           <q-tooltip v-if="isClosePhoneDisabled && closePhoneDisabledTooltip">
             {{ closePhoneDisabledTooltip }}
@@ -146,6 +150,7 @@
                        padding="none"
                        flat
                        round
+                       data-testid="phone-hide-local-time-button"
                        @click="hideLocalTime">
                 </q-btn>
               </template>
@@ -167,6 +172,7 @@
                        flat
                        round
                        :disabled="isContactReadOnly"
+                       data-testid="phone-contact-info-button"
                        @click="goToContact">
                 </q-btn>
               </q-item-label>
@@ -174,6 +180,7 @@
                 <span class="d-inline-flex">{{ leadNumber }}</span>
                 <b-link class="copy-phone-number text-white d-inline-flex ml-1"
                         href="#"
+                        data-testid="phone-copy-number-link"
                         @click.prevent="copyPhoneNumber(leadNumberRaw)">
                   <copy-icon />
                 </b-link>
@@ -198,6 +205,7 @@
                        ripple
                        round
                        no-caps
+                       data-testid="phone-decline-call-button"
                        @click="rejectCall">
                   <cancel-call-icon width="52"
                                     height="52">
@@ -211,6 +219,7 @@
                        ripple
                        round
                        no-caps
+                       data-testid="phone-ignore-call-button"
                        @click="rejectCall">
                   <ignore-call-icon width="52"
                                     height="52">
@@ -225,6 +234,7 @@
                        ripple
                        round
                        no-caps
+                       data-testid="phone-accept-call-button"
                        @click="answerCall">
                   <accept-call-icon width="52"
                                     height="52">
@@ -239,6 +249,7 @@
                        ripple
                        round
                        no-caps
+                       data-testid="phone-unpark-call-button"
                        @click="unparkCommunication">
                   <parked-call-icon width="52"
                                     height="52">
@@ -255,6 +266,7 @@
                      no-caps
                      :disable="dialer.currentStatus === 'MAKING_CALL'"
                      :class="hangupCallClass"
+                     data-testid="phone-hangup-call-button"
                      @click="hangupCall">
                 <cancel-call-icon width="52"
                                   height="52">
@@ -282,6 +294,7 @@
                 <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                               v-if="contact">
                   <span class="d-inline-flex cursor-pointer link-only"
+                        data-testid="phone-contact-name-link"
                         @click="goToContact"
                         v-if="!isContactReadOnly">
                     {{ contactName | truncate(15) }}
@@ -293,6 +306,7 @@
                   <span class="d-inline-flex">{{ leadNumberRaw | fixPhone }}</span>
                   <b-link class="copy-phone-number text-grey-100 d-inline-flex ml-1"
                           href="#"
+                          data-testid="phone-copy-number-link-menu"
                           @click.prevent="copyPhoneNumber(leadNumberRaw)">
                     <copy-icon />
                   </b-link>
@@ -313,6 +327,7 @@
               <div class="d-flex justify-content-between align-items-center w-100 pr-2">
                 <q-item-label class="cursor-pointer"
                               v-if="contact"
+                              data-testid="phone-contact-members-link"
                               @click="openExpansion('members')">
                   <div class="d-flex align-items-center">
                     <ready-icon v-if="!shouldIntroduce" />
@@ -332,6 +347,7 @@
                        :loading="loadingMerge"
                        :disabled="isIntroduceDisabled"
                        v-if="shouldIntroduce"
+                       data-testid="phone-merge-calls-button"
                        @click="mergeCalls">
                   <merge-icon class="ml-2" />
                 </q-btn>
@@ -340,6 +356,7 @@
               <div class="d-flex justify-content-between align-items-center mt-3 w-100 pr-2"
                    v-if="addedParty">
                 <q-item-label class="cursor-pointer"
+                              data-testid="phone-added-party-members-link"
                               @click="openExpansion('members')">
                   <div class="d-flex align-items-center">
                     <ready-icon />
@@ -363,6 +380,7 @@
                        unelevated
                        :loading="loadingDropThirdParty"
                        :disabled="loadingDropThirdParty"
+                       data-testid="phone-drop-third-party-button"
                        @click="dropThirdParty">
                   <drop-participant-icon />
                 </q-btn>
@@ -372,6 +390,7 @@
             <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">
               <button class="phone-buttons btn"
                       :disabled="isMuteDisabled"
+                      data-testid="phone-mute-button"
                       @click="toggleMute">
                 <mute-icon :width="iconSizes.mute.width"
                            :height="iconSizes.mute.height"
@@ -385,6 +404,7 @@
               </button>
               <button class="phone-buttons btn"
                       :disabled="isHoldDisabled || loadingHold || loadingUnhold"
+                      data-testid="phone-hold-button"
                       @click="toggleHold">
                 <hold-icon :width="iconSizes.hold.width"
                            :height="iconSizes.hold.height"
@@ -397,6 +417,7 @@
                 <span>{{ dialer.isHeld ? 'Unhold' : 'Hold' }}</span>
               </button>
               <button class="phone-buttons btn"
+                      data-testid="phone-keypad-button"
                       @click="openExpansion('dialpad')">
                 <dialpad-icon :width="iconSizes.keypad.width"
                               :height="iconSizes.keypad.height">
@@ -405,6 +426,7 @@
               </button>
               <button class="phone-buttons btn"
                       :disabled="isDisabledPhoneButtons"
+                      data-testid="phone-recording-button"
                       @click="toggleRecordingStatus">
                 <template v-if="dialer.communication.should_record === true">
                   <record-icon :width="iconSizes.recording.width"
@@ -428,6 +450,7 @@
             </div>
             <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">
               <button class="phone-buttons elevated btn"
+                      data-testid="phone-notes-button"
                       @click="openExpansion('notes')">
                 <notes-icon :width="iconSizes.notes.width"
                             :height="iconSizes.notes.height">
@@ -435,6 +458,7 @@
                 <span>Notes</span>
               </button>
               <button class="phone-buttons elevated btn"
+                      data-testid="phone-tags-button"
                       @click="openExpansion('tags')">
                 <tags-icon :width="iconSizes.tags.width"
                            :height="iconSizes.tags.height">
@@ -443,6 +467,7 @@
               </button>
               <button class="phone-buttons elevated btn"
                       :disabled="isVmDropDisabled"
+                      data-testid="phone-vm-drop-button"
                       @click="openExpansion('vm-drop')">
                 <vm-drop-icon :width="iconSizes.vmdrop.width"
                               :height="iconSizes.vmdrop.height">
@@ -453,6 +478,7 @@
             <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3 actions-block">
               <button class="phone-buttons btn"
                       :disabled="isHangupDisabled"
+                      data-testid="phone-end-call-button"
                       @click="endCall">
                 <cancel-call-icon :width="iconSizes.call.width"
                                   :height="iconSizes.call.height">
@@ -460,6 +486,7 @@
               </button>
               <button class="phone-buttons btn"
                       :disabled="isAddDisabled"
+                      data-testid="phone-add-button"
                       @click="openExpansion('add')">
                 <add-icon :width="iconSizes.add.width"
                           :height="iconSizes.add.height">
@@ -468,6 +495,7 @@
               </button>
               <button class="phone-buttons btn"
                       :disabled="isTransferDisabled"
+                      data-testid="phone-transfer-button"
                       @click="openExpansion('transfer')">
                 <transfer-icon :width="iconSizes.transfer.width"
                                :height="iconSizes.transfer.height">
@@ -476,6 +504,7 @@
               </button>
               <button class="phone-buttons btn"
                       :disabled="isMoreDisabled"
+                      data-testid="phone-more-button"
                       @click="openExpansion('more')">
                 <more-icon :width="iconSizes.more.width"
                            :height="iconSizes.more.height">
@@ -500,6 +529,7 @@
                   <div class="mr-auto">
                     <p class="contact-name mb-1">
                       <span class="d-inline-flex cursor-pointer link-only"
+                            data-testid="phone-contact-name-link-wrapup"
                             @click="goToContact">
                             {{ contactName | truncate(15) }}
                       </span>
@@ -510,6 +540,7 @@
                       <span>{{ contact.phone_number | fixPhone }}</span>
                       <b-link class="copy-phone-number text-grey-100 d-inline-flex ml-1"
                               href="#"
+                              data-testid="phone-copy-number-link-wrapup"
                               @click.prevent="copyPhoneNumber(contact.phone_number)">
                         <copy-icon/>
                       </b-link>
@@ -597,6 +628,7 @@
                             size="sm"
                             :loading="loadingSendMessage"
                             :disabled="loadingSendMessage || !template"
+                            data-testid="phone-send-message-button"
                             @click="sendMessage">
                     <span>Send</span>
                   </b-button>
@@ -695,6 +727,7 @@
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
                   :disabled="shouldDisableCallBackButton || temporaryDisableFinishButton"
+                  data-testid="phone-callback-button"
                   @click="onCallBackClick">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -704,6 +737,7 @@
 
         <b-button variant="primary"
                   :disabled="isNotDisposed || isNotOnWrapUp || temporaryDisableFinishButton"
+                  data-testid="phone-finish-button"
                   @click="onFinish">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -732,6 +766,7 @@
                      :ripple="false"
                      :class="[ !expanded ? 'invisible' : '']"
                      :label="phoneExpansionLabel"
+                     data-testid="phone-save-reset-expansion-button"
                      @click="saveAndResetExpansion">
               </q-btn>
             </q-item-section>
@@ -750,6 +785,7 @@
                     <span class="d-inline-flex">{{ leadNumberRaw | fixPhone }}</span>
                     <b-link href="#"
                             class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                            data-testid="phone-copy-number-link-members"
                             @click.prevent="copyPhoneNumber(leadNumberRaw)">
                       <i class="material-icons">content_copy</i>
                     </b-link>
@@ -820,18 +856,21 @@
                   <div class="d-flex flex-column dialpad">
                     <div class="d-flex flex-row align-items-center justify-content-between mb-2">
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-1"
                               @click="sendDigit('1')">
                         <span class="number-text">1</span>
                         <span class="number-text-sub invisible">$</span>
                       </button>
 
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-2"
                               @click="sendDigit('2')">
                         <span class="number-text">2</span>
                         <span class="number-text-sub">A B C</span>
                       </button>
 
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-3"
                               @click="sendDigit('3')">
                         <span class="number-text">3</span>
                         <span class="number-text-sub">D E F</span>
@@ -839,18 +878,21 @@
                     </div>
                     <div class="d-flex flex-row align-items-center justify-content-between mb-2">
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-4"
                               @click="sendDigit('4')">
                         <span class="number-text">4</span>
                         <span class="number-text-sub">G H I</span>
                       </button>
 
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-5"
                               @click="sendDigit('5')">
                         <span class="number-text">5</span>
                         <span class="number-text-sub">J K L</span>
                       </button>
 
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-6"
                               @click="sendDigit('6')">
                         <span class="number-text">6</span>
                         <span class="number-text-sub">M N O</span>
@@ -858,18 +900,21 @@
                     </div>
                     <div class="d-flex flex-row align-items-center justify-content-between mb-2">
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-7"
                               @click="sendDigit('7')">
                         <span class="number-text">7</span>
                         <span class="number-text-sub">P Q R S</span>
                       </button>
 
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-8"
                               @click="sendDigit('8')">
                         <span class="number-text">8</span>
                         <span class="number-text-sub">T U V</span>
                       </button>
 
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-9"
                               @click="sendDigit('9')">
                         <span class="number-text">9</span>
                         <span class="number-text-sub">W X Y Z</span>
@@ -877,18 +922,21 @@
                     </div>
                     <div class="d-flex flex-row align-items-center justify-content-between">
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-asterisk"
                               @click="sendDigit('*')">
                         <span class="number-text">*</span>
                         <span class="number-text-sub invisible">$</span>
                       </button>
 
                       <button class="number-btn-wrapper btn"
-                              v-longpress="handleLongPress">
+                              v-longpress="handleLongPress"
+                              data-testid="phone-dialpad-0">
                         <span class="number-text">0</span>
                         <span class="number-text-sub">+</span>
                       </button>
 
                       <button class="number-btn-wrapper btn"
+                              data-testid="phone-dialpad-hash"
                               @click="sendDigit('#')">
                         <span class="number-text">#</span>
                         <span class="number-text-sub invisible">$</span>
@@ -901,6 +949,7 @@
                            round
                            no-caps
                            unelevated
+                           data-testid="phone-dialpad-end-call-button"
                            @click="endCall">
                       <cancel-call-icon width="56"
                                         height="56">
@@ -926,6 +975,7 @@
                     <b-button variant="primary"
                               size="sm"
                               block
+                              data-testid="phone-save-notes-button"
                               @click="saveNotes">
                       <span>Save Notes</span>
                     </b-button>
@@ -991,6 +1041,7 @@
                                      icon="refresh"
                                      flat
                                      round
+                                     data-testid="phone-refresh-users-button"
                                      @click="getUsers">
                               </q-btn>
                             </div>
@@ -1062,6 +1113,7 @@
                                   block
                                   :loading="loadingAdd"
                                   :disabled="loadingAdd || !addValidated"
+                                  data-testid="phone-add-participant-button"
                                   @click="addParticipant">
                           <i class="material-icons-outlined">person_add_alt</i>
                           <span class="ml-2">Add</span>
@@ -1073,6 +1125,7 @@
                                   block
                                   :loading="loadingIntroduce"
                                   :disabled="loadingIntroduce || !introduceValidated"
+                                  data-testid="phone-introduce-participant-button"
                                   @click="introduceParticipant">
                           <i class="material-icons-outlined">people</i>
                           <span class="ml-2">Introduce</span>
@@ -1133,6 +1186,7 @@
                                      icon="refresh"
                                      flat
                                      round
+                                     data-testid="phone-refresh-users-transfer-button"
                                      @click="getUsers">
                               </q-btn>
                             </div>
@@ -1202,6 +1256,7 @@
                               block
                               :loading="loadingTransfer"
                               :disabled="loadingTransfer || !transferValidated"
+                              data-testid="phone-transfer-call-button"
                               @click="transferCall">
                       <span>Transfer</span>
                     </b-button>
@@ -1223,6 +1278,7 @@
                               block
                               :loading="loadingSendVmDrop"
                               :disabled="loadingSendVmDrop || !vmDropId"
+                              data-testid="phone-send-vm-drop-button"
                               @click="sendVmDrop">
                       <span>Leave Voicemail</span>
                     </b-button>
@@ -1234,6 +1290,7 @@
               <q-card-section class="height-140">
                 <div class="d-flex justify-content-start w-100 pt-3 pl-3 pr-3">
                   <button class="phone-buttons btn"
+                          data-testid="phone-scripts-button"
                           @click="openExpansion('scripts')">
                     <scripts-icon :width="iconSizes.scripts.width"
                                   :height="iconSizes.scripts.height">
@@ -1242,6 +1299,7 @@
                   </button>
                   <button class="phone-buttons btn"
                           :disabled="isParkDisabled"
+                          data-testid="phone-park-call-button"
                           @click="parkCall">
                     <park-call-icon :width="iconSizes.parkCall.width"
                                     :height="iconSizes.parkCall.height">
@@ -1249,6 +1307,7 @@
                     <span>Park Call</span>
                   </button>
                   <button class="phone-buttons btn"
+                          data-testid="phone-open-contact-button"
                           @click="openContact">
                     <contact-icon :width="iconSizes.contact.width"
                                   :height="iconSizes.contact.height">
@@ -1256,6 +1315,7 @@
                     <span>Contact</span>
                   </button>
                   <button class="phone-buttons btn"
+                          data-testid="phone-integrations-button"
                           @click="openExpansion('integrations')">
                     <integrations-icon :width="iconSizes.integrations.width"
                                        :height="iconSizes.integrations.height">
