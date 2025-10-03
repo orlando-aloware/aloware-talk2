@@ -75,11 +75,13 @@
             <q-item-label class="mb-1">Input device</q-item-label>
             <device-selector :devices="inputDevices"
                              v-model="currentInputDevice"
+                             data-testid="phone-input-device-selector"
                              @change="setInputDevice">
             </device-selector>
             <q-item-label class="mt-3 mb-1">Output device</q-item-label>
             <device-selector :devices="outputDevices"
                              v-model="currentOutputDevice"
+                             data-testid="phone-output-device-selector"
                              @change="setOutputDevice">
             </device-selector>
 
@@ -576,6 +578,7 @@
                                           :highlighted="isHighlightedCallDisposition"
                                           :required="isHighlightedCallDisposition"
                                           :communication="dialer.communication"
+                                          data-testid="phone-call-disposition-selector"
                                           @change="onCallDisposed">
                 </call-disposition-wrapper>
               </div>
@@ -602,6 +605,7 @@
                                              :required="isHighlightedContactDisposition"
                                              :contact="contact"
                                              :is-read-only="isContactReadOnly"
+                                             data-testid="phone-contact-disposition-selector"
                                              @change="onContactDisposed">
                 </contact-disposition-wrapper>
               </div>
@@ -617,6 +621,7 @@
                   <template-selector class="w-100"
                                      v-model="templateId"
                                      :disable=isMessagingBlocked(getCampaign(dialer.communication.campaign_id,true),true)
+                                     data-testid="phone-template-selector"
                                      @change="changeTemplate">
                   </template-selector>
                   <q-tooltip v-if="isMessagingBlocked(getCampaign(dialer.communication.campaign_id,true),true)">
@@ -967,6 +972,7 @@
                                         ref="communicationNotes"
                                         :communication="dialer.communication"
                                         :no-auto-save="true"
+                                        data-testid="phone-communication-notes"
                                         @notesChanged="storeNotes"
                                         @onUnsavedChanges="onCommunicationNotesUnsaved">
                     </communication-note>
@@ -1002,6 +1008,7 @@
                   <script-selector class="w-100"
                                    :communication="dialer.communication"
                                    v-model="scriptId"
+                                   data-testid="phone-script-selector"
                                    @change="changeScript">
                   </script-selector>
                 </div>
@@ -1034,6 +1041,7 @@
                                                        ref="availableUserSelector"
                                                        :communication="dialer.communication"
                                                        v-model="add.userId"
+                                                       data-testid="phone-add-user-selector"
                                                        @change="changeAddUser">
                               </available-user-selector>
                               <q-btn class="text-size-xxs ml-1"
@@ -1068,6 +1076,7 @@
                                                  :isGenericSelectorStyle="true"
                                                  :clearable="true"
                                                  v-model="add.ringGroupId"
+                                                 data-testid="phone-add-ring-group-selector"
                                                  @change="changeAddRingGroup">
                             </ring-group-selector>
                           </template>
@@ -1179,6 +1188,7 @@
                                                        class="flex-grow-1"
                                                        :communication="dialer.communication"
                                                        v-model="transfer.userId"
+                                                       data-testid="phone-transfer-user-selector"
                                                        @change="changeTransferUser">
                               </available-user-selector>
                               <q-btn class="text-size-xxs ml-1"
@@ -1213,6 +1223,7 @@
                                                  :isGenericSelectorStyle="true"
                                                  :clearable="true"
                                                  v-model="transfer.ringGroupId"
+                                                 data-testid="phone-transfer-ring-group-selector"
                                                  @change="changeTransferRingGroup">
                             </ring-group-selector>
                           </template>
@@ -1270,6 +1281,7 @@
                   <div class="d-flex">
                     <vm-drop-selector class="w-100"
                                       v-model="vmDropId"
+                                      data-testid="phone-vm-drop-selector"
                                       @change="changeVmDrop"/>
                   </div>
                   <div class="d-flex">
