@@ -53,7 +53,7 @@
           class='duplicateContactPhoneNumberMessage'
           v-if='hasDuplicates'
         >
-          {{ duplicatePhoneNumbersDescription }}
+          <div v-html="duplicatePhoneNumbersDescription"></div>
         </q-card-section>
         <q-separator v-if='hasDuplicates' />
         <integration-hubspot-one-contact
@@ -353,6 +353,11 @@ export default {
     duplicatePhoneNumbersDescription () {
       if (!this.integrationData || !this.integrationData.duplicates) {
         return ''
+      }
+
+      if (!this.integrationData.id) {
+        return 'This contact is not linked to HubSpot because the phone number is already connected to another Aloware contact through a different HubSpot record.\n' +
+          '<strong>Resolution:</strong> In HubSpot, remove this phone number from the conflicting record and assign it to a <strong>new, unused HubSpot contact</strong>. This will allow Aloware to link the number correctly.'
       }
 
       const values = [...new Set(this.integrationData.duplicates
