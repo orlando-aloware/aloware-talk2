@@ -55,6 +55,11 @@
         >
           <div v-html="duplicatePhoneNumbersDescription"></div>
         </q-card-section>
+        <q-card-section
+          class='duplicateContactPhoneNumberMessage'
+          v-if='!integrationData.properties.phone && !integrationData.properties.mobilephone && !integrationData.properties.fax'>
+          This HubSpot contact has no phone number. Aloware requires a valid number to sync contacts. Resolution: Re-add the phone number and merge duplicates in HubSpot, or assign a new unique number to correctly re-link this record.
+        </q-card-section>
         <q-separator v-if='hasDuplicates' />
         <integration-hubspot-one-contact
           ref="hubspotOneContact"

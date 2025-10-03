@@ -98,35 +98,6 @@
           <div class='mt-1'>Merge duplicates in HubSpot or assign a different unique number to re-link.</div>
         </q-tooltip>
       </p>
-      <p class='mb-0'
-         data-testid='integration-hubspot-no-phone'
-         v-if='!integrationData.properties.phone && !integrationData.properties.mobilephone'>
-        <span class='data-icon-label'>Phone: </span>
-        <span class='data-value'>
-          None — may not sync
-          <span
-            class='ml-1'
-            aria-label='More info'
-            style='cursor: pointer'
-            @mouseenter='showNoPhoneTooltip = true'
-            @mouseleave='showNoPhoneTooltip = false'
-          >
-            <i class='fa fa-info-circle' aria-hidden='true'></i>
-          </span>
-          <q-tooltip
-            v-model='showNoPhoneTooltip'
-            anchor='top middle'
-            self='bottom middle'
-            :offset='[0, 8]'
-          >
-            This HubSpot contact has no phone number. Aloware requires a valid phone number to sync contacts.<br/>
-            Removing the phone in HubSpot does not resolve conflicts when that same number is assigned to another <br/>
-            HubSpot contact; the current contact will still be linked in Aloware by that number.<br/>
-            To fix, re-add the phone number and merge the HubSpot contacts or assign a different unique phone number <br/>
-            to correctly re-link records.
-          </q-tooltip>
-        </span>
-      </p>
       <!-- Start Lifecycle Stage Section -->
       <div v-if="lifecycleStagesOptions.length > 1" class="lifecycle-stage-container" data-testid="integration-hubspot-lifecycle-stage">
         <div class="d-flex justify-content-between align-items-center">
