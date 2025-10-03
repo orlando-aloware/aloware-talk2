@@ -403,7 +403,7 @@ export default {
         if (integration.name === SALESFORCE_INTEGRATION) {
           const priority = Array.isArray(data?.priority) && data.priority.length > 0
             ? data.priority
-            : ['contacts', 'leads', 'accounts']
+            : ['leads', 'contacts', 'accounts']
           for (const entity of priority) {
             const candidate = data[`${entity}_link`]
             if (candidate && candidate !== '#') {
