@@ -276,6 +276,13 @@ import ContactInfoBadges from './contact-info/contact-info-badges.vue'
 import ContactInfoTime from './contact-info/contact-info-time.vue'
 import LineSelector from 'components/generic-selectors/line-selector'
 import ContactInfoIntegrations from 'components/contacts/contact-info/header/integrations/contact-info-integrations.vue'
+import {
+  GUESTY_INTEGRATION,
+  HUBSPOT_INTEGRATION,
+  PIPEDRIVE_INTEGRATION,
+  SALESFORCE_INTEGRATION,
+  ZOHO_INTEGRATION
+} from 'src/constants/integrations'
 
 export default {
   name: 'contact-info',
@@ -379,22 +386,43 @@ export default {
 
       const INTEGRATIONS = [
         { name: 'gohighlevel', label: 'GoHighLevel' },
-        { name: 'guesty', label: 'Guesty' },
-        { name: 'hubspot', label: 'HubSpot' },
-        { name: 'pipedrive', label: 'Pipedrive' },
-        { name: 'salesforce', label: 'Salesforce' },
-        { name: 'zoho', label: 'Zoho' }
+        { name: GUESTY_INTEGRATION, label: 'Guesty' },
+        { name: HUBSPOT_INTEGRATION, label: 'HubSpot' },
+        { name: PIPEDRIVE_INTEGRATION, label: 'Pipedrive' },
+        { name: SALESFORCE_INTEGRATION, label: 'Salesforce' },
+        { name: ZOHO_INTEGRATION, label: 'Zoho' }
       ]
 
-      return INTEGRATIONS
-        .filter(integration => {
-          const link = this.contact.integration_data[integration.name]?.link
-          return link && link !== '#'
-        })
-        .map(integration => ({
-          ...integration,
-          link: this.contact.integration_data[integration.name].link
-        }))
+      return INTEGRATIONS.reduce((acc, integration) => {
+        const data = this.contact.integration_data[integration.name]
+        if (!data) {
+          return acc
+        }
+
+        let link = null
+        if (integration.name === SALESFORCE_INTEGRATION) {
+          const priority = Array.isArray(data?.priority) && data.priority.length > 0
+            ? data.priority
+            : ['contacts', 'leads', 'accounts']
+          for (const entity of priority) {
+            const candidate = data[`${entity}_link`]
+            if (candidate && candidate !== '#') {
+              link = candidate
+              break
+            }
+          }
+        } else {
+          link = data?.link
+        }
+
+        if (link && link !== '#') {
+          acc.push({
+            ...integration,
+            link
+          })
+        }
+        return acc
+      }, [])
     }
   },
 
