@@ -213,6 +213,9 @@ export default {
       // HubSpot widget visibility state
       isCallingWidgetVisible: true,
 
+      // HubSpot Calling Extensions SDK instance
+      extensions: null,
+
       // Contact details for calls
       contactDetails: {
         contactName: '',
@@ -659,7 +662,7 @@ export default {
 
       console.log('Debugging handleDialNumber conditions:', {
         callExtensionsInitialized: this.callExtensionsInitialized,
-        extensionsVisibility: this.extensionsVisibility,
+        isCallingWidgetVisible: this.isCallingWidgetVisible,
         initialized: this.initialized,
         profile: !!this.profile,
         dialerReady: this.dialer?.isReady,
@@ -670,7 +673,7 @@ export default {
       })
 
       if (this.callExtensionsInitialized &&
-        this.extensionsVisibility &&
+        this.isCallingWidgetVisible &&
         this.initialized &&
         this.profile &&
         this.dialer?.isReady &&
