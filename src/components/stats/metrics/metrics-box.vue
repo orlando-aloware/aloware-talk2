@@ -8,6 +8,14 @@
       @mouseleave="hovered = false"
       transtion-show="fade"
       transtion-hide="fade">
+      <q-tooltip
+        v-if="tooltip"
+        anchor="top middle"
+        self="center middle"
+        :offset="[0, 24]"
+      >
+        {{ tooltip }}
+      </q-tooltip>
       <b-badge
         v-if="hovered"
         @click="confirmDeletion"
@@ -128,6 +136,9 @@ export default {
     ...mapState('stats', ['availableMetrics', 'metricLoader']),
     dialogName () {
       return `remove-metric-dialog-${this.metric.id}`
+    },
+    tooltip () {
+      return this.availableMetrics.find(item => item.metric_id === this.metric.metric_id)?.tooltip
     },
     color () {
       const col = this.MetricOptionColors.METRIC_OPTIONS_COLORS.find(c => {
