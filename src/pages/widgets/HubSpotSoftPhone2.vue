@@ -606,6 +606,10 @@ export default {
       try {
         this.displayState = DisplayState.HIDE
 
+        // Wait for dialer token generation with timeout
+        const maxWaitTime = 15000 // 15 seconds
+        const startTime = Date.now()
+
         do {
           if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
             console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
@@ -615,8 +619,24 @@ export default {
             console.log('waiting for agent to become available to make the call', this.dialer.currentStatus)
           }
 
+          // Check if we've exceeded the timeout
+          if ((Date.now() - startTime) > maxWaitTime) {
+            console.error('Timeout waiting for dialer token generation')
+            this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
+            this.$generalNotification('Failed to initialize dialer. Please try again.', 'error', 5000, true)
+            return
+          }
+
           await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
         } while (this.dialer.currentStatus === 'GENERATING_TOKEN')
+
+        // If we're still generating token after timeout, something is wrong
+        if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
+          console.error('Dialer still generating token after timeout - possible API failure')
+          this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
+          this.$generalNotification('Dialer initialization failed. Please refresh and try again.', 'error', 5000, true)
+          return
+        }
 
         await this.getContact()
 
