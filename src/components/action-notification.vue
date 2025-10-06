@@ -215,6 +215,7 @@ import {
 import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../constants/agent-status'
+import talk2Api from 'src/plugins/api/api'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
@@ -266,7 +267,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
+    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users', 'ringGroups']),
     ...mapState('cache', ['currentCompany']),
 
     isCall () {
@@ -770,6 +771,17 @@ export default {
     },
 
     async ignoreFishing () {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+
+      if (ringGroup?.is_personal_inbox) {
+        try {
+          // Force terminate for personal inboxes, since there is no other agents to take the call
+          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
+        } catch (error) {
+          console.error('Failed to force terminate communication on personal inbox:', error)
+        }
+      }
+
       this.$closeActionNotification('callFishing')
       // console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
       this.closeCallNotifications(this.id, this.communicationId)
