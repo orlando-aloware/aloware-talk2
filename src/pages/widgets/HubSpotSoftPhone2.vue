@@ -174,6 +174,12 @@ export default {
 
   mixins: [agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin],
 
+  props: {
+    apiKey: {
+      required: false
+    }
+  },
+
   data () {
     return {
       // Constants
@@ -266,6 +272,12 @@ export default {
             if (!this.authenticated) {
               // User needs to login first, redirect to login page
               this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
+              return
+            }
+
+            // Prevent duplicate calls - if already dialing, ignore new dial requests
+            if (!this.initialized || this.isDialed) {
+              console.log('[HubSpot Widget] Skipping postDialNumber - not initialized or already dialing')
               return
             }
 
@@ -1011,6 +1023,32 @@ export default {
         status = true
       }
 
+      const lastCall = this.profile?.last_call
+
+      // check if there is no last communication on hold
+      if (lastCall && lastCall.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
+        status = true
+      }
+
+      // define last call values to track useful updates if needed
+      if (status) {
+        if (lastCall) {
+          this.setDialerCommunication(lastCall)
+          this.setDialerContact(lastCall?.contact)
+        }
+
+        // do not show a widget message when force disposition, in this case, the dialer will appear with wrap-up page
+        if (lastCall &&
+          // the last call should not be held
+          lastCall.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW &&
+          this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
+          this.checkForceDisposition) {
+          this.setDialerCurrentStatus('WRAP_UP')
+        } else {
+          this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
+        }
+      }
+
       return status
     },
 
@@ -1041,9 +1079,11 @@ export default {
         if (withLastUsedCallLine) {
           this.campaignId = res?.data?.last_used_call_line
         }
+
         const profile = {
           'last_call': res?.data?.last_call
         }
+
         this.setProfile(profile)
       }).catch(err => {
         this.$handleErrors(err.response)
@@ -1069,6 +1109,30 @@ export default {
           isAvailable: this.isAgentAvailable,
           sizeInfo: HUBSPOT_WIDGET_SIZE
         })
+      }
+    },
+
+    /**
+     * Stops dialing if there is a display state change
+     */
+    displayState (to) {
+      if (to !== DisplayState.HIDE && this.startDialing) {
+        this.startDialing = false
+      }
+    },
+
+    /**
+     * Handles widget visibility changes to maintain correct UI state
+     */
+    isCallingWidgetVisible (newVal) {
+      if (newVal) {
+        // Widget became visible - check if agent is on call
+        if (this.profile && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+          this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
+        }
+      } else {
+        // Widget was hidden - clear dial number to prevent state leaks
+        this.setHubspotDialNumber(null)
       }
     },
     /**
