@@ -44,7 +44,7 @@
       </p>
       <p class='mb-0'
          data-testid='integration-hubspot-phone'
-         v-if='integrationData.properties.phone'>
+         v-if='integrationData.properties?.phone'>
         <span class='data-icon-label'>Phone: </span>
         <span class='data-value'>
           {{ integrationData.properties.phone }}
@@ -72,7 +72,7 @@
       </p>
       <p class='mb-0'
          data-testid='integration-hubspot-mobilephone'
-         v-if='integrationData.properties.mobilephone'>
+         v-if='integrationData.properties?.mobilephone'>
         <span class='data-icon-label'>Mobile Phone: </span>
         <span class='data-value'>
           {{ integrationData.properties.mobilephone }}
