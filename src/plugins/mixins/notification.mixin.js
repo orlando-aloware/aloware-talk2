@@ -309,13 +309,12 @@ export default {
               'ringGroup': ringGroup,
               'user.profile.id': this.user?.profile?.id,
               'communication.id': communication?.id,
-              'communication.contact.user_id': communication?.contact?.user_id,
-              'communication.is_call_waiting': communication?.is_call_waiting
+              'communication.contact.user_id': communication?.contact?.user_id
             })
             break
           }
 
-          const callType = (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) || communication.is_call_waiting ? 'callFishing' : 'incomingCall'
+          const callType = (ringGroup?.should_queue && ringGroup?.fishing_mode) ? 'callFishing' : 'incomingCall'
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupId = communication.ring_group_id
           const ringGroupName = _.get(communication, 'ring_group.name', null)

@@ -176,7 +176,7 @@ export default {
       this.inboxes.forEach(inbox => {
         const {
           teams,
-          call_waiting: callWaiting,
+          is_personal_inbox: isPersonalInbox,
           user_ids: userIds,
           team_ids: teamIds,
           watcher_user_ids: watcherUserIds,
@@ -192,9 +192,9 @@ export default {
           watcherTeamUserIds?.includes(this.profile.id) ||
           watcherTeamIds?.some(id => this.teamsIds.includes(id))
 
-        if (callWaiting && isConnected) {
+        if (isPersonalInbox && isConnected) {
           personal.push(inbox)
-        } else if (!callWaiting && isConnected) {
+        } else if (!isPersonalInbox && isConnected) {
           connected.push(inbox)
         } else if (isWatching) {
           watching.push(inbox)

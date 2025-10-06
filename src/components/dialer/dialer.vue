@@ -2181,7 +2181,6 @@ export default {
 
       const communication = {
         id: parseInt(communicationData.Id) || null,
-        is_call_waiting: communicationData.CallWaiting,
         contact: {
           id: parseInt(customParams.ContactId) || null,
           name: customParams.ContactName,
