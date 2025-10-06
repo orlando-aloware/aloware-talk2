@@ -172,6 +172,31 @@
                         />
                       </div>
                       <!-- End Boolean Select -->
+                      <!-- Start Country Select -->
+                      <div v-else-if="isCountryField(filter.field)" class="country-select-container">
+                        <q-select
+                          v-model="filter.value"
+                          :options="countryOptions"
+                          outlined
+                          dense
+                          emit-value
+                          map-options
+                          use-input
+                          input-debounce="0"
+                          :placeholder="filter.value ? '' : 'Select country'"
+                          class="criteria-form-input"
+                          @filter="filterCountryOptions"
+                        >
+                          <template v-slot:no-option>
+                            <q-item>
+                              <q-item-section class="text-grey">
+                                No results
+                              </q-item-section>
+                            </q-item>
+                          </template>
+                        </q-select>
+                      </div>
+                      <!-- End Country Select -->
                       <!-- Regular input for other fields -->
                       <q-input
                         v-else
@@ -182,6 +207,9 @@
                         class="criteria-form-input"
                         :maxlength="['eq', 'not_eq', 'contains', 'not_contains'].includes(filter.operator) ? 75 : undefined"
                       />
+                      <div v-if="shouldShowCaseInsensitiveHelper(filter.field, filter.value)" class="helper-text">
+                        Text case is ignored
+                      </div>
                     </div>
 
                       <div class="delete-button-container">
@@ -305,6 +333,31 @@
                         />
                       </div>
                       <!-- End Boolean Select -->
+                      <!-- Start Country Select -->
+                      <div v-else-if="isCountryField(block.field)" class="country-select-container">
+                        <q-select
+                          v-model="block.value"
+                          :options="countryOptions"
+                          outlined
+                          dense
+                          emit-value
+                          map-options
+                          use-input
+                          input-debounce="0"
+                          :placeholder="block.value ? '' : 'Select country'"
+                          class="criteria-form-input"
+                          @filter="filterCountryOptions"
+                        >
+                          <template v-slot:no-option>
+                            <q-item>
+                              <q-item-section class="text-grey">
+                                No results
+                              </q-item-section>
+                            </q-item>
+                          </template>
+                        </q-select>
+                      </div>
+                      <!-- End Country Select -->
                       <!-- Regular input for other fields -->
                       <q-input
                         v-else
@@ -315,6 +368,9 @@
                         class="criteria-form-input"
                         :maxlength="['eq', 'not_eq', 'contains', 'not_contains'].includes(block.operator) ? 75 : undefined"
                       />
+                      <div v-if="shouldShowCaseInsensitiveHelper(block.field, block.value)" class="helper-text">
+                        Text case is ignored
+                      </div>
                     </div>
 
                     <div class="delete-button-container">
@@ -372,6 +428,7 @@
 </template>
 
 <script>
+import { getValidCountryOptions } from 'src/plugins/helpers/highlevel-validation'
 
 export default {
   name: 'HighlevelSearchCriteriaForm',
@@ -390,6 +447,7 @@ export default {
   mounted () {
     this.fetchSearchOptions()
     this.filteredFieldOptions = this.availableFields
+    this.filteredCountryOptions = getValidCountryOptions()
   },
 
   data () {
@@ -398,6 +456,7 @@ export default {
       isLoading: false,
       availableFields: [],
       filteredFieldOptions: [],
+      filteredCountryOptions: [],
       availableOperators: [
         { label: 'Is', value: 'eq' },
         { label: 'Is Not', value: 'not_eq' },
@@ -424,6 +483,10 @@ export default {
   },
 
   computed: {
+    countryOptions () {
+      return this.filteredCountryOptions.length > 0 ? this.filteredCountryOptions : getValidCountryOptions()
+    },
+
     hasCriteria () {
       const criteriaToCheck = this.showEditDialog ? this.tempSearchCriteria : this.searchCriteria
       return criteriaToCheck.filters.some(block => {
@@ -698,6 +761,17 @@ export default {
       return booleanFieldNames.includes(fieldValue)
     },
 
+    isCountryField (fieldValue) {
+      if (!fieldValue) return false
+
+      return fieldValue === 'country'
+    },
+
+    shouldShowCaseInsensitiveHelper (field, value) {
+      return (['firstNameLowerCase', 'lastNameLowerCase', 'type'].includes(field)) ||
+             (field === 'tags' && this.getValuesArray(value).length === 0)
+    },
+
     validateFieldValue (filter) {
       const errors = []
 
@@ -725,6 +799,10 @@ export default {
       } else if (this.isBooleanField(filter.field)) {
         if (filter.value === null || filter.value === undefined) {
           errors.push('Please select Yes or No')
+        }
+      } else if (this.isCountryField(filter.field)) {
+        if (!filter.value || filter.value.toString().trim() === '') {
+          errors.push('Please select a country')
         }
       } else {
         if (!filter.value || filter.value.toString().trim() === '') {
@@ -802,6 +880,12 @@ export default {
       // Handle boolean fields
       if (this.isBooleanField(filter.field)) {
         this.$set(filter, 'value', null)
+        return
+      }
+
+      // Handle country fields
+      if (this.isCountryField(filter.field)) {
+        this.$set(filter, 'value', '')
         return
       }
 
@@ -903,6 +987,23 @@ export default {
         this.filteredFieldOptions = this.availableFields.filter(field =>
           field.label.toLowerCase().includes(val.toLowerCase()) ||
           field.value.toLowerCase().includes(val.toLowerCase())
+        )
+      })
+    },
+
+    // Filter country options for searchable dropdown
+    filterCountryOptions (val, update) {
+      if (val === '') {
+        update(() => {
+          this.filteredCountryOptions = getValidCountryOptions()
+        })
+        return
+      }
+
+      update(() => {
+        this.filteredCountryOptions = getValidCountryOptions().filter(country =>
+          country.label.toLowerCase().includes(val.toLowerCase()) ||
+          country.value.toLowerCase().includes(val.toLowerCase())
         )
       })
     },
@@ -1532,8 +1633,18 @@ export default {
   width: 100%;
 }
 
+.country-select-container {
+  width: 100%;
+}
+
 .range-date-input-container {
   width: 100%;
+}
+
+.helper-text {
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
 }
 
 /* Override modal width - this will make the select fields more consistent in height */

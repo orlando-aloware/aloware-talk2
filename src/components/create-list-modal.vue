@@ -64,6 +64,7 @@
             </label>
           </div>
           <div class="form-check mt-2"
+               v-if="filteredEnabledIntegrations.length > 0"
                @click="onListTypeSelected(IMPORT_FROM_INTEGRATION_TYPE)">
             <input class="form-check-input"
                    type="radio"
@@ -405,10 +406,13 @@ export default {
     },
 
     filteredEnabledIntegrations () {
-      // show only ready for contact list integrations
-      return this.integrationsEnabled.filter(integration => [
+      const availableIntegrations = [
         HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION, PIPEDRIVE_INTEGRATION, HIGHLEVEL_INTEGRATION
-      ].includes(integration.toLowerCase()))
+      ]
+
+      return this.integrationsEnabled.filter(integration =>
+        availableIntegrations.includes(integration.toLowerCase())
+      )
     },
 
     hasValidHighLevelCriteria () {

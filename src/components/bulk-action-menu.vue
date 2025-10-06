@@ -480,6 +480,8 @@ export default {
         }
       })
 
+      this.$VueEvent.fire('datatable-reset-sorts')
+
       if (isChunked) {
         // remove the used set of contact ids
         chunkedContactIds.splice(0, 1)

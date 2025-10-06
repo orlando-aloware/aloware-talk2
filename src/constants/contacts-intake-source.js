@@ -1,0 +1,27 @@
+export const INTAKE_SOURCE = {
+  aloware: 'ALOWARE',
+  'click-to-call': 'CLICK-TO-CALL',
+  'email-capture': 'EMAIL-CAPTURE',
+  facebook: 'FACEBOOK',
+  'form-capture': 'FORM-CAPTURE',
+  gohighlevel: 'GOHIGHLEVEL',
+  'gohighlevel-webhook': 'GOHIGHLEVEL-WEBHOOK',
+  guesty: 'GUESTY',
+  'guesty-webhook': 'GUESTY-WEBHOOK',
+  'hubspot': 'HUBSPOT',
+  'hubspot-webhook': 'HUBSPOT-WEBHOOK',
+  imports: 'IMPORTS',
+  init: 'INIT',
+  pipedrive: 'PIPEDRIVE',
+  'pipedrive-webhook': 'PIPEDRIVE-WEBHOOK',
+  'register_form': 'REGISTER-FORM',
+  salesforce: 'SALESFORCE',
+  'single-sms': 'SINGLE-SMS',
+  ui: 'UI',
+  'voip-call': 'VOIP-CALL',
+  'voip-fax': 'VOIP-FAX',
+  'voip-sms': 'VOIP-SMS',
+  web: 'EXTENSION', // Alias for web. Back-end value is 'web'.
+  'zapier-sms': 'ZAPIER-SMS',
+  zoho: 'ZOHO'
+}

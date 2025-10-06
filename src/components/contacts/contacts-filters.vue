@@ -315,15 +315,8 @@ export default {
         }
 
         const filters = this.filtersFiltered.filter((filter) => {
-          if (!groupId && (!filter.group_id || filter.group_id.length < 1)) {
-            return false
-          }
-
-          if (filter.group_id !== groupId) {
-            return false
-          }
-
           if (filter.key === 'created_at_list') {
+            // show created_at_list filter only for lists
             if (!this.isContactListsOrPowerDialer || [ContactListTypes.DYNAMIC, ContactListTypes.DYNAMIC_REMOTE_LIST].includes(this.selectedList?.type)) {
               return false
             }
@@ -332,7 +325,11 @@ export default {
             filter.label = 'Date Added to ' + (this.isPowerDialer ? 'Power Dialer' : 'List')
           }
 
-          return true
+          if (!groupId) {
+            return !filter.group_id || filter.group_id.length < 1
+          }
+
+          return filter.group_id === groupId
         })
 
         return {

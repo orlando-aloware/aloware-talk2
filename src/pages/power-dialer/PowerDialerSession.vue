@@ -137,14 +137,6 @@ export default {
       return DEFAULT_FILTER_LIST
     },
 
-    isValidList () {
-      if (this.selectedList.id !== this.$route.params.id) {
-        return false
-      }
-
-      return this.selectedList.name.length > 0
-    },
-
     totalTasksInQueue () {
       return this.powerDialerTasks.in_queue.length
     }
@@ -226,6 +218,8 @@ export default {
     },
 
     fetchTasks (status, isNextPage = false, refreshData = false) {
+      const id = this.$route.params.id
+
       if (status) {
         let taskType = ''
         switch (status) {
@@ -244,7 +238,7 @@ export default {
         }
 
         let params = {
-          id: this.selectedList.id,
+          id,
           task_status: status,
           per_page: 50
         }
@@ -312,11 +306,11 @@ export default {
       Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(stat => {
         const taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
 
-        const params = stat === 'all' ? { id: this.selectedList.id } : {
-          id: this.selectedList.id,
-          task_status: taskStatus
+        const params = {
+          id,
+          per_page: 50,
+          ...(stat !== 'all' ? { task_status: taskStatus } : {})
         }
-        params.per_page = 50
 
         this.getTaskByFilter(params).then(res => {
           this.powerDialerTasks[stat] = res.data.data
@@ -326,13 +320,7 @@ export default {
     },
 
     async fetchCurrentList () {
-      let id = ''
-
-      if (this.isValidList) {
-        id = this.selectedList.id
-      } else {
-        id = this.$route.params.id
-      }
+      const id = this.$route.params.id
 
       Promise.all([
         this.getPowerDialerList(id),

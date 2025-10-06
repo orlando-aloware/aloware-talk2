@@ -645,8 +645,8 @@ export default {
       return this.fixedColumns?.some(column => column.name === columnName)
     },
 
-    onResetSorts (data) {
-      this.sorts = null
+    onResetSorts () {
+      this.sorts = {}
     },
 
     assignStartingSortsWithDefaultFallback (startOrder = null) {
