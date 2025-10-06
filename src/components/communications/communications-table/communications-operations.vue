@@ -155,7 +155,7 @@ export default {
     },
 
     showBargeAndWhisperButton () {
-      return this.userCanBargeAndWhisper(this.row)
+      return this.canBargeAndWhisper(this.row)
     }
   },
 

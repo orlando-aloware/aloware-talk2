@@ -42,6 +42,62 @@
           class='data-value'>{{ integrationData.hubspot_owner.firstName + ' ' + integrationData.hubspot_owner.lastName
           }}</span>
       </p>
+      <p class='mb-0'
+         data-testid='integration-hubspot-phone'
+         v-if='integrationData.properties?.phone'>
+        <span class='data-icon-label'>Phone: </span>
+        <span class='data-value'>
+          {{ integrationData.properties.phone }}
+          <span
+            v-if="isPrimary && isPhoneConflicted"
+            class='ml-1'
+            aria-label='More info'
+            style='cursor: pointer'
+            @mouseenter='showPhoneConflictTooltip = true'
+            @mouseleave='showPhoneConflictTooltip = false'
+          >
+            <i class='fa fa-exclamation-triangle' aria-hidden='true'></i>
+          </span>
+        </span>
+        <q-tooltip
+          v-if="isPrimary && isPhoneConflicted"
+          v-model='showPhoneConflictTooltip'
+          anchor='top middle'
+          self='bottom middle'
+          :offset='[0, 8]'
+        >
+          <div>This number is linked to another Aloware contact.</div>
+          <div class='mt-1'>Merge duplicates in HubSpot or assign a different unique number to re-link.</div>
+        </q-tooltip>
+      </p>
+      <p class='mb-0'
+         data-testid='integration-hubspot-mobilephone'
+         v-if='integrationData.properties?.mobilephone'>
+        <span class='data-icon-label'>Mobile Phone: </span>
+        <span class='data-value'>
+          {{ integrationData.properties.mobilephone }}
+          <span
+            v-if="isPrimary && isMobilePhoneConflicted"
+            class='ml-1'
+            aria-label='More info'
+            style='cursor: pointer'
+            @mouseenter='showMobileConflictTooltip = true'
+            @mouseleave='showMobileConflictTooltip = false'
+          >
+            <i class='fa fa-exclamation-triangle' aria-hidden='true'></i>
+          </span>
+        </span>
+        <q-tooltip
+          v-if="isPrimary && isMobilePhoneConflicted"
+          v-model='showMobileConflictTooltip'
+          anchor='top middle'
+          self='bottom middle'
+          :offset='[0, 8]'
+        >
+          <div>This number is linked to another Aloware contact.</div>
+          <div class='mt-1'>Merge duplicates in HubSpot or assign a different unique number to re-link.</div>
+        </q-tooltip>
+      </p>
       <!-- Start Lifecycle Stage Section -->
       <div v-if="lifecycleStagesOptions.length > 1" class="lifecycle-stage-container" data-testid="integration-hubspot-lifecycle-stage">
         <div class="d-flex justify-content-between align-items-center">
@@ -75,6 +131,15 @@
           </div>
         </div>
       </div>
+
+      <p class='mb-0 mt-2'
+         data-testid='integration-hubspot-aloware-contact-link'
+         v-if='integrationData.aloware_contact_id'>
+        <span class='data-icon-label'>
+          <router-link :to="{ path: '/contacts/' + integrationData.aloware_contact_id }" style="margin-left: 0">Aloware Contact Link</router-link>
+        </span>
+      </p>
+
       <!-- Start Lifecycle Stage Menu -->
       <template v-if="isPrimary">
         <q-menu v-model="showEditLifecycleStageMenu"
@@ -238,7 +303,10 @@ export default {
       selectedLifecycleStage: this.lifecycleStagesOptions.find(stage => stage.value === this.integrationData?.properties?.lifecyclestage) || null,
       previouslySelectedLifecycleStage: null,
       displayedLifecycleStage: this.lifecycleStagesOptions.find(stage => stage.value === this.integrationData?.properties?.lifecyclestage)?.label || 'None',
-      lifecycleStageIsSubmitting: false
+      lifecycleStageIsSubmitting: false,
+      showNoPhoneTooltip: false,
+      showPhoneConflictTooltip: false,
+      showMobileConflictTooltip: false
     }
   },
   computed: {
@@ -272,6 +340,14 @@ export default {
 
     canUpdateLifecycleStage () {
       return !!this.integrationData?.can_update_lifecycle_stages
+    },
+
+    isPhoneConflicted () {
+      return this.isNumberConflictedForAnotherAlowareContact(this.integrationData?.properties?.phone)
+    },
+
+    isMobilePhoneConflicted () {
+      return this.isNumberConflictedForAnotherAlowareContact(this.integrationData?.properties?.mobilephone)
     }
   },
   methods: {
@@ -322,6 +398,14 @@ export default {
       const currentIndex = this.lifecycleStagesOptions.findIndex(stage => stage.value === this.selectedLifecycleStage.value)
 
       return currentIndex < previousIndex
+    },
+
+    isNumberConflictedForAnotherAlowareContact (number) {
+      if (!number || !this.integrationData || !this.integrationData.duplicates) return false
+      // Highlight only if this number is tied to another Aloware contact
+      const conflicts = this.integrationData.duplicates
+        .filter(d => (d.duplicated_by || []).some(db => db.value === number && !db.is_primary))
+      return conflicts.length !== 0
     }
   },
 
@@ -362,8 +446,4 @@ export default {
   width: 220px;
 }
 
-.see-all-matches {
-  margin-top: -8px;
-  margin-bottom: 8px;
-}
 </style>
