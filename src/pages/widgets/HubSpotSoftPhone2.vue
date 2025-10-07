@@ -358,6 +358,11 @@ export default {
         return true
       }
 
+      // Don't show loading if agent is in wrap-up - show the wrap-up UI instead
+      if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) {
+        return false
+      }
+
       return DIALER_STATUSES.includes(this.dialer?.currentStatus) &&
         !this.dialer?.parkedCall &&
         this.displayState === DisplayState.HIDE
@@ -601,7 +606,10 @@ export default {
        */
       // if not empty then dialer was called, and we are here after login page so we must dial the number
       if (!this.hubspotDialNumber) {
-        this.displayState = DisplayState.READY_FOR_CALLS
+        // Don't change displayState if agent is in wrap-up - keep the wrap-up UI visible
+        if (this.profile?.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || !this.checkForceDisposition) {
+          this.displayState = DisplayState.READY_FOR_CALLS
+        }
         return
       }
 
@@ -750,15 +758,22 @@ export default {
         const agentStatus = data.agent_status
         this.setAgentStatus(agentStatus)
 
-        if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS &&
-          this.displayState === DisplayState.SHOW_ALERT_AGENT_ON_CALL &&
-          !this.isDialed) {
-          // For HubSpot widget, return to ready state instead of showing call finished
+        // Handle agent status transitions and update display state accordingly
+
+        // Agent became available after wrap-up - return to ready state
+        if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && previousStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
           this.displayState = DisplayState.READY_FOR_CALLS
-        } else if (this.displayState !== DisplayState.SHOW_ALERT_AGENT_ON_CALL &&
-          this.isInitializing &&
-          agentStatus === AgentStatus.AGENT_STATUS_ON_CALL &&
-          !this.isDialed) {
+          // Reset dialer status if it's still in wrap-up
+          if (this.dialer?.currentStatus === 'WRAP_UP') {
+            this.$VueEvent.fire('resetCall')
+          }
+        } else if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS &&
+            this.displayState === DisplayState.SHOW_ALERT_AGENT_ON_CALL &&
+            !this.isDialed) {
+          // Agent became available while showing "on call" alert - return to ready state
+          this.displayState = DisplayState.READY_FOR_CALLS
+        } else if (agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) {
+          // Agent entered wrap-up with forced dispositions - show wrap-up UI
           this.displayState = DisplayState.HIDE
         }
 
@@ -1077,6 +1092,7 @@ export default {
           this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
           this.checkForceDisposition) {
           this.setDialerCurrentStatus('WRAP_UP')
+          this.displayState = DisplayState.HIDE // Set display state to HIDE so webrtc component shows the wrap-up UI
         } else {
           this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
         }
@@ -1180,6 +1196,31 @@ export default {
         } else {
           this.extensions.userUnavailable()
         }
+      }
+    },
+
+    /**
+     * Watch for dialer status changes to ensure wrap-up state is properly set
+     */
+    'dialer.currentStatus' (newStatus, oldStatus) {
+      // When dialer becomes READY and agent is in wrap-up, restore the wrap-up state
+      // But only if we're coming from an initialization state, not from wrap-up completion
+      if (newStatus === 'READY' &&
+          this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP &&
+          this.checkForceDisposition &&
+          oldStatus !== 'WRAP_UP') {
+        this.validateHasActiveCallStatus()
+      }
+
+      // Keep dialer in WRAP_UP if agent is still in wrap-up
+      // But allow transition when agent status changes to ACCEPTING_CALLS (wrap-up completion)
+      if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP &&
+          newStatus !== 'WRAP_UP' &&
+          this.checkForceDisposition &&
+          oldStatus !== 'WRAP_UP' && // Allow any transition FROM WRAP_UP (wrap-up completion flow)
+          newStatus !== 'GENERATING_TOKEN' && // Don't force during token generation
+          newStatus !== 'TOKEN_GENERATED') { // Don't force after token is generated
+        this.setDialerCurrentStatus('WRAP_UP')
       }
     }
   },
