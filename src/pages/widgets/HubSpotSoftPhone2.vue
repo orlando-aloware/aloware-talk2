@@ -756,6 +756,13 @@ export default {
       ) {
         const previousStatus = this.profile.agent_status
         const agentStatus = data.agent_status
+        console.log('[DEBUG handleAgentStatusUpdate]', {
+          previousStatus,
+          agentStatus,
+          dialerStatus: this.dialer?.currentStatus,
+          checkForceDisposition: this.checkForceDisposition,
+          displayState: this.displayState
+        })
         this.setAgentStatus(agentStatus)
 
         // Handle agent status transitions and update display state accordingly
@@ -1203,23 +1210,34 @@ export default {
      * Watch for dialer status changes to ensure wrap-up state is properly set
      */
     'dialer.currentStatus' (newStatus, oldStatus) {
+      console.log('[DEBUG dialer.currentStatus watcher]', {
+        oldStatus,
+        newStatus,
+        agentStatus: this.profile?.agent_status,
+        checkForceDisposition: this.checkForceDisposition
+      })
+
       // When dialer becomes READY and agent is in wrap-up, restore the wrap-up state
-      // But only if we're coming from an initialization state, not from wrap-up completion
+      // But only if we're coming from an initialization state AND this widget has the communication
       if (newStatus === 'READY' &&
           this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP &&
           this.checkForceDisposition &&
+          this.dialer?.communication && // Only restore if this widget has the communication
           oldStatus !== 'WRAP_UP') {
+        console.log('[DEBUG] Restoring wrap-up state')
         this.validateHasActiveCallStatus()
       }
 
-      // Keep dialer in WRAP_UP if agent is still in wrap-up
+      // Keep dialer in WRAP_UP if agent is still in wrap-up AND this widget has the communication
       // But allow transition when agent status changes to ACCEPTING_CALLS (wrap-up completion)
       if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP &&
           newStatus !== 'WRAP_UP' &&
           this.checkForceDisposition &&
+          this.dialer?.communication && // Only force if this widget has the communication
           oldStatus !== 'WRAP_UP' && // Allow any transition FROM WRAP_UP (wrap-up completion flow)
           newStatus !== 'GENERATING_TOKEN' && // Don't force during token generation
           newStatus !== 'TOKEN_GENERATED') { // Don't force after token is generated
+        console.log('[DEBUG] Forcing dialer back to WRAP_UP')
         this.setDialerCurrentStatus('WRAP_UP')
       }
     }
