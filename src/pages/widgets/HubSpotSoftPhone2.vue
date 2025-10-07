@@ -1172,20 +1172,12 @@ export default {
      * Updates the agent status in HubSpot if it changes in Aloware
      */
     'profile.agent_status' (newStatus) {
-      console.log('[HubSpot Widget] Agent status changed:', {
-        oldStatus: this.profile?.agent_status,
-        newStatus: newStatus,
-        isAgentAvailable: this.isAgentAvailable
-      })
-
       this.callSdkOptions.isAvailable = this.isAgentAvailable
 
       if (this.callExtensionsInitialized && this.extensions) {
         if (newStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS) {
-          console.log('[HubSpot Widget] Notifying HubSpot: user available')
           this.extensions.userAvailable()
         } else {
-          console.log('[HubSpot Widget] Notifying HubSpot: user unavailable')
           this.extensions.userUnavailable()
         }
       }
