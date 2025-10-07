@@ -271,12 +271,9 @@ export default {
 
           onDialNumber: async (data) => {
             console.log('Component mode:', this.componentMode)
-            if (this.componentMode === ComponentMode.REMOTE) {
-              console.log('Calling Remote:Dial number event received from HubSpot:', data)
-              return
-            }
 
-            if (this.componentMode === ComponentMode.WINDOW) {
+            // Outbound calls should only be handled in Window mode
+            if (this.componentMode === ComponentMode.REMOTE) {
               console.log('Dial number event received from HubSpot:', data)
               return
             }
@@ -871,6 +868,7 @@ export default {
           // Return to ready state when call is completed
           this.displayState = DisplayState.READY_FOR_CALLS
           this.startDialing = false
+          this.isDialed = false
         }
 
         if (!this.defaultOutboundCampaignId) {
@@ -1174,12 +1172,20 @@ export default {
      * Updates the agent status in HubSpot if it changes in Aloware
      */
     'profile.agent_status' (newStatus) {
+      console.log('[HubSpot Widget] Agent status changed:', {
+        oldStatus: this.profile?.agent_status,
+        newStatus: newStatus,
+        isAgentAvailable: this.isAgentAvailable
+      })
+
       this.callSdkOptions.isAvailable = this.isAgentAvailable
 
       if (this.callExtensionsInitialized && this.extensions) {
         if (newStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS) {
+          console.log('[HubSpot Widget] Notifying HubSpot: user available')
           this.extensions.userAvailable()
         } else {
+          console.log('[HubSpot Widget] Notifying HubSpot: user unavailable')
           this.extensions.userUnavailable()
         }
       }
