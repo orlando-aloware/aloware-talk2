@@ -137,7 +137,7 @@
   </div>
 </template>
 <script>
-import HubSpotCallingExtensionsClient from 'src/utils/HubSpotCallingExtensionsClient'
+import { hubspotCallingExtensionsClient as HubSpotCallingExtensionsClient, ComponentMode } from 'src/utils/HubSpotCallingExtensionsClient'
 import Webrtc from 'components/webrtc'
 import DialerListeners from 'components/dialer-listeners'
 import LogoutIcon from 'components/icons/logout-icon'
@@ -240,6 +240,10 @@ export default {
             // Reset dialer to clean state when HubSpot SDK is ready (timers, call data, call controls, etc.)
             this.$VueEvent.fire('resetCall')
 
+            // Store component mode from HubSpot SDK (following official example exactly)
+            this.componentMode = data.iframeLocation
+            console.log(`[HubSpot Widget] Component mode: ${this.componentMode}`)
+
             // Store the portal ID from HubSpot SDK
             this.hubspotPortalId = data.portalId
             console.log('Portal ID received from HubSpot SDK:', data.portalId)
@@ -266,6 +270,17 @@ export default {
           },
 
           onDialNumber: async (data) => {
+            console.log('Component mode:', this.componentMode)
+            if (this.componentMode === ComponentMode.REMOTE) {
+              console.log('Calling Remote:Dial number event received from HubSpot:', data)
+              return
+            }
+
+            if (this.componentMode === ComponentMode.WINDOW) {
+              console.log('Dial number event received from HubSpot:', data)
+              return
+            }
+
             console.log('Dial number event received from HubSpot:', data)
             this.setHubspotDialNumber(data)
 

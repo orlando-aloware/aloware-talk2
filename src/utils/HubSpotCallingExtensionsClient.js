@@ -54,5 +54,16 @@ class HubSpotCallingExtensionsClient {
   }
 }
 
-const instance = new HubSpotCallingExtensionsClient()
-export default instance
+export const hubspotCallingExtensionsClient = new HubSpotCallingExtensionsClient()
+
+/**
+ * Component mode is used to determine the mode of the component.
+ * 'window' - when the component is detached in a separate browser window (maintains connection on HubSpot navigation)
+ * 'remote' - when the component is embedded in a HubSpot iframe (loses connection with the parent window)
+ * @see https://developers.hubspot.com/docs/apps/legacy-apps/extensions/calling-extensions/receive-incoming-calls
+ */
+export const ComponentMode = Object.freeze({
+  WINDOW: 'window',
+  REMOTE: 'remote',
+  UNKNOWN: 'unknown'
+})
