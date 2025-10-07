@@ -129,7 +129,6 @@ export default {
   },
 
   created () {
-    console.log(this.profile)
     this.dialerListeners.updateCommunication = (data) => {
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
