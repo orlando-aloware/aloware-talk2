@@ -538,7 +538,8 @@ const RECORD_DISABLED_REASONS = {
   ACCOUNT_FORCED_ALWAYS_RECORD: 'Recording is set to always record at account level',
   USER_LEVEL_DISABLED: 'Recording is disabled at user level',
   CALL_NOT_CONNECTED: 'Call is not in progress',
-  BUSY: 'Processing'
+  BUSY: 'Processing',
+  LINE_LEVEL: 'Recording following line settings'
 }
 
 export default {
@@ -747,6 +748,7 @@ export default {
         return RECORD_DISABLED_REASONS.CALL_NOT_CONNECTED
       }
 
+      // if following company settings
       if ((this.currentCompany?.force_outbound_recording || this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_DEFAULT)) {
         // force disabled at account level
         if (this.currentCompany?.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER) {
@@ -757,17 +759,15 @@ export default {
         if (this.currentCompany?.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS) {
           return RECORD_DISABLED_REASONS.ACCOUNT_FORCED_ALWAYS_RECORD
         }
+      }
 
-        // use line settings
+      // enable if following user settings
+      if ([OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER, OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS].includes(this.profile.outbound_call_recording_mode)) {
         return null
       }
 
-      // disabled at user level
-      if (this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER) {
-        return RECORD_DISABLED_REASONS.USER_LEVEL_DISABLED
-      }
-
-      return null
+      // following line level settings
+      return RECORD_DISABLED_REASONS.LINE_LEVEL
     },
 
     isRecordDisabled () {
