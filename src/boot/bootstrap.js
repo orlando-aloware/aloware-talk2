@@ -590,6 +590,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   // skip if same notification
   if (['call', 'incomingCall', 'callFishing'].includes(settings.type) &&
     this.$store.state.notifications[settings.type].communicationId === settings.communicationId) {
+    console.log('Ignoring notification because it is the same notification', { settings })
     return
   }
 
@@ -597,6 +598,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   const smsNoMessage = settings.type === 'sms' && !settings.message && !settings.attachment
 
   if (!settings.title || noMessage || smsNoMessage) {
+    console.log('Ignoring notification because it has no title, message, or attachment', { settings })
     return
   }
 
@@ -614,7 +616,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     const found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
 
     if (found) {
-      console.log('Vue.prototype.$actionNotification - notification already queued', {
+      console.log('Ignoring notification because it is already queued', {
         'contactId': settings.contactId,
         'communicationId': settings.communicationId
       })
@@ -628,7 +630,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     this.$store.commit('SET_NOTIFICATIONS', data)
 
     if (settings.type === 'callFishing') {
-      console.log('Vue.prototype.$actionNotification - ADD_TO_CALL_FISHING_QUEUE', {
+      console.log('Adding notification to call fishing queue', {
         'settings': settings
       })
       this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
@@ -638,6 +640,9 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   }
 
   if (settings.type !== 'callFishing') {
+    console.log('Hiding notification', {
+      'settings': settings
+    })
     this.$bvToast.hide(settings.type)
   }
 
@@ -660,7 +665,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
         this.$store.commit('SET_NOTIFICATIONS', data)
 
         if (settings.type === 'callFishing') {
-          console.log('Vue.prototype.$actionNotification actionNotificationUnqueuedIntervals - ADD_TO_CALL_FISHING_QUEUE', {
+          console.log('Adding notification to call fishing queue', {
             'settings': settings
           })
           this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
@@ -690,7 +695,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     // if call is not queued in our call fishing notification queue,
     // then we no longer need to continue to wait for notification availability
     if (!queue) {
-      console.log('Vue.prototype.$actionNotification actionNotificationQueuedIntervals - notification not queued', {
+      console.log('Ignoring notification because it is not queued', {
         'settings': settings
       })
       clearInterval(window.actionNotificationQueuedIntervals[settings.type])
@@ -702,7 +707,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
       this.$store.commit('SET_NOTIFICATIONS', data)
 
       if (settings.type === 'callFishing') {
-        console.log('Vue.prototype.$actionNotification actionNotificationQueuedIntervals - ADD_TO_CALL_FISHING_QUEUE', {
+        console.log('Adding notification to call fishing queue', {
           'settings': settings
         })
         this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
