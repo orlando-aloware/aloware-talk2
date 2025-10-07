@@ -792,9 +792,16 @@ export default {
       this.$closeActionNotification('callFishing')
     },
 
-    rejectCall () {
-      if (this.id !== 'callFishing' ||
-        (this.id === 'callFishing' &&
+    async rejectCall () {
+      const isCallFishing = this.id === 'callFishing'
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+
+      if (isCallFishing && ringGroup?.is_personal_inbox) {
+        await this.ignoreFishing()
+      }
+
+      if (!isCallFishing ||
+        (isCallFishing &&
           (!this.queue ||
             (this.queue && !this.queue.length))
         )
@@ -805,11 +812,9 @@ export default {
 
       this.$VueEvent.fire('rejectCall')
 
-      if (this.id === 'callFishing') {
+      if (isCallFishing) {
         this.$VueEvent.fire('hidePhone')
-      }
 
-      if (this.id === 'callFishing') {
         if (this.queue && this.queue.length) {
           this.switchCallFishingFromQueue()
         } else {

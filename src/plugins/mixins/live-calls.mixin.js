@@ -6,6 +6,7 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { agentMixin, notificationMixin, userMixin } from 'src/plugins/mixins/index'
+import talk2Api from '../api/api'
 export default {
   mixins: [
     agentMixin,
@@ -243,6 +244,7 @@ export default {
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
     },
+
     onAcceptCall (e) {
       if ((this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') || this.isAgentOnCall) {
         this.showIncomingCallMenu = true
@@ -292,13 +294,16 @@ export default {
       this.setShowPhone(true)
       e.stopImmediatePropagation()
     },
+
     onRejectCall (e) {
       this.isRejecting = true
+
       if (this.isCallFishingMode && this.isCallFishing) {
         this.removeFromCallFishingQueue(this.communication.id)
         this.isRejecting = false
         this.processRemoveFromNotification(this.communication)
         e.stopImmediatePropagation()
+        this.ignoreFishingIfPersonalInbox()
         return
       }
 
@@ -314,10 +319,12 @@ export default {
       this.processRemoveFromNotification(this.communication)
       e.stopImmediatePropagation()
     },
+
     onHangUpCall (e) {
       this.$VueEvent.fire('hangupCall')
       e.stopImmediatePropagation()
     },
+
     onUnparkCall (e) {
       if ((this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') || this.isAgentOnCall) {
         this.showParkedCallMenu = true
@@ -334,6 +341,19 @@ export default {
       e.stopImmediatePropagation()
     },
 
+    async ignoreFishingIfPersonalInbox () {
+      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      if (ringGroup?.is_personal_inbox) {
+        try {
+          // Force terminate for personal inboxes, since there is no other agents to take the call
+          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
+        } catch (error) {
+          console.error('Failed to force terminate communication on personal inbox:', error)
+        }
+      }
+    },
+
     onParkCurrentCallAndConnect () {
       this.showParkedCallMenu = false
 
@@ -343,6 +363,7 @@ export default {
 
       this.answerCommunication(true, true)
     },
+
     onHangupCurrentCallAndConnect () {
       this.showParkedCallMenu = false
 
@@ -352,14 +373,17 @@ export default {
 
       this.answerCommunication(false, true)
     },
+
     onParkCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
       this.answerCommunication(true, false)
     },
+
     onHangUpCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
       this.answerCommunication(false, true)
     },
+
     async answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
