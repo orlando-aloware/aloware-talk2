@@ -1188,6 +1188,9 @@ export default {
     // Clean up inbound call listener
     this.$VueEvent.stop('new_in_app_call', this.handleIncomingCall)
     console.log('Successfully removed new_in_app_call listener')
+
+    // End any active call when component is destroyed
+    this.endActiveCall()
   },
 
   async created () {
