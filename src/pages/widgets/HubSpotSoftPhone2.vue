@@ -144,6 +144,7 @@ import LogoutIcon from 'components/icons/logout-icon'
 import { mapState, mapActions } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import { DialerStatus } from 'src/constants/dialer-status'
 import { OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK, OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT } from 'src/constants/user-outbound-calling-modes'
 import { local as localStorageHelper } from 'src/plugins/helpers/storage'
 import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin } from 'src/plugins/mixins'
@@ -156,7 +157,8 @@ const DisplayState = Object.freeze({
   CRITICAL_ERROR_HAPPENED: 5
 })
 
-const DIALER_STATUSES = ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY', null]
+// Dialer statuses where we should display a loading indicator while the dialer component initializes
+const DIALER_INITIALIZATION_STATUSES = [DialerStatus.GENERATING_TOKEN, DialerStatus.TOKEN_GENERATED, DialerStatus.READY, null]
 
 const HUBSPOT_WIDGET_SIZE = {
   height: 522,
@@ -363,7 +365,7 @@ export default {
         return false
       }
 
-      return DIALER_STATUSES.includes(this.dialer?.currentStatus) &&
+      return DIALER_INITIALIZATION_STATUSES.includes(this.dialer?.currentStatus) &&
         !this.dialer?.parkedCall &&
         this.displayState === DisplayState.HIDE
     },
@@ -464,10 +466,10 @@ export default {
       const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
       const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
       const isForcedDispositionOnWrapUp = (isForcedCallDisposition || isForcedContactDisposition) &&
-        this.dialer.currentStatus === 'WRAP_UP'
+        this.dialer.currentStatus === DialerStatus.WRAP_UP
 
       return this.loadingAgentStatus ||
-        ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus) ||
+        [DialerStatus.RECEIVED_CALL_INVITE, DialerStatus.MAKING_CALL, DialerStatus.CALL_CONNECTED].includes(this.dialer.currentStatus) ||
         this.isAgentOnCall || isForcedDispositionOnWrapUp
     },
 
@@ -604,7 +606,6 @@ export default {
        * if empty then onDialNumber event was not called - skip calling,
        * if not empty then dialer was called, and we are here after login page so we must dial the number
        */
-      // if not empty then dialer was called, and we are here after login page so we must dial the number
       if (!this.hubspotDialNumber) {
         // Don't change displayState if agent is in wrap-up - keep the wrap-up UI visible
         if (this.profile?.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || !this.checkForceDisposition) {
@@ -627,11 +628,11 @@ export default {
         this.displayState = DisplayState.HIDE
 
         // Wait for dialer token generation with timeout
-        const maxWaitTime = 15000 // 15 seconds
-        const startTime = Date.now()
+        const tokenGenerationTimeoutMs = 15000 // 15 seconds
+        const tokenGenerationStartTime = Date.now()
 
         do {
-          if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
+          if (this.dialer.currentStatus === DialerStatus.GENERATING_TOKEN) {
             console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
           }
 
@@ -640,7 +641,7 @@ export default {
           }
 
           // Check if we've exceeded the timeout
-          if ((Date.now() - startTime) > maxWaitTime) {
+          if ((Date.now() - tokenGenerationStartTime) > tokenGenerationTimeoutMs) {
             console.error('Timeout waiting for dialer token generation')
             this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
             this.$generalNotification('Failed to initialize dialer. Please try again.', 'error', 5000, true)
@@ -648,10 +649,10 @@ export default {
           }
 
           await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
-        } while (this.dialer.currentStatus === 'GENERATING_TOKEN')
+        } while (this.dialer.currentStatus === DialerStatus.GENERATING_TOKEN)
 
         // If we're still generating token after timeout, something is wrong
-        if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
+        if (this.dialer.currentStatus === DialerStatus.GENERATING_TOKEN) {
           console.error('Dialer still generating token after timeout - possible API failure')
           this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
           this.$generalNotification('Dialer initialization failed. Please refresh and try again.', 'error', 5000, true)
@@ -746,7 +747,7 @@ export default {
     },
 
     /**
-     * Handles agent status changes from global events - notifies HubSpot of availability changes
+     * Handle agent status transitions and update display state accordingly - notifies HubSpot of availability changes
      */
     handleAgentStatusUpdate (data) {
       if (
@@ -756,6 +757,7 @@ export default {
       ) {
         const previousStatus = this.profile.agent_status
         const agentStatus = data.agent_status
+
         console.log('[DEBUG handleAgentStatusUpdate]', {
           previousStatus,
           agentStatus,
@@ -763,20 +765,14 @@ export default {
           checkForceDisposition: this.checkForceDisposition,
           displayState: this.displayState
         })
-        this.setAgentStatus(agentStatus)
 
-        // Handle agent status transitions and update display state accordingly
+        this.setAgentStatus(agentStatus)
 
         // Agent became available after wrap-up - return to ready state
         if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && previousStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
           this.displayState = DisplayState.READY_FOR_CALLS
-          // Reset dialer status if it's still in wrap-up
-          if (this.dialer?.currentStatus === 'WRAP_UP') {
-            this.$VueEvent.fire('resetCall')
-          }
-        } else if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS &&
-            this.displayState === DisplayState.SHOW_ALERT_AGENT_ON_CALL &&
-            !this.isDialed) {
+          if (this.dialer?.currentStatus === DialerStatus.WRAP_UP) this.$VueEvent.fire('resetCall') // Reset dialer status if it's still in wrap-up
+        } else if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.displayState === DisplayState.SHOW_ALERT_AGENT_ON_CALL && !this.isDialed) {
           // Agent became available while showing "on call" alert - return to ready state
           this.displayState = DisplayState.READY_FOR_CALLS
         } else if (agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) {
@@ -799,7 +795,7 @@ export default {
         // close widget if finish button in wrap-up page was not clicked but dialing started from another place
         if (this.isDialed &&
           [AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, AgentStatus.AGENT_STATUS_ON_CALL].includes(agentStatus) &&
-          this.dialer?.currentStatus === 'WRAP_UP' &&
+          this.dialer?.currentStatus === DialerStatus.WRAP_UP &&
           previousStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
           this.isDialed = false
           this.onCancelCall()
@@ -876,7 +872,7 @@ export default {
      * Handles call completion events from webrtc component
      */
     handleCallCompletedEvent (skipCallFinished = false) {
-      const skippedStatuses = ['MAKING_CALL', 'RECEIVED_CALL_INVITE', 'ANSWERING_CALL', 'CALL_CONNECTED']
+      const skippedStatuses = [DialerStatus.MAKING_CALL, DialerStatus.RECEIVED_CALL_INVITE, DialerStatus.ANSWERING_CALL, DialerStatus.CALL_CONNECTED]
 
       // some logic can send wrong status of call completed in a short time when call is just initiating
       if (skippedStatuses.includes(this.dialer?.currentStatus)) {
@@ -960,7 +956,7 @@ export default {
         this.setHubspotDialNumber(null)
         this.setDialerCommunication(null)
         this.setDialerContact(null)
-        this.setDialerCurrentStatus('OFFLINE')
+        this.setDialerCurrentStatus(DialerStatus.OFFLINE)
 
         // Reset extensions state
         this.isCallingWidgetVisible = false
@@ -1017,12 +1013,12 @@ export default {
       this.displayState = DisplayState.HIDE
       this.setDialerCommunication(communication)
       this.setDialerContact(communication.contact)
-      this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
+      this.setDialerCurrentStatus(DialerStatus.RECEIVED_CALL_INVITE)
 
       console.log('Set dialer state for inbound call:', {
         communication: communication.id,
         contact: communication.contact?.name,
-        status: 'RECEIVED_CALL_INVITE'
+        status: DialerStatus.RECEIVED_CALL_INVITE
       })
 
       // Call processActionNotification to trigger the action notification system
@@ -1039,7 +1035,7 @@ export default {
       this.displayState = DisplayState.HIDE
       this.isDialed = false
 
-      if (this.dialer?.currentStatus === 'WRAP_UP' && !this.checkDialerForceDisposition) {
+      if (this.dialer?.currentStatus === DialerStatus.WRAP_UP && !this.checkDialerForceDisposition) {
         this.$VueEvent.fire('endWrapUp')
       }
 
@@ -1065,16 +1061,16 @@ export default {
         status = true
       }
 
-      const statuses = [
-        'MAKING_CALL',
-        'CALL_CONNECTED',
-        'HANGING_UP_CALL',
-        'CALL_DISCONNECTED',
-        'WRAP_UP',
-        'ANSWERING_CALL'
+      const activeCallStatuses = [
+        DialerStatus.MAKING_CALL,
+        DialerStatus.CALL_CONNECTED,
+        DialerStatus.HANGING_UP_CALL,
+        DialerStatus.CALL_DISCONNECTED,
+        DialerStatus.WRAP_UP,
+        DialerStatus.ANSWERING_CALL
       ]
 
-      if (statuses.includes(this.dialer?.currentStatus)) {
+      if (activeCallStatuses.includes(this.dialer?.currentStatus)) {
         status = true
       }
 
@@ -1098,7 +1094,7 @@ export default {
           lastCall.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW &&
           this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
           this.checkForceDisposition) {
-          this.setDialerCurrentStatus('WRAP_UP')
+          this.setDialerCurrentStatus(DialerStatus.WRAP_UP)
           this.displayState = DisplayState.HIDE // Set display state to HIDE so webrtc component shows the wrap-up UI
         } else {
           this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
@@ -1155,7 +1151,6 @@ export default {
   watch: {
     /**
      * Updates the logged in status in HubSpot if it changes in Aloware
-     * @param newVal
      */
     authenticated (newVal) {
       if (newVal && this.extensions) {
@@ -1219,11 +1214,11 @@ export default {
 
       // When dialer becomes READY and agent is in wrap-up, restore the wrap-up state
       // But only if we're coming from an initialization state AND this widget has the communication
-      if (newStatus === 'READY' &&
+      if (newStatus === DialerStatus.READY &&
           this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP &&
           this.checkForceDisposition &&
           this.dialer?.communication && // Only restore if this widget has the communication
-          oldStatus !== 'WRAP_UP') {
+          oldStatus !== DialerStatus.WRAP_UP) {
         console.log('[DEBUG] Restoring wrap-up state')
         this.validateHasActiveCallStatus()
       }
@@ -1231,14 +1226,14 @@ export default {
       // Keep dialer in WRAP_UP if agent is still in wrap-up AND this widget has the communication
       // But allow transition when agent status changes to ACCEPTING_CALLS (wrap-up completion)
       if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP &&
-          newStatus !== 'WRAP_UP' &&
+          newStatus !== DialerStatus.WRAP_UP &&
           this.checkForceDisposition &&
           this.dialer?.communication && // Only force if this widget has the communication
-          oldStatus !== 'WRAP_UP' && // Allow any transition FROM WRAP_UP (wrap-up completion flow)
-          newStatus !== 'GENERATING_TOKEN' && // Don't force during token generation
-          newStatus !== 'TOKEN_GENERATED') { // Don't force after token is generated
+          oldStatus !== DialerStatus.WRAP_UP && // Allow any transition FROM WRAP_UP (wrap-up completion flow)
+          newStatus !== DialerStatus.GENERATING_TOKEN && // Don't force during token generation
+          newStatus !== DialerStatus.TOKEN_GENERATED) { // Don't force after token is generated
         console.log('[DEBUG] Forcing dialer back to WRAP_UP')
-        this.setDialerCurrentStatus('WRAP_UP')
+        this.setDialerCurrentStatus(DialerStatus.WRAP_UP)
       }
     }
   },
