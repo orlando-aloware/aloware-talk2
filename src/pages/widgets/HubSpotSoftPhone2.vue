@@ -146,6 +146,7 @@ import * as AgentStatus from 'src/constants/agent-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { DialerStatus } from 'src/constants/dialer-status'
 import { OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK, OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT } from 'src/constants/user-outbound-calling-modes'
+import { BROADCAST_CHANNEL_NAME, BroadcastMessageTypes, createBroadcastMessage } from 'src/constants/hubspot-softphone-broadcast'
 import { local as localStorageHelper } from 'src/plugins/helpers/storage'
 import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin } from 'src/plugins/mixins'
 
@@ -186,6 +187,7 @@ export default {
     return {
       // Constants
       DisplayState,
+      BroadcastMessageTypes,
 
       campaignId: null,
 
@@ -223,6 +225,12 @@ export default {
 
       // HubSpot Calling Extensions SDK instance
       extensions: null,
+
+      // Component mode of the widget (remote vs window)
+      componentMode: ComponentMode.UNKNOWN,
+
+      // Broadcast Channel for cross-instance communication (remote ↔ window)
+      broadcastChannel: null,
 
       // Contact details for calls
       contactDetails: {
@@ -565,6 +573,36 @@ export default {
     ...mapActions('cache', [
       'setCurrentCompany'
     ]),
+
+    /**
+     * Handles incoming broadcast messages from the other component instance (remote ↔ window)
+     * @param {MessageEvent} event - Broadcast message event containing type and payload
+     */
+    handleBroadcastMessage (event) {
+      const { type, payload } = event.data
+
+      console.log(`[${this.componentMode}] Received broadcast:`, type, payload)
+
+      // TODO: Implement specific message handlers
+      // For now, just log the messages to verify Broadcast Channel is working
+      console.log('[HubSpot Widget] Broadcast message handler - implementation pending')
+    },
+
+    /**
+     * Publishes a broadcast message to the other component instance (remote ↔ window)
+     * @param {string} type - Message type from BroadcastMessageTypes
+     * @param {object} payload - Message payload data
+     */
+    publishBroadcast (type, payload = {}) {
+      if (!this.broadcastChannel) {
+        console.warn('[HubSpot Widget] Cannot publish broadcast - channel not initialized')
+        return
+      }
+
+      const message = createBroadcastMessage(type, payload)
+      this.broadcastChannel.postMessage(message)
+      console.log(`[${this.componentMode}] Published broadcast:`, type, payload)
+    },
 
     /**
      * Authenticates user and sets up application state - required before any calling functionality
@@ -1239,6 +1277,12 @@ export default {
   },
 
   beforeDestroy () {
+    // Close Broadcast Channel
+    if (this.broadcastChannel) {
+      this.broadcastChannel.close()
+      console.log('[HubSpot Widget] Broadcast Channel closed')
+    }
+
     // Clean up inbound call listener
     this.$VueEvent.stop('new_in_app_call', this.handleIncomingCall)
     console.log('Successfully removed new_in_app_call listener')
@@ -1257,6 +1301,16 @@ export default {
   },
   async mounted () {
     let probableError = null
+
+    // Initialize Broadcast Channel for cross-instance communication (remote ↔ window)
+    try {
+      this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
+      this.broadcastChannel.onmessage = this.handleBroadcastMessage
+      console.log(`[HubSpot Widget] Broadcast Channel '${BROADCAST_CHANNEL_NAME}' initialized successfully`)
+    } catch (error) {
+      console.error('[HubSpot Widget] Failed to initialize Broadcast Channel:', error)
+      // Continue without broadcast channel - component will work in standalone mode
+    }
 
     try {
       this.extensions = await HubSpotCallingExtensionsClient.initialize(this.callSdkOptions)
