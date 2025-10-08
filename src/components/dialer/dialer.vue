@@ -79,6 +79,7 @@ export default {
       tokenRetryTimeout: null,
       maxTokenRetries: 3,
       baseRetryDelay: 1000, // 1 second base delay
+      pendingNotificationData: null,
       notificationShownFromCustomParams: false
     }
   },
@@ -433,9 +434,13 @@ export default {
       this.notificationShownFromCustomParams = false
 
       if (communicationData) {
-        this.$VueEvent.fire('new_in_app_call', communicationData)
-        this.processActionNotification(communicationData, 'call')
-        this.notificationShownFromCustomParams = true
+        if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+          this.$VueEvent.fire('new_in_app_call', communicationData)
+          this.processActionNotification(communicationData, 'call')
+          this.notificationShownFromCustomParams = true
+        } else {
+          this.pendingNotificationData = communicationData
+        }
       }
 
       this.getCommunication(call.callSid, call.from).then(res => {
@@ -443,6 +448,7 @@ export default {
           if (!this.notificationShownFromCustomParams) {
             this.$VueEvent.fire('new_in_app_call', res.data)
             this.processActionNotification(res.data, 'call')
+            this.pendingNotificationData = null
           }
           this.addNonOwnedLiveContact(res.data)
         }
@@ -1057,14 +1063,13 @@ export default {
 
       // only start wrap up timer if there is a communication
       if (this.dialer.communication) {
-        const callWrapUpOptions = this.dialer.communication.call_wrap_up_options
-        if (callWrapUpOptions['wrap_up'] && // if the backend says wrap it up
-          callWrapUpOptions['user_id'] === this.profile.id && // and if the user who answered the call is trying to go to wrap up (prevents third-parties from going to wrap-up state)
-          (this.hasNoParkedAndInprogressCall ||
-          this.hasParkedAndInprogressCall ||
-          this.hasCallInProgressNotParked) &&
-          !(this.parkFromAnotherTab || this.hungFromAnotherTab)) {
-          this.startWrapUpTimer(this.dialer.communication.call_wrap_up_options['duration'])
+        const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
+            this.hasParkedAndInprogressCall ||
+            this.hasCallInProgressNotParked) &&
+          !(this.parkFromAnotherTab || this.hungFromAnotherTab)
+
+        if (shouldStartWrapUp) {
+          this.startWrapUpTimer()
           return
         }
       }
@@ -1695,6 +1700,7 @@ export default {
       this.setShowIncomingCallNotification(false)
       this.setDialerAiAgentWhisper(false)
       this.setDialerAiAgentTakeover(false)
+      this.pendingNotificationData = null
       this.notificationShownFromCustomParams = false
     },
 
@@ -1749,7 +1755,7 @@ export default {
       clearInterval(this.$options.callDurationInterval)
     },
 
-    startWrapUpTimer (duration = null) {
+    startWrapUpTimer () {
       this.setDialerCurrentStatus('WRAP_UP')
 
       // when communication is rejected by app, skip wrap-up
@@ -1758,22 +1764,22 @@ export default {
         return
       }
 
-      duration = duration ?? (this.currentCompany && this.currentCompany.force_wrap_up)
+      const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
         ? this.currentCompany.wrap_up_seconds
         : this.profile.wrap_up_seconds
-      console.log('Wrap-up time: ' + duration)
+      console.log('Wrap-up time: ' + wrapUpTimer)
 
-      if (duration < 0 || this.isBargingOrWhispering) {
+      if (wrapUpTimer < 0 || this.isBargingOrWhispering) {
         this.backToDial('Talk-StartWrapUpTimer')
         return
       }
 
-      if (duration === 0) {
+      if (wrapUpTimer === 0) {
         this.stopWrapUpTimer()
         return
       }
 
-      this.setDialerWrapUpDuration(duration)
+      this.setDialerWrapUpDuration(wrapUpTimer)
       this.setDialerWrapUpTimer(this.secondsToHms(this.dialer.wrapUpDuration))
       this.$options.wrapUpDurationInterval = setInterval(this.countWrapUpDuration, 1000)
     },
@@ -2239,6 +2245,18 @@ export default {
     'dialer.currentStatus': function (value) {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
+      }
+    },
+
+    agentStatus (newStatus, oldStatus) {
+      if (newStatus === AgentStatus.AGENT_STATUS_RINGING &&
+        oldStatus !== AgentStatus.AGENT_STATUS_RINGING &&
+        this.pendingNotificationData &&
+        !this.notificationShownFromCustomParams) {
+        this.$VueEvent.fire('new_in_app_call', this.pendingNotificationData)
+        this.processActionNotification(this.pendingNotificationData, 'call')
+        this.notificationShownFromCustomParams = true
+        this.pendingNotificationData = null
       }
     }
   },
