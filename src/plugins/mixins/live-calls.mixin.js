@@ -1,5 +1,4 @@
 import _, { isEmpty } from 'lodash'
-import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
@@ -7,6 +6,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { agentMixin, notificationMixin, userMixin } from 'src/plugins/mixins/index'
 import talk2Api from '../api/api'
+
 export default {
   mixins: [
     agentMixin,
@@ -222,7 +222,13 @@ export default {
         return false
       }
 
-      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
+      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      if (!ringGroup) {
+        return false
+      }
+
+      return this.isPersonalInbox && ringGroup.should_queue && ringGroup.fishing_mode
     },
 
     isPersonalInbox () {
