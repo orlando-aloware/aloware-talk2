@@ -1040,6 +1040,12 @@ export default function (/* { ssrContext } */) {
           communication.tag_ids = []
         }
 
+        // if the current communication.call_wrap_up_options.user_id is not empty but the new communication.call_wrap_up_options.user_id is empty, use the current communication.call_wrap_up_options
+        // this is to prevent overwriting the current communication.call_wrap_up_options when API call gets the response after the communciation.updated event is received.
+        if (communication?.call_wrap_up_options?.user_id === null && ![null, undefined].includes(state.dialer?.communication?.call_wrap_up_options?.user_id)) {
+          communication.call_wrap_up_options = state.dialer.communication.call_wrap_up_options
+        }
+
         Vue.set(state.dialer, 'communication', communication)
       },
 
