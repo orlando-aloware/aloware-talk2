@@ -1758,7 +1758,7 @@ export default {
         return
       }
 
-      duration = duration ?? (this.currentCompany && this.currentCompany.force_wrap_up)
+      duration = duration !== null ? duration !== undefined : (this.currentCompany && this.currentCompany.force_wrap_up)
         ? this.currentCompany.wrap_up_seconds
         : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + duration)
