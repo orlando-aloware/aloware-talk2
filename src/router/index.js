@@ -52,6 +52,12 @@ export default function ({ store }) {
   })
 
   Router.beforeEach((to, from, next) => {
+    // HubSpot widget restoration: if the widget was active and we're navigating to root, redirect to widget
+    if (store.state.isHubSpotWidget && (to.path === '/' || to.name === 'Inbox')) {
+      console.log('[Router] Restoring HubSpot widget route')
+      return next('/widgets/hubspot-call-extension')
+    }
+
     next()
     const isWidget = to.matched.some(route => route?.meta?.isWidget)
 
@@ -107,6 +113,18 @@ export default function ({ store }) {
       name: to.name,
       path: to.path
     })
+
+    // Clear HubSpot widget flag when navigating away from widget to non-widget pages
+    // But don't clear during Login flow (auth pages) or root (common intermediate step)
+    const wasOnWidget = from.matched.some(route => route?.meta?.isHubSpotWidget)
+    const isNowOnWidget = to.matched.some(route => route?.meta?.isHubSpotWidget)
+    const isNowOnAuth = to.matched.some(route => route?.meta?.isGuest)
+    const isNowOnRoot = to.path === '/' || to.name === 'Inbox'
+
+    if (wasOnWidget && !isNowOnWidget && !isNowOnAuth && !isNowOnRoot) {
+      console.log('[Router] Left HubSpot widget, clearing flag')
+      store.commit('SET_IS_HUBSPOT_WIDGET', false)
+    }
   })
 
   if (process.env.APP_ENV === 'production' && process.env.GA_TRACKING_ID) {
