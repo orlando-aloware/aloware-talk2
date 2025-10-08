@@ -1758,12 +1758,9 @@ export default {
         return
       }
 
-      if (duration === null || duration === undefined) {
-        duration = (this.currentCompany && this.currentCompany.force_wrap_up)
-          ? this.currentCompany.wrap_up_seconds
-          : this.profile.wrap_up_seconds
-      }
-
+      duration = duration ?? (this.currentCompany && this.currentCompany.force_wrap_up)
+        ? this.currentCompany.wrap_up_seconds
+        : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + duration)
 
       if (duration < 0 || this.isBargingOrWhispering) {
