@@ -761,8 +761,13 @@ export default {
         }
       }
 
-      // enable if following user settings
-      if ([OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER, OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS].includes(this.profile.outbound_call_recording_mode)) {
+      // disabled at user level
+      if (this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER) {
+        return RECORD_DISABLED_REASONS.USER_LEVEL_DISABLED
+      }
+
+      // enabled at user level
+      if (this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS) {
         return null
       }
 
