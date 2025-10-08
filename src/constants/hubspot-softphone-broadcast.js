@@ -40,9 +40,6 @@ export const BroadcastMessageTypes = Object.freeze({
    */
   OUTGOING_CALL_INITIATED: 'OUTGOING_CALL_INITIATED',
 
-  // ============================================
-  // Inbound Call Events
-  // ============================================
   /**
    * Sent when an inbound call is received from Aloware
    * Direction: Window → Remote
@@ -57,9 +54,6 @@ export const BroadcastMessageTypes = Object.freeze({
    */
   INCOMING_CALL_RECEIVED: 'INCOMING_CALL_RECEIVED',
 
-  // ============================================
-  // Call State Events
-  // ============================================
   /**
    * Sent when a call is answered (inbound or outbound)
    * Direction: Window → Remote
@@ -95,9 +89,6 @@ export const BroadcastMessageTypes = Object.freeze({
    */
   CALL_CANCELLED: 'CALL_CANCELLED',
 
-  // ============================================
-  // Agent State Events
-  // ============================================
   /**
    * Sent when agent changes their status
    * Direction: Remote → Window (or Window → Remote)
@@ -119,9 +110,6 @@ export const BroadcastMessageTypes = Object.freeze({
    */
   AGENT_UNAVAILABLE: 'AGENT_UNAVAILABLE',
 
-  // ============================================
-  // Configuration Events
-  // ============================================
   /**
    * Sent when the selected campaign changes
    * Direction: Remote → Window (or Window → Remote)
@@ -129,9 +117,6 @@ export const BroadcastMessageTypes = Object.freeze({
    */
   CAMPAIGN_CHANGED: 'CAMPAIGN_CHANGED',
 
-  // ============================================
-  // Error Events
-  // ============================================
   /**
    * Sent when an error occurs that needs to be broadcast
    * Direction: Window → Remote (or Remote → Window)
@@ -156,6 +141,7 @@ export function createBroadcastMessage (type, payload = {}) {
 
 /**
  * Helper function to validate a broadcast message
+ *
  * @param {object} message - Message to validate
  * @returns {boolean} True if message is valid
  */
