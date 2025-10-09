@@ -65,7 +65,7 @@
                                    @change="onIntegrationListChanged"/>
       </template>
 
-      <div v-if="!contactsCountValid && this.optionSelected"
+      <div v-if="!contactsCountValid && hasSelectedContactList"
            class="text-negative text-caption q-mt-sm">
         This list contains no contacts. Please select a valid list with contacts to proceed
       </div>
@@ -123,6 +123,10 @@ export default {
         default:
           return false
       }
+    },
+
+    hasSelectedContactList () {
+      return this.optionSelected && (this.source.integration?.list || this.source.list?.id || this.source.filters)
     },
 
     options () {
