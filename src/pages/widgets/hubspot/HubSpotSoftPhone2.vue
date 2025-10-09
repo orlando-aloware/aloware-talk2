@@ -110,12 +110,22 @@
     <calling-remote-incoming-call
       v-if="displayState === DisplayState.INCOMING_CALL && incomingCallData"
       :contact-name="incomingCallData.contact?.name || 'Unknown Caller'"
-      :phone-number="incomingCallData.contact?.phone_number | formatPhone"
+      :phone-number="incomingCallData.contact?.phone_number"
       :company-name="incomingCallData.contact?.company_name"
       @accept="handleAcceptCall"
       @decline="handleDeclineCall"
     />
     <!-- End Incoming Call UI -->
+
+    <!-- Start Active Call UI (REMOTE mode only) -->
+    <calling-remote-active-call
+      v-else-if="displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL && activeCallData"
+      :contact-name="activeCallData.contact?.name || 'Unknown Contact'"
+      :phone-number="activeCallData.contact?.phone_number"
+      :company-name="activeCallData.contact?.company_name"
+      :call-duration="activeCallData.callDuration"
+    />
+    <!-- End Active Call UI -->
 
     <!-- Start Agent On Call State -->
     <div
@@ -153,6 +163,7 @@ import Webrtc from 'components/webrtc'
 import DialerListeners from 'components/dialer-listeners'
 import LogoutIcon from 'components/icons/logout-icon'
 import CallingRemoteIncomingCall from './components/CallingRemoteIncomingCall'
+import CallingRemoteActiveCall from './components/CallingRemoteActiveCall'
 import { mapState, mapActions } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -168,7 +179,8 @@ const DisplayState = Object.freeze({
   SHOW_ALERT_CALL_FINISHED: 3,
   READY_FOR_CALLS: 4,
   CRITICAL_ERROR_HAPPENED: 5,
-  INCOMING_CALL: 6 // For REMOTE mode custom incoming call UI
+  INCOMING_CALL: 6, // For REMOTE mode custom incoming call UI
+  CALLING_REMOTE_ACTIVE_CALL: 7 // For REMOTE mode active call UI
 })
 
 // Dialer statuses where we should display a loading indicator while the dialer component initializes
@@ -186,7 +198,8 @@ export default {
     Webrtc,
     DialerListeners,
     LogoutIcon,
-    CallingRemoteIncomingCall
+    CallingRemoteIncomingCall,
+    CallingRemoteActiveCall
   },
 
   mixins: [agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin],
@@ -239,6 +252,9 @@ export default {
 
       // Inbound call state for REMOTE mode
       incomingCallData: null,
+
+      // Active call state for REMOTE mode
+      activeCallData: null,
 
       // HubSpot Calling Extensions SDK instance
       extensions: null,
@@ -617,6 +633,22 @@ export default {
           }
           break
 
+        case BroadcastMessageTypes.CALL_CONNECTED:
+          // REMOTE mode: Show active call UI
+          if (this.componentMode === ComponentMode.REMOTE) {
+            console.log('[REMOTE] Call connected, showing active call UI')
+            this.showActiveCallUI(payload)
+          }
+          break
+
+        case BroadcastMessageTypes.CALL_ENDED:
+          // REMOTE mode: Hide active call UI and return to ready state
+          if (this.componentMode === ComponentMode.REMOTE) {
+            console.log('[REMOTE] Call ended, hiding active call UI')
+            this.hideActiveCallUI()
+          }
+          break
+
         case BroadcastMessageTypes.CALL_CANCELLED:
           // REMOTE mode: Hide incoming call UI
           if (this.componentMode === ComponentMode.REMOTE) {
@@ -850,7 +882,10 @@ export default {
 
         // Agent became available after wrap-up - return to ready state
         if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && previousStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-          this.displayState = DisplayState.READY_FOR_CALLS
+          // Don't change display state if we're showing active call UI in REMOTE mode
+          if (this.displayState !== DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
+            this.displayState = DisplayState.READY_FOR_CALLS
+          }
           if (this.dialer?.currentStatus === DialerStatus.WRAP_UP) this.$VueEvent.fire('resetCall') // Reset dialer status if it's still in wrap-up
         } else if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.displayState === DisplayState.SHOW_ALERT_AGENT_ON_CALL && !this.isDialed) {
           // Agent became available while showing "on call" alert - return to ready state
@@ -961,6 +996,21 @@ export default {
 
       if (this.extensions) {
         this.extensions.callEnded()
+
+        // Broadcast CALL_ENDED to REMOTE mode when call ends in WINDOW mode
+        if (this.componentMode === ComponentMode.WINDOW) {
+          console.log('[WINDOW] Call ended, broadcasting to REMOTE')
+          this.publishBroadcast(BroadcastMessageTypes.CALL_ENDED, {
+            callId: this.dialer?.communication?.id,
+            endedAt: Date.now()
+          })
+        }
+
+        // In REMOTE mode, don't change display state if showing active call UI - wait for broadcast
+        if (this.componentMode === ComponentMode.REMOTE && this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
+          console.log('[REMOTE] Skipping state change - active call UI is showing')
+          return
+        }
 
         if (!this.dialer.parkedCall) {
           // Return to ready state when call is completed
@@ -1130,7 +1180,37 @@ export default {
     hideIncomingCallUI () {
       console.log('[REMOTE] Hiding incoming call UI')
       this.incomingCallData = null
-      this.displayState = DisplayState.READY_FOR_CALLS
+      // Only change to READY_FOR_CALLS if we're actually in incoming call state
+      if (this.displayState === DisplayState.INCOMING_CALL) {
+        this.displayState = DisplayState.READY_FOR_CALLS
+      }
+    },
+
+    /**
+     * Shows custom active call UI in REMOTE mode
+     */
+    showActiveCallUI (payload) {
+      const { communication, contact, callDuration } = payload
+
+      console.log('[REMOTE] Displaying active call UI for:', contact?.name)
+
+      this.activeCallData = { communication, contact, callDuration }
+      this.displayState = DisplayState.CALLING_REMOTE_ACTIVE_CALL
+
+      // Hide incoming call UI if it was showing
+      this.incomingCallData = null
+    },
+
+    /**
+     * Hides active call UI in REMOTE mode
+     */
+    hideActiveCallUI () {
+      console.log('[REMOTE] Hiding active call UI')
+      this.activeCallData = null
+      // Only change to READY_FOR_CALLS if we're actually in active call state
+      if (this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
+        this.displayState = DisplayState.READY_FOR_CALLS
+      }
     },
 
     /**
@@ -1233,6 +1313,16 @@ export default {
           this.checkForceDisposition) {
           this.setDialerCurrentStatus(DialerStatus.WRAP_UP)
           this.displayState = DisplayState.HIDE // Set display state to HIDE so webrtc component shows the wrap-up UI
+        } else if (this.componentMode === ComponentMode.REMOTE &&
+                   this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
+                   lastCall) {
+          // REMOTE mode: Show active call UI when agent is on call
+          console.log('[REMOTE] Agent is on call, showing active call UI')
+          this.showActiveCallUI({
+            communication: lastCall,
+            contact: lastCall?.contact,
+            callDuration: ''
+          })
         } else {
           this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
         }
@@ -1348,6 +1438,18 @@ export default {
         agentStatus: this.profile?.agent_status,
         checkForceDisposition: this.checkForceDisposition
       })
+
+      // Broadcast CALL_CONNECTED to REMOTE mode when call connects in WINDOW mode
+      if (this.componentMode === ComponentMode.WINDOW &&
+          newStatus === DialerStatus.CALL_CONNECTED &&
+          oldStatus !== DialerStatus.CALL_CONNECTED) {
+        console.log('[WINDOW] Call connected, broadcasting to REMOTE')
+        this.publishBroadcast(BroadcastMessageTypes.CALL_CONNECTED, {
+          communication: this.dialer?.communication,
+          contact: this.dialer?.contact,
+          callDuration: '' // Will be updated via interval or separate broadcast
+        })
+      }
 
       // When dialer becomes READY and agent is in wrap-up, restore the wrap-up state
       // But only if we're coming from an initialization state AND this widget has the communication

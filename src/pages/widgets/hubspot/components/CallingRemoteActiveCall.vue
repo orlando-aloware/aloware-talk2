@@ -1,8 +1,12 @@
 <template>
-  <div class="incoming-call-widget bg-dark d-flex flex-column">
+  <div class="active-call-widget bg-dark d-flex flex-column">
     <div class="phone-header d-flex justify-content-center align-items-center flex-grow-0">
-      <div class="d-flex flex-row text-xs text-white">
-        <span>Incoming Call</span>
+      <div class="d-flex flex-row text-xs text-white align-items-center">
+        <q-badge
+          color="green-6"
+          class="status-badge q-mr-sm"
+        />
+        <span>Active Call</span>
       </div>
     </div>
 
@@ -23,68 +27,45 @@
             {{ companyName }}
           </q-item-label>
         </div>
-      </div>
 
-      <div class="phone-status d-flex justify-content-center">
-        <span class="text-size-xs text-grey-82">Call will open in calling window</span>
-      </div>
-
-      <div class="phone-cta">
-        <div class="d-flex flex-row justify-content-center" style="gap: 48px;">
-          <div class="d-flex flex-column align-items-center">
-            <q-btn
-              class="height-52 bg-white"
-              ripple
-              round
-              no-caps
-              @click="$emit('decline')"
-            >
-              <cancel-call-icon width="52" height="52" />
-            </q-btn>
-            <span class="text-size-xs mt-1 text-white">Decline</span>
-          </div>
-          <div class="d-flex flex-column align-items-center">
-            <q-btn
-              class="height-52 bg-white"
-              ripple
-              round
-              no-caps
-              @click="$emit('accept')"
-            >
-              <accept-call-icon width="52" height="52" />
-            </q-btn>
-            <span class="text-size-xs mt-1 text-white">Accept</span>
-          </div>
+        <!-- Call Duration -->
+        <div class="call-duration mt-3" v-if="callDuration">
+          <span class="text-size-lg text-white _500">{{ callDuration }}</span>
         </div>
+      </div>
+
+      <div class="phone-status d-flex flex-column align-items-center justify-content-center" style="gap: 8px;">
+        <span class="text-size-xs text-grey-82">Call is active in calling window</span>
+        <span class="text-size-xs text-grey-82">Use the calling window to manage this call</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import CancelCallIcon from 'components/icons/cancel-call-icon'
-import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
 
 export default {
-  name: 'CallingRemoteIncomingCall',
+  name: 'CallingRemoteActiveCall',
 
   components: {
-    CancelCallIcon,
-    AcceptCallIcon,
     PersonIcon
   },
 
   props: {
     contactName: {
       type: String,
-      default: 'Unknown Caller'
+      default: 'Unknown Contact'
     },
     phoneNumber: {
       type: String,
       default: ''
     },
     companyName: {
+      type: String,
+      default: ''
+    },
+    callDuration: {
       type: String,
       default: ''
     }
@@ -102,7 +83,7 @@ export default {
 </script>
 
 <style scoped>
-.incoming-call-widget {
+.active-call-widget {
   width: 100vw;
   max-width: 100%;
   height: 522px;
@@ -117,5 +98,21 @@ export default {
   padding-left: 12px;
   padding-right: 12px;
   flex-shrink: 0;
+}
+
+.status-badge {
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  min-height: 8px;
+  padding: 0;
+  display: inline-block;
+}
+
+.call-duration {
+  padding: 8px 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
 }
 </style>
