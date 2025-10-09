@@ -118,6 +118,9 @@ export default {
   SET_CONTACTS_LAST_USED_LINE (state, { inboxId, contactId, lastLineUsed }) {
     state.contactsLastUsedLines.set(`${inboxId}-${contactId}`, lastLineUsed)
   },
+  SET_CONTACTS_LAST_USED_LINES_UPDATED_AT (state, updatedAt) {
+    state.contactsLastUsedLinesUpdatedAt = updatedAt
+  },
   SET_TEAM_INBOX_CAMPAIGNS (state, data) {
     state.teamInboxCampaigns = data
   },
@@ -146,6 +149,7 @@ export default {
     state.activeSort = {}
     state.teamInboxTutorialComponent = null
     state.contactsLastUsedLines = new Map()
+    state.contactsLastUsedLinesUpdatedAt = null
     state.teamInboxCampaigns = []
     state.loadingTeamInboxCampaigns = false
   }

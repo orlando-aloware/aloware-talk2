@@ -87,7 +87,8 @@ export default {
         'message-composer'
       ],
       listeners: {},
-      contactFetchFailed: false
+      contactFetchFailed: false,
+      lastLineUsedWatcher: null
     }
   },
 
@@ -108,7 +109,7 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    ...mapState('TeamInbox', ['contactsLastUsedLines']),
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'contactsLastUsedLinesUpdatedAt']),
 
     selectedCampaign () {
       if (this.campaigns) {
@@ -632,6 +633,7 @@ export default {
     },
 
     showContactInfo (contactId, forceClearLoading = false) {
+      this.cleanUpContactsLastUsedLinesWatcher()
       this.mapCommunicationsData()
 
       if (this.teamInbox) {
@@ -641,9 +643,10 @@ export default {
         }
 
         const key = `${inboxId}-${contactId}`
-
         if (this.contactsLastUsedLines.has(key)) {
           this.selectedCampaignId = this.contactsLastUsedLines.get(key)
+        } else {
+          this.waitForContactsLastUsedLines(key)
         }
       } else {
         // sanity check and clear
@@ -730,6 +733,27 @@ export default {
       if (!this.smsOnly && (storage.local.getItem('PREVIOUS_ROUTE_NAME') !== 'Contacts' || forceClearLoading)) {
         this.loadingContactCommunications = false
       }
+    },
+
+    waitForContactsLastUsedLines (key) {
+      this.stopContactsLastUsedLinesWatcher = this.$watch('contactsLastUsedLinesUpdatedAt', () => {
+        if (this.contactsLastUsedLines.has(key) && !this.selectedCampaignId) {
+          this.selectedCampaignId = this.contactsLastUsedLines.get(key)
+          this.cleanUpContactsLastUsedLinesWatcher()
+        }
+      })
+
+      setTimeout(() => {
+        this.cleanUpContactsLastUsedLinesWatcher()
+      }, 5000)
+    },
+
+    cleanUpContactsLastUsedLinesWatcher () {
+      if (this.stopContactsLastUsedLinesWatcher) {
+        this.stopContactsLastUsedLinesWatcher()
+      }
+
+      this.stopContactsLastUsedLinesWatcher = null
     },
 
     updateSelectedContact (contact) {
