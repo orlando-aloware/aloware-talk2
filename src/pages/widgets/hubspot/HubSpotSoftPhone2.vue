@@ -1318,9 +1318,22 @@ export default {
                    lastCall) {
           // REMOTE mode: Show active call UI when agent is on call
           console.log('[REMOTE] Agent is on call, showing active call UI')
+
+          // Use lastCall contact if available and has data, otherwise construct from available data
+          let contact = lastCall?.contact
+
+          if (!contact || (!contact.name && !contact.phone_number)) {
+            contact = {
+              name: this.contactDetails.contactName || 'Unknown Contact',
+              phone_number: this.hubspotDialNumber?.phoneNumber || lastCall?.from_number,
+              company_name: this.contactDetails.companyName,
+              id: this.contactDetails.contactId
+            }
+          }
+
           this.showActiveCallUI({
             communication: lastCall,
-            contact: lastCall?.contact,
+            contact: contact,
             callDuration: ''
           })
         } else {
@@ -1444,9 +1457,24 @@ export default {
           newStatus === DialerStatus.CALL_CONNECTED &&
           oldStatus !== DialerStatus.CALL_CONNECTED) {
         console.log('[WINDOW] Call connected, broadcasting to REMOTE')
+
+        // For outbound calls, use contactDetails which has the full contact info
+        // For inbound calls, use dialer.contact which is already populated
+        let contact = this.dialer?.contact
+
+        // If contact is missing or has no name/phone, use contactDetails from outbound call flow
+        if (!contact || (!contact.name && !contact.phone_number)) {
+          contact = {
+            name: this.contactDetails.contactName,
+            phone_number: this.hubspotDialNumber?.phoneNumber,
+            company_name: this.contactDetails.companyName,
+            id: this.contactDetails.contactId
+          }
+        }
+
         this.publishBroadcast(BroadcastMessageTypes.CALL_CONNECTED, {
           communication: this.dialer?.communication,
-          contact: this.dialer?.contact,
+          contact: contact,
           callDuration: '' // Will be updated via interval or separate broadcast
         })
       }
