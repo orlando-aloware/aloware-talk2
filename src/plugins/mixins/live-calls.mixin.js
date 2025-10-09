@@ -282,6 +282,10 @@ export default {
             this.$VueEvent.fire('endWrapUp')
           }
 
+          if (this.isPersonalInbox) {
+            this.closeCallNotifications('callFishing', this.communication.id, true)
+          }
+
           this.$VueEvent.fire('answerCallFishing', data)
           this.setShowPhone(true)
           this.isAnsweringCall = false
@@ -308,6 +312,11 @@ export default {
         this.removeFromCallFishingQueue(this.communication.id)
         this.isRejecting = false
         this.processRemoveFromNotification(this.communication)
+
+        if (this.isPersonalInbox) {
+          this.closeCallNotifications('callFishing', this.communication.id, true)
+        }
+
         e.stopImmediatePropagation()
         this.ignoreFishingIfPersonalInbox()
         return
@@ -406,6 +415,10 @@ export default {
       }
 
       await this.fetchCurrentCommunicationIfNeeded(data)
+
+      if (this.isPersonalInbox) {
+        this.closeCallNotifications('callFishing', this.communication.id, true)
+      }
 
       this.$VueEvent.fire('answerCallFishing', data)
       this.setShowPhone(true)

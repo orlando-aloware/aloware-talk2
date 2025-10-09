@@ -124,7 +124,10 @@ export default {
       const callFishingQueue = { data: _.get(this.notifications, 'callFishing.queue', null) }
       callFishingQueue.data = callFishingQueue.data && callFishingQueue.data.constructor === Array && callFishingQueue.data.length
 
-      if (type === 'callFishing' && this.currentCompany.fishing_mode_notification_sound) {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+      const isPersonalInbox = ringGroup?.is_personal_inbox
+
+      if (type === 'callFishing' && (this.currentCompany.fishing_mode_notification_sound || isPersonalInbox || forceClose)) {
         this.stopAudio()
       }
 

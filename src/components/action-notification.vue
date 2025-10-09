@@ -687,8 +687,12 @@ export default {
         return
       }
 
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+      const isPersonalInbox = ringGroup?.is_personal_inbox
+
       this.isValidNotification = true
-      const shouldPlayFishingNotificationSound = this.id === 'callFishing' && this.currentCompany.fishing_mode_notification_sound
+      const shouldPlayFishingNotificationSound = this.id === 'callFishing' &&
+        ((!isPersonalInbox && this.currentCompany.fishing_mode_notification_sound) || (isPersonalInbox && !this.isAgentOrDialerOnCall))
       this.playAudio(shouldPlayFishingNotificationSound)
     },
 
@@ -763,6 +767,7 @@ export default {
 
       if (this.id === 'callFishing') {
         this.handleAnswerCommunication()
+        this.closeCallNotifications(this.id, this.communicationId)
         return
       }
 
