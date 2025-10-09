@@ -242,7 +242,6 @@ export default {
 
       // Component initialization state
       initialized: false,
-      isInitializing: true,
 
       // HubSpot portal ID received from SDK
       hubspotPortalId: null,
@@ -1561,7 +1560,6 @@ export default {
     HubSpotCallingExtensionsClient.subscribe(this.callSdkOptions.eventHandlers)
     this.callExtensionsInitialized = true
     await this.initializeAuth()
-    this.isInitializing = false
 
     // Set up listener for inbound calls from Aloware
     console.log('Setting up listener for new_in_app_call events')
@@ -1581,10 +1579,11 @@ body {
 }
 
 .widget-container {
+  position: relative;
   max-width: 350px;
   margin: 0 auto;
   height: auto !important;
-  min-height: auto !important;
+  min-height: 522px;
   max-height: fit-content !important;
 }
 
