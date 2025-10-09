@@ -388,10 +388,10 @@ export default {
     },
 
     lineInboxName () {
-      const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = this.selectedLine || {}
+      const { ring_group: ringGroup } = this.selectedLine || {}
 
       const deletedPattern = /_deleted_\d+$/
-      const name = ringGroup?.name || personalInbox?.name
+      const name = ringGroup?.name
 
       return name?.match(deletedPattern) ? '' : name
     },
