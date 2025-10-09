@@ -92,7 +92,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
-    ...mapState(['campaigns', 'campaignsIsLoading']),
+    ...mapState(['campaigns']),
     ...mapState('TeamInbox', ['activeInbox', 'activeInboxId', 'teamInboxCampaigns']),
 
     isAllInboxes () {
@@ -238,12 +238,6 @@ export default {
       this.lineOptions = this.formattedLineOptions
       this.setIncomingNumber()
     }
-
-    console.log('selectedCampaign in line-selector:', this.campaignId)
-    console.log('selectedCampaign isAvailableInInbox', this.lineOptions.some(campaign => campaign.id === this.campaignId))
-    console.log('selectedCampaign lineOptions', this.lineOptions)
-    console.log('selectedCampaign campaignsIsLoading', this.campaignsIsLoading)
-    console.log('selectedCampaign selectedCampaign', this.selectedCampaign)
   },
 
   methods: {
