@@ -267,7 +267,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
+    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users', 'ringGroups']),
     ...mapState('cache', ['currentCompany']),
 
     isCall () {
@@ -687,8 +687,12 @@ export default {
         return
       }
 
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+      const isPersonalInbox = ringGroup?.is_personal_inbox
+
       this.isValidNotification = true
-      const shouldPlayFishingNotificationSound = this.id === 'callFishing' && this.currentCompany.fishing_mode_notification_sound
+      const shouldPlayFishingNotificationSound = this.id === 'callFishing' &&
+        ((!isPersonalInbox && this.currentCompany.fishing_mode_notification_sound) || (isPersonalInbox && !this.isAgentOrDialerOnCall))
       this.playAudio(shouldPlayFishingNotificationSound)
     },
 
@@ -763,6 +767,7 @@ export default {
 
       if (this.id === 'callFishing') {
         this.handleAnswerCommunication()
+        this.closeCallNotifications(this.id, this.communicationId)
         return
       }
 
@@ -771,11 +776,14 @@ export default {
     },
 
     async ignoreFishing () {
-      if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+
+      if (ringGroup?.is_personal_inbox) {
         try {
+          // Force terminate for personal inboxes, since there is no other agents to take the call
           await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
         } catch (error) {
-          console.error('Failed to force terminate communication:', error)
+          console.error('Failed to force terminate communication on personal inbox:', error)
         }
       }
 
@@ -789,9 +797,16 @@ export default {
       this.$closeActionNotification('callFishing')
     },
 
-    rejectCall () {
-      if (this.id !== 'callFishing' ||
-        (this.id === 'callFishing' &&
+    async rejectCall () {
+      const isCallFishing = this.id === 'callFishing'
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+
+      if (isCallFishing && ringGroup?.is_personal_inbox) {
+        await this.ignoreFishing()
+      }
+
+      if (!isCallFishing ||
+        (isCallFishing &&
           (!this.queue ||
             (this.queue && !this.queue.length))
         )
@@ -802,11 +817,9 @@ export default {
 
       this.$VueEvent.fire('rejectCall')
 
-      if (this.id === 'callFishing') {
+      if (isCallFishing) {
         this.$VueEvent.fire('hidePhone')
-      }
 
-      if (this.id === 'callFishing') {
         if (this.queue && this.queue.length) {
           this.switchCallFishingFromQueue()
         } else {

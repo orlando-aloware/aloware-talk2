@@ -337,7 +337,7 @@ export default {
       // checks if accessible_campaigns is available and then looks for communication campaign_id in that array
       if (
         !teamInbox &&
-        this.profile.accessible_campaigns && this.profile.accessible_campaigns.length > 0 &&
+        this.profile.accessible_campaigns &&
         this.profile.line_access_limit &&
         communication.campaign_id &&
         !this.profile.accessible_campaigns.includes(communication.campaign_id)
@@ -348,7 +348,7 @@ export default {
       // checks if accessible_users is available and then looks for communication user_id in that array
       if (
         !teamInbox &&
-        this.profile.accessible_users && this.profile.accessible_users.length > 0 &&
+        this.profile.accessible_users &&
         this.profile.user_access_limit &&
         communication.user_id &&
         !this.profile.accessible_users.includes(communication.user_id)
@@ -359,7 +359,7 @@ export default {
       // checks if accessible_users is available and then looks for an intersection between accessible_users and attempting_users
       if (
         !teamInbox &&
-        this.profile.accessible_users && this.profile.accessible_users.length > 0 &&
+        this.profile.accessible_users &&
         this.profile.user_access_limit &&
         communication.attempting_users &&
         [
