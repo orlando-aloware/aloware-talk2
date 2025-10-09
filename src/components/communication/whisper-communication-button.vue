@@ -2,7 +2,7 @@
   <span class="cursor-pointer"
         data-testid="comm-whisper-button-whisper-span"
         :id="`action-whisper-${_uid}`"
-        v-if="userCanBargeAndWhisper(communication)"
+        v-if="canBargeAndWhisper(communication)"
         @click="dialog">
     <ear-icon :height="iconHeight"
               :width="iconWidth"/>

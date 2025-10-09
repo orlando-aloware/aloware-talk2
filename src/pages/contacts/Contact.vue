@@ -2,7 +2,7 @@
   <b-overlay class="h-100 w-100"
              variant="white"
              rounded="sm"
-             :show="isShowContact"
+             :show="isShowContactOverlay"
              :opacity="0.85"
              v-if="authenticated">
     <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between"
@@ -172,7 +172,7 @@ export default {
       return Object.keys(this.contact).length === 0
     },
 
-    isShowContact () {
+    isShowContactOverlay () {
       return this.changingSelectedContact || this.campaignsIsLoading ||
         this.usersIsLoading || !this.campaigns ||
         !this.users || !this.tags || this.leaving || this.loadingContact || this.isEmptyContact
@@ -206,7 +206,8 @@ export default {
       contactComponentListeners: {},
       ContactTaskStatus,
       CommunicationDirections,
-      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
+      fetchContactTimeout: null
     }
   },
 
@@ -256,11 +257,30 @@ export default {
       }
 
       this.isContactDetailsCollapsed = !this.isContactDetailsCollapsed
+    },
+
+    initFetchContactTimeout () {
+      this.fetchContactTimeout = setTimeout(() => {
+        if (this.isShowContactOverlay) {
+          // Send a warning to Sentry if the contact information is taking too long to fetch
+          window.Sentry.captureMessage('Slowness detected when fetching contact information', {
+            level: 'warning',
+            extra: {
+              contactId: this.contactId,
+              loadingContact: this.loadingContact,
+              loadingCampaigns: this.loadingCampaigns,
+              changingSelectedContact: this.changingSelectedContact,
+              loadingUsers: this.loadingUsers
+            }
+          })
+        }
+      }, 8000)
     }
   },
 
   mounted () {
     if (this.authenticated) {
+      this.initFetchContactTimeout()
       this.fetchContact()
     }
 
@@ -398,6 +418,14 @@ export default {
       if (value && this.isMobile) {
         this.$VueEvent.fire('hide_mobile_footer', false)
       }
+    },
+
+    isShowContactOverlay (value) {
+      if (value) {
+        // Reset the timeout when the selected contact changes
+        clearTimeout(this.fetchContactTimeout)
+        this.initFetchContactTimeout()
+      }
     }
   },
 
@@ -406,6 +434,7 @@ export default {
   },
 
   beforeDestroy () {
+    clearTimeout(this.fetchContactTimeout)
     this.setIsContactMixinUsed(false)
     this.removeListeners()
     this.setContact({})

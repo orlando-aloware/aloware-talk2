@@ -233,8 +233,8 @@ export default {
         }
       ]
 
-      // Add "All Inboxes" only for demo companies
-      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) && !this.search) {
+      // Add "All Inboxes" only for demo/whitelisted companies
+      if (this.companyHasAccessToAllInboxes && !this.search) {
         navItems.unshift({
           id: INBOX_TYPE_ALL,
           name: 'All Inboxes',
@@ -394,7 +394,7 @@ export default {
       }
 
       // If user has any inboxes, prioritize "All Inboxes" as the first option
-      if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) && !this.search) {
+      if (this.companyHasAccessToAllInboxes && !this.search) {
         const allInboxes = [
           ...this.parsedInboxes.personal,
           ...this.parsedInboxes.connected,
@@ -501,7 +501,7 @@ export default {
       const inboxIds = Object.keys(inboxList ?? {}).flatMap((parsedInbox) => inboxList[parsedInbox].map((inbox) => inbox.id))
 
       if (!inboxIds.length) {
-        return
+        return []
       }
 
       // Filter out the "all" inbox ID since it's virtual

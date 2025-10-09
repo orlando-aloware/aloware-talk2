@@ -41,6 +41,13 @@ export default {
 
     isAllInboxesRoute () {
       return this.$route.params.inboxId === ALL_INBOXES_ID
+    },
+
+    companyHasAccessToAllInboxes () {
+      // @custom All Inboxes Whitelisted companies (WAT-1772)
+      const ALL_INBOXES_WHITELISTED_COMPANIES = [135, 497, 1362, 1413, 1990, 2382, 2521, 3493, 4152, 5018, 5597, 6224, 6554, 7113, 1728, 1979, 6663, 7666, 7756, 7757, 2915, 2349]
+
+      return this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || ALL_INBOXES_WHITELISTED_COMPANIES.includes(this.profile.company_id)
     }
   },
 

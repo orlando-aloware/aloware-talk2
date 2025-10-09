@@ -65,13 +65,16 @@
                            @change="(eventPayload) => onSettingsChange(eventPayload, 'script_id')"/>
         </div>
 
-        <div class="col-6 pl-3">
+        <div class="col-12 pl-3 mt-2">
           <label class="label mb-1">
-            Order by
+            Order By
           </label>
-          <session-order-selector class="generic-selector-2 dial-sessions__form__order-selector"
-                                  v-model="resources.order"
-                                  @change="(eventPayload) => onSettingsChange(eventPayload, 'order')"/>
+          <b-alert show
+                   variant="info"
+                   class="px-3 py-2 text-sm mb-0">
+            <information-circle-icon />
+            Contacts are dialed in the order they appear on your list. Click column headers to sort before dialing
+          </b-alert>
         </div>
       </div>
 
@@ -264,7 +267,6 @@ import ScriptSelector from 'components/generic-selectors/session-scripts-selecto
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
-import SessionOrderSelector from 'components/generic-selectors/session-order-selector.vue'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
@@ -306,7 +308,6 @@ export default {
     ContactDispositionSelector,
     VmDropSelector,
     CallDispositionSelector,
-    SessionOrderSelector,
     InformationCircleIcon
   },
 

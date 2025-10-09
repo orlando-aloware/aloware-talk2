@@ -377,6 +377,12 @@
                :disabled="isRecordDisabled"
                data-testid="toggle-recording-button-expanded"
                @click="onToggleRecording">
+          <q-tooltip content-class="bg-grey-light11 text-nowrap"
+                     anchor="bottom middle"
+                     self="center middle"
+                     v-if="isRecordDisabled && recordDisabledTooltip">
+            {{ recordDisabledTooltip }}
+          </q-tooltip>
 
           <stop-icon class="mr-2"
                     color="#62666E"
@@ -527,6 +533,15 @@ import PlayBarIcon from 'components/icons/play-bar-icon.vue'
 
 const PD_PAUSED_PROP_NAME = 'is_power_dialer_paused'
 
+const RECORD_DISABLED_REASONS = {
+  ACCOUNT_FORCED_DISABLED: 'Recording is disabled at account level',
+  ACCOUNT_FORCED_ALWAYS_RECORD: 'Recording is set to always record at account level',
+  USER_LEVEL_DISABLED: 'Recording is disabled at user level',
+  CALL_NOT_CONNECTED: 'Call is not in progress',
+  BUSY: 'Processing',
+  LINE_LEVEL: 'Recording following line settings'
+}
+
 export default {
   name: 'SessionCallStatus',
 
@@ -577,7 +592,8 @@ export default {
       loadingHold: false,
       loadingUnhold: false,
       isRedialClicked: false,
-      isProcessingDNC: false
+      isProcessingDNC: false,
+      loadingToggleRecordingStatus: false
     }
   },
 
@@ -722,10 +738,49 @@ export default {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
     },
 
+    recordDisabledReason () {
+      if (this.loadingToggleRecordingStatus) {
+        return RECORD_DISABLED_REASONS.BUSY
+      }
+
+      // disable if call not connected or is completed
+      if (!this.statusCallConnected || this.isCallCompleted) {
+        return RECORD_DISABLED_REASONS.CALL_NOT_CONNECTED
+      }
+
+      // if following company settings
+      if ((this.currentCompany?.force_outbound_recording || this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_DEFAULT)) {
+        // force disabled at account level
+        if (this.currentCompany?.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER) {
+          return RECORD_DISABLED_REASONS.ACCOUNT_FORCED_DISABLED
+        }
+
+        // force enabled at account level
+        if (this.currentCompany?.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS) {
+          return RECORD_DISABLED_REASONS.ACCOUNT_FORCED_ALWAYS_RECORD
+        }
+      }
+
+      // disabled at user level
+      if (this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER) {
+        return RECORD_DISABLED_REASONS.USER_LEVEL_DISABLED
+      }
+
+      // enabled at user level
+      if (this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS) {
+        return null
+      }
+
+      // following line level settings
+      return RECORD_DISABLED_REASONS.LINE_LEVEL
+    },
+
     isRecordDisabled () {
-      return this.statusCallConnected ||
-        this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER ||
-        (this.profile.company.force_outbound_recording && this.profile.company.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER)
+      return this.recordDisabledReason !== null
+    },
+
+    recordDisabledTooltip () {
+      return this.recordDisabledReason || ''
     },
 
     isCallCompleted () {
@@ -1375,7 +1430,11 @@ export default {
     },
 
     onToggleRecording () {
+      this.loadingToggleRecordingStatus = true
       this.$VueEvent.fire('toggleRecordingStatus')
+      setTimeout(() => {
+        this.loadingToggleRecordingStatus = false
+      }, 1000)
     },
 
     onTogglePause () {
