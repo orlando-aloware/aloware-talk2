@@ -87,7 +87,8 @@ export default {
         'message-composer'
       ],
       listeners: {},
-      contactFetchFailed: false
+      contactFetchFailed: false,
+      lastLineUsedWatcher: null
     }
   },
 
@@ -108,7 +109,7 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    ...mapState('TeamInbox', ['contactsLastUsedLines']),
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'contactsLastUsedLinesUpdatedAt']),
 
     selectedCampaign () {
       if (this.campaigns) {
@@ -631,7 +632,23 @@ export default {
       })
     },
 
+    waitForContactsLastUsedLines (key) {
+      const unwatch = this.$watch('contactsLastUsedLinesUpdatedAt', () => {
+        if (this.contactsLastUsedLines.has(key)) {
+          this.selectedCampaignId = this.contactsLastUsedLines.get(key)
+          unwatch() // Clean up watcher
+          console.log('selectedCampaign waitForContactsLastUsedLines worked <<<<', this.selectedCampaignId)
+        }
+      })
+
+      // Timeout fallback
+      setTimeout(() => {
+        unwatch()
+      }, 5000) // 5 second timeout
+    },
+
     showContactInfo (contactId, forceClearLoading = false) {
+      console.log('selectedCampaign showContactInfo')
       this.mapCommunicationsData()
 
       if (this.teamInbox) {
@@ -641,9 +658,13 @@ export default {
         }
 
         const key = `${inboxId}-${contactId}`
-
+        console.log('selectedCampaign key', key)
+        console.log('selectedCampaign contactsLastUsedLines', this.contactsLastUsedLines)
         if (this.contactsLastUsedLines.has(key)) {
           this.selectedCampaignId = this.contactsLastUsedLines.get(key)
+          console.log('selectedCampaign in mixin:', this.selectedCampaignId)
+        } else {
+          this.waitForContactsLastUsedLines(key)
         }
       } else {
         // sanity check and clear

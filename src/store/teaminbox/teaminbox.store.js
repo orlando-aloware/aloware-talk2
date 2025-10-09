@@ -53,6 +53,7 @@ export default function () {
     teamInboxTutorialComponent: null,
     teamInboxEmptyStateVideoComponent: null,
     contactsLastUsedLines: new Map(),
+    contactsLastUsedLinesUpdatedAt: null,
     loadingTeamInboxCampaigns: false,
     teamInboxCampaigns: []
   }

@@ -7,7 +7,7 @@
               option-value="id"
               option-label="name"
               behavior="menu"
-              placeholder="Select line..."
+              :placeholder="placeholderText"
               v-model="selectedLine"
               :options="lineOptions"
               :loading="isBusy"
@@ -92,8 +92,8 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
-    ...mapState(['campaigns']),
-    ...mapState('TeamInbox', ['activeInbox', 'activeInboxId', 'teamInboxCampaigns']),
+    ...mapState(['campaigns', 'campaignsIsLoading']),
+    ...mapState('TeamInbox', ['activeInbox', 'activeInboxId', 'teamInboxCampaigns', 'contactsLastUsedLines', 'contactsLastUsedLinesUpdatedAt']),
 
     isAllInboxes () {
       return this.$route.params.inboxId === ALL_INBOXES_ID
@@ -216,6 +216,10 @@ export default {
 
     getAllInboxesSelectedInboxId () {
       return this.$route.query.inboxId ? +this.$route.query.inboxId : null
+    },
+
+    placeholderText () {
+      return this.selectedLine ? '' : 'Select line...'
     }
   },
 
@@ -238,6 +242,12 @@ export default {
       this.lineOptions = this.formattedLineOptions
       this.setIncomingNumber()
     }
+
+    console.log('selectedCampaign in line-selector:', this.campaignId)
+    console.log('selectedCampaign isAvailableInInbox', this.lineOptions.some(campaign => campaign.id === this.campaignId))
+    console.log('selectedCampaign lineOptions', this.lineOptions)
+    console.log('selectedCampaign campaignsIsLoading', this.campaignsIsLoading)
+    console.log('selectedCampaign selectedCampaign', this.selectedCampaign)
   },
 
   methods: {
@@ -385,9 +395,37 @@ export default {
   },
 
   watch: {
+    contactsLastUsedLinesUpdatedAt (value) {
+      console.log('selectedCampaign contactsLastUsedLinesUpdatedAt in watch', value)
+      console.log('selectedCampaign contactsLastUsedLinesUpdatedAt in watch map', this.contactsLastUsedLines)
+
+      if (!this.contactsLastUsedLines.size) {
+        console.log('selectedCampaign contactsLastUsedLines is empty in watcher')
+        return
+      }
+
+      if (this.campaignId && this.selectedCampaign) {
+        console.log('selectedCampaign campaignId and selectedCampaign are set in watcher')
+        return
+      }
+
+      const key = `${this.activeInboxId}-${this.contact?.id}`
+
+      if (this.contactsLastUsedLines.has(key)) {
+        const campaignId = this.contactsLastUsedLines.get(key)
+        const campaign = this.lineOptions.find(campaign => campaign.id === campaignId)
+
+        if (campaign) {
+          console.log('----------> selectedCampaign campaign found in watcher', campaign)
+          // this.selectedLine = campaign
+          // this.getIncomingNumber()
+        }
+      }
+    },
+
     'contact.id': function (value) {
       if (this.contact && this.contact.id) {
-        this.setDefaultLine(value)
+        this.setDefaultLine()
         this.showPlaceholder()
       }
     },
