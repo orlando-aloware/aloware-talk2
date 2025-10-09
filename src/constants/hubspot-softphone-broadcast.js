@@ -55,6 +55,13 @@ export const BroadcastMessageTypes = Object.freeze({
   INCOMING_CALL_RECEIVED: 'INCOMING_CALL_RECEIVED',
 
   /**
+   * Sent when user accepts an inbound call in REMOTE mode
+   * Direction: Remote → Window
+   * Payload: { communicationId, contactId }
+   */
+  ACCEPT_INBOUND_CALL: 'ACCEPT_INBOUND_CALL',
+
+  /**
    * Sent when a call is answered (inbound or outbound)
    * Direction: Window → Remote
    * Payload: { callId, answeredAt }

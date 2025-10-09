@@ -106,6 +106,17 @@
     </div>
     <!-- End Critical Error State -->
 
+    <!-- Start Incoming Call UI (REMOTE mode only) -->
+    <calling-remote-incoming-call
+      v-if="displayState === DisplayState.INCOMING_CALL && incomingCallData"
+      :contact-name="incomingCallData.contact?.name || 'Unknown Caller'"
+      :phone-number="incomingCallData.contact?.phone_number | formatPhone"
+      :company-name="incomingCallData.contact?.company_name"
+      @accept="handleAcceptCall"
+      @decline="handleDeclineCall"
+    />
+    <!-- End Incoming Call UI -->
+
     <!-- Start Agent On Call State -->
     <div
       v-else-if="displayState === DisplayState.SHOW_ALERT_AGENT_ON_CALL"
@@ -141,6 +152,7 @@ import { hubspotCallingExtensionsClient as HubSpotCallingExtensionsClient, Compo
 import Webrtc from 'components/webrtc'
 import DialerListeners from 'components/dialer-listeners'
 import LogoutIcon from 'components/icons/logout-icon'
+import CallingRemoteIncomingCall from './components/CallingRemoteIncomingCall'
 import { mapState, mapActions } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -155,7 +167,8 @@ const DisplayState = Object.freeze({
   SHOW_ALERT_AGENT_ON_CALL: 2,
   SHOW_ALERT_CALL_FINISHED: 3,
   READY_FOR_CALLS: 4,
-  CRITICAL_ERROR_HAPPENED: 5
+  CRITICAL_ERROR_HAPPENED: 5,
+  INCOMING_CALL: 6 // For REMOTE mode custom incoming call UI
 })
 
 // Dialer statuses where we should display a loading indicator while the dialer component initializes
@@ -172,7 +185,8 @@ export default {
   components: {
     Webrtc,
     DialerListeners,
-    LogoutIcon
+    LogoutIcon,
+    CallingRemoteIncomingCall
   },
 
   mixins: [agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin],
@@ -222,6 +236,9 @@ export default {
 
       // HubSpot widget visibility state
       isCallingWidgetVisible: true,
+
+      // Inbound call state for REMOTE mode
+      incomingCallData: null,
 
       // HubSpot Calling Extensions SDK instance
       extensions: null,
@@ -583,9 +600,34 @@ export default {
 
       console.log(`[${this.componentMode}] Received broadcast:`, type, payload)
 
-      // TODO: Implement specific message handlers
-      // For now, just log the messages to verify Broadcast Channel is working
-      console.log('[HubSpot Widget] Broadcast message handler - implementation pending')
+      switch (type) {
+        case BroadcastMessageTypes.INCOMING_CALL_STARTED:
+          // REMOTE mode: Show custom incoming call UI
+          if (this.componentMode === ComponentMode.REMOTE) {
+            console.log('[REMOTE] Showing custom incoming call UI')
+            this.showIncomingCallUI(payload)
+          }
+          break
+
+        case BroadcastMessageTypes.ACCEPT_INBOUND_CALL:
+          // WINDOW mode: Answer the call
+          if (this.componentMode === ComponentMode.WINDOW) {
+            console.log('[WINDOW] Accepting call from REMOTE broadcast')
+            this.$VueEvent.fire('answerCall')
+          }
+          break
+
+        case BroadcastMessageTypes.CALL_CANCELLED:
+          // REMOTE mode: Hide incoming call UI
+          if (this.componentMode === ComponentMode.REMOTE) {
+            console.log('[REMOTE] Call declined, hiding UI')
+            this.hideIncomingCallUI()
+          }
+          break
+
+        default:
+          console.log('[HubSpot Widget] Unhandled broadcast message type:', type)
+      }
     },
 
     /**
@@ -1014,6 +1056,7 @@ export default {
      */
     async handleIncomingCall (communication) {
       console.log('Inbound call received:', communication)
+      console.log('Component mode:', this.componentMode)
 
       if (!this.authenticated) {
         console.log('User not authenticated, skipping inbound call')
@@ -1025,45 +1068,101 @@ export default {
         return
       }
 
-      // For HubSpot inbound calls, we need to properly notify HubSpot
-      if (this.extensions) {
-        console.log('Extensions available, proceeding with HubSpot notification')
-        const phoneNumber = this.$options.filters.fixPhone(communication.contact?.phone_number)
+      // WINDOW mode: Handle the call AND broadcast to REMOTE mode
+      if (this.componentMode === ComponentMode.WINDOW) {
+        console.log('[WINDOW] Processing inbound call')
 
-        try {
-          // Notify HubSpot about the inbound call
-          this.extensions.incomingCall({
-            phoneNumber: phoneNumber,
-            contactName: communication.contact?.name || 'Unknown Caller',
-            contactId: communication.contact?.id?.toString(),
-            callId: communication.id?.toString()
-          })
-          console.log('Successfully notified HubSpot about inbound call')
-        } catch (error) {
-          console.error('Error handling HubSpot notification:', error)
-          // Continue with the call flow even if HubSpot notification fails
+        // Notify HubSpot about the inbound call
+        if (this.extensions) {
+          const phoneNumber = this.$options.filters.fixPhone(communication.contact?.phone_number)
+
+          try {
+            this.extensions.incomingCall({
+              phoneNumber: phoneNumber,
+              contactName: communication.contact?.name || 'Unknown Caller',
+              contactId: communication.contact?.id?.toString(),
+              callId: communication.id?.toString()
+            })
+            console.log('[WINDOW] Successfully notified HubSpot about inbound call')
+          } catch (error) {
+            console.error('[WINDOW] Error handling HubSpot notification:', error)
+          }
         }
-      } else {
-        console.log('No extensions available')
+
+        // Set up the dialer state for call handling
+        this.setDialerCommunication(communication)
+        this.setDialerContact(communication.contact)
+        this.setDialerCurrentStatus(DialerStatus.RECEIVED_CALL_INVITE)
+        this.displayState = DisplayState.HIDE
+
+        // Show accept/reject buttons in WINDOW mode
+        this.processActionNotification(communication, 'call')
+
+        // Broadcast to REMOTE mode to show custom UI
+        this.publishBroadcast(BroadcastMessageTypes.INCOMING_CALL_STARTED, {
+          communication,
+          contact: communication.contact
+        })
+
+        console.log('[WINDOW] Inbound call setup completed')
+        return
       }
 
-      // Set up the dialer state for the main Aloware system to handle
-      this.displayState = DisplayState.HIDE
-      this.setDialerCommunication(communication)
-      this.setDialerContact(communication.contact)
-      this.setDialerCurrentStatus(DialerStatus.RECEIVED_CALL_INVITE)
+      // REMOTE mode: Ignore - will receive broadcast from WINDOW
+      console.log('[REMOTE] Ignoring new_in_app_call event - will receive broadcast')
+    },
 
-      console.log('Set dialer state for inbound call:', {
-        communication: communication.id,
-        contact: communication.contact?.name,
-        status: DialerStatus.RECEIVED_CALL_INVITE
+    /**
+     * Shows custom incoming call UI in REMOTE mode
+     */
+    showIncomingCallUI (payload) {
+      const { communication, contact } = payload
+
+      console.log('[REMOTE] Displaying custom incoming call UI for:', contact?.name)
+
+      this.incomingCallData = { communication, contact }
+      this.displayState = DisplayState.INCOMING_CALL
+    },
+
+    /**
+     * Hides incoming call UI in REMOTE mode
+     */
+    hideIncomingCallUI () {
+      console.log('[REMOTE] Hiding incoming call UI')
+      this.incomingCallData = null
+      this.displayState = DisplayState.READY_FOR_CALLS
+    },
+
+    /**
+     * Handles accept button click in REMOTE mode
+     */
+    handleAcceptCall () {
+      console.log('[REMOTE] Accept button clicked - broadcasting to WINDOW')
+
+      this.publishBroadcast(BroadcastMessageTypes.ACCEPT_INBOUND_CALL, {
+        communicationId: this.incomingCallData?.communication?.id,
+        contactId: this.incomingCallData?.contact?.id
       })
 
-      // Call processActionNotification to trigger the action notification system
-      // This is what shows the accept/reject buttons
-      this.processActionNotification(communication, 'call')
+      // Hide the incoming call UI
+      this.hideIncomingCallUI()
+    },
 
-      console.log('Inbound call handling completed successfully')
+    /**
+     * Handles decline button click in REMOTE mode
+     */
+    handleDeclineCall () {
+      console.log('[REMOTE] Decline button clicked - broadcasting to WINDOW')
+
+      this.publishBroadcast(BroadcastMessageTypes.CALL_CANCELLED, {
+        communicationId: this.incomingCallData?.communication?.id
+      })
+
+      // Fire reject event (WINDOW will handle the actual rejection)
+      this.$VueEvent.fire('rejectCall')
+
+      // Hide the incoming call UI
+      this.hideIncomingCallUI()
     },
 
     /**
@@ -1401,4 +1500,5 @@ body {
   padding: 0 !important;
   display: inline-block !important;
 }
+
 </style>
