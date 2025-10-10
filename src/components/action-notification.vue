@@ -259,7 +259,6 @@ export default {
     return {
       runningDateTime: null,
       runningDateTimeInterval: null,
-      isValidNotification: false,
       notificationListeners: {},
       AgentStatus,
       teamInboxLink: null
@@ -287,10 +286,6 @@ export default {
 
       if (this.queue) {
         toastClass.data += ' has-clear-queues'
-      }
-
-      if (!this.isValidNotification) {
-        toastClass.data += ' hide'
       }
 
       return toastClass.data
@@ -648,7 +643,6 @@ export default {
 
     onShow () {
       console.log('Communication when event Show notification triggers: ', this.communication)
-      this.isValidNotification = false
       this.stopNotificationListeners()
       this.startNotificationListeners()
     },
@@ -690,7 +684,6 @@ export default {
       const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
       const isPersonalInbox = ringGroup?.is_personal_inbox
 
-      this.isValidNotification = true
       const shouldPlayFishingNotificationSound = this.id === 'callFishing' &&
         ((!isPersonalInbox && this.currentCompany.fishing_mode_notification_sound) || (isPersonalInbox && !this.isAgentOrDialerOnCall))
       this.playAudio(shouldPlayFishingNotificationSound)
