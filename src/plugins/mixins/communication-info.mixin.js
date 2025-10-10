@@ -224,7 +224,7 @@ export default {
         case CommunicationRejectionReasons.REJECTION_REASON_MESSAGE_EMPTY:
           return 'Message body was required.'
         case CommunicationRejectionReasons.REJECTION_REASON_NUMBER_IS_INTERNATIONAL:
-          return 'The contact phone number was international.'
+          return 'The traffic to this country is not allowed.'
         case CommunicationRejectionReasons.REJECTION_REASON_FAX_NUMBER_NOT_FOUND:
           return 'We couldn\'t send a fax from a non-fax capable number.'
         case CommunicationRejectionReasons.REJECTION_REASON_INVALID_OR_WRONG_PHONE_NUMBER:
