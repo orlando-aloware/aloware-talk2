@@ -28,8 +28,7 @@ export default {
     },
 
     isForcedCallDisposition () {
-      const isPowerDialerSession = this.$route.meta.id === 'power-dialer-session'
-      return (this.currentCompany && this.currentCompany.force_call_disposition) || (this.isForcedRedialEnabled && isPowerDialerSession)
+      return (this.currentCompany && this.currentCompany.force_call_disposition) || (this.isForcedRedialEnabled && this.isOnPowerDialerSessionRoute)
     },
 
     isForcedContactDisposition () {
@@ -49,9 +48,8 @@ export default {
       }
 
       const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
-      const isPowerDialerSession = this.$route.meta.id === 'power-dialer-session'
 
-      return (isForcedCallDisposition || (this.isForcedRedialEnabled && isPowerDialerSession)) && !this.isCallDisposed
+      return (isForcedCallDisposition || (this.isForcedRedialEnabled && this.isOnPowerDialerSessionRoute)) && !this.isCallDisposed
     },
 
     isHighlightedContactDisposition () {
