@@ -28,7 +28,7 @@ export default {
     },
 
     isForcedCallDisposition () {
-      return (this.currentCompany && this.currentCompany.force_call_disposition) || this.isForcedRedialEnabled
+      return (this.currentCompany && this.currentCompany.force_call_disposition) || (this.isForcedRedialEnabled && this.isOnPowerDialerSessionRoute)
     },
 
     isForcedContactDisposition () {
@@ -49,7 +49,7 @@ export default {
 
       const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
 
-      return (isForcedCallDisposition || this.isForcedRedialEnabled) && !this.isCallDisposed
+      return (isForcedCallDisposition || (this.isForcedRedialEnabled && this.isOnPowerDialerSessionRoute)) && !this.isCallDisposed
     },
 
     isHighlightedContactDisposition () {
