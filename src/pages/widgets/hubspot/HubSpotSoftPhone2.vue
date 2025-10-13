@@ -665,6 +665,22 @@ export default {
           }
           break
 
+        case BroadcastMessageTypes.REQUEST_CURRENT_STATE:
+          // WINDOW mode: Send current call state to Remote
+          if (this.componentMode === ComponentMode.WINDOW) {
+            console.log('[WINDOW] Received state request from Remote, sending current state')
+            this.sendCurrentState(payload.requestId)
+          }
+          break
+
+        case BroadcastMessageTypes.CURRENT_STATE_RESPONSE:
+          // REMOTE mode: Receive and apply current call state from Window
+          if (this.componentMode === ComponentMode.REMOTE) {
+            console.log('[REMOTE] Received current state from Window:', payload)
+            this.applyCurrentState(payload)
+          }
+          break
+
         default:
           console.log('[HubSpot Widget] Unhandled broadcast message type:', type)
       }
@@ -684,6 +700,78 @@ export default {
       const message = createBroadcastMessage(type, payload)
       this.broadcastChannel.postMessage(message)
       console.log(`[${this.componentMode}] Published broadcast:`, type, payload)
+    },
+
+    /**
+     * Sends current call state to Remote in response to REQUEST_CURRENT_STATE
+     * @param {string} requestId - Request ID from Remote
+     */
+    sendCurrentState (requestId) {
+      const agentStatus = this.profile?.agent_status
+      const dialerStatus = this.dialer?.currentStatus
+
+      let hasActiveCall = false
+      let callType = null
+      let communication = null
+      let contact = null
+      let callDuration = ''
+
+      // Check for incoming call (ringing)
+      if (agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+        hasActiveCall = true
+        callType = 'incoming'
+        communication = this.dialer?.communication || this.incomingCallData?.communication
+        contact = this.dialer?.contact || this.incomingCallData?.contact
+      } else if (agentStatus === AgentStatus.AGENT_STATUS_ON_CALL ||
+               dialerStatus === DialerStatus.CALL_CONNECTED ||
+               dialerStatus === DialerStatus.MAKING_CALL) {
+        hasActiveCall = true
+        callType = 'active'
+        communication = this.dialer?.communication || this.activeCallData?.communication
+        contact = this.dialer?.contact || this.activeCallData?.contact
+        callDuration = this.activeCallData?.callDuration || ''
+      }
+
+      console.log('[WINDOW] Sending current state:', {
+        hasActiveCall,
+        callType,
+        hasContact: !!contact,
+        hasCommunication: !!communication
+      })
+
+      this.publishBroadcast(BroadcastMessageTypes.CURRENT_STATE_RESPONSE, {
+        requestId,
+        hasActiveCall,
+        callType,
+        communication,
+        contact,
+        callDuration
+      })
+    },
+
+    /**
+     * Applies current state received from Window
+     * @param {object} payload - State payload from Window
+     */
+    applyCurrentState (payload) {
+      const { hasActiveCall, callType, communication, contact, callDuration } = payload
+
+      if (!hasActiveCall) {
+        console.log('[REMOTE] No active call in Window - staying in ready state')
+        this.displayState = DisplayState.READY_FOR_CALLS
+        return
+      }
+
+      if (callType === 'incoming' && communication && contact) {
+        console.log('[REMOTE] Applying incoming call state from Window')
+        this.showIncomingCallUI({ communication, contact })
+      } else if (callType === 'active' && communication && contact) {
+        console.log('[REMOTE] Applying active call state from Window')
+        this.showActiveCallUI({ communication, contact, callDuration })
+      } else {
+        console.log('[REMOTE] Invalid state from Window - showing ready state')
+        this.displayState = DisplayState.READY_FOR_CALLS
+      }
     },
 
     /**
@@ -729,15 +817,14 @@ export default {
       if (!this.hubspotDialNumber) {
         // Check for incoming/active calls in REMOTE mode after page refresh
         if (this.componentMode === ComponentMode.REMOTE) {
-          // Show incoming call UI when agent is ringing (rare - SDK usually drops call on refresh)
+          // For RINGING status: Request current state from Window
           if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING) {
-            const lastCall = this.profile?.last_call
-            if (lastCall) {
-              this.showIncomingCallUI({
-                communication: lastCall,
-                contact: lastCall?.contact
-              })
-            }
+            console.log('[REMOTE] Agent is ringing - requesting current state from Window')
+            this.displayState = DisplayState.READY_FOR_CALLS
+            this.publishBroadcast(BroadcastMessageTypes.REQUEST_CURRENT_STATE, {
+              requestId: `remote-${Date.now()}`,
+              timestamp: Date.now()
+            })
           } else if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
                      this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
                      this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
@@ -1429,14 +1516,10 @@ export default {
           this.setDialerCurrentStatus(DialerStatus.WRAP_UP)
           this.displayState = DisplayState.HIDE // Show webrtc component with wrap-up UI
         } else if (this.componentMode === ComponentMode.REMOTE &&
-                   this.profile.agent_status === AgentStatus.AGENT_STATUS_RINGING &&
-                   lastCall) {
-          // REMOTE mode: Show incoming call UI when agent is ringing
-          console.log('[REMOTE] Agent is ringing, showing incoming call UI')
-          this.showIncomingCallUI({
-            communication: lastCall,
-            contact: lastCall?.contact
-          })
+                   this.profile.agent_status === AgentStatus.AGENT_STATUS_RINGING) {
+          // REMOTE mode: Don't use lastCall for incoming calls - wait for broadcast
+          console.log('[REMOTE] Agent is ringing, waiting for INCOMING_CALL_STARTED broadcast')
+          this.displayState = DisplayState.READY_FOR_CALLS
         } else if (this.componentMode === ComponentMode.REMOTE &&
                    (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
                     this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||

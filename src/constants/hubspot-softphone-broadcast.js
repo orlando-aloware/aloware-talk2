@@ -129,7 +129,24 @@ export const BroadcastMessageTypes = Object.freeze({
    * Direction: Window → Remote (or Remote → Window)
    * Payload: { errorType, errorMessage, errorDetails }
    */
-  ERROR_OCCURRED: 'ERROR_OCCURRED'
+  ERROR_OCCURRED: 'ERROR_OCCURRED',
+
+  // ============================================
+  // State Synchronization Events
+  // ============================================
+  /**
+   * Sent when Remote loads and needs current call state from Window
+   * Direction: Remote → Window
+   * Payload: { requestId, timestamp }
+   */
+  REQUEST_CURRENT_STATE: 'REQUEST_CURRENT_STATE',
+
+  /**
+   * Sent in response to REQUEST_CURRENT_STATE with current call information
+   * Direction: Window → Remote
+   * Payload: { requestId, hasActiveCall, callType, communication, contact, callDuration }
+   */
+  CURRENT_STATE_RESPONSE: 'CURRENT_STATE_RESPONSE'
 })
 
 /**
