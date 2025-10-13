@@ -879,29 +879,29 @@ export default {
         const previousStatus = this.profile.agent_status
         const agentStatus = data.agent_status
 
-        console.log('[DEBUG handleAgentStatusUpdate]', {
-          previousStatus,
-          agentStatus,
-          dialerStatus: this.dialer?.currentStatus,
-          checkForceDisposition: this.checkForceDisposition,
-          displayState: this.displayState
-        })
-
         this.setAgentStatus(agentStatus)
 
         // Agent became available after wrap-up - return to ready state
         if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && previousStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-          // Don't change display state if we're showing active call UI in REMOTE mode
-          if (this.displayState !== DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
-            this.displayState = DisplayState.READY_FOR_CALLS
-          }
+          // Clear active call data and transition to ready state
+          this.activeCallData = null
+          this.displayState = DisplayState.READY_FOR_CALLS
           if (this.dialer?.currentStatus === DialerStatus.WRAP_UP) this.$VueEvent.fire('resetCall') // Reset dialer status if it's still in wrap-up
         } else if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.displayState === DisplayState.SHOW_ALERT_AGENT_ON_CALL && !this.isDialed) {
           // Agent became available while showing "on call" alert - return to ready state
           this.displayState = DisplayState.READY_FOR_CALLS
         } else if (agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) {
-          // Agent entered wrap-up with forced dispositions - show wrap-up UI
-          this.displayState = DisplayState.HIDE
+          // Agent entered wrap-up with forced dispositions
+          // Keep activeCallData if showing Active Call UI (for REMOTE mode during wrap-up)
+          // Set dialer status to WRAP_UP if it's not already set
+          if (this.dialer?.currentStatus !== DialerStatus.WRAP_UP) {
+            this.setDialerCurrentStatus(DialerStatus.WRAP_UP)
+          }
+
+          // Only change displayState if not showing Active Call UI
+          if (this.displayState !== DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
+            this.displayState = DisplayState.HIDE
+          }
         }
 
         // if we finished - don't need to handle dial number
@@ -1214,11 +1214,21 @@ export default {
      * Hides active call UI in REMOTE mode
      */
     hideActiveCallUI () {
-      console.log('[REMOTE] Hiding active call UI')
-      this.activeCallData = null
-      // Only change to READY_FOR_CALLS if we're actually in active call state
+      console.log('[REMOTE] Call ended - checking if should hide active call UI')
+
+      // Only change state if we're actually in active call state
       if (this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
-        this.displayState = DisplayState.READY_FOR_CALLS
+        // If agent is in wrap-up, KEEP showing the Active Call UI with contact info
+        // It will transition to Ready for Calls when wrap-up completes
+        if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) {
+          console.log('[REMOTE] Agent in wrap-up - keeping Active Call UI visible')
+          // Don't clear activeCallData or change displayState
+          // The UI will continue showing the contact info during wrap-up
+        } else {
+          console.log('[REMOTE] No wrap-up - clearing Active Call UI')
+          this.activeCallData = null
+          this.displayState = DisplayState.READY_FOR_CALLS
+        }
       }
     },
 
