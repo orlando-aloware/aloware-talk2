@@ -49,7 +49,9 @@
           </b-button>
 
           <!-- Session Main Page -->
-          <session-contact-page class="flex-grow-1 overflow-hidden"/>
+          <session-contact-page id="session-contact-page"
+                                class="flex-grow-1 overflow-hidden"
+                                data-testid="session-contact-page"/>
         </div>
       </div>
     </div>
