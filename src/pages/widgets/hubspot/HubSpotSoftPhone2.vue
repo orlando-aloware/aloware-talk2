@@ -1372,14 +1372,26 @@ export default {
 
           // Use lastCall contact if available and has data, otherwise construct from available data
           // For outbound calls without lastCall yet, use contactDetails
+          // For unparked calls, use dialer.communication.contact
           let contact = lastCall?.contact
 
+          // Try dialer.contact (for active calls)
+          if (!contact || (!contact.name && !contact.phone_number)) {
+            contact = this.dialer?.contact
+          }
+
+          // Try dialer.communication.contact (for unparked calls)
+          if (!contact || (!contact.name && !contact.phone_number)) {
+            contact = this.dialer?.communication?.contact
+          }
+
+          // Last resort: use contactDetails or construct from available data
           if (!contact || (!contact.name && !contact.phone_number)) {
             contact = {
-              name: this.contactDetails.contactName || this.dialer?.contact?.name || 'Unknown Contact',
-              phone_number: this.hubspotDialNumber?.phoneNumber || this.dialer?.contact?.phone_number || lastCall?.from_number,
-              company_name: this.contactDetails.companyName || this.dialer?.contact?.company_name,
-              id: this.contactDetails.contactId || this.dialer?.contact?.id
+              name: this.contactDetails.contactName || 'Unknown Contact',
+              phone_number: this.hubspotDialNumber?.phoneNumber || lastCall?.from_number,
+              company_name: this.contactDetails.companyName,
+              id: this.contactDetails.contactId
             }
           }
 
@@ -1394,6 +1406,61 @@ export default {
       }
 
       return status
+    },
+
+    /**
+     * Broadcasts CALL_CONNECTED event with contact data
+     */
+    broadcastCallConnected () {
+      // For outbound calls, use contactDetails which has the full contact info
+      // For inbound calls, use dialer.contact which is already populated
+      // For unparked calls, use dialer.communication.contact which is loaded after status change
+      let contact = this.dialer?.contact
+
+      // If contact is missing or has no name/phone, try communication.contact (for unparked calls)
+      if (!contact || (!contact.name && !contact.phone_number)) {
+        contact = this.dialer?.communication?.contact
+      }
+
+      // If still missing, try extracting from Twilio call customParameters (for unparked calls)
+      if (!contact || (!contact.name && !contact.phone_number)) {
+        const customParams = this.dialer?.call?.customParameters
+        if (customParams && customParams.size > 0) {
+          contact = {
+            name: customParams.get('ContactName'),
+            phone_number: this.dialer?.communication?.contact?.phone_number, // Use phone from communication if available
+            company_name: customParams.get('CompanyName'),
+            id: customParams.get('ContactId')
+          }
+        }
+      }
+
+      // Last resort: use contactDetails from outbound call flow
+      if (!contact || (!contact.name && !contact.phone_number)) {
+        contact = {
+          name: this.contactDetails.contactName || this.dialer?.communication?.contact?.name,
+          phone_number: this.hubspotDialNumber?.phoneNumber || this.dialer?.communication?.from_number || this.dialer?.communication?.to_number,
+          company_name: this.contactDetails.companyName || this.dialer?.communication?.contact?.company_name,
+          id: this.contactDetails.contactId || this.dialer?.communication?.contact?.id
+        }
+      }
+
+      console.log('[DEBUG] Broadcasting CALL_CONNECTED with contact:', {
+        contactName: contact?.name,
+        phoneNumber: contact?.phone_number,
+        dialerContact: !!this.dialer?.contact,
+        communicationContact: !!this.dialer?.communication?.contact,
+        customParamsContact: !!this.dialer?.call?.customParameters,
+        fromNumber: this.dialer?.communication?.from_number,
+        toNumber: this.dialer?.communication?.to_number,
+        hasCommunication: !!this.dialer?.communication
+      })
+
+      this.publishBroadcast(BroadcastMessageTypes.CALL_CONNECTED, {
+        communication: this.dialer?.communication,
+        contact: contact,
+        callDuration: '' // Will be updated via interval or separate broadcast
+      })
     },
 
     /**
@@ -1497,31 +1564,40 @@ export default {
      * Watch for dialer status changes to ensure wrap-up state is properly set
      */
     'dialer.currentStatus' (newStatus, oldStatus) {
+      // Debug: Log all status changes
+      console.log('[DEBUG dialer.currentStatus watcher]', {
+        oldStatus,
+        newStatus,
+        componentMode: this.componentMode,
+        agentStatus: this.profile?.agent_status,
+        hasDialerContact: !!this.dialer?.contact,
+        hasCommunicationContact: !!this.dialer?.communication?.contact,
+        fromNumber: this.dialer?.communication?.from_number,
+        toNumber: this.dialer?.communication?.to_number
+      })
+
       // Broadcast CALL_CONNECTED to REMOTE mode when call connects in WINDOW mode
       if (this.componentMode === ComponentMode.WINDOW &&
           newStatus === DialerStatus.CALL_CONNECTED &&
           oldStatus !== DialerStatus.CALL_CONNECTED) {
         console.log('[WINDOW] Call connected, broadcasting to REMOTE')
 
-        // For outbound calls, use contactDetails which has the full contact info
-        // For inbound calls, use dialer.contact which is already populated
-        let contact = this.dialer?.contact
-
-        // If contact is missing or has no name/phone, use contactDetails from outbound call flow
-        if (!contact || (!contact.name && !contact.phone_number)) {
-          contact = {
-            name: this.contactDetails.contactName,
-            phone_number: this.hubspotDialNumber?.phoneNumber,
-            company_name: this.contactDetails.companyName,
-            id: this.contactDetails.contactId
+        // For unparked calls, the communication is loaded asynchronously after status changes
+        // We need to wait for it to be loaded before broadcasting
+        const attemptBroadcast = (retryCount = 0) => {
+          if (!this.dialer?.communication && retryCount < 5) {
+            console.log(`[DEBUG] Communication not loaded yet (attempt ${retryCount + 1}/5), retrying...`)
+            setTimeout(() => attemptBroadcast(retryCount + 1), 200) // Retry after 200ms
+          } else {
+            if (!this.dialer?.communication) {
+              console.log('[WARNING] Communication still not loaded after 5 retries, broadcasting anyway')
+            }
+            this.broadcastCallConnected()
           }
         }
 
-        this.publishBroadcast(BroadcastMessageTypes.CALL_CONNECTED, {
-          communication: this.dialer?.communication,
-          contact: contact,
-          callDuration: '' // Will be updated via interval or separate broadcast
-        })
+        // Start with initial 100ms delay
+        setTimeout(() => attemptBroadcast(), 100)
       }
 
       // When dialer becomes READY and agent is in wrap-up, restore the wrap-up state
