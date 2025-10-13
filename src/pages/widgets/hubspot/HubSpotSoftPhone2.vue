@@ -242,6 +242,7 @@ export default {
 
       // Component initialization state
       initialized: false,
+      isInitializing: true,
 
       // HubSpot portal ID received from SDK
       hubspotPortalId: null,
@@ -1311,11 +1312,11 @@ export default {
           this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
           this.checkForceDisposition) {
           this.setDialerCurrentStatus(DialerStatus.WRAP_UP)
-          this.displayState = DisplayState.HIDE // Set display state to HIDE so webrtc component shows the wrap-up UI
+          this.displayState = DisplayState.HIDE // Set display state to HIDE so webrtc component shows the wrap-up UI (for both WINDOW and REMOTE)
         } else if (this.componentMode === ComponentMode.REMOTE &&
                    this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
                    lastCall) {
-          // REMOTE mode: Show active call UI when agent is on call
+          // REMOTE mode: Show active call UI when agent is on call (not wrap-up)
           console.log('[REMOTE] Agent is on call, showing active call UI')
 
           // Use lastCall contact if available and has data, otherwise construct from available data
@@ -1560,6 +1561,7 @@ export default {
     HubSpotCallingExtensionsClient.subscribe(this.callSdkOptions.eventHandlers)
     this.callExtensionsInitialized = true
     await this.initializeAuth()
+    this.isInitializing = false
 
     // Set up listener for inbound calls from Aloware
     console.log('Setting up listener for new_in_app_call events')
