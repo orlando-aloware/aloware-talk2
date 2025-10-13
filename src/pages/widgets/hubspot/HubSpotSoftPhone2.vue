@@ -242,7 +242,6 @@ export default {
 
       // Component initialization state
       initialized: false,
-      isInitializing: true,
 
       // HubSpot portal ID received from SDK
       hubspotPortalId: null,
@@ -402,7 +401,9 @@ export default {
       }
 
       // Don't show loading if agent is in wrap-up - show the wrap-up UI instead
-      if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) {
+      // Check both agent status and dialer status to catch wrap-up during initialization
+      if ((this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) ||
+          this.dialer?.currentStatus === DialerStatus.WRAP_UP) {
         return false
       }
 
@@ -719,8 +720,16 @@ export default {
        * if not empty then dialer was called, and we are here after login page so we must dial the number
        */
       if (!this.hubspotDialNumber) {
-        // Don't change displayState if agent is in wrap-up - keep the wrap-up UI visible
-        if (this.profile?.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || !this.checkForceDisposition) {
+        // Only check for active calls in REMOTE mode when agent is ON_CALL (not wrap-up)
+        // This shows active call UI after refresh, but lets dialer watcher handle wrap-up
+        if (this.componentMode === ComponentMode.REMOTE &&
+            this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+          this.validateHasActiveCallStatus()
+        }
+
+        // Don't change displayState if agent is in wrap-up OR if we just set active call UI
+        if ((this.profile?.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || !this.checkForceDisposition) &&
+            this.displayState !== DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
           this.displayState = DisplayState.READY_FOR_CALLS
         }
         return
@@ -1312,7 +1321,7 @@ export default {
           this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
           this.checkForceDisposition) {
           this.setDialerCurrentStatus(DialerStatus.WRAP_UP)
-          this.displayState = DisplayState.HIDE // Set display state to HIDE so webrtc component shows the wrap-up UI (for both WINDOW and REMOTE)
+          this.displayState = DisplayState.HIDE // Show webrtc component with wrap-up UI
         } else if (this.componentMode === ComponentMode.REMOTE &&
                    this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
                    lastCall) {
@@ -1445,13 +1454,6 @@ export default {
      * Watch for dialer status changes to ensure wrap-up state is properly set
      */
     'dialer.currentStatus' (newStatus, oldStatus) {
-      console.log('[DEBUG dialer.currentStatus watcher]', {
-        oldStatus,
-        newStatus,
-        agentStatus: this.profile?.agent_status,
-        checkForceDisposition: this.checkForceDisposition
-      })
-
       // Broadcast CALL_CONNECTED to REMOTE mode when call connects in WINDOW mode
       if (this.componentMode === ComponentMode.WINDOW &&
           newStatus === DialerStatus.CALL_CONNECTED &&
@@ -1561,7 +1563,6 @@ export default {
     HubSpotCallingExtensionsClient.subscribe(this.callSdkOptions.eventHandlers)
     this.callExtensionsInitialized = true
     await this.initializeAuth()
-    this.isInitializing = false
 
     // Set up listener for inbound calls from Aloware
     console.log('Setting up listener for new_in_app_call events')
