@@ -720,16 +720,31 @@ export default {
        * if not empty then dialer was called, and we are here after login page so we must dial the number
        */
       if (!this.hubspotDialNumber) {
-        // Only check for active calls in REMOTE mode when agent is ON_CALL (not wrap-up)
-        // This shows active call UI after refresh, but lets dialer watcher handle wrap-up
-        if (this.componentMode === ComponentMode.REMOTE &&
-            this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
-          this.validateHasActiveCallStatus()
+        // Check for incoming/active calls in REMOTE mode after page refresh
+        if (this.componentMode === ComponentMode.REMOTE) {
+          // Show incoming call UI when agent is ringing (rare - SDK usually drops call on refresh)
+          if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING) {
+            const lastCall = this.profile?.last_call
+            if (lastCall) {
+              this.showIncomingCallUI({
+                communication: lastCall,
+                contact: lastCall?.contact
+              })
+            }
+          } else if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+            // Show active call UI when agent is on call (not wrap-up)
+            this.validateHasActiveCallStatus()
+          }
         }
 
-        // Don't change displayState if agent is in wrap-up OR if we just set active call UI
-        if ((this.profile?.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || !this.checkForceDisposition) &&
-            this.displayState !== DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
+        // Don't change displayState if agent is ringing, in wrap-up, showing incoming call, or showing active call UI
+        const shouldNotChangeToReady =
+          this.profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING ||
+          (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) ||
+          this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL ||
+          this.displayState === DisplayState.INCOMING_CALL
+
+        if (!shouldNotChangeToReady) {
           this.displayState = DisplayState.READY_FOR_CALLS
         }
         return
@@ -1292,7 +1307,8 @@ export default {
     validateHasActiveCallStatus () {
       let status = false
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_RINGING ||
+          this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
         (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition)) {
         status = true
       }
@@ -1332,6 +1348,15 @@ export default {
           this.checkForceDisposition) {
           this.setDialerCurrentStatus(DialerStatus.WRAP_UP)
           this.displayState = DisplayState.HIDE // Show webrtc component with wrap-up UI
+        } else if (this.componentMode === ComponentMode.REMOTE &&
+                   this.profile.agent_status === AgentStatus.AGENT_STATUS_RINGING &&
+                   lastCall) {
+          // REMOTE mode: Show incoming call UI when agent is ringing
+          console.log('[REMOTE] Agent is ringing, showing incoming call UI')
+          this.showIncomingCallUI({
+            communication: lastCall,
+            contact: lastCall?.contact
+          })
         } else if (this.componentMode === ComponentMode.REMOTE &&
                    this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
                    lastCall) {
