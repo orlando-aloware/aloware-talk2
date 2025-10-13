@@ -112,6 +112,7 @@
       :contact-name="incomingCallData.contact?.name || 'Unknown Caller'"
       :phone-number="incomingCallData.contact?.phone_number"
       :company-name="incomingCallData.contact?.company_name"
+      :is-call-connected="dialer?.currentStatus === DialerStatus.CALL_CONNECTED"
       @accept="handleAcceptCall"
       @decline="handleDeclineCall"
     />
@@ -214,6 +215,7 @@ export default {
     return {
       // Constants
       DisplayState,
+      DialerStatus,
       BroadcastMessageTypes,
 
       campaignId: null,
@@ -621,6 +623,11 @@ export default {
         case BroadcastMessageTypes.INCOMING_CALL_STARTED:
           // REMOTE mode: Show custom incoming call UI
           if (this.componentMode === ComponentMode.REMOTE) {
+            // Safety check: If we're already in an active call, ignore this broadcast
+            if (this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
+              console.log('[REMOTE] Ignoring INCOMING_CALL_STARTED - already showing active call UI')
+              return
+            }
             console.log('[REMOTE] Showing custom incoming call UI')
             this.showIncomingCallUI(payload)
           }
@@ -1198,10 +1205,31 @@ export default {
     showIncomingCallUI (payload) {
       const { communication, contact } = payload
 
+      // Safety check: If call is already connected (check both dialer and agent status)
+      const isCallConnected = this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
+                             this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+
+      if (isCallConnected) {
+        console.log('[REMOTE] Call already connected/on-call, showing active call UI instead of incoming')
+        this.showActiveCallUI({ communication, contact, callDuration: '' })
+        return
+      }
+
       console.log('[REMOTE] Displaying custom incoming call UI for:', contact?.name)
 
       this.incomingCallData = { communication, contact }
       this.displayState = DisplayState.INCOMING_CALL
+
+      // Re-check after a short delay in case the call was accepted very quickly
+      setTimeout(() => {
+        const isConnectedNow = this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
+                               this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+
+        if (this.displayState === DisplayState.INCOMING_CALL && isConnectedNow) {
+          console.log('[REMOTE] Call was accepted quickly - switching to active call UI')
+          this.showActiveCallUI({ communication, contact, callDuration: '' })
+        }
+      }, 500)
     },
 
     /**
@@ -1209,6 +1237,18 @@ export default {
      */
     hideIncomingCallUI () {
       console.log('[REMOTE] Hiding incoming call UI')
+
+      // Safety check: If call is already connected (check both dialer and agent status)
+      // Don't transition to READY_FOR_CALLS - wait for CALL_CONNECTED broadcast
+      const isCallConnected = this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
+                             this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+
+      if (isCallConnected) {
+        console.log('[REMOTE] Call already connected/on-call - keeping current state, waiting for broadcast')
+        // Don't clear incomingCallData yet - keep it so we can use it for active call UI
+        return
+      }
+
       this.incomingCallData = null
       // Only change to READY_FOR_CALLS if we're actually in incoming call state
       if (this.displayState === DisplayState.INCOMING_CALL) {
@@ -1224,11 +1264,11 @@ export default {
 
       console.log('[REMOTE] Displaying active call UI for:', contact?.name)
 
+      // Force clear any incoming call state
+      this.incomingCallData = null
+
       this.activeCallData = { communication, contact, callDuration }
       this.displayState = DisplayState.CALLING_REMOTE_ACTIVE_CALL
-
-      // Hide incoming call UI if it was showing
-      this.incomingCallData = null
     },
 
     /**
@@ -1257,6 +1297,25 @@ export default {
      * Handles accept button click in REMOTE mode
      */
     handleAcceptCall () {
+      console.log('[REMOTE] Accept button clicked', {
+        dialerStatus: this.dialer?.currentStatus,
+        agentStatus: this.profile?.agent_status
+      })
+
+      // Safety check: If call is already connected (check both dialer and agent status)
+      const isCallConnected = this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
+                             this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+
+      if (isCallConnected) {
+        console.log('[REMOTE] Accept button clicked but call already connected/on-call - forcing active call UI')
+        // Get communication and contact data from incoming call
+        const { communication, contact } = this.incomingCallData || {}
+        if (communication && contact) {
+          this.showActiveCallUI({ communication, contact, callDuration: '' })
+        }
+        return
+      }
+
       console.log('[REMOTE] Accept button clicked - broadcasting to WINDOW')
 
       this.publishBroadcast(BroadcastMessageTypes.ACCEPT_INBOUND_CALL, {
@@ -1264,7 +1323,7 @@ export default {
         contactId: this.incomingCallData?.contact?.id
       })
 
-      // Hide the incoming call UI
+      // Hide the incoming call UI (will wait for broadcast if call is already connected)
       this.hideIncomingCallUI()
     },
 
@@ -1272,6 +1331,21 @@ export default {
      * Handles decline button click in REMOTE mode
      */
     handleDeclineCall () {
+      // Safety check: If call is already connected (check both dialer and agent status)
+      // Force show active call UI (can't decline active call)
+      const isCallConnected = this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
+                             this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+
+      if (isCallConnected) {
+        console.log('[REMOTE] Decline button clicked but call already connected/on-call - forcing active call UI')
+        // Get communication and contact data from incoming call
+        const { communication, contact } = this.incomingCallData || {}
+        if (communication && contact) {
+          this.showActiveCallUI({ communication, contact, callDuration: '' })
+        }
+        return
+      }
+
       console.log('[REMOTE] Decline button clicked - broadcasting to WINDOW')
 
       this.publishBroadcast(BroadcastMessageTypes.CALL_CANCELLED, {
@@ -1444,17 +1518,6 @@ export default {
           id: this.contactDetails.contactId || this.dialer?.communication?.contact?.id
         }
       }
-
-      console.log('[DEBUG] Broadcasting CALL_CONNECTED with contact:', {
-        contactName: contact?.name,
-        phoneNumber: contact?.phone_number,
-        dialerContact: !!this.dialer?.contact,
-        communicationContact: !!this.dialer?.communication?.contact,
-        customParamsContact: !!this.dialer?.call?.customParameters,
-        fromNumber: this.dialer?.communication?.from_number,
-        toNumber: this.dialer?.communication?.to_number,
-        hasCommunication: !!this.dialer?.communication
-      })
 
       this.publishBroadcast(BroadcastMessageTypes.CALL_CONNECTED, {
         communication: this.dialer?.communication,

@@ -37,6 +37,7 @@
               ripple
               round
               no-caps
+              :disable="isCallConnected"
               @click="$emit('decline')"
             >
               <cancel-call-icon width="52" height="52" />
@@ -49,6 +50,7 @@
               ripple
               round
               no-caps
+              :disable="isCallConnected"
               @click="$emit('accept')"
             >
               <accept-call-icon width="52" height="52" />
@@ -87,6 +89,10 @@ export default {
     companyName: {
       type: String,
       default: ''
+    },
+    isCallConnected: {
+      type: Boolean,
+      default: false
     }
   },
 
