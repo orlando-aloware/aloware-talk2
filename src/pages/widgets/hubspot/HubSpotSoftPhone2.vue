@@ -731,16 +731,22 @@ export default {
                 contact: lastCall?.contact
               })
             }
-          } else if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
-            // Show active call UI when agent is on call (not wrap-up)
+          } else if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
+                     this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
+                     this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
+            // Show active call UI when agent is on call OR actively dialing/connected
             this.validateHasActiveCallStatus()
           }
         }
 
         // Don't change displayState if agent is ringing, in wrap-up, showing incoming call, or showing active call UI
+        // Also check dialer status for outbound calls that are in progress
         const shouldNotChangeToReady =
           this.profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING ||
+          this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
           (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) ||
+          this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
+          this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
           this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL ||
           this.displayState === DisplayState.INCOMING_CALL
 
@@ -1358,25 +1364,27 @@ export default {
             contact: lastCall?.contact
           })
         } else if (this.componentMode === ComponentMode.REMOTE &&
-                   this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
-                   lastCall) {
-          // REMOTE mode: Show active call UI when agent is on call (not wrap-up)
-          console.log('[REMOTE] Agent is on call, showing active call UI')
+                   (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
+                    this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
+                    this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED)) {
+          // REMOTE mode: Show active call UI when agent is on call OR actively dialing/connected
+          console.log('[REMOTE] Agent is on call or dialing, showing active call UI')
 
           // Use lastCall contact if available and has data, otherwise construct from available data
+          // For outbound calls without lastCall yet, use contactDetails
           let contact = lastCall?.contact
 
           if (!contact || (!contact.name && !contact.phone_number)) {
             contact = {
-              name: this.contactDetails.contactName || 'Unknown Contact',
-              phone_number: this.hubspotDialNumber?.phoneNumber || lastCall?.from_number,
-              company_name: this.contactDetails.companyName,
-              id: this.contactDetails.contactId
+              name: this.contactDetails.contactName || this.dialer?.contact?.name || 'Unknown Contact',
+              phone_number: this.hubspotDialNumber?.phoneNumber || this.dialer?.contact?.phone_number || lastCall?.from_number,
+              company_name: this.contactDetails.companyName || this.dialer?.contact?.company_name,
+              id: this.contactDetails.contactId || this.dialer?.contact?.id
             }
           }
 
           this.showActiveCallUI({
-            communication: lastCall,
+            communication: lastCall || this.dialer?.communication,
             contact: contact,
             callDuration: ''
           })
