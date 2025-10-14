@@ -24,8 +24,22 @@
     />
     <!-- End Dialer Listeners -->
 
+    <!-- Start HubSpot Integration Disabled State -->
+    <div class="p-3" v-if="displayState === DisplayState.HUBSPOT_INTEGRATION_DISABLED">
+      <p><strong>HubSpot Integration Disabled</strong></p>
+      <hr>
+      <p>Please enable the HubSpot integration in the settings page to use this widget.</p>
+      <q-btn
+        color="primary"
+        label="Reload Widget"
+        class="full-width q-mt-md"
+        @click="reloadWidget"
+      />
+    </div>
+    <!-- End HubSpot Integration Disabled State -->
+
     <!-- Start Ready for Calls State -->
-    <div class="p-3" v-if="displayState === DisplayState.READY_FOR_CALLS">
+    <div class="p-3" v-else-if="displayState === DisplayState.READY_FOR_CALLS">
        <div class="status-header">
         <div class="d-flex align-items-center">
           <strong>{{ availabilityMessage }}</strong>
@@ -181,7 +195,8 @@ const DisplayState = Object.freeze({
   READY_FOR_CALLS: 4,
   CRITICAL_ERROR_HAPPENED: 5,
   INCOMING_CALL: 6, // For REMOTE mode custom incoming call UI
-  CALLING_REMOTE_ACTIVE_CALL: 7 // For REMOTE mode active call UI
+  CALLING_REMOTE_ACTIVE_CALL: 7, // For REMOTE mode active call UI
+  HUBSPOT_INTEGRATION_DISABLED: 8 // When HubSpot integration is disabled
 })
 
 // Dialer statuses where we should display a loading indicator while the dialer component initializes
@@ -331,6 +346,12 @@ export default {
               return
             }
 
+            // Ignore outbound calls if HubSpot integration is disabled
+            if (!this.isHubspotIntegrationEnabled) {
+              console.log('[HubSpot Widget] Ignoring outbound call - integration is disabled')
+              return
+            }
+
             // Prevent duplicate calls - if already dialing, ignore new dial requests
             if (!this.initialized || this.isDialed) {
               console.log('[HubSpot Widget] Skipping postDialNumber - not initialized or already dialing')
@@ -386,6 +407,13 @@ export default {
     ...mapState('auth', ['authenticated', 'profile']),
     ...mapState(['dialer', 'hubspotDialNumber']),
 
+    /**
+     * Checks if HubSpot integration is enabled for the current company
+     */
+    isHubspotIntegrationEnabled () {
+      return this.currentCompany && this.currentCompany.hubspot_integration_enabled
+    },
+
     // Determines if agent can receive calls, used to update the isAvailable property in callSdkOptions
     isAgentAvailable () {
       return this.profile && this.profile.agent_status === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
@@ -398,6 +426,11 @@ export default {
 
     // Shows loading spinner during dialer initialization
     isLoadingDialer () {
+      // Don't show loading if HubSpot integration is disabled
+      if (this.displayState === DisplayState.HUBSPOT_INTEGRATION_DISABLED) {
+        return false
+      }
+
       if (this.isPreparingOutboundCall || !this.initialized) {
         return true
       }
@@ -692,6 +725,12 @@ export default {
           }
           break
 
+        case BroadcastMessageTypes.WIDGET_RELOAD_REQUESTED:
+          // Another instance requested widget reload, reload this instance too
+          console.log('[HubSpot Widget] Reload requested from other instance, reloading page...')
+          window.location.reload()
+          break
+
         default:
           console.log('[HubSpot Widget] Unhandled broadcast message type:', type)
       }
@@ -813,6 +852,13 @@ export default {
      * Handles post-authentication logic - notifies HubSpot of login and initiates calls if needed
      */
     handleUserLogin () {
+      // Check if HubSpot integration is enabled first
+      if (!this.isHubspotIntegrationEnabled) {
+        console.log('[HubSpot Widget] HubSpot integration is disabled')
+        this.displayState = DisplayState.HUBSPOT_INTEGRATION_DISABLED
+        return
+      }
+
       if (this.callExtensionsInitialized) {
         this.extensions.userLoggedIn()
         // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
@@ -868,6 +914,12 @@ export default {
      * Initiates the actual call process after authentication - placeholder for now
      */
     async postDialNumber () {
+      // Additional safety check: ignore if integration is disabled
+      if (!this.isHubspotIntegrationEnabled) {
+        console.log('[HubSpot Widget] postDialNumber blocked - integration is disabled')
+        return
+      }
+
       this.$bvModal.hide('daytime-hours-confirmation')
       this.isPreparingOutboundCall = true
 
@@ -1061,6 +1113,12 @@ export default {
         contactDetails: this.contactDetails
       })
 
+      // Block making calls if integration is disabled
+      if (!this.isHubspotIntegrationEnabled) {
+        console.log('[HubSpot Widget] makeCall blocked - integration is disabled')
+        return
+      }
+
       if (!this.campaignId) {
         console.log('[HubSpot Widget] Campaign ID is null')
         this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
@@ -1172,6 +1230,12 @@ export default {
      * Handles call initiation
      */
     handleCall (callData) {
+      // Block call initiation if integration is disabled
+      if (!this.isHubspotIntegrationEnabled) {
+        console.log('[HubSpot Widget] handleCall blocked - integration is disabled')
+        return
+      }
+
       // if there's a call in progress or in wrap up, we omit the call
       if (this.validateHasActiveCallStatus()) {
         return
@@ -1245,6 +1309,12 @@ export default {
 
       if (!this.authenticated) {
         console.log('User not authenticated, skipping inbound call')
+        return
+      }
+
+      // Ignore incoming calls if HubSpot integration is disabled
+      if (!this.isHubspotIntegrationEnabled) {
+        console.log('[HubSpot Widget] Ignoring inbound call - integration is disabled')
         return
       }
 
@@ -1628,6 +1698,25 @@ export default {
     },
 
     /**
+     * Reloads the widget by refreshing the window
+     * Also broadcasts to other widget instance to reload as well
+     */
+    reloadWidget () {
+      console.log('[HubSpot Widget] Reload widget button clicked, broadcasting to other instance...')
+
+      // Broadcast reload request to other widget instance (remote ↔ window)
+      this.publishBroadcast(BroadcastMessageTypes.WIDGET_RELOAD_REQUESTED, {
+        reason: 'user_clicked_reload_button',
+        timestamp: Date.now()
+      })
+
+      // Small delay to ensure broadcast is sent before reloading
+      setTimeout(() => {
+        window.location.reload()
+      }, 100)
+    },
+
+    /**
      * Gets contact details from HubSpot API
      */
     async getContact () {
@@ -1788,8 +1877,10 @@ export default {
     this.$VueEvent.stop('new_in_app_call', this.handleIncomingCall)
     console.log('Successfully removed new_in_app_call listener')
 
-    // End any active call when component is destroyed
-    this.endActiveCall()
+    // End any active call when component is destroyed (only if integration is enabled)
+    if (this.isHubspotIntegrationEnabled) {
+      this.endActiveCall()
+    }
 
     // Close Broadcast Channel
     if (this.broadcastChannel) {
@@ -1829,6 +1920,7 @@ export default {
       // Continue without broadcast channel - component will work in standalone mode
     }
 
+    // Initialize HubSpot SDK (needed for iframe communication regardless of integration status)
     try {
       this.extensions = await HubSpotCallingExtensionsClient.initialize(this.callSdkOptions)
     } catch (error) {

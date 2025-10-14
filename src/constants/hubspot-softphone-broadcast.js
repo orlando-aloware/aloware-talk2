@@ -153,7 +153,14 @@ export const BroadcastMessageTypes = Object.freeze({
    * Direction: Both → Both
    * Payload: { timestamp }
    */
-  USER_LOGGED_IN: 'USER_LOGGED_IN'
+  USER_LOGGED_IN: 'USER_LOGGED_IN',
+
+  /**
+   * Sent when user clicks reload widget button
+   * Direction: Both → Both
+   * Payload: { timestamp, reason }
+   */
+  WIDGET_RELOAD_REQUESTED: 'WIDGET_RELOAD_REQUESTED'
 })
 
 /**
