@@ -681,6 +681,17 @@ export default {
           }
           break
 
+        case BroadcastMessageTypes.USER_LOGGED_IN:
+          // Another instance logged in successfully, reload page to ensure clean state
+          // Only reload if we're not already authenticated to avoid infinite reload loop
+          if (!this.authenticated) {
+            console.log('[HubSpot Widget] Other instance logged in, reloading page...')
+            window.location.reload()
+          } else {
+            console.log('[HubSpot Widget] Other instance logged in, but already authenticated - ignoring')
+          }
+          break
+
         default:
           console.log('[HubSpot Widget] Unhandled broadcast message type:', type)
       }
@@ -1773,18 +1784,18 @@ export default {
   },
 
   beforeDestroy () {
-    // Close Broadcast Channel
-    if (this.broadcastChannel) {
-      this.broadcastChannel.close()
-      console.log('[HubSpot Widget] Broadcast Channel closed')
-    }
-
     // Clean up inbound call listener
     this.$VueEvent.stop('new_in_app_call', this.handleIncomingCall)
     console.log('Successfully removed new_in_app_call listener')
 
     // End any active call when component is destroyed
     this.endActiveCall()
+
+    // Close Broadcast Channel
+    if (this.broadcastChannel) {
+      this.broadcastChannel.close()
+      console.log('[HubSpot Widget] Broadcast Channel closed')
+    }
   },
 
   async created () {
@@ -1797,6 +1808,16 @@ export default {
   },
   async mounted () {
     let probableError = null
+
+    // Check if we just came from login - if so, reload to ensure HubSpot SDK reinitializes
+    if (this.$route.query.from_login === 'true') {
+      console.log('[HubSpot Widget] Detected from_login param, reloading to reinitialize SDK...')
+      // Remove the query param and reload
+      const url = new URL(window.location.href)
+      url.searchParams.delete('from_login')
+      window.location.replace(url.toString())
+      return
+    }
 
     // Initialize Broadcast Channel for cross-instance communication (remote ↔ window)
     try {

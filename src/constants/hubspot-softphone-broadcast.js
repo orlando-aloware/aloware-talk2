@@ -146,7 +146,14 @@ export const BroadcastMessageTypes = Object.freeze({
    * Direction: Window → Remote
    * Payload: { requestId, hasActiveCall, callType, communication, contact, callDuration }
    */
-  CURRENT_STATE_RESPONSE: 'CURRENT_STATE_RESPONSE'
+  CURRENT_STATE_RESPONSE: 'CURRENT_STATE_RESPONSE',
+
+  /**
+   * Sent when user successfully logs in from either instance
+   * Direction: Both → Both
+   * Payload: { timestamp }
+   */
+  USER_LOGGED_IN: 'USER_LOGGED_IN'
 })
 
 /**
