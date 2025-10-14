@@ -598,39 +598,31 @@ class HubSpotWidgetService {
     return this.contactDetails
   }
 
-  // ============================================
-  // Call Actions
-  // ============================================
-
   /**
    * Handles accepting an incoming call
+   *
    * @param {object} incomingCallData - Incoming call data
    * @param {object} dialerState - Current dialer state
    * @param {object} profileState - Current profile state
    * @returns {object} Result with action to take
    */
   acceptCall (incomingCallData, dialerState, profileState) {
-    console.log('[REMOTE] Accept button clicked', {
-      dialerStatus: dialerState?.currentStatus,
-      agentStatus: profileState?.agent_status
-    })
-
-    // Safety check: If call is already connected
+    // Check if call is already connected
     const isCallConnected = this.checkCallConnectionStatus(dialerState?.currentStatus, profileState?.agent_status)
 
     if (isCallConnected) {
-      console.log('[REMOTE] Accept button clicked but call already connected/on-call - forcing active call UI')
+      console.log('[HubSpot Widget] Accept button clicked but call already connected/on-call - forcing active call UI')
       const { communication, contact } = incomingCallData || {}
+
       if (communication && contact) {
         return {
           action: 'show_active_call',
           ...this.showActiveCall({ communication, contact })
         }
       }
+
       return { action: 'skip' }
     }
-
-    console.log('[REMOTE] Accept button clicked - broadcasting to WINDOW')
 
     return {
       action: 'broadcast_accept',
@@ -646,17 +638,17 @@ class HubSpotWidgetService {
 
   /**
    * Handles declining an incoming call
+   *
    * @param {object} incomingCallData - Incoming call data
    * @param {object} dialerState - Current dialer state
    * @param {object} profileState - Current profile state
    * @returns {object} Result with action to take
    */
   declineCall (incomingCallData, dialerState, profileState) {
-    // Safety check: If call is already connected
+    // Check if call is already connected
     const isCallConnected = this.checkCallConnectionStatus(dialerState?.currentStatus, profileState?.agent_status)
 
     if (isCallConnected) {
-      console.log('[REMOTE] Decline button clicked but call already connected/on-call - forcing active call UI')
       const { communication, contact } = incomingCallData || {}
       if (communication && contact) {
         return {
@@ -666,8 +658,6 @@ class HubSpotWidgetService {
       }
       return { action: 'skip' }
     }
-
-    console.log('[REMOTE] Decline button clicked - broadcasting to WINDOW')
 
     return {
       action: 'broadcast_decline',

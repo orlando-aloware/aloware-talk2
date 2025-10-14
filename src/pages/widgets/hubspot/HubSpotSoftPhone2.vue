@@ -693,7 +693,8 @@ export default {
 
         case BroadcastMessageTypes.REQUEST_CURRENT_STATE:
           // WINDOW mode: Send current call state to Remote
-          if (this.componentMode === ComponentMode.WINDOW) {
+          // Use !== REMOTE to handle UNKNOWN mode during initialization
+          if (this.componentMode !== ComponentMode.REMOTE) {
             console.log('[WINDOW] Received state request from Remote, sending current state')
             this.sendCurrentState(payload.requestId)
           }
@@ -701,7 +702,8 @@ export default {
 
         case BroadcastMessageTypes.CURRENT_STATE_RESPONSE:
           // REMOTE mode: Receive and apply current call state from Window
-          if (this.componentMode === ComponentMode.REMOTE) {
+          // Use !== WINDOW to handle UNKNOWN mode during initialization
+          if (this.componentMode !== ComponentMode.WINDOW) {
             console.log('[REMOTE] Received current state from Window:', payload)
             this.applyCurrentState(payload)
           }
@@ -1430,66 +1432,65 @@ export default {
      * Handles accept button click in REMOTE mode
      */
     handleAcceptCall () {
-      console.log('[REMOTE] Accept button clicked', {
-        dialerStatus: this.dialer?.currentStatus,
-        agentStatus: this.profile?.agent_status
-      })
-
-      // Safety check: If call is already connected (check both dialer and agent status)
-      const isCallConnected = this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
-                             this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-
-      if (isCallConnected) {
-        console.log('[REMOTE] Accept button clicked but call already connected/on-call - forcing active call UI')
-        // Get communication and contact data from incoming call
-        const { communication, contact } = this.incomingCallData || {}
-        if (communication && contact) {
-          this.showActiveCallUI({ communication, contact })
-        }
+      if (this.componentMode === ComponentMode.WINDOW) {
         return
       }
 
-      console.log('[REMOTE] Accept button clicked - broadcasting to WINDOW')
+      const result = this.widgetService.acceptCall(this.incomingCallData, this.dialer, this.profile)
 
-      this.publishBroadcast(BroadcastMessageTypes.ACCEPT_INBOUND_CALL, {
-        communicationId: this.incomingCallData?.communication?.id,
-        contactId: this.incomingCallData?.contact?.id
-      })
+      switch (result.action) {
+        case 'show_active_call':
+          // Call already connected, so force show active call UI instead of accepting the call
+          this.displayState = result.displayState
+          this.activeCallData = result.activeCallData
+          this.incomingCallData = result.incomingCallData
+          break
 
-      // Hide the incoming call UI (will wait for broadcast if call is already connected)
-      this.hideIncomingCallUI()
+        case 'broadcast_accept':
+          // Broadcast to WINDOW mode to accept the call
+          this.publishBroadcast(result.broadcast.type, result.broadcast.payload)
+          this.hideIncomingCallUI()
+          break
+
+        case 'skip':
+          break
+      }
     },
 
     /**
      * Handles decline button click in REMOTE mode
      */
     handleDeclineCall () {
-      // Safety check: If call is already connected (check both dialer and agent status)
-      // Force show active call UI (can't decline active call)
-      const isCallConnected = this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
-                             this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-
-      if (isCallConnected) {
-        console.log('[REMOTE] Decline button clicked but call already connected/on-call - forcing active call UI')
-        // Get communication and contact data from incoming call
-        const { communication, contact } = this.incomingCallData || {}
-        if (communication && contact) {
-          this.showActiveCallUI({ communication, contact })
-        }
+      if (this.componentMode === ComponentMode.WINDOW) {
         return
       }
 
-      console.log('[REMOTE] Decline button clicked - broadcasting to WINDOW')
+      const result = this.widgetService.declineCall(this.incomingCallData, this.dialer, this.profile)
 
-      this.publishBroadcast(BroadcastMessageTypes.CALL_CANCELLED, {
-        communicationId: this.incomingCallData?.communication?.id
-      })
+      switch (result.action) {
+        case 'show_active_call':
+          // Call already connected, so force show active call UI instead of declining the call
+          this.displayState = result.displayState
+          this.activeCallData = result.activeCallData
+          this.incomingCallData = result.incomingCallData
+          break
 
-      // Fire reject event (WINDOW will handle the actual rejection)
-      this.$VueEvent.fire('rejectCall')
+        case 'broadcast_decline':
+          // Broadcast to WINDOW mode to decline the call
+          this.publishBroadcast(result.broadcast.type, result.broadcast.payload)
 
-      // Hide the incoming call UI
-      this.hideIncomingCallUI()
+          // Fire reject event if needed
+          if (result.fireRejectEvent) {
+            this.$VueEvent.fire('rejectCall')
+          }
+
+          // Hide the incoming call UI
+          this.hideIncomingCallUI()
+          break
+
+        case 'skip':
+          break
+      }
     },
 
     /**
