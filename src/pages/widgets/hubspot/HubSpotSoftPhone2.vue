@@ -637,7 +637,8 @@ export default {
     ]),
 
     /**
-     * Handles incoming broadcast messages from the other component instance (remote ↔ window)
+     * Handles incoming broadcast messages from the other component instance (REMOTE <-> WINDOW)
+     *
      * @param {MessageEvent} event - Broadcast message event containing type and payload
      */
     handleBroadcastMessage (event) {
@@ -647,46 +648,42 @@ export default {
 
       switch (type) {
         case BroadcastMessageTypes.INCOMING_CALL_STARTED:
-          // REMOTE mode: Show custom incoming call UI
+          // Show custom incoming call UI in REMOTE mode
           if (this.componentMode === ComponentMode.REMOTE) {
-            // Safety check: If we're already in an active call, ignore this broadcast
+            // If we're already in an active call, ignore this broadcast
             if (this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
-              console.log('[REMOTE] Ignoring INCOMING_CALL_STARTED - already showing active call UI')
               return
             }
-            console.log('[REMOTE] Showing custom incoming call UI')
+
             this.showIncomingCallUI(payload)
           }
           break
 
         case BroadcastMessageTypes.ACCEPT_INBOUND_CALL:
-          // WINDOW mode: Answer the call
+          // Answer the call in WINDOW mode
           if (this.componentMode === ComponentMode.WINDOW) {
-            console.log('[WINDOW] Accepting call from REMOTE broadcast')
             this.$VueEvent.fire('answerCall')
           }
           break
 
         case BroadcastMessageTypes.CALL_CONNECTED:
-          // REMOTE mode: Show active call UI
+          // Show active call UI in REMOTE mode
           if (this.componentMode === ComponentMode.REMOTE) {
-            console.log('[REMOTE] Call connected, showing active call UI')
             this.showActiveCallUI(payload)
           }
+
           break
 
         case BroadcastMessageTypes.CALL_ENDED:
-          // REMOTE mode: Hide active call UI and return to ready state
+          // Hide active call UI and return to ready state in REMOTE mode
           if (this.componentMode === ComponentMode.REMOTE) {
-            console.log('[REMOTE] Call ended, hiding active call UI')
             this.hideActiveCallUI()
           }
           break
 
         case BroadcastMessageTypes.CALL_CANCELLED:
-          // REMOTE mode: Hide incoming call UI
+          // Hide incoming call UI in REMOTE mode
           if (this.componentMode === ComponentMode.REMOTE) {
-            console.log('[REMOTE] Call declined, hiding UI')
             this.hideIncomingCallUI()
           }
           break
@@ -1293,18 +1290,18 @@ export default {
     },
 
     /**
-     * Handle inbound calls from Aloware and notify HubSpot
+     * Handle inbound calls from Aloware and notify HubSpot (WINDOW mode only)
      */
     async handleIncomingCall (communication) {
       console.log('Inbound call received:', communication)
       console.log('Component mode:', this.componentMode)
 
+      // Validation checks
       if (!this.authenticated) {
         console.log('[HubSpot Widget] User not authenticated, skipping inbound call')
         return
       }
 
-      // Ignore incoming calls if HubSpot integration is disabled
       if (!this.isHubspotIntegrationEnabled) {
         console.log('[HubSpot Widget] Ignoring inbound call - integration is disabled')
         return
@@ -1315,38 +1312,24 @@ export default {
         return
       }
 
-      // WINDOW mode: Handle the call AND broadcast to REMOTE mode
-      if (this.componentMode === ComponentMode.WINDOW) {
-        // Notify HubSpot about the inbound call
-        if (this.extensions) {
-          const phoneNumber = this.$options.filters.fixPhone(communication.contact?.phone_number)
+      if (this.componentMode !== ComponentMode.WINDOW) {
+        return
+      }
 
-          try {
-            this.extensions.incomingCall({
-              phoneNumber: phoneNumber,
-              contactName: communication.contact?.name || 'Unknown Caller',
-              contactId: communication.contact?.id?.toString(),
-              callId: communication.id?.toString()
-            })
-          } catch (error) {
-            console.error('[HubSpot Widget] Error handling HubSpot notification:', error)
-          }
-        }
+      const result = this.widgetService.handleIncomingCall(
+        communication,
+        this.componentMode,
+        this.extensions,
+        this.processActionNotification,
+        this.publishBroadcast
+      )
 
-        // Set up the dialer state for call handling
-        this.setDialerCommunication(communication)
-        this.setDialerContact(communication.contact)
-        this.setDialerCurrentStatus(DialerStatus.RECEIVED_CALL_INVITE)
-        this.displayState = DisplayState.HIDE
-
-        // Show accept/reject buttons in WINDOW mode
-        this.processActionNotification(communication, 'call')
-
-        // Broadcast to REMOTE mode to show custom UI
-        this.publishBroadcast(BroadcastMessageTypes.INCOMING_CALL_STARTED, {
-          communication,
-          contact: communication.contact
-        })
+      // Apply the returned state
+      if (result.success) {
+        this.setDialerCommunication(result.communication)
+        this.setDialerContact(result.contact)
+        this.setDialerCurrentStatus(result.dialerStatus)
+        this.displayState = result.displayState
       }
     },
 
@@ -1497,21 +1480,18 @@ export default {
      * Ends any active call when HubSpot widget becomes hidden
      */
     endActiveCall () {
-      this.displayState = DisplayState.HIDE
+      const result = this.widgetService.endActiveCall(this.dialer, this.checkDialerForceDisposition)
+
+      // Update display state
+      this.displayState = result.displayState
       this.isDialed = false
 
-      if (this.dialer?.currentStatus === DialerStatus.WRAP_UP && !this.checkDialerForceDisposition) {
-        this.$VueEvent.fire('endWrapUp')
-      }
+      // Fire all events returned by the service
+      result.eventsToFire.forEach(eventName => {
+        this.$VueEvent.fire(eventName)
+      })
 
-      if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
-        this.$VueEvent.fire('hangupCall')
-      }
-
-      if (!this.checkDialerForceDisposition) {
-        this.$VueEvent.fire('resetCall')
-      }
-
+      // Handle call completion
       this.handleCallCompletedEvent(true)
     },
 
@@ -1519,35 +1499,16 @@ export default {
      * Validates if there's an active call status that should prevent new calls
      */
     validateHasActiveCallStatus () {
-      let status = false
-
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_RINGING ||
-          this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
-        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition)) {
-        status = true
-      }
-
-      const activeCallStatuses = [
-        DialerStatus.MAKING_CALL,
-        DialerStatus.CALL_CONNECTED,
-        DialerStatus.HANGING_UP_CALL,
-        DialerStatus.CALL_DISCONNECTED,
-        DialerStatus.WRAP_UP,
-        DialerStatus.ANSWERING_CALL
-      ]
-
-      if (activeCallStatuses.includes(this.dialer?.currentStatus)) {
-        status = true
-      }
-
       const lastCall = this.profile?.last_call
 
-      // check if there is no last communication on hold
-      if (lastCall && lastCall.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
-        status = true
-      }
+      const status = this.widgetService.validateActiveCallStatus(
+        this.profile,
+        this.dialer,
+        this.componentMode,
+        lastCall
+      )
 
-      // define last call values to track useful updates if needed
+      // Handle state updates if there's an active call
       if (status) {
         if (lastCall) {
           this.setDialerCommunication(lastCall)
@@ -1564,14 +1525,14 @@ export default {
           this.displayState = DisplayState.HIDE // Show webrtc component with wrap-up UI
         } else if (this.componentMode === ComponentMode.REMOTE &&
                    this.profile.agent_status === AgentStatus.AGENT_STATUS_RINGING) {
-          // REMOTE mode: Don't use lastCall for incoming calls - wait for broadcast
+          // REMOTE: Don't use lastCall for incoming calls - wait for broadcast
           console.log('[REMOTE] Agent is ringing, waiting for INCOMING_CALL_STARTED broadcast')
           this.displayState = DisplayState.READY_FOR_CALLS
         } else if (this.componentMode === ComponentMode.REMOTE &&
                    (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
                     this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
                     this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED)) {
-          // REMOTE mode: Show active call UI when agent is on call OR actively dialing/connected
+          // REMOTE: Show active call UI when agent is on call OR actively dialing/connected
           console.log('[REMOTE] Agent is on call or dialing, showing active call UI')
 
           // Use lastCall contact if available and has data, otherwise construct from available data

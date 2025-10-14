@@ -413,7 +413,7 @@ class HubSpotWidgetService {
    * @returns {object} Result with actions to take
    */
   handleIncomingCall (communication, componentMode, extensions, processActionNotification, publishBroadcast) {
-    console.log('[WINDOW] Processing inbound call')
+    console.log('[HubSpot Widget] Processing inbound call')
 
     // Notify HubSpot about the inbound call
     if (extensions) {
@@ -449,12 +449,9 @@ class HubSpotWidgetService {
     }
   }
 
-  // ============================================
-  // Validation & Checks
-  // ============================================
-
   /**
    * Validates if there's an active call status that should prevent new calls
+   *
    * @param {object} profile - User profile
    * @param {object} dialer - Dialer state
    * @param {string} componentMode - Component mode (window/remote)
@@ -673,6 +670,7 @@ class HubSpotWidgetService {
 
   /**
    * Ends an active call
+   *
    * @param {object} dialer - Dialer state
    * @param {boolean} checkForceDisposition - Whether force disposition is required
    * @returns {object} Events to fire
