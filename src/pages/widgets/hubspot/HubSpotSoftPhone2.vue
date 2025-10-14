@@ -138,7 +138,6 @@
       :contact-name="activeCallData.contact?.name || 'Unknown Contact'"
       :phone-number="activeCallData.contact?.phone_number"
       :company-name="activeCallData.contact?.company_name"
-      :call-duration="activeCallData.callDuration"
     />
     <!-- End Active Call UI -->
 
@@ -187,17 +186,8 @@ import { OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK, OUTBOUND_CALLING_MODE_ACCOUNT
 import { BROADCAST_CHANNEL_NAME, BroadcastMessageTypes, createBroadcastMessage } from 'src/constants/hubspot-softphone-broadcast'
 import { local as localStorageHelper } from 'src/plugins/helpers/storage'
 import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin } from 'src/plugins/mixins'
-
-const DisplayState = Object.freeze({
-  HIDE: 1,
-  SHOW_ALERT_AGENT_ON_CALL: 2,
-  SHOW_ALERT_CALL_FINISHED: 3,
-  READY_FOR_CALLS: 4,
-  CRITICAL_ERROR_HAPPENED: 5,
-  INCOMING_CALL: 6, // For REMOTE mode custom incoming call UI
-  CALLING_REMOTE_ACTIVE_CALL: 7, // For REMOTE mode active call UI
-  HUBSPOT_INTEGRATION_DISABLED: 8 // When HubSpot integration is disabled
-})
+import HubSpotWidgetService from 'src/services/integrations/hubspot/HubSpotWidgetService'
+import { DisplayState } from 'src/constants/hubspot-widget-display-states'
 
 // Dialer statuses where we should display a loading indicator while the dialer component initializes
 const DIALER_INITIALIZATION_STATUSES = [DialerStatus.GENERATING_TOKEN, DialerStatus.TOKEN_GENERATED, DialerStatus.READY, null]
@@ -228,6 +218,9 @@ export default {
 
   data () {
     return {
+      // Service instance
+      widgetService: null,
+
       // Constants
       DisplayState,
       DialerStatus,
@@ -764,7 +757,6 @@ export default {
       let callType = null
       let communication = null
       let contact = null
-      let callDuration = ''
 
       // Check for incoming call (ringing)
       if (agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
@@ -779,7 +771,6 @@ export default {
         callType = 'active'
         communication = this.dialer?.communication || this.activeCallData?.communication
         contact = this.dialer?.contact || this.activeCallData?.contact
-        callDuration = this.activeCallData?.callDuration || ''
       }
 
       console.log('[WINDOW] Sending current state:', {
@@ -794,8 +785,7 @@ export default {
         hasActiveCall,
         callType,
         communication,
-        contact,
-        callDuration
+        contact
       })
     },
 
@@ -804,7 +794,7 @@ export default {
      * @param {object} payload - State payload from Window
      */
     applyCurrentState (payload) {
-      const { hasActiveCall, callType, communication, contact, callDuration } = payload
+      const { hasActiveCall, callType, communication, contact } = payload
 
       if (!hasActiveCall) {
         console.log('[REMOTE] No active call in Window - staying in ready state')
@@ -817,7 +807,7 @@ export default {
         this.showIncomingCallUI({ communication, contact })
       } else if (callType === 'active' && communication && contact) {
         console.log('[REMOTE] Applying active call state from Window')
-        this.showActiveCallUI({ communication, contact, callDuration })
+        this.showActiveCallUI({ communication, contact })
       } else {
         console.log('[REMOTE] Invalid state from Window - showing ready state')
         this.displayState = DisplayState.READY_FOR_CALLS
@@ -1308,7 +1298,7 @@ export default {
       console.log('Component mode:', this.componentMode)
 
       if (!this.authenticated) {
-        console.log('User not authenticated, skipping inbound call')
+        console.log('[HubSpot Widget] User not authenticated, skipping inbound call')
         return
       }
 
@@ -1319,14 +1309,12 @@ export default {
       }
 
       if (!this.isAgentAvailable) {
-        console.log('Agent not available, skipping inbound call')
+        console.log('[HubSpot Widget] Agent not available, skipping inbound call')
         return
       }
 
       // WINDOW mode: Handle the call AND broadcast to REMOTE mode
       if (this.componentMode === ComponentMode.WINDOW) {
-        console.log('[WINDOW] Processing inbound call')
-
         // Notify HubSpot about the inbound call
         if (this.extensions) {
           const phoneNumber = this.$options.filters.fixPhone(communication.contact?.phone_number)
@@ -1338,9 +1326,8 @@ export default {
               contactId: communication.contact?.id?.toString(),
               callId: communication.id?.toString()
             })
-            console.log('[WINDOW] Successfully notified HubSpot about inbound call')
           } catch (error) {
-            console.error('[WINDOW] Error handling HubSpot notification:', error)
+            console.error('[HubSpot Widget] Error handling HubSpot notification:', error)
           }
         }
 
@@ -1358,35 +1345,22 @@ export default {
           communication,
           contact: communication.contact
         })
-
-        console.log('[WINDOW] Inbound call setup completed')
-        return
       }
-
-      // REMOTE mode: Ignore - will receive broadcast from WINDOW
-      console.log('[REMOTE] Ignoring new_in_app_call event - will receive broadcast')
     },
 
     /**
      * Shows custom incoming call UI in REMOTE mode
      */
     showIncomingCallUI (payload) {
-      const { communication, contact } = payload
-
-      // Safety check: If call is already connected (check both dialer and agent status)
-      const isCallConnected = this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
-                             this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-
-      if (isCallConnected) {
-        console.log('[REMOTE] Call already connected/on-call, showing active call UI instead of incoming')
-        this.showActiveCallUI({ communication, contact, callDuration: '' })
+      if (this.componentMode === ComponentMode.WINDOW) {
         return
       }
 
-      console.log('[REMOTE] Displaying custom incoming call UI for:', contact?.name)
+      const result = this.widgetService.showIncomingCall(payload, this.dialer, this.profile)
 
-      this.incomingCallData = { communication, contact }
-      this.displayState = DisplayState.INCOMING_CALL
+      // Update component state from service result
+      this.displayState = result.displayState
+      this.incomingCallData = result.incomingCallData
 
       // Re-check after a short delay in case the call was accepted very quickly
       setTimeout(() => {
@@ -1394,8 +1368,7 @@ export default {
                                this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
 
         if (this.displayState === DisplayState.INCOMING_CALL && isConnectedNow) {
-          console.log('[REMOTE] Call was accepted quickly - switching to active call UI')
-          this.showActiveCallUI({ communication, contact, callDuration: '' })
+          this.showActiveCallUI({ communication: payload.communication, contact: payload.contact })
         }
       }, 500)
     },
@@ -1404,23 +1377,19 @@ export default {
      * Hides incoming call UI in REMOTE mode
      */
     hideIncomingCallUI () {
-      console.log('[REMOTE] Hiding incoming call UI')
-
-      // Safety check: If call is already connected (check both dialer and agent status)
-      // Don't transition to READY_FOR_CALLS - wait for CALL_CONNECTED broadcast
-      const isCallConnected = this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
-                             this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-
-      if (isCallConnected) {
-        console.log('[REMOTE] Call already connected/on-call - keeping current state, waiting for broadcast')
-        // Don't clear incomingCallData yet - keep it so we can use it for active call UI
+      if (this.componentMode === ComponentMode.WINDOW) {
         return
       }
 
-      this.incomingCallData = null
-      // Only change to READY_FOR_CALLS if we're actually in incoming call state
-      if (this.displayState === DisplayState.INCOMING_CALL) {
-        this.displayState = DisplayState.READY_FOR_CALLS
+      const result = this.widgetService.hideIncomingCall(this.dialer, this.profile)
+
+      // Update component state from service result
+      if (result.shouldClearData) {
+        this.incomingCallData = null
+      }
+
+      if (result.displayState && this.displayState === DisplayState.INCOMING_CALL) {
+        this.displayState = result.displayState
       }
     },
 
@@ -1428,35 +1397,31 @@ export default {
      * Shows custom active call UI in REMOTE mode
      */
     showActiveCallUI (payload) {
-      const { communication, contact, callDuration } = payload
+      if (this.componentMode === ComponentMode.WINDOW) {
+        return
+      }
 
-      console.log('[REMOTE] Displaying active call UI for:', contact?.name)
+      const result = this.widgetService.showActiveCall(payload)
 
-      // Force clear any incoming call state
-      this.incomingCallData = null
-
-      this.activeCallData = { communication, contact, callDuration }
-      this.displayState = DisplayState.CALLING_REMOTE_ACTIVE_CALL
+      this.displayState = result.displayState
+      this.activeCallData = result.activeCallData
+      this.incomingCallData = result.incomingCallData
     },
 
     /**
      * Hides active call UI in REMOTE mode
      */
     hideActiveCallUI () {
-      console.log('[REMOTE] Call ended - checking if should hide active call UI')
+      if (this.componentMode === ComponentMode.WINDOW) {
+        return
+      }
 
-      // Only change state if we're actually in active call state
       if (this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL) {
-        // If agent is in wrap-up, KEEP showing the Active Call UI with contact info
-        // It will transition to Ready for Calls when wrap-up completes
-        if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) {
-          console.log('[REMOTE] Agent in wrap-up - keeping Active Call UI visible')
-          // Don't clear activeCallData or change displayState
-          // The UI will continue showing the contact info during wrap-up
-        } else {
-          console.log('[REMOTE] No wrap-up - clearing Active Call UI')
-          this.activeCallData = null
-          this.displayState = DisplayState.READY_FOR_CALLS
+        const result = this.widgetService.hideActiveCall(this.profile, this.checkForceDisposition)
+
+        if (!result.shouldKeepUI) {
+          this.activeCallData = result.activeCallData
+          this.displayState = result.displayState
         }
       }
     },
@@ -1479,7 +1444,7 @@ export default {
         // Get communication and contact data from incoming call
         const { communication, contact } = this.incomingCallData || {}
         if (communication && contact) {
-          this.showActiveCallUI({ communication, contact, callDuration: '' })
+          this.showActiveCallUI({ communication, contact })
         }
         return
       }
@@ -1509,7 +1474,7 @@ export default {
         // Get communication and contact data from incoming call
         const { communication, contact } = this.incomingCallData || {}
         if (communication && contact) {
-          this.showActiveCallUI({ communication, contact, callDuration: '' })
+          this.showActiveCallUI({ communication, contact })
         }
         return
       }
@@ -1635,8 +1600,7 @@ export default {
 
           this.showActiveCallUI({
             communication: lastCall || this.dialer?.communication,
-            contact: contact,
-            callDuration: ''
+            contact: contact
           })
         } else {
           this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
@@ -1685,8 +1649,7 @@ export default {
 
       this.publishBroadcast(BroadcastMessageTypes.CALL_CONNECTED, {
         communication: this.dialer?.communication,
-        contact: contact,
-        callDuration: '' // Will be updated via interval or separate broadcast
+        contact: contact
       })
     },
 
@@ -1898,6 +1861,26 @@ export default {
     }
   },
   async mounted () {
+    // Initialize service that handles all business logic for the HubSpot calling widget
+    this.widgetService = new HubSpotWidgetService({
+      $axios: this.$axios,
+      $VueEvent: this.$VueEvent,
+      $generalNotification: this.$generalNotification,
+      $options: this.$options,
+      $bvModal: this.$bvModal,
+      vuexActions: {
+        check: this.check,
+        setCurrentCompany: this.setCurrentCompany,
+        resetVuex: this.resetVuex,
+        setProfile: this.setProfile,
+        setDialerCommunication: this.setDialerCommunication,
+        setDialerContact: this.setDialerContact,
+        setDialerCurrentStatus: this.setDialerCurrentStatus,
+        changeAgentStatus: this.changeAgentStatus,
+        checkForceDisposition: () => this.checkForceDisposition
+      }
+    })
+
     let probableError = null
 
     // Check if we just came from login - if so, reload to ensure HubSpot SDK reinitializes

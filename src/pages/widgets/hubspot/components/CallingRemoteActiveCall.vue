@@ -27,11 +27,6 @@
             {{ companyName }}
           </q-item-label>
         </div>
-
-        <!-- Call Duration -->
-        <div class="call-duration mt-3" v-if="callDuration">
-          <span class="text-size-lg text-white _500">{{ callDuration }}</span>
-        </div>
       </div>
 
       <div class="phone-status d-flex flex-column align-items-center justify-content-center" style="gap: 8px;">
@@ -62,10 +57,6 @@ export default {
       default: ''
     },
     companyName: {
-      type: String,
-      default: ''
-    },
-    callDuration: {
       type: String,
       default: ''
     }
@@ -108,11 +99,5 @@ export default {
   min-height: 8px;
   padding: 0;
   display: inline-block;
-}
-
-.call-duration {
-  padding: 8px 16px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
 }
 </style>
