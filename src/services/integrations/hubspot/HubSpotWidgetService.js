@@ -185,10 +185,6 @@ class HubSpotWidgetService {
     this.activeCallData = null
   }
 
-  // ============================================
-  // Call Flow Orchestration
-  // ============================================
-
   /**
    * Initiates an outbound call
    * @param {object} params - Call initiation parameters
@@ -490,6 +486,7 @@ class HubSpotWidgetService {
 
   /**
    * Checks if call is connected based on dialer and agent status
+   *
    * @param {string} dialerStatus - Current dialer status
    * @param {number} agentStatus - Current agent status
    * @returns {boolean} True if call is connected
@@ -501,6 +498,7 @@ class HubSpotWidgetService {
 
   /**
    * Determines if CALL_CONNECTED broadcast should be sent
+   *
    * @param {string} componentMode - Component mode
    * @param {string} newStatus - New dialer status
    * @param {string} oldStatus - Old dialer status
@@ -512,12 +510,9 @@ class HubSpotWidgetService {
            oldStatus !== DialerStatus.CALL_CONNECTED
   }
 
-  // ============================================
-  // Contact & Campaign Management
-  // ============================================
-
   /**
    * Fetches contact details from HubSpot API
+   *
    * @param {object} hubspotDialNumber - Dial number from HubSpot
    * @param {boolean} isAlwaysAskModeEnabled - Whether always-ask mode is enabled
    * @returns {Promise<object>} Result with contact details
@@ -572,6 +567,7 @@ class HubSpotWidgetService {
 
   /**
    * Resolves the default campaign ID based on company and profile settings
+   *
    * @param {object} profile - User profile
    * @param {object} currentCompany - Current company
    * @param {boolean} shouldUseCompanyCampaignId - Whether to use company campaign
@@ -589,6 +585,7 @@ class HubSpotWidgetService {
 
   /**
    * Gets contact details
+   *
    * @returns {object} Contact details
    */
   getContactDetails () {
@@ -698,6 +695,7 @@ class HubSpotWidgetService {
 
   /**
    * Cancels a call
+   *
    * @param {number} defaultCampaignId - Default campaign ID to restore
    * @returns {object} Updated state
    */
@@ -708,12 +706,9 @@ class HubSpotWidgetService {
     }
   }
 
-  // ============================================
-  // Call Data Preparation
-  // ============================================
-
   /**
    * Prepares call connected data for broadcasting
+   *
    * @param {object} dialer - Dialer state
    * @param {object} contactDetails - Contact details
    * @param {object} hubspotDialNumber - HubSpot dial number
@@ -743,7 +738,7 @@ class HubSpotWidgetService {
       }
     }
 
-    // Last resort: use contactDetails from outbound call flow
+    // Use contactDetails from outbound call flow as last resort
     if (!contact || (!contact.name && !contact.phone_number)) {
       contact = {
         name: contactDetails.contactName || dialer?.communication?.contact?.name,
@@ -759,12 +754,9 @@ class HubSpotWidgetService {
     }
   }
 
-  // ============================================
-  // Agent Status Management
-  // ============================================
-
   /**
    * Updates agent status based on status update event
+   *
    * @param {object} data - Status update data
    * @param {object} currentProfile - Current profile
    * @param {object} currentCompany - Current company
@@ -809,21 +801,6 @@ class HubSpotWidgetService {
   }
 
   /**
-   * Resets agent status to accepting calls
-   * @returns {object} Action to take
-   */
-  resetAgentStatus () {
-    return {
-      newStatus: AgentStatus.AGENT_STATUS_ACCEPTING_CALLS,
-      source: 'Talk-ResetAgentStatus'
-    }
-  }
-
-  // ============================================
-  // Authentication & User
-  // ============================================
-
-  /**
    * Authenticates the user
    * @param {string} apiKey - API key
    * @param {function} checkAction - Vuex check action
@@ -851,6 +828,7 @@ class HubSpotWidgetService {
 
   /**
    * Handles post-login logic
+   *
    * @param {object} params - Login parameters
    * @returns {object} Result with display state and actions
    */
@@ -876,9 +854,8 @@ class HubSpotWidgetService {
     // If no dial number, check for incoming/active calls in REMOTE mode
     if (!hubspotDialNumber) {
       if (componentMode === ComponentMode.REMOTE) {
-        // For RINGING status: Request current state from Window
+        // For RINGING status, request current state from Window
         if (profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING) {
-          console.log('[REMOTE] Agent is ringing - requesting current state from Window')
           return {
             displayState: DisplayState.READY_FOR_CALLS,
             shouldRequestState: true,

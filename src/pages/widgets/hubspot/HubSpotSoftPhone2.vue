@@ -1576,43 +1576,13 @@ export default {
      * Broadcasts CALL_CONNECTED event with contact data
      */
     broadcastCallConnected () {
-      // For outbound calls, use contactDetails which has the full contact info
-      // For inbound calls, use dialer.contact which is already populated
-      // For unparked calls, use dialer.communication.contact which is loaded after status change
-      let contact = this.dialer?.contact
+      const data = this.widgetService.prepareCallConnectedData(
+        this.dialer,
+        this.contactDetails,
+        this.hubspotDialNumber
+      )
 
-      // If contact is missing or has no name/phone, try communication.contact (for unparked calls)
-      if (!contact || (!contact.name && !contact.phone_number)) {
-        contact = this.dialer?.communication?.contact
-      }
-
-      // If still missing, try extracting from Twilio call customParameters (for unparked calls)
-      if (!contact || (!contact.name && !contact.phone_number)) {
-        const customParams = this.dialer?.call?.customParameters
-        if (customParams && customParams.size > 0) {
-          contact = {
-            name: customParams.get('ContactName'),
-            phone_number: this.dialer?.communication?.contact?.phone_number, // Use phone from communication if available
-            company_name: customParams.get('CompanyName'),
-            id: customParams.get('ContactId')
-          }
-        }
-      }
-
-      // Last resort: use contactDetails from outbound call flow
-      if (!contact || (!contact.name && !contact.phone_number)) {
-        contact = {
-          name: this.contactDetails.contactName || this.dialer?.communication?.contact?.name,
-          phone_number: this.hubspotDialNumber?.phoneNumber || this.dialer?.communication?.from_number || this.dialer?.communication?.to_number,
-          company_name: this.contactDetails.companyName || this.dialer?.communication?.contact?.company_name,
-          id: this.contactDetails.contactId || this.dialer?.communication?.contact?.id
-        }
-      }
-
-      this.publishBroadcast(BroadcastMessageTypes.CALL_CONNECTED, {
-        communication: this.dialer?.communication,
-        contact: contact
-      })
+      this.publishBroadcast(BroadcastMessageTypes.CALL_CONNECTED, data)
     },
 
     /**
@@ -1645,37 +1615,34 @@ export default {
      * Gets contact details from HubSpot API
      */
     async getContact () {
-      const withLastUsedCallLine = this.isAlwaysAskModeEnabled
+      const result = await this.widgetService.fetchContactDetails(
+        this.hubspotDialNumber,
+        this.isAlwaysAskModeEnabled
+      )
 
-      await this.$axios.post('/api/v1/integrations/hubspot/find-contact', {
-        params: this.hubspotDialNumber,
-        with_last_used_call_line: withLastUsedCallLine,
-        with_last_call: true
-      }).then(res => {
-        const contact = res?.data?.contact
-        this.contactDetails.contactName = this.getContactName(contact)
-        this.contactDetails.contactTimezone = contact.timezone
-        this.contactDetails.companyName = contact.company_name
-        this.contactDetails.contactId = contact.id
+      if (result.success) {
+        // Update contact details from service result
+        this.contactDetails = { ...this.contactDetails, ...result.contactDetails }
 
-        if (withLastUsedCallLine) {
-          this.campaignId = res?.data?.last_used_call_line
+        // Update campaign ID if provided
+        if (result.campaignId) {
+          this.campaignId = result.campaignId
         }
 
-        const profile = {
-          'last_call': res?.data?.last_call
+        // Update profile with last call if provided
+        if (result.lastCall) {
+          this.setProfile({ last_call: result.lastCall })
         }
-
-        this.setProfile(profile)
-      }).catch(err => {
-        this.$handleErrors(err.response)
+      } else {
+        // Handle error
+        this.$handleErrors(result.error?.response)
         this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
         if (this.extensions) {
           this.extensions.callEnded()
         }
 
-        throw err
-      })
+        throw result.error
+      }
     }
   },
   watch: {
