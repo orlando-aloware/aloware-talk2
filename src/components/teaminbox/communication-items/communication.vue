@@ -205,10 +205,7 @@ export default {
         ring_group_id: this.teamInboxId,
         current_status2: this.currentStatus,
         disposition_status2: this.dispositionStatus,
-        last_call_source: this.lastCallSource,
-        campaign: {
-          call_waiting_ring_group_id: this.campaign ? this.campaign.call_waiting_ring_group_id : this.getCampaign(this.campaignId)?.call_waiting_ring_group_id
-        }
+        last_call_source: this.lastCallSource
       }
     },
 

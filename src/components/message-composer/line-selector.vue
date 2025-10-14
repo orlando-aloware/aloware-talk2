@@ -387,7 +387,7 @@ export default {
   watch: {
     'contact.id': function (value) {
       if (this.contact && this.contact.id) {
-        this.setDefaultLine(value)
+        this.setDefaultLine()
         this.showPlaceholder()
       }
     },

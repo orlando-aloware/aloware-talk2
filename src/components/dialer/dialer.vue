@@ -1064,6 +1064,14 @@ export default {
 
       // only start wrap up timer if there is a communication
       if (this.dialer.communication) {
+        // Skip wrap-up for barge/whisper calls
+        const isBargeOrWhisperCall = this.dialer?.isBargeOrWhisperCall
+
+        if (isBargeOrWhisperCall) {
+          this.backToDial('Talk-Device.OnDisconnect', false, true)
+          return
+        }
+
         const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
             this.hasParkedAndInprogressCall ||
             this.hasCallInProgressNotParked) &&
@@ -1701,6 +1709,7 @@ export default {
       this.setShowIncomingCallNotification(false)
       this.setDialerAiAgentWhisper(false)
       this.setDialerAiAgentTakeover(false)
+      this.setDialerIsBargeOrWhisperCall(false)
       this.pendingNotificationData = null
       this.notificationShownFromCustomParams = false
     },
@@ -1805,6 +1814,17 @@ export default {
     },
 
     backToDial (signature = 'Talk-BackToDial', forceStatus = false, ignoreForceDisposition = false) {
+      // Check if this is a barge/whisper call
+      const isBargeOrWhisperCall = this.dialer?.isBargeOrWhisperCall
+
+      // For barge/whisper calls, skip force disposition and reset immediately
+      if (isBargeOrWhisperCall) {
+        // Force agent status to available for barge/whisper calls
+        this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, true, 1, signature)
+        this.resetCall(signature)
+        return
+      }
+
       // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
       if (signature !== 'Talk-Connection.OnCancel') {
         this.resetAgentStatus(forceStatus, signature)
@@ -2123,7 +2143,8 @@ export default {
       'removeParkedCall',
       'setIsCallBackButtonDisabled',
       'setDialerAiAgentWhisper',
-      'setDialerAiAgentTakeover'
+      'setDialerAiAgentTakeover',
+      'setDialerIsBargeOrWhisperCall'
     ]),
 
     // Helper method to reset token retry state
@@ -2182,7 +2203,6 @@ export default {
 
       const communication = {
         id: parseInt(communicationData.Id) || null,
-        is_call_waiting: communicationData.CallWaiting,
         contact: {
           id: parseInt(customParams.ContactId) || null,
           name: customParams.ContactName,

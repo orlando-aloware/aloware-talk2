@@ -25,6 +25,11 @@ export default {
     },
 
     isContactNotDisposed () {
+      // Skip contact disposition requirement for barge/whisper calls
+      if (this.isBargeOrWhisperCall) {
+        return false
+      }
+
       const hasContactDisposition = this.isContactDisposed || this.dialer.contact?.disposition_status_id
 
       return this.isForcedContactDisposition &&

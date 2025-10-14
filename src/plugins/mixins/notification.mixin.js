@@ -124,7 +124,10 @@ export default {
       const callFishingQueue = { data: _.get(this.notifications, 'callFishing.queue', null) }
       callFishingQueue.data = callFishingQueue.data && callFishingQueue.data.constructor === Array && callFishingQueue.data.length
 
-      if (type === 'callFishing' && this.currentCompany.fishing_mode_notification_sound) {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+      const isPersonalInbox = ringGroup?.is_personal_inbox
+
+      if (type === 'callFishing' && (this.currentCompany.fishing_mode_notification_sound || isPersonalInbox || forceClose)) {
         this.stopAudio()
       }
 
@@ -309,13 +312,12 @@ export default {
               'ringGroup': ringGroup,
               'user.profile.id': this.user?.profile?.id,
               'communication.id': communication?.id,
-              'communication.contact.user_id': communication?.contact?.user_id,
-              'communication.is_call_waiting': communication?.is_call_waiting
+              'communication.contact.user_id': communication?.contact?.user_id
             })
             break
           }
 
-          const callType = (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) || communication.is_call_waiting ? 'callFishing' : 'incomingCall'
+          const callType = (ringGroup?.should_queue && ringGroup?.fishing_mode) ? 'callFishing' : 'incomingCall'
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupId = communication.ring_group_id
           const ringGroupName = _.get(communication, 'ring_group.name', null)

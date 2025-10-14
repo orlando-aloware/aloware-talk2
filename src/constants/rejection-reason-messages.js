@@ -55,7 +55,7 @@ export const REJECTION_REASONS = [
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_NUMBER_IS_INTERNATIONAL,
-    message: 'Calls to this country are not allowed'
+    message: 'The traffic to this country is not allowed'
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_INVALID_OR_WRONG_PHONE_NUMBER,
