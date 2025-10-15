@@ -14,8 +14,6 @@ class HubSpotBroadcastManager {
     this.broadcastChannel = null
     this.componentMode = ComponentMode.UNKNOWN
     this.messageHandlers = new Map()
-
-    // Store dependencies
     this.onMessageCallback = dependencies.onMessageCallback || null
   }
 

@@ -323,16 +323,17 @@ export default {
               return
             }
             
-            // Check for active or parked calls
+            // Check for active, parked calls, or ringing
             const hasActiveOrParkedCall =
               this.isDialed ||
               this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
               this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
+              this.dialer?.currentStatus === DialerStatus.RECEIVED_CALL_INVITE ||
               this.dialer?.parkedCall
             
             if (hasActiveOrParkedCall) {
-              console.log('[HubSpot Widget] Call in progress (active or parked), showing alert')
-              this.$generalNotification('You are already on a call', 'warning', 2500, true)
+              console.log('[HubSpot Widget] Call in progress, ignoring outbound call')
+              this.$generalNotification('You are already engaged in a call', 'warning', 2500, true)
               return
             }
 
@@ -382,7 +383,7 @@ export default {
       return this.currentCompany && this.currentCompany.hubspot_integration_enabled
     },
 
-    // Determines if agent can receive calls, used to update the isAvailable property in callSdkOptions
+    // Determines if an agent can receive calls used to update the isAvailable property in callSdkOptions
     isAgentAvailable () {
       return this.profile && this.profile.agent_status === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
     },
@@ -403,7 +404,7 @@ export default {
         return true
       }
 
-      // Don't show loading if agent is in wrap-up - show the wrap-up UI instead
+      // Don't show loading if the agent is in wrap-up - show the wrap-up UI instead
       // Check both agent status and dialer status to catch wrap-up during initialization
       if ((this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) ||
           this.dialer?.currentStatus === DialerStatus.WRAP_UP) {
@@ -416,7 +417,7 @@ export default {
     },
 
     /**
-     * Determines if user should be prompted for campaign selection before each call
+     * Determines if the user should be prompted for campaign selection before each call
      */
     isAlwaysAskModeEnabled () {
       if (!this.profile) {
