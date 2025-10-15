@@ -187,6 +187,7 @@ class HubSpotWidgetService {
 
   /**
    * Initiates an outbound call
+   *
    * @param {object} params - Call initiation parameters
    * @returns {object} Result with success status and updated state
    */
@@ -242,6 +243,9 @@ class HubSpotWidgetService {
         updatedCampaignId = contactResult.campaignId
       }
 
+      const contactDetails = contactResult.contactDetails
+      const lastCall = contactResult.lastCall
+
       // Check for active call status
       const hasActiveCall = this.validateActiveCallStatus(profile, dialer, null, profile?.last_call)
       if (hasActiveCall) {
@@ -275,7 +279,9 @@ class HubSpotWidgetService {
       return {
         success: true,
         displayState: DisplayState.HIDE,
-        campaignId: updatedCampaignId
+        campaignId: updatedCampaignId,
+        contactDetails: contactDetails,
+        lastCall: lastCall
       }
     } catch (error) {
       console.error('Error during initiateOutboundCall:', error)
@@ -288,9 +294,29 @@ class HubSpotWidgetService {
   }
 
   /**
-   * Executes the dial flow logic
-   * @param {object} params - Dial flow parameters
-   * @returns {object} Result with action to take
+   * Executes the dial flow logic - determines what action to take based on current state
+   *
+   * DIAL FLOW:
+   * 1. Check for active call -> Skip if call in progress
+   * 2. Check widget visibility -> Show alert if hidden
+   * 3. Check for parked call -> Show alert if call is parked
+   * 4. Validate all conditions:
+   *    - HubSpot SDK initialized
+   *    - Widget is visible
+   *    - Component initialized
+   *    - User profile loaded
+   *    - Dialer is ready
+   *    - Campaign selected (or always-ask mode enabled)
+   *    - Not in forced disposition wrap-up
+   * 5. If all conditions met → Make the call
+   * 6. If dialer not ready → Retry after delay
+   * 7. Otherwise → Show dialer UI for user interaction
+   *
+   * @returns {object} Result with action to take:
+   *   - action: 'skip' | 'show_alert' | 'make_call' | 'retry' | 'show_dialer'
+   *   - displayState: DisplayState constant
+   *   - reason: String explaining why this action was chosen
+   *   - retryDelay: Number of ms to wait before retry (if action is 'retry')
    */
   executeDialFlow (params) {
     const {
@@ -304,13 +330,13 @@ class HubSpotWidgetService {
       initialized
     } = params
 
-    // Validate active call status
+    // Step 1: Validate no active call in progress
     const hasActiveCall = this.validateActiveCallStatus(profile, dialer, null, profile?.last_call)
     if (hasActiveCall) {
       return { action: 'skip', reason: 'active_call' }
     }
 
-    // Stop if widget is not visible
+    // Step 2: Ensure widget is visible
     if (!isCallingWidgetVisible) {
       return {
         action: 'show_alert',
@@ -319,7 +345,7 @@ class HubSpotWidgetService {
       }
     }
 
-    // Don't allow to make a call if there's a parked call
+    // Step 3: Check for parked call (another call on hold)
     if (dialer?.parkedCall) {
       return {
         action: 'show_alert',
@@ -328,27 +354,34 @@ class HubSpotWidgetService {
       }
     }
 
-    // Check if all conditions are met to make the call
+    // Step 4: Check if all conditions are met to make the call
     const canMakeCall = callExtensionsInitialized &&
       isCallingWidgetVisible &&
       initialized &&
       profile &&
       dialer?.isReady &&
+      // If campaign is selected, ensure we're not in always-ask mode (which requires manual selection of the campaign)
       (campaignId !== null ? !isAlwaysAskModeEnabled : false) &&
+      // If in wrap-up, ensure force disposition is not blocking
       (profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? !checkForceDisposition : true)
 
+    // Step 5: All conditions met - proceed with call
     if (canMakeCall) {
       return {
         action: 'make_call',
         displayState: DisplayState.HIDE
       }
-    } else if (!dialer?.isReady) {
+    }
+
+    // Step 6: Dialer not ready - retry after delay
+    if (!dialer?.isReady) {
       return {
         action: 'retry',
         retryDelay: 1000
       }
     }
 
+    // Step 7: Conditions not met - show dialer UI for user interaction
     return {
       action: 'show_dialer',
       reason: 'conditions_not_met'
@@ -357,11 +390,12 @@ class HubSpotWidgetService {
 
   /**
    * Validates parameters and initiates a call
+   *
    * @param {object} params - Call parameters
-   * @returns {object} Result with success status
+   * @returns {object} Result with success status and call params
    */
   placeCall (params) {
-    const { campaignId, hubspotDialNumber, contactDetails } = params
+    const { campaignId, hubspotDialNumber, contactDetails, profile, dialer } = params
 
     console.log('[HubSpot Widget] makeCall started')
     console.log('[HubSpot Widget] Current state:', {
@@ -380,6 +414,16 @@ class HubSpotWidgetService {
       }
     }
 
+    // Validate no active call
+    const hasActiveCall = this.validateActiveCallStatus(profile, dialer, null, profile?.last_call)
+    if (hasActiveCall) {
+      console.log('[HubSpot Widget] validateHasActiveCallStatus returned true, returning early')
+      return {
+        success: false,
+        hasActiveCall: true
+      }
+    }
+
     const callParams = {
       currentNumber: this.$options.filters.fixPhone(hubspotDialNumber?.phoneNumber),
       outboundCampaignId: campaignId.toString(),
@@ -388,13 +432,10 @@ class HubSpotWidgetService {
       contactId: contactDetails.contactId
     }
 
-    console.log('[HubSpot Widget] Firing makeCall event with params:', callParams)
-    this.$VueEvent.fire('makeCall', callParams)
-    console.log('[HubSpot Widget] makeCall completed')
-
     return {
       success: true,
-      displayState: DisplayState.HIDE
+      displayState: DisplayState.HIDE,
+      callParams: callParams
     }
   }
 

@@ -345,26 +345,25 @@ export default {
               return
             }
 
-            // Prevent duplicate calls - if already dialing, ignore new dial requests
-            if (!this.initialized || this.isDialed) {
-              console.log('[HubSpot Widget] Skipping postDialNumber - not initialized or already dialing')
+            if (!this.initialized) {
+              console.log('[HubSpot Widget] Skipping postDialNumber - not initialized')
               return
             }
 
-            console.log('[HubSpot Widget] Proceeding with postDialNumber')
+            // Ignore outbound calls if there is already an active call
+            if (this.isDialed || this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
+              console.log('[HubSpot Widget] Active call in progress, silently ignoring outbound call request')
+              return
+            }
+
             await this.postDialNumber()
           },
 
           onIncomingCall: async (event) => {
             console.log('Incoming call received from HubSpot:', event)
-            // This event is triggered when HubSpot receives a call
-            // For now, we'll just log it - this would be used if calls came to HubSpot first
           },
 
           onVisibilityChanged: (data) => {
-            console.log('onVisibilityChanged event received:', data)
-            // Widget is visible if it's not hidden (minimized is OK for calling remote)
-            // For calling remote: allow calls when minimized, end calls when hidden
             this.isCallingWidgetVisible = !data?.isHidden
             if (!this.isCallingWidgetVisible) {
               console.log('Widget is now hidden - ending active call')
@@ -373,23 +372,19 @@ export default {
           },
 
           onExternalCallIdNotPresent: (data) => {
-            console.warn('External call ID not present:', data)
-            // This is expected for some call flows, just log it
+            console.log('[HubSpot Widget] External call ID not present:', data)
           },
 
           onInitiateCallIdFailed: (data) => {
-            console.warn('Initiate call ID failed:', data)
-            // Handle call initiation failure
+            console.log('[HubSpot Widget] Initiate call ID failed:', data)
           },
 
           onCallerIdMatchFailed: (data) => {
-            console.warn('Caller ID match failed:', data)
-            // Handle caller ID matching failure
+            console.log('[HubSpot Widget] Caller ID match failed:', data)
           },
 
           onCreateEngagementFailed: (data) => {
-            console.warn('Create engagement failed:', data)
-            // Handle engagement creation failure
+            console.log('[HubSpot Widget] Create engagement failed:', data)
           }
         }
       }
@@ -900,137 +895,114 @@ export default {
     },
 
     /**
-     * Initiates the actual call process after authentication - placeholder for now
+     * Initiates the actual call process
      */
     async postDialNumber () {
-      // Additional safety check: ignore if integration is disabled
       if (!this.isHubspotIntegrationEnabled) {
         console.log('[HubSpot Widget] postDialNumber blocked - integration is disabled')
         return
       }
 
-      this.$bvModal.hide('daytime-hours-confirmation')
       this.isPreparingOutboundCall = true
 
       try {
         this.displayState = DisplayState.HIDE
 
-        // Wait for dialer token generation with timeout
-        const tokenGenerationTimeoutMs = 15000 // 15 seconds
-        const tokenGenerationStartTime = Date.now()
+        const result = await this.widgetService.initiateOutboundCall({
+          dialer: this.dialer,
+          profile: this.profile,
+          hubspotDialNumber: this.hubspotDialNumber,
+          isAlwaysAskModeEnabled: this.isAlwaysAskModeEnabled,
+          campaignId: this.campaignId,
+          shouldUseCompanyCampaignId: this.shouldUseCompanyCampaignId,
+          shouldUseProfileCampaignId: this.shouldUseProfileCampaignId,
+          currentCompany: this.currentCompany
+        })
 
-        do {
-          if (this.dialer.currentStatus === DialerStatus.GENERATING_TOKEN) {
-            console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
-          }
+        if (!result.success) {
+          this.displayState = result.displayState || DisplayState.CRITICAL_ERROR_HAPPENED
 
-          if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-            console.log('waiting for agent to become available to make the call', this.dialer.currentStatus)
-          }
-
-          // Check if we've exceeded the timeout
-          if ((Date.now() - tokenGenerationStartTime) > tokenGenerationTimeoutMs) {
-            console.error('Timeout waiting for dialer token generation')
-            this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
-            this.$generalNotification('Failed to initialize dialer. Please try again.', 'error', 5000, true)
+          if (result.hasActiveCall) {
+            // Active call detected, stop here
             return
           }
 
-          await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
-        } while (this.dialer.currentStatus === DialerStatus.GENERATING_TOKEN)
-
-        // If we're still generating token after timeout, something is wrong
-        if (this.dialer.currentStatus === DialerStatus.GENERATING_TOKEN) {
-          console.error('Dialer still generating token after timeout - possible API failure')
-          this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
-          this.$generalNotification('Dialer initialization failed. Please refresh and try again.', 'error', 5000, true)
           return
         }
 
-        await this.getContact()
-
-        if (this.validateHasActiveCallStatus()) {
-          return
+        this.displayState = result.displayState
+        if (result.campaignId) {
+          this.campaignId = result.campaignId
         }
 
-        // if dialing is initiating and current profile status is on wrap-up, then means that somewhere else wrap-up screen is not closed,
-        // we need to initiate end wrap-up session to adequately tracking dialing statuses changes
-        if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-          this.resetAgentStatus()
+        // Update contact details from service
+        if (result.contactDetails) {
+          this.contactDetails = { ...this.contactDetails, ...result.contactDetails }
         }
 
-        this.$VueEvent.fire('resetCall')
+        // Update profile if last call was fetched
+        if (result.lastCall) {
+          this.setProfile({ last_call: result.lastCall })
+        }
       } catch (error) {
         console.error('Error during postDialNumber:', error)
+        this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
         return
       } finally {
         this.isPreparingOutboundCall = false
-      }
-
-      if (!this.isAlwaysAskModeEnabled) {
-        this.defineDefaultOutboundCampaignId()
-
-        if (this.defaultOutboundCampaignId) {
-          this.campaignId = this.defaultOutboundCampaignId
-        }
       }
 
       await this.handleDialNumber()
     },
 
     async handleDialNumber () {
-      console.log('Handle')
-      console.log('CurrentStatus:', this.dialer?.currentStatus)
-
-      if (this.validateHasActiveCallStatus()) {
-        return
-      }
-
-      // stop if modal is disabled
-      if (!this.isCallingWidgetVisible) {
-        this.displayState = DisplayState.SHOW_ALERT_CALL_FINISHED
-        return
-      }
-
-      // don't allow to make a call if there's a parked call
-      if (this.dialer?.parkedCall) {
-        this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
-        return
-      }
-
-      this.displayState = DisplayState.HIDE
-      this.startDialing = true
-
-      console.log('Debugging handleDialNumber conditions:', {
-        callExtensionsInitialized: this.callExtensionsInitialized,
+      const result = this.widgetService.executeDialFlow({
+        dialer: this.dialer,
+        profile: this.profile,
         isCallingWidgetVisible: this.isCallingWidgetVisible,
-        initialized: this.initialized,
-        profile: !!this.profile,
-        dialerReady: this.dialer?.isReady,
         campaignId: this.campaignId,
         isAlwaysAskModeEnabled: this.isAlwaysAskModeEnabled,
-        agentStatus: this.agentStatus,
-        checkForceDisposition: this.checkForceDisposition
+        checkForceDisposition: this.checkForceDisposition,
+        callExtensionsInitialized: this.callExtensionsInitialized,
+        initialized: this.initialized
       })
 
-      if (this.callExtensionsInitialized &&
-        this.isCallingWidgetVisible &&
-        this.initialized &&
-        this.profile &&
-        this.dialer?.isReady &&
-        // if isAlwaysAskModeEnabled is true then dialing will be triggered from select campaign dialog component
-        (this.campaignId !== null ? !this.isAlwaysAskModeEnabled : false) &&
-        (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? !this.checkForceDisposition : true)) {
-        console.log('All conditions met, calling handleCall()')
-        this.handleCall()
-      } else if (!this.dialer?.isReady) {
-        console.log('Dialer not ready, setting retry timeout')
-        this.dialerRetryTimeout = setTimeout(() => {
-          this.handleDialNumber()
-        }, 1000)
-      } else {
-        console.log('Conditions not met, showing dialer UI')
-        // do not handle call but show dialer, it supposes to show wrap-up or other useful UI
+      switch (result.action) {
+        case 'skip':
+          // Active call or other reason to skip
+          console.log('Skipping dial:', result.reason)
+          break
+
+        case 'show_alert':
+          // Show alert and update display state
+          this.displayState = result.displayState
+          console.log('Showing alert:', result.reason)
+          break
+
+        case 'make_call':
+          // All conditions met, proceed with call
+          this.displayState = result.displayState
+          this.startDialing = true
+          this.handleCall()
+          break
+
+        case 'retry':
+          // Dialer not ready, retry after delay
+          console.log('Dialer not ready, setting retry timeout')
+          this.dialerRetryTimeout = setTimeout(() => {
+            this.handleDialNumber()
+          }, result.retryDelay)
+          break
+
+        case 'show_dialer':
+          // Conditions not met, show dialer UI
+          this.displayState = DisplayState.HIDE
+          this.startDialing = true
+          console.log('Conditions not met, showing dialer UI:', result.reason)
+          break
+
+        default:
+          console.warn('Unknown action from executeDialFlow:', result.action)
       }
     },
 
@@ -1095,42 +1067,35 @@ export default {
     },
 
     makeCall () {
-      console.log('[HubSpot Widget] makeCall started')
-      console.log('[HubSpot Widget] Current state:', {
-        campaignId: this.campaignId,
-        hubspotDialNumber: this.hubspotDialNumber,
-        contactDetails: this.contactDetails
-      })
-
       // Block making calls if integration is disabled
       if (!this.isHubspotIntegrationEnabled) {
         console.log('[HubSpot Widget] makeCall blocked - integration is disabled')
         return
       }
 
-      if (!this.campaignId) {
-        console.log('[HubSpot Widget] Campaign ID is null')
-        this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
-        this.$generalNotification('The dialer does not meet all the required criteria to start calling.', 'error', 5000, true)
+      // Use service to validate and prepare call
+      const result = this.widgetService.placeCall({
+        campaignId: this.campaignId,
+        hubspotDialNumber: this.hubspotDialNumber,
+        contactDetails: this.contactDetails,
+        profile: this.profile,
+        dialer: this.dialer
+      })
+
+      if (!result.success) {
+        // Handle error
+        if (result.hasActiveCall) {
+          console.log('[HubSpot Widget] Active call detected, skipping')
+          return
+        }
+        this.displayState = result.displayState || DisplayState.CRITICAL_ERROR_HAPPENED
         return
       }
 
-      if (this.validateHasActiveCallStatus()) {
-        console.log('[HubSpot Widget] validateHasActiveCallStatus returned true, returning early')
-        return
-      }
-
-      const callParams = {
-        currentNumber: this.$options.filters.fixPhone(this.hubspotDialNumber?.phoneNumber),
-        outboundCampaignId: this.campaignId.toString(),
-        contactName: this.contactDetails.contactName,
-        companyName: this.contactDetails.companyName,
-        contactId: this.contactDetails.contactId
-      }
-
-      console.log('[HubSpot Widget] Firing makeCall event with params:', callParams)
-      this.displayState = DisplayState.HIDE
-      this.$VueEvent.fire('makeCall', callParams)
+      // Fire makeCall event with prepared params
+      console.log('[HubSpot Widget] Firing makeCall event with params:', result.callParams)
+      this.displayState = result.displayState
+      this.$VueEvent.fire('makeCall', result.callParams)
       console.log('[HubSpot Widget] makeCall completed')
     },
 
