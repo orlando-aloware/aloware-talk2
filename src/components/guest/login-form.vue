@@ -341,7 +341,7 @@ export default {
         return '/widgets/hubspot-call-extension'
       }
 
-      // Return original path for all other contexts
+      // Return the original path for all other contexts
       return originalPath
     },
 

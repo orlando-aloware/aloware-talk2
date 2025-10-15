@@ -52,7 +52,7 @@ export default function ({ store }) {
   })
 
   Router.beforeEach((to, from, next) => {
-    // HubSpot widget restoration: if the widget was active and we're navigating to root, redirect to widget
+    // HubSpot widget restoration: if the widget was active, and we're navigating to root, redirect to the widget
     if (store.state.isHubSpotWidget && (to.path === '/' || to.name === 'Inbox')) {
       console.log('[Router] Restoring HubSpot widget route')
       return next('/widgets/hubspot-call-extension')

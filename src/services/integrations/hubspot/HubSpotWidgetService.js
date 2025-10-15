@@ -2,7 +2,6 @@ import * as AgentStatus from 'src/constants/agent-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { DialerStatus } from 'src/constants/dialer-status'
 import { DisplayState } from 'src/constants/hubspot-widget-display-states'
-import { ComponentMode } from 'src/utils/HubSpotCallingExtensionsClient'
 import { BroadcastMessageTypes } from 'src/constants/hubspot-softphone-broadcast'
 
 /**
@@ -38,10 +37,6 @@ class HubSpotWidgetService {
     }
   }
 
-  // ============================================
-  // Call State Management
-  // ============================================
-
   /**
    * Shows incoming call UI (Used in REMOTE mode)
    *
@@ -53,7 +48,7 @@ class HubSpotWidgetService {
   showIncomingCall (payload, dialerState, profileState) {
     const { communication, contact } = payload
 
-    // Safety check: If call is already connected (check both dialer and agent status)
+    // Safety check: If the call is already connected (check both dialer and agent status)
     const isCallConnected = dialerState?.currentStatus === DialerStatus.CALL_CONNECTED ||
                            profileState?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
 
@@ -80,7 +75,7 @@ class HubSpotWidgetService {
   hideIncomingCall (dialerState, profileState) {
     console.log('[HubSpot Widget] Hiding incoming call UI')
 
-    // If call is already connected (check both dialer and agent status)
+    // If the call is already connected (check both dialer and agent status)
     // Don't transition to READY_FOR_CALLS - wait for CALL_CONNECTED broadcast
     const isCallConnected = dialerState?.currentStatus === DialerStatus.CALL_CONNECTED ||
                            profileState?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
@@ -135,10 +130,9 @@ class HubSpotWidgetService {
    * @returns {object} Updated state { displayState, activeCallData, shouldKeepUI }
    */
   hideActiveCall (profileState, checkForceDisposition) {
-    // If agent is in wrap-up, KEEP showing the Active Call UI with contact info
+    // If the agent is in wrap-up, keep showing the Active Call UI with contact info
     // It will transition to Ready for Calls when wrap-up completes
     if (profileState?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && checkForceDisposition) {
-      console.log('[HubSpot Widget] Agent in wrap-up - keeping Active Call UI visible')
       return {
         shouldKeepUI: true,
         displayState: null,
@@ -146,7 +140,6 @@ class HubSpotWidgetService {
       }
     }
 
-    console.log('[HubSpot Widget] No wrap-up - clearing Active Call UI')
     this.activeCallData = null
 
     return {
@@ -226,7 +219,7 @@ class HubSpotWidgetService {
         }
       }
 
-      // If dialing is initiating and current profile status is on wrap-up, reset agent status
+      // If dialing is initiating and the current profile status is on wrap-up, reset agent status
       if (profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
         this.vuexActions.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-ResetAgentStatus')
       }
@@ -265,12 +258,11 @@ class HubSpotWidgetService {
   }
 
   /**
-   * Executes the dial flow logic - determines what action to take based on current state
+   * Executes the dial flow logic - determines what action to take based on the current state
    *
-   * DIAL FLOW:
-   * 1. Check for active call -> Skip if call in progress
+   * 1. Check for active call -> Skip if the call is in progress
    * 2. Check widget visibility -> Show alert if hidden
-   * 3. Check for parked call -> Show alert if call is parked
+   * 3. Check for parked call -> Show alert if the call is parked
    * 4. Validate all conditions:
    *    - HubSpot SDK initialized
    *    - Widget is visible
@@ -280,8 +272,8 @@ class HubSpotWidgetService {
    *    - Campaign selected (or always-ask mode enabled)
    *    - Not in forced disposition wrap-up
    * 5. If all conditions met → Make the call
-   * 6. If dialer not ready → Retry after delay
-   * 7. Otherwise → Show dialer UI for user interaction
+   * 6. If the dialer is not ready → Retry after delay
+   * 7. Otherwise, show the dialer UI for user interaction
    *
    * @returns {object} Result with action to take:
    *   - action: 'skip' | 'show_alert' | 'make_call' | 'retry' | 'show_dialer'
@@ -404,7 +396,7 @@ class HubSpotWidgetService {
   }
 
   /**
-   * Handles incoming call processing (Used in WINDOW mode)
+   * Handles incoming call processing and notifies HubSpot (Used in WINDOW mode)
    *
    * @param {object} communication - Call communication object
    * @param {object} extensions - HubSpot SDK extensions instance
@@ -413,7 +405,6 @@ class HubSpotWidgetService {
    * @returns {object} Result with actions to take
    */
   handleIncomingCall (communication, extensions, processActionNotification, publishBroadcast) {
-    // Notify HubSpot about the inbound call
     if (extensions) {
       const phoneNumber = this.$options.filters.fixPhone(communication.contact?.phone_number)
 
@@ -487,7 +478,7 @@ class HubSpotWidgetService {
   }
 
   /**
-   * Checks if call is connected based on dialer and agent status
+   * Checks if the call is connected based on dialer and agent status
    *
    * @param {string} dialerStatus - Current dialer status
    * @param {number} agentStatus - Current agent status
@@ -496,20 +487,6 @@ class HubSpotWidgetService {
   checkCallConnectionStatus (dialerStatus, agentStatus) {
     return dialerStatus === DialerStatus.CALL_CONNECTED ||
            agentStatus === AgentStatus.AGENT_STATUS_ON_CALL
-  }
-
-  /**
-   * Determines if CALL_CONNECTED broadcast should be sent
-   *
-   * @param {string} componentMode - Component mode
-   * @param {string} newStatus - New dialer status
-   * @param {string} oldStatus - Old dialer status
-   * @returns {boolean} True if should broadcast
-   */
-  shouldBroadcastCallConnected (componentMode, newStatus, oldStatus) {
-    return componentMode === ComponentMode.WINDOW &&
-           newStatus === DialerStatus.CALL_CONNECTED &&
-           oldStatus !== DialerStatus.CALL_CONNECTED
   }
 
   /**
@@ -594,7 +571,7 @@ class HubSpotWidgetService {
    * @returns {object} Result with action to take
    */
   acceptCall (incomingCallData, dialerState, profileState) {
-    // Check if call is already connected
+    // Check if the call is already connected
     const isCallConnected = this.checkCallConnectionStatus(dialerState?.currentStatus, profileState?.agent_status)
 
     if (isCallConnected) {
@@ -632,7 +609,7 @@ class HubSpotWidgetService {
    * @returns {object} Result with action to take
    */
   declineCall (incomingCallData, dialerState, profileState) {
-    // Check if call is already connected
+    // Check if the call is already connected
     const isCallConnected = this.checkCallConnectionStatus(dialerState?.currentStatus, profileState?.agent_status)
 
     if (isCallConnected) {
@@ -695,43 +672,47 @@ class HubSpotWidgetService {
    * @returns {object} Broadcast payload
    */
   prepareCallConnectedData (dialer, contactDetails, hubspotDialNumber) {
-    // For outbound calls, use contactDetails which has the full contact info
-    // For inbound calls, use dialer.contact which is already populated
-    // For unparked calls, use dialer.communication.contact which is loaded after status change
-    let contact = dialer?.contact
-
-    // If contact is missing or has no name/phone, try communication.contact (for unparked calls)
-    if (!contact || (!contact.name && !contact.phone_number)) {
-      contact = dialer?.communication?.contact
-    }
-
-    // If still missing, try extracting from Twilio call customParameters (for unparked calls)
-    if (!contact || (!contact.name && !contact.phone_number)) {
-      const customParams = dialer?.call?.customParameters
-      if (customParams && customParams.size > 0) {
-        contact = {
-          name: customParams.get('ContactName'),
-          phone_number: dialer?.communication?.contact?.phone_number,
-          company_name: customParams.get('CompanyName'),
-          id: customParams.get('ContactId')
-        }
-      }
-    }
-
-    // Use contactDetails from outbound call flow as last resort
-    if (!contact || (!contact.name && !contact.phone_number)) {
-      contact = {
-        name: contactDetails.contactName || dialer?.communication?.contact?.name,
-        phone_number: hubspotDialNumber?.phoneNumber || dialer?.communication?.from_number || dialer?.communication?.to_number,
-        company_name: contactDetails.companyName || dialer?.communication?.contact?.company_name,
-        id: contactDetails.contactId || dialer?.communication?.contact?.id
-      }
-    }
+    const contact = this.resolveContactDetails(contactDetails, hubspotDialNumber, dialer, dialer?.lastCall)
 
     return {
       communication: dialer?.communication,
       contact: contact
     }
+  }
+
+  /**
+   * Retrieves that contact details of a call from multiple sources
+   *
+   * @param contactDetails
+   * @param hubspotDialNumber
+   * @param dialer
+   * @param lastCall
+   */
+  resolveContactDetails (contactDetails, hubspotDialNumber, dialer, lastCall) {
+    // Check dialer contact (priority)
+    let contact = dialer?.contact
+
+    // If contact is missing or incomplete, fallback to `dialer.communication.contact` for unparked calls
+    if (!contact || (!contact.name && !contact.phone_number)) {
+      contact = dialer?.communication?.contact
+    }
+
+    // If contact is still missing, check `lastCall.contact`
+    if (!contact || (!contact.name && !contact.phone_number)) {
+      contact = lastCall?.contact
+    }
+
+    // If all else fails, construct a contact from `contactDetails` or fall back to default
+    if (!contact || (!contact.name && !contact.phone_number)) {
+      contact = {
+        name: contactDetails.contactName || 'Unknown Contact',
+        phone_number: hubspotDialNumber?.phoneNumber || lastCall?.from_number || '',
+        company_name: contactDetails.companyName || '',
+        id: contactDetails.contactId || null
+      }
+    }
+
+    return contact
   }
 }
 

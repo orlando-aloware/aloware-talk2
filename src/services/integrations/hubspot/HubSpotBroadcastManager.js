@@ -8,12 +8,6 @@ import { DialerStatus } from 'src/constants/dialer-status'
  *
  * Manages all cross-instance communication between the Calling Remote (HubSpot iframe)
  * and Calling Window (detached popup) using the BroadcastChannel API.
- *
- * Responsibilities:
- * - Initialize and manage BroadcastChannel lifecycle
- * - Send and receive broadcast messages
- * - Handle state synchronization between instances
- * - Manage login synchronization
  */
 class HubSpotBroadcastManager {
   constructor (dependencies = {}) {
@@ -95,25 +89,6 @@ class HubSpotBroadcastManager {
   }
 
   /**
-   * Registers a handler for a specific message type
-   *
-   * @param {string} messageType - Message type from BroadcastMessageTypes
-   * @param {function} handler - Handler function to call when message is received
-   */
-  registerHandler (messageType, handler) {
-    this.messageHandlers.set(messageType, handler)
-  }
-
-  /**
-   * Unregisters a handler for a specific message type
-   *
-   * @param {string} messageType - Message type from BroadcastMessageTypes
-   */
-  unregisterHandler (messageType) {
-    this.messageHandlers.delete(messageType)
-  }
-
-  /**
    * Clears all registered handlers
    */
   clearHandlers () {
@@ -136,28 +111,13 @@ class HubSpotBroadcastManager {
 
   /**
    * Checks if the BroadcastChannel is initialized and ready
-   *
-   * @returns {boolean} True if channel is ready
    */
   isReady () {
     return !!this.broadcastChannel
   }
 
   /**
-   * Broadcasts that an incoming call has started
-   *
-   * @param {object} communication - Communication object
-   * @param {object} contact - Contact object
-   */
-  broadcastIncomingCallStarted (communication, contact) {
-    return this.publish(BroadcastMessageTypes.INCOMING_CALL_STARTED, {
-      communication,
-      contact
-    })
-  }
-
-  /**
-   * Broadcasts that user accepted an inbound call
+   * Broadcasts that the user accepted an inbound call
    *
    * @param {number} communicationId - Communication ID
    * @param {number} contactId - Contact ID
@@ -266,18 +226,6 @@ class HubSpotBroadcastManager {
   }
 
   /**
-   * Broadcasts that user logged in successfully
-   *
-   * @param {number} userId - User ID (optional)
-   */
-  broadcastUserLoggedIn (userId = null) {
-    return this.publish(BroadcastMessageTypes.USER_LOGGED_IN, {
-      userId,
-      timestamp: Date.now()
-    })
-  }
-
-  /**
    * Broadcasts widget reload request
    *
    * @param {string} reason - Reason for reload
@@ -291,12 +239,11 @@ class HubSpotBroadcastManager {
 
   /**
    * Creates a temporary BroadcastChannel, sends a message, and closes it
-   * Useful for one-off broadcasts (e.g., login success) where
-   * a persistent channel is not needed
+   * Useful for one-off broadcasts (e.g., login success) where a persistent channel is not needed
    *
    * @param {string} type - Message type
    * @param {object} payload - Message payload
-   * @returns {Promise<boolean>} True if message was sent successfully
+   * @returns {Promise<boolean>} True if the message was sent successfully
    */
   static sendOneTimeBroadcast (type, payload = {}) {
     return new Promise((resolve) => {
@@ -317,10 +264,10 @@ class HubSpotBroadcastManager {
 
   /**
    * Creates a temporary BroadcastChannel for listening to specific message types
-   * Useful for temporary listeners (e.g., login form waiting for login from other instance)
+   * Useful for temporary listeners (e.g., login form waiting for login from the other instance)
    *
    * @param {function} onMessage - Callback to handle messages
-   * @returns {object} Object with close method to cleanup the listener
+   * @returns {object} Object with close method to clean up the listener
    */
   static createTemporaryListener (onMessage) {
     try {
