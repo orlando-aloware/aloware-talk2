@@ -679,6 +679,9 @@ export default {
           // Hide incoming call UI in REMOTE mode
           if (this.componentMode === ComponentMode.REMOTE) {
             this.hideIncomingCallUI()
+          } else if (this.componentMode === ComponentMode.WINDOW) {
+            // Decline the call in WINDOW mode
+            this.$VueEvent.fire('rejectCall')
           }
           break
 
