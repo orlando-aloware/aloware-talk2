@@ -648,7 +648,7 @@ export default {
           break
 
         case BroadcastMessageTypes.CALL_ENDED:
-          // Hide the active call UI and return to ready state in REMOTE mode
+          // Hide the active call UI and return to the ready state in REMOTE mode
           if (this.componentMode === ComponentMode.REMOTE) {
             this.hideActiveCallUI()
           }

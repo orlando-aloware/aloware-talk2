@@ -297,7 +297,7 @@ export default {
       // Get the dynamic HubSpot domain from company settings
       const hubspotDomain = this.$store?.state?.auth?.profile?.company?.hubspot_company_ui_domain || 'app.hubspot.com'
 
-      // Check if user is coming from HubSpot calling window mode (popup/iframe)
+      // Check if the user is coming from HubSpot calling window mode (popup/iframe)
       // This handles scenarios like: https://app.hubspot.com/calling-integration-popup-ui/49267018
       // or custom domains like: https://custom.hubspot.com/calling-integration-popup-ui/49267018
       const referrerHasHubSpot = document.referrer && document.referrer.includes('hubspot-call-extension')
@@ -326,6 +326,7 @@ export default {
     /**
      * Ensures the redirect path is correct for the current context
      * This fixes issues where users in HubSpot extension mode get redirected to wrong pages
+     *
      * @param {string} originalPath - The original redirect path from query parameters
      * @returns {string} - The corrected redirect path
      */
@@ -337,7 +338,6 @@ export default {
 
       // Redirect to HubSpot extension if conditions are met and integration is enabled
       if (hubSpotContext.shouldRedirect) {
-        console.log('[HubSpot Login Redirect] ✅ Redirecting to HubSpot extension')
         return '/widgets/hubspot-call-extension'
       }
 
@@ -395,7 +395,6 @@ export default {
       if (type === BroadcastMessageTypes.USER_LOGGED_IN) {
         // Only navigate if we're not already authenticated to avoid reload loops
         if (!this.authenticated) {
-          console.log('[Login Form] Other HubSpot instance logged in, navigating to widget...')
           const redirectPath = this.$route.query.redirect || '/widgets/hubspot-call-extension'
           window.location.replace(`${window.location.origin}${redirectPath}`)
         } else {
@@ -439,15 +438,14 @@ export default {
 
   mounted () {
     // Listen for login events from other HubSpot widget instances
-    // Initialize temporary listener if we're on HubSpot widget OR redirecting to it
+    // Initialize temporary listener if we're on the HubSpot widget OR redirecting to it
     const redirectPath = this.$route.query?.redirect
     const isHubSpotContext = this.isHubSpotWidget || (redirectPath && redirectPath.includes('hubspot-call-extension'))
 
     if (isHubSpotContext) {
       try {
-        // Use broadcast manager static method for temporary listening
+        // Use the broadcast manager static method for temporary listening
         this.hubspotLoginChannel = HubSpotBroadcastManager.createTemporaryListener(this.onHubSpotLoginFromOtherInstance)
-        console.log('[Login Form] Listening for HubSpot login events from other instances')
       } catch (error) {
         console.error('[Login Form] Failed to initialize login listener:', error)
       }
@@ -455,11 +453,9 @@ export default {
   },
 
   beforeDestroy () {
-    // Clean up BroadcastChannel if still open
     if (this.hubspotLoginChannel) {
       this.hubspotLoginChannel.close()
       this.hubspotLoginChannel = null
-      console.log('[Login Form] Closed BroadcastChannel in beforeDestroy')
     }
   }
 }
