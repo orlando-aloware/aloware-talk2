@@ -1092,11 +1092,8 @@ export default {
         return
       }
 
-      // Fire makeCall event with prepared params
-      console.log('[HubSpot Widget] Firing makeCall event with params:', result.callParams)
       this.displayState = result.displayState
       this.$VueEvent.fire('makeCall', result.callParams)
-      console.log('[HubSpot Widget] makeCall completed')
     },
 
     /**

@@ -155,37 +155,6 @@ class HubSpotWidgetService {
   }
 
   /**
-   * Gets incoming call data
-   * @returns {object|null}
-   */
-  getIncomingCallData () {
-    return this.incomingCallData
-  }
-
-  /**
-   * Gets active call data
-   * @returns {object|null}
-   */
-  getActiveCallData () {
-    return this.activeCallData
-  }
-
-  /**
-   * Clears all call data
-   */
-  clearCallData () {
-    this.incomingCallData = null
-    this.activeCallData = null
-  }
-
-  /**
-   * Clears active call data only
-   */
-  clearActiveCallData () {
-    this.activeCallData = null
-  }
-
-  /**
    * Initiates an outbound call
    *
    * @param {object} params - Call initiation parameters
@@ -625,15 +594,6 @@ class HubSpotWidgetService {
   }
 
   /**
-   * Gets contact details
-   *
-   * @returns {object} Contact details
-   */
-  getContactDetails () {
-    return this.contactDetails
-  }
-
-  /**
    * Handles accepting an incoming call
    *
    * @param {object} incomingCallData - Incoming call data
@@ -735,19 +695,6 @@ class HubSpotWidgetService {
   }
 
   /**
-   * Cancels a call
-   *
-   * @param {number} defaultCampaignId - Default campaign ID to restore
-   * @returns {object} Updated state
-   */
-  cancelCall (defaultCampaignId) {
-    return {
-      campaignId: defaultCampaignId,
-      shouldCallCompleted: true
-    }
-  }
-
-  /**
    * Prepares call connected data for broadcasting
    *
    * @param {object} dialer - Dialer state
@@ -792,148 +739,6 @@ class HubSpotWidgetService {
     return {
       communication: dialer?.communication,
       contact: contact
-    }
-  }
-
-  /**
-   * Updates agent status based on status update event
-   *
-   * @param {object} data - Status update data
-   * @param {object} currentProfile - Current profile
-   * @param {object} currentCompany - Current company
-   * @param {object} dialer - Dialer state
-   * @returns {object|null} Actions to take or null if no action needed
-   */
-  updateAgentStatus (data, currentProfile, currentCompany, dialer) {
-    if (
-      currentCompany?.id !== data.company_id ||
-      currentProfile?.id !== data.user_id ||
-      currentProfile.agent_status === data.agent_status
-    ) {
-      return null
-    }
-
-    const previousStatus = currentProfile.agent_status
-    const agentStatus = data.agent_status
-
-    const result = {
-      newAgentStatus: agentStatus,
-      actions: []
-    }
-
-    // Agent became available after wrap-up - return to ready state
-    if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && previousStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-      result.actions.push({
-        type: 'clear_active_call_data'
-      })
-      result.actions.push({
-        type: 'set_display_state',
-        displayState: DisplayState.READY_FOR_CALLS
-      })
-      if (dialer?.currentStatus === DialerStatus.WRAP_UP) {
-        result.actions.push({
-          type: 'fire_event',
-          event: 'resetCall'
-        })
-      }
-    }
-
-    return result
-  }
-
-  /**
-   * Authenticates the user
-   * @param {string} apiKey - API key
-   * @param {function} checkAction - Vuex check action
-   * @param {object} callbacks - Callback functions
-   * @returns {Promise<object>} Result with success status
-   */
-  async authenticateUser (apiKey, checkAction, callbacks) {
-    try {
-      const res = await checkAction()
-
-      return {
-        success: true,
-        companyId: res.data.user.company.id,
-        company: res.data.user.company
-      }
-    } catch (err) {
-      console.log('Error: api key is not valid', err)
-      return {
-        success: false,
-        error: err,
-        shouldRedirectToLogin: true
-      }
-    }
-  }
-
-  /**
-   * Handles post-login logic
-   *
-   * @param {object} params - Login parameters
-   * @returns {object} Result with display state and actions
-   */
-  handlePostLogin (params) {
-    const {
-      profile,
-      dialer,
-      componentMode,
-      hubspotDialNumber,
-      isHubspotIntegrationEnabled,
-      checkForceDisposition
-    } = params
-
-    // Check if HubSpot integration is enabled first
-    if (!isHubspotIntegrationEnabled) {
-      console.log('[HubSpot Widget] HubSpot integration is disabled')
-      return {
-        displayState: DisplayState.HUBSPOT_INTEGRATION_DISABLED,
-        shouldSkip: true
-      }
-    }
-
-    // If no dial number, check for incoming/active calls in REMOTE mode
-    if (!hubspotDialNumber) {
-      if (componentMode === ComponentMode.REMOTE) {
-        // For RINGING status, request current state from Window
-        if (profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING) {
-          return {
-            displayState: DisplayState.READY_FOR_CALLS,
-            shouldRequestState: true,
-            requestId: `remote-${Date.now()}`
-          }
-        } else if (profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
-                   dialer?.currentStatus === DialerStatus.MAKING_CALL ||
-                   dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
-          // Show active call UI when agent is on call OR actively dialing/connected
-          return {
-            shouldValidateActiveCall: true
-          }
-        }
-      }
-
-      // Determine if should change to ready state
-      const shouldNotChangeToReady =
-        profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING ||
-        profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
-        (profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && checkForceDisposition) ||
-        dialer?.currentStatus === DialerStatus.MAKING_CALL ||
-        dialer?.currentStatus === DialerStatus.CALL_CONNECTED
-
-      if (!shouldNotChangeToReady) {
-        return {
-          displayState: DisplayState.READY_FOR_CALLS
-        }
-      }
-
-      return {
-        shouldSkip: true
-      }
-    }
-
-    // Has dial number, proceed with dialing
-    return {
-      shouldPostDialNumber: true
     }
   }
 }
