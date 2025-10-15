@@ -128,6 +128,7 @@ class HubSpotWidgetService {
 
   /**
    * Hides active call UI in REMOTE mode
+   *
    * @param {object} profileState - Current profile/agent state
    * @param {boolean} checkForceDisposition - Whether force disposition is required
    * @returns {object} Updated state { displayState, activeCallData, shouldKeepUI }
@@ -366,13 +367,6 @@ class HubSpotWidgetService {
   placeCall (params) {
     const { campaignId, hubspotDialNumber, contactDetails, profile, dialer } = params
 
-    console.log('[HubSpot Widget] makeCall started')
-    console.log('[HubSpot Widget] Current state:', {
-      campaignId,
-      hubspotDialNumber,
-      contactDetails
-    })
-
     if (!campaignId) {
       console.log('[HubSpot Widget] Campaign ID is null')
       this.$generalNotification('The dialer does not meet all the required criteria to start calling.', 'error', 5000, true)
@@ -419,8 +413,6 @@ class HubSpotWidgetService {
    * @returns {object} Result with actions to take
    */
   handleIncomingCall (communication, componentMode, extensions, processActionNotification, publishBroadcast) {
-    console.log('[HubSpot Widget] Processing inbound call')
-
     // Notify HubSpot about the inbound call
     if (extensions) {
       const phoneNumber = this.$options.filters.fixPhone(communication.contact?.phone_number)

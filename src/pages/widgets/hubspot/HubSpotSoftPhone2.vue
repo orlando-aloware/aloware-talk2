@@ -687,7 +687,6 @@ export default {
 
         case BroadcastMessageTypes.REQUEST_CURRENT_STATE:
           // WINDOW mode: Send current call state to Remote
-          // Use !== REMOTE to handle UNKNOWN mode during initialization
           if (this.componentMode !== ComponentMode.REMOTE) {
             console.log('[WINDOW] Received state request from Remote, sending current state')
             this.sendCurrentState(payload.requestId)
@@ -696,7 +695,6 @@ export default {
 
         case BroadcastMessageTypes.CURRENT_STATE_RESPONSE:
           // REMOTE mode: Receive and apply current call state from Window
-          // Use !== WINDOW to handle UNKNOWN mode during initialization
           if (this.componentMode !== ComponentMode.WINDOW) {
             console.log('[REMOTE] Received current state from Window:', payload)
             this.applyCurrentState(payload)
@@ -705,7 +703,6 @@ export default {
 
         case BroadcastMessageTypes.USER_LOGGED_IN:
           // Another instance logged in successfully, reload page to ensure clean state
-          // Only reload if we're not already authenticated to avoid infinite reload loop
           if (!this.authenticated) {
             console.log('[HubSpot Widget] Other instance logged in, reloading page...')
             window.location.reload()
@@ -725,14 +722,7 @@ export default {
       }
     },
 
-    /**
-     * Publishes a broadcast message to the other component instance (remote ↔ window)
-     * @param {string} type - Message type from BroadcastMessageTypes
-     * @param {object} payload - Message payload data
-     */
-    publishBroadcast (type, payload = {}) {
-      return this.broadcastManager?.publish(type, payload)
-    },
+
 
     /**
      * Sends current call state to Remote in response to REQUEST_CURRENT_STATE
@@ -798,7 +788,7 @@ export default {
     },
 
     /**
-     * Handles post-authentication logic - notifies HubSpot of login and initiates calls if needed
+     * Handles post-authentication logic
      */
     handleUserLogin () {
       // Check if HubSpot integration is enabled first
@@ -850,6 +840,7 @@ export default {
         if (!shouldNotChangeToReady) {
           this.displayState = DisplayState.READY_FOR_CALLS
         }
+
         return
       }
 
@@ -884,8 +875,8 @@ export default {
         if (!result.success) {
           this.displayState = result.displayState || DisplayState.CRITICAL_ERROR_HAPPENED
 
+          // If there's an active call, stop here
           if (result.hasActiveCall) {
-            // Active call detected, stop here
             return
           }
 
@@ -1242,7 +1233,7 @@ export default {
         this.componentMode,
         this.extensions,
         this.processActionNotification,
-        this.publishBroadcast
+        (type, payload) => this.broadcastManager?.publish(type, payload)
       )
 
       // Apply the returned state
@@ -1352,7 +1343,10 @@ export default {
 
         case 'broadcast_accept':
           // Broadcast to WINDOW mode to accept the call
-          this.publishBroadcast(result.broadcast.type, result.broadcast.payload)
+          this.broadcastManager?.broadcastAcceptInboundCall(
+            result.broadcast.payload.communicationId,
+            result.broadcast.payload.contactId
+          )
           this.hideIncomingCallUI()
           break
 
@@ -1381,7 +1375,9 @@ export default {
 
         case 'broadcast_decline':
           // Broadcast to WINDOW mode to decline the call
-          this.publishBroadcast(result.broadcast.type, result.broadcast.payload)
+          this.broadcastManager?.broadcastCallCancelled(
+            result.broadcast.payload.communicationId
+          )
 
           // Fire reject event if needed
           if (result.fireRejectEvent) {
