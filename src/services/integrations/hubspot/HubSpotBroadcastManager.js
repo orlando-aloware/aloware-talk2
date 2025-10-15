@@ -301,16 +301,12 @@ class HubSpotBroadcastManager {
   static sendOneTimeBroadcast (type, payload = {}) {
     return new Promise((resolve) => {
       try {
-        console.log('[Broadcast Manager] Creating one-time BroadcastChannel')
         const channel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
 
         const message = createBroadcastMessage(type, payload)
         channel.postMessage(message)
-        console.log('[Broadcast Manager] One-time broadcast sent:', type, payload)
 
         channel.close()
-        console.log('[Broadcast Manager] One-time BroadcastChannel closed')
-
         resolve(true)
       } catch (error) {
         console.error('[Broadcast Manager] Failed to send one-time broadcast:', error)

@@ -3,6 +3,7 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import { DialerStatus } from 'src/constants/dialer-status'
 import { DisplayState } from 'src/constants/hubspot-widget-display-states'
 import { ComponentMode } from 'src/utils/HubSpotCallingExtensionsClient'
+import { BroadcastMessageTypes } from 'src/constants/hubspot-softphone-broadcast'
 
 /**
  * HubSpot Widget Service
@@ -406,13 +407,12 @@ class HubSpotWidgetService {
    * Handles incoming call processing (Used in WINDOW mode)
    *
    * @param {object} communication - Call communication object
-   * @param {string} componentMode - Current component mode
    * @param {object} extensions - HubSpot SDK extensions instance
    * @param {function} processActionNotification - Callback to process action notification
    * @param {function} publishBroadcast - Callback to publish broadcast
    * @returns {object} Result with actions to take
    */
-  handleIncomingCall (communication, componentMode, extensions, processActionNotification, publishBroadcast) {
+  handleIncomingCall (communication, extensions, processActionNotification, publishBroadcast) {
     // Notify HubSpot about the inbound call
     if (extensions) {
       const phoneNumber = this.$options.filters.fixPhone(communication.contact?.phone_number)
@@ -433,7 +433,7 @@ class HubSpotWidgetService {
     processActionNotification(communication, 'call')
 
     // Broadcast to REMOTE mode
-    publishBroadcast('INCOMING_CALL_STARTED', {
+    publishBroadcast(BroadcastMessageTypes.INCOMING_CALL_STARTED, {
       communication,
       contact: communication.contact
     })
@@ -614,7 +614,7 @@ class HubSpotWidgetService {
     return {
       action: 'broadcast_accept',
       broadcast: {
-        type: 'ACCEPT_INBOUND_CALL',
+        type: BroadcastMessageTypes.ACCEPT_INBOUND_CALL,
         payload: {
           communicationId: incomingCallData?.communication?.id,
           contactId: incomingCallData?.contact?.id
@@ -649,7 +649,7 @@ class HubSpotWidgetService {
     return {
       action: 'broadcast_decline',
       broadcast: {
-        type: 'CALL_CANCELLED',
+        type: BroadcastMessageTypes.CALL_CANCELLED,
         payload: {
           communicationId: incomingCallData?.communication?.id
         }

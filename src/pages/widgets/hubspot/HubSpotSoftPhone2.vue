@@ -1230,7 +1230,6 @@ export default {
 
       const result = this.widgetService.handleIncomingCall(
         communication,
-        this.componentMode,
         this.extensions,
         this.processActionNotification,
         (type, payload) => this.broadcastManager?.publish(type, payload)
