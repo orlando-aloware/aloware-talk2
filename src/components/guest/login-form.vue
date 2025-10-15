@@ -107,7 +107,8 @@ import { mapActions, mapState } from 'vuex'
 import { aclMixin, guestFormsMixin, recaptchaMixin } from 'src/plugins/mixins'
 import SecurityCode from 'components/guest/security-code'
 import * as storage from 'src/plugins/helpers/storage'
-import { BROADCAST_CHANNEL_NAME, BroadcastMessageTypes } from 'src/constants/hubspot-softphone-broadcast'
+import { BroadcastMessageTypes } from 'src/constants/hubspot-softphone-broadcast'
+import HubSpotBroadcastManager from 'src/services/integrations/hubspot/HubSpotBroadcastManager'
 
 export default {
   components: { SecurityCode },
@@ -260,19 +261,12 @@ export default {
       // Check if we're redirecting to HubSpot widget (not if we're currently on it)
       const isRedirectingToHubSpot = redirectPath.includes('hubspot-call-extension')
       if (isRedirectingToHubSpot) {
-        // Always create a fresh channel for broadcasting (simpler and more reliable)
-        console.log('[Login Form] Creating fresh BroadcastChannel for login broadcast')
-        const broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-
-        console.log('[Login Form] Broadcasting login success...')
-        broadcastChannel.postMessage({
-          type: BroadcastMessageTypes.USER_LOGGED_IN,
-          payload: { timestamp: Date.now() }
-        })
-
-        // Close immediately after posting (best practice per MDN)
-        broadcastChannel.close()
-        console.log('[Login Form] Closed BroadcastChannel after sending broadcast')
+        // Use broadcast manager static method for one-time broadcast
+        console.log('[Login Form] Broadcasting login success via Broadcast Manager...')
+        HubSpotBroadcastManager.sendOneTimeBroadcast(
+          BroadcastMessageTypes.USER_LOGGED_IN,
+          { timestamp: Date.now() }
+        )
 
         // Navigate with from_login=true query param to trigger reload in the widget
         // Small delay to ensure broadcast is fully transmitted before page unload
@@ -445,14 +439,14 @@ export default {
 
   mounted () {
     // Listen for login events from other HubSpot widget instances
-    // Initialize channel if we're on HubSpot widget OR redirecting to it
+    // Initialize temporary listener if we're on HubSpot widget OR redirecting to it
     const redirectPath = this.$route.query?.redirect
     const isHubSpotContext = this.isHubSpotWidget || (redirectPath && redirectPath.includes('hubspot-call-extension'))
 
     if (isHubSpotContext) {
       try {
-        this.hubspotLoginChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-        this.hubspotLoginChannel.onmessage = this.onHubSpotLoginFromOtherInstance
+        // Use broadcast manager static method for temporary listening
+        this.hubspotLoginChannel = HubSpotBroadcastManager.createTemporaryListener(this.onHubSpotLoginFromOtherInstance)
         console.log('[Login Form] Listening for HubSpot login events from other instances')
       } catch (error) {
         console.error('[Login Form] Failed to initialize login listener:', error)

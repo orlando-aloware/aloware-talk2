@@ -183,10 +183,11 @@ import * as AgentStatus from 'src/constants/agent-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { DialerStatus } from 'src/constants/dialer-status'
 import { OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK, OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT } from 'src/constants/user-outbound-calling-modes'
-import { BROADCAST_CHANNEL_NAME, BroadcastMessageTypes, createBroadcastMessage } from 'src/constants/hubspot-softphone-broadcast'
+import { BroadcastMessageTypes } from 'src/constants/hubspot-softphone-broadcast'
 import { local as localStorageHelper } from 'src/plugins/helpers/storage'
 import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin, notificationMixin } from 'src/plugins/mixins'
 import HubSpotWidgetService from 'src/services/integrations/hubspot/HubSpotWidgetService'
+import HubSpotBroadcastManager from 'src/services/integrations/hubspot/HubSpotBroadcastManager'
 import { DisplayState } from 'src/constants/hubspot-widget-display-states'
 
 // Dialer statuses where we should display a loading indicator while the dialer component initializes
@@ -218,8 +219,9 @@ export default {
 
   data () {
     return {
-      // Service instance
+      // Service instances
       widgetService: null,
+      broadcastManager: null,
 
       // Constants
       DisplayState,
@@ -270,9 +272,6 @@ export default {
 
       // Component mode of the widget (remote vs window)
       componentMode: ComponentMode.UNKNOWN,
-
-      // Broadcast Channel for cross-instance communication (remote ↔ window)
-      broadcastChannel: null,
 
       // Contact details for calls
       contactDetails: {
@@ -729,14 +728,7 @@ export default {
      * @param {object} payload - Message payload data
      */
     publishBroadcast (type, payload = {}) {
-      if (!this.broadcastChannel) {
-        console.warn('[HubSpot Widget] Cannot publish broadcast - channel not initialized')
-        return
-      }
-
-      const message = createBroadcastMessage(type, payload)
-      this.broadcastChannel.postMessage(message)
-      console.log(`[${this.componentMode}] Published broadcast:`, type, payload)
+      return this.broadcastManager?.publish(type, payload)
     },
 
     /**
@@ -744,43 +736,13 @@ export default {
      * @param {string} requestId - Request ID from Remote
      */
     sendCurrentState (requestId) {
-      const agentStatus = this.profile?.agent_status
-      const dialerStatus = this.dialer?.currentStatus
-
-      let hasActiveCall = false
-      let callType = null
-      let communication = null
-      let contact = null
-
-      // Check for incoming call (ringing)
-      if (agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
-        hasActiveCall = true
-        callType = 'incoming'
-        communication = this.dialer?.communication || this.incomingCallData?.communication
-        contact = this.dialer?.contact || this.incomingCallData?.contact
-      } else if (agentStatus === AgentStatus.AGENT_STATUS_ON_CALL ||
-               dialerStatus === DialerStatus.CALL_CONNECTED ||
-               dialerStatus === DialerStatus.MAKING_CALL) {
-        hasActiveCall = true
-        callType = 'active'
-        communication = this.dialer?.communication || this.activeCallData?.communication
-        contact = this.dialer?.contact || this.activeCallData?.contact
-      }
-
-      console.log('[WINDOW] Sending current state:', {
-        hasActiveCall,
-        callType,
-        hasContact: !!contact,
-        hasCommunication: !!communication
-      })
-
-      this.publishBroadcast(BroadcastMessageTypes.CURRENT_STATE_RESPONSE, {
-        requestId,
-        hasActiveCall,
-        callType,
-        communication,
-        contact
-      })
+        this.broadcastManager?.sendCurrentState({
+          requestId,
+          profile: this.profile,
+          dialer: this.dialer,
+          incomingCallData: this.incomingCallData,
+          activeCallData: this.activeCallData
+        })
     },
 
     /**
@@ -862,10 +824,7 @@ export default {
           if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING) {
             console.log('[REMOTE] Agent is ringing - requesting current state from Window')
             this.displayState = DisplayState.READY_FOR_CALLS
-            this.publishBroadcast(BroadcastMessageTypes.REQUEST_CURRENT_STATE, {
-              requestId: `remote-${Date.now()}`,
-              timestamp: Date.now()
-            })
+            this.broadcastManager?.requestCurrentState(`remote-${Date.now()}`)
           } else if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
                      this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
                      this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
@@ -1144,10 +1103,7 @@ export default {
         // Broadcast CALL_ENDED to REMOTE mode when call ends in WINDOW mode
         if (this.componentMode === ComponentMode.WINDOW) {
           console.log('[WINDOW] Call ended, broadcasting to REMOTE')
-          this.publishBroadcast(BroadcastMessageTypes.CALL_ENDED, {
-            callId: this.dialer?.communication?.id,
-            endedAt: Date.now()
-          })
+          this.broadcastManager?.broadcastCallEnded(this.dialer?.communication?.id, Date.now())
         }
 
         // In REMOTE mode, don't change display state if showing active call UI - wait for broadcast
@@ -1544,7 +1500,7 @@ export default {
         this.hubspotDialNumber
       )
 
-      this.publishBroadcast(BroadcastMessageTypes.CALL_CONNECTED, data)
+      this.broadcastManager?.broadcastCallConnected(data.communication, data.contact)
     },
 
     /**
@@ -1561,11 +1517,7 @@ export default {
     reloadWidget () {
       console.log('[HubSpot Widget] Reload widget button clicked, broadcasting to other instance...')
 
-      // Broadcast reload request to other widget instance (remote ↔ window)
-      this.publishBroadcast(BroadcastMessageTypes.WIDGET_RELOAD_REQUESTED, {
-        reason: 'user_clicked_reload_button',
-        timestamp: Date.now()
-      })
+      this.broadcastManager?.broadcastWidgetReload('user_clicked_reload_button')
 
       // Small delay to ensure broadcast is sent before reloading
       setTimeout(() => {
@@ -1736,11 +1688,7 @@ export default {
       this.endActiveCall()
     }
 
-    // Close Broadcast Channel
-    if (this.broadcastChannel) {
-      this.broadcastChannel.close()
-      console.log('[HubSpot Widget] Broadcast Channel closed')
-    }
+    this.broadcastManager?.close()
   },
 
   async created () {
@@ -1784,17 +1732,14 @@ export default {
       return
     }
 
-    // Initialize Broadcast Channel for cross-instance communication (remote ↔ window)
-    try {
-      this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-      this.broadcastChannel.onmessage = this.handleBroadcastMessage
-      console.log(`[HubSpot Widget] Broadcast Channel '${BROADCAST_CHANNEL_NAME}' initialized successfully`)
-    } catch (error) {
-      console.error('[HubSpot Widget] Failed to initialize Broadcast Channel:', error)
-      // Continue without broadcast channel - component will work in standalone mode
-    }
+    // Initialize Broadcast Manager for cross-instance communication (remote <-> window)
+    this.broadcastManager = new HubSpotBroadcastManager({
+      onMessageCallback: this.handleBroadcastMessage
+    })
 
-    // Initialize HubSpot SDK (needed for iframe communication regardless of integration status)
+    this.broadcastManager.initialize(this.componentMode, this.handleBroadcastMessage)
+
+    // Initialize HubSpot SDK
     try {
       this.extensions = await HubSpotCallingExtensionsClient.initialize(this.callSdkOptions)
     } catch (error) {
