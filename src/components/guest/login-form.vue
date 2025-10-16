@@ -252,24 +252,24 @@ export default {
         redirectPath = decodeURIComponent(redirectQuery)
       }
 
-      // This will fix redirect path if the app is in the HubSpot Extension Context
-      redirectPath = await this.getCorrectRedirectPathForContext(redirectPath)
+      // This will fix a redirect path if the app is in the HubSpot Extension Context
+      redirectPath = await this.getCorrectRedirectPathForContext(redirectPath, company)
 
       this.$emit('userLoggedIn')
 
       // For HubSpot widgets: broadcast login and navigate with reload trigger
-      // Check if we're redirecting to HubSpot widget (not if we're currently on it)
+      // Check if we're redirecting to the HubSpot widget (not if we're currently on it)
       const isRedirectingToHubSpot = redirectPath.includes('hubspot-call-extension')
       if (isRedirectingToHubSpot) {
         // Use broadcast manager static method for one-time broadcast
         console.log('[Login Form] Broadcasting login success via Broadcast Manager...')
-        HubSpotBroadcastManager.sendOneTimeBroadcast(
+        await HubSpotBroadcastManager.sendOneTimeBroadcast(
           BroadcastMessageTypes.USER_LOGGED_IN,
           { timestamp: Date.now() }
         )
 
         // Navigate with from_login=true query param to trigger reload in the widget
-        // Small delay to ensure broadcast is fully transmitted before page unload
+        // Small delay to ensure the broadcast is fully transmitted before the page unloaded
         setTimeout(() => {
           const url = `${window.location.origin}${redirectPath}${redirectPath.includes('?') ? '&' : '?'}from_login=true`
           console.log('[Login Form] Navigating to:', url)
@@ -289,13 +289,13 @@ export default {
      *
      * @returns {Object} - Object containing redirect decision and context info
      */
-    checkHubSpotRedirectContext () {
+    checkHubSpotRedirectContext (company = null) {
       // Check if we're in HubSpot extension mode or redirecting to HubSpot extension
       const isHubSpotExtension = this.$route.name === 'HubSpot Call Extension' ||
                                  this.$route.path.includes('hubspot-call-extension')
 
-      // Get the dynamic HubSpot domain from company settings
-      const hubspotDomain = this.$store?.state?.auth?.profile?.company?.hubspot_company_ui_domain || 'app.hubspot.com'
+      // Get the HubSpot domain from company settings
+      const hubspotDomain = company?.hubspot_company_ui_domain || this.$store?.state?.auth?.profile?.company?.hubspot_company_ui_domain || 'app.hubspot.com'
 
       // Check if the user is coming from HubSpot calling window mode (popup/iframe)
       // This handles scenarios like: https://app.hubspot.com/calling-integration-popup-ui/49267018
@@ -310,7 +310,7 @@ export default {
                                    referrerIsHubSpot
 
       // Check if HubSpot integration is enabled
-      const isHubSpotEnabled = this.$store?.state?.auth?.profile?.company?.hubspot_integration_enabled
+      const isHubSpotEnabled = company?.hubspot_integration_enabled ?? this.$store?.state?.auth?.profile?.company?.hubspot_integration_enabled
 
       // Determine if we should redirect to HubSpot extension
       const shouldRedirect = hasHubSpotConditions && isHubSpotEnabled
@@ -328,13 +328,14 @@ export default {
      * This fixes issues where users in HubSpot extension mode get redirected to wrong pages
      *
      * @param {string} originalPath - The original redirect path from query parameters
-     * @returns {string} - The corrected redirect path
+     * @param {object} company - The current company object
+     * @returns Promise<{string}> - The corrected redirect path
      */
-    async getCorrectRedirectPathForContext (originalPath) {
+    async getCorrectRedirectPathForContext (originalPath, company = null) {
       // Wait for Vuex to resolve completely before checking HubSpot context
       await this.$nextTick()
 
-      const hubSpotContext = this.checkHubSpotRedirectContext()
+      const hubSpotContext = this.checkHubSpotRedirectContext(company)
 
       // Redirect to HubSpot extension if conditions are met and integration is enabled
       if (hubSpotContext.shouldRedirect) {

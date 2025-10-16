@@ -283,8 +283,8 @@ export default {
 
       // HubSpot Calling Extensions SDK configuration options
       callSdkOptions: {
-        debugMode: true, // Whether to log various inbound/outbound messages to console
-        eventHandlers: { // eventHandlers handle inbound messages
+        debugMode: true, // Whether to log various inbound/outbound messages to the console
+        eventHandlers: {
           onReady: (data) => {
             // Reset dialer to clean state when HubSpot SDK is ready (timers, call data, call controls, etc.)
             this.$VueEvent.fire('resetCall')
@@ -312,8 +312,8 @@ export default {
             this.setHubspotDialNumber(data)
 
             if (!this.authenticated) {
-              // User needs to login first, redirect to login page
-              this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
+              // User needs to log in first, redirect to the login page
+              await this.$router.push({ name: 'Login', query: { redirect: '/widgets/hubspot-call-extension' } })
               return
             }
 
@@ -340,10 +340,6 @@ export default {
             await this.postDialNumber()
           },
 
-          onIncomingCall: async (event) => {
-            console.log('Incoming call received from HubSpot:', event)
-          },
-
           onVisibilityChanged: (data) => {
             this.isCallingWidgetVisible = !data?.isHidden
             if (!this.isCallingWidgetVisible) {
@@ -351,22 +347,6 @@ export default {
               this.endActiveCall()
             }
           },
-
-          onExternalCallIdNotPresent: (data) => {
-            console.log('[HubSpot Widget] External call ID not present:', data)
-          },
-
-          onInitiateCallIdFailed: (data) => {
-            console.log('[HubSpot Widget] Initiate call ID failed:', data)
-          },
-
-          onCallerIdMatchFailed: (data) => {
-            console.log('[HubSpot Widget] Caller ID match failed:', data)
-          },
-
-          onCreateEngagementFailed: (data) => {
-            console.log('[HubSpot Widget] Create engagement failed:', data)
-          }
         }
       }
     }
@@ -761,7 +741,7 @@ export default {
         console.log('Error: api key is not valid', err)
         this.$handleErrors(err.response)
         if (this.$route.name !== 'Login') {
-          this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
+          await this.$router.push({ name: 'Login', query: { redirect: '/widgets/hubspot-call-extension' } })
         }
       }
     },
@@ -770,12 +750,56 @@ export default {
      * Handles post-authentication logic
      */
     handleUserLogin () {
+      // // Check if HubSpot integration is enabled first
+      // if (!this.isHubspotIntegrationEnabled) {
+      //   this.displayState = DisplayState.HUBSPOT_INTEGRATION_DISABLED
+      //   return
+      // }
+      //
+      // if (this.callExtensionsInitialized) {
+      //   this.extensions.userLoggedIn()
+      //   // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
+      //   if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
+      //     this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
+      //   }
+      // }
+      //
+      // // Check for incoming/active calls in REMOTE mode after page refresh
+      // if (this.componentMode === ComponentMode.REMOTE) {
+      //   // For RINGING status, request the current state from Window
+      //   if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING) {
+      //     console.log('[REMOTE] Agent is ringing - requesting current state from Window')
+      //     this.displayState = DisplayState.READY_FOR_CALLS
+      //     this.broadcastManager?.requestCurrentState(`remote-${Date.now()}`)
+      //   } else if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
+      //     this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
+      //     this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
+      //     // Show active call UI when the agent is on call OR actively dialing/connected
+      //     this.validateHasActiveCallStatus()
+      //   }
+      // }
+      //
+      // // Don't change displayState if the agent is ringing, in wrap-up, showing incoming call, or showing active call UI
+      // // Also check dialer status for outbound calls that are in progress
+      // const shouldNotChangeToReady =
+      //   this.profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING ||
+      //   this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
+      //   (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) ||
+      //   this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
+      //   this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
+      //   this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL ||
+      //   this.displayState === DisplayState.INCOMING_CALL
+      //
+      // if (!shouldNotChangeToReady) {
+      //   this.displayState = DisplayState.READY_FOR_CALLS
+      // }
+      
       // Check if HubSpot integration is enabled first
       if (!this.isHubspotIntegrationEnabled) {
         this.displayState = DisplayState.HUBSPOT_INTEGRATION_DISABLED
         return
       }
-
+      
       if (this.callExtensionsInitialized) {
         this.extensions.userLoggedIn()
         // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
@@ -783,10 +807,10 @@ export default {
           this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
         }
       }
-
+      
       /**
        * if empty, then onDialNumber event was not called - skip calling,
-       * if not empty then dialer was called, and we are here after login page so we must dial the number
+       * if not empty, then dialer was called, so we must dial the number
        */
       if (!this.hubspotDialNumber) {
         // Check for incoming/active calls in REMOTE mode after page refresh
@@ -797,13 +821,13 @@ export default {
             this.displayState = DisplayState.READY_FOR_CALLS
             this.broadcastManager?.requestCurrentState(`remote-${Date.now()}`)
           } else if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
-                     this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
-                     this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
+            this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
+            this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
             // Show active call UI when the agent is on call OR actively dialing/connected
             this.validateHasActiveCallStatus()
           }
         }
-
+        
         // Don't change displayState if the agent is ringing, in wrap-up, showing incoming call, or showing active call UI
         // Also check dialer status for outbound calls that are in progress
         const shouldNotChangeToReady =
@@ -814,14 +838,14 @@ export default {
           this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
           this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL ||
           this.displayState === DisplayState.INCOMING_CALL
-
+        
         if (!shouldNotChangeToReady) {
           this.displayState = DisplayState.READY_FOR_CALLS
         }
-
+        
         return
       }
-
+      
       this.postDialNumber()
     },
 
