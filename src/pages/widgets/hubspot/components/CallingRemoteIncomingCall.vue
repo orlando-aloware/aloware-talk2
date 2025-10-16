@@ -30,7 +30,7 @@
       </div>
 
       <div class="phone-cta">
-        <div class="d-flex flex-row justify-content-center" style="gap: 48px;">
+        <div class="d-flex flex-row justify-content-center" style="gap: 60px;">
           <div class="d-flex flex-column align-items-center">
             <q-btn
               class="height-52 bg-white"
