@@ -14,7 +14,7 @@ class HubSpotCallingExtensionsClient {
    * Initialize the HubSpot Calling Extensions SDK.
    *
    * CallingExtensions initialization must happen only once and not repeat
-   * when, for instance, login page is called. Otherwise we lose connection with
+   * when, for instance, the login page is called. Otherwise, we lose connection with
    * the parent HubSpot window.
    *
    * @param {Object} options - SDK configuration options
