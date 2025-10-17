@@ -233,8 +233,8 @@ export default {
         }
       ]
 
-      // Add "All Inboxes" only for demo/whitelisted companies
-      if (this.companyHasAccessToAllInboxes && !this.search) {
+      // Add "All Inboxes" only if not searching
+      if (!this.search) {
         navItems.unshift({
           id: INBOX_TYPE_ALL,
           name: 'All Inboxes',
@@ -393,8 +393,7 @@ export default {
         return null
       }
 
-      // If user has any inboxes, prioritize "All Inboxes" as the first option
-      if (this.companyHasAccessToAllInboxes && !this.search) {
+      if (!this.search) {
         const allInboxes = [
           ...this.parsedInboxes.personal,
           ...this.parsedInboxes.connected,
