@@ -11,8 +11,6 @@
         <trial-expired-modal v-if="showTrialExpiredModal"/>
         <cancelled-account-modal v-else-if="showCancelledAccountModal"/>
         <trial-banner v-else-if="showIsTrialBanner"/>
-        <teaminbox-empty-state-video v-else-if="showTeamInboxEmptyStateVideo"/>
-        <teaminbox-tutorial-video v-else-if="showTeamInboxTutorialVideo"/>
       </template>
       <div class="h-100"
            :class="{ 'page': !isWidget }">
@@ -242,8 +240,6 @@ import KycFillDialog from 'components/kyc-fill-dialog.vue'
 import KycReloadDialog from 'components/kyc-reload-dialog.vue'
 import Modal from 'components/modal.vue'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
-import teaminboxEmptyStateVideo from 'components/teaminbox/teaminbox-empty-state-video.vue'
-import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
 import TrialBanner from 'components/trial-banner.vue'
 import _ from 'lodash'
 import {
@@ -332,9 +328,7 @@ export default {
     TrialBanner,
     TrialExpiredModal,
     CancelledAccountModal,
-    AccountSelector,
-    teaminboxTutorialVideo,
-    teaminboxEmptyStateVideo
+    AccountSelector
   },
 
   mixins: [
@@ -508,20 +502,6 @@ export default {
 
     showIsTrialBanner () {
       return this.isTrial && this.companyHasTrialStatus && !this.isWidget
-    },
-
-    showTeamInboxEmptyStateVideo () {
-      // Show empty state video when on Team Inbox route AND user has no inboxes
-      return this.$route.name.includes(TEAMINBOXES_MENU_TITLE) &&
-        this.isTeamInboxesLoaded &&
-        !this.hasTeamInboxes
-    },
-
-    showTeamInboxTutorialVideo () {
-      // Show tutorial video when on Team Inbox route AND user has inboxes
-      return this.$route.name.includes(TEAMINBOXES_MENU_TITLE) &&
-        this.isTeamInboxesLoaded &&
-        this.hasTeamInboxes
     },
 
     companyHasTrialStatus () {
