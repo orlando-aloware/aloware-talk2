@@ -52,6 +52,12 @@ export default function ({ store }) {
   })
 
   Router.beforeEach((to, from, next) => {
+    // HubSpot widget restoration: if the widget was active, and we're navigating to root, redirect to the widget
+    if (store.state.isHubSpotWidget && (to.path === '/' || to.name === 'Inbox')) {
+      console.log('[Router] Restoring HubSpot widget route')
+      return next('/widgets/hubspot-call-extension')
+    }
+
     next()
     const isWidget = to.matched.some(route => route?.meta?.isWidget)
 
@@ -63,6 +69,12 @@ export default function ({ store }) {
 
     if (isSalesforceWidget) {
       store.commit('SET_IS_SALESFORCE_WIDGET', true)
+    }
+
+    const isHubSpotWidget = to.matched.some(route => route?.meta?.isHubSpotWidget)
+
+    if (isHubSpotWidget) {
+      store.commit('SET_IS_HUBSPOT_WIDGET', true)
     }
 
     const record = to.matched.find(record => record.meta.title)

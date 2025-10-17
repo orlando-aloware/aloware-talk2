@@ -30,7 +30,7 @@
     "@fortawesome/free-solid-svg-icons": "6.6.0",
     "@fullstory/browser": "^1.5.1",
     "@gkt/microphone": "^1.0.3",
-    "@hubspot/calling-extensions-sdk": "^0.5.1",
+    "@hubspot/calling-extensions-sdk": "^0.9.7",
     "@popperjs/core": "^2.11.8",
     "@quasar/extras": "^1.16.9",
     "@riophae/vue-treeselect": "^0.4.0",

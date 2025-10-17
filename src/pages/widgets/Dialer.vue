@@ -1,4 +1,6 @@
 <template>
+  <!-- @deprecation notice: the HubSpot-specific code is deprecated and will be removed in the future. -->
+  <!-- Please refer to HubSpotSoftphone instead for using the dialer in HubSpot. -->
   <div>
     <b-overlay
       class="h-100 w-100 position-absolute"
