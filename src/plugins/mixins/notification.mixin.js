@@ -24,7 +24,7 @@ export default {
       'notificationAudio'
     ]),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['isWidget', 'isSalesforceWidget', 'isHubSpotWidget']),
+    ...mapState(['isWidget', 'isSalesforceWidget']),
     ...mapState('powerDialer', [
       'powerDialerTasks'
     ])
