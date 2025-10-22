@@ -1,14 +1,11 @@
 <template>
   <div class="ellipse"
        data-testid="ring-group-row">
-    <span v-if="ringGroup.id && ringGroup.call_waiting && !hasCompanyTeamInboxEnabled">
-      Call waiting queue
-    </span>
     <a class="cursor-pointer"
        target="_blank"
        :href="getRingGroupURL(ringGroupId)"
        :id="`comm-ring-group-${_uid}`"
-       v-else-if="ringGroup.id && !isAgent"
+       v-if="ringGroup.id && !isAgent"
        @click="handleRingGroupClick(ringGroupId, $event)">
       <external-link-icon color="#1976D2"/>
       {{ removeDeletedSuffix(ringGroup.name) }}

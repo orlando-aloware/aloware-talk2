@@ -230,7 +230,7 @@
                   target="_blank"
                   :href="getRingGroupURL(communication.ring_group_id)"
                   :id="`comm-ring-group-${_uid}`"
-                  v-if="communication.ring_group_id && (this.hasCompanyTeamInboxEnabled || !getRingGroup(communication.ring_group_id).call_waiting)"
+                  v-if="communication.ring_group_id && this.hasCompanyTeamInboxEnabled"
                   @click="handleRingGroupClick(communication.ring_group_id, $event)">
                   <span class="text-blue cursor-pointer"
                         :title="getRingGroup(communication.ring_group_id).name">

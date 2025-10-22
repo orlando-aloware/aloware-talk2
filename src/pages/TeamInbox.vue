@@ -26,7 +26,7 @@ import Contact from 'pages/contacts/Contact'
 import TeamInboxSide from 'components/teaminbox/teaminbox-side'
 import { aclMixin, userMixin, teamInboxPropsMixin, TeamInboxMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { TEAMINBOXES_MENU_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { mapFields } from 'vuex-map-fields'
 import { debounce } from 'lodash'
 import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
@@ -132,11 +132,6 @@ export default {
 
         this.$router.replace({ name: 'Inbox' })
       }
-    }
-
-    if (this.isAllInboxesRoute && !this.companyHasAccessToAllInboxes) {
-      this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
-      return
     }
 
     this.resizeHandler()

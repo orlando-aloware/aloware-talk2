@@ -37,21 +37,13 @@ export default {
 
   mounted () {
     const wasShown = Platform.is.electron ? localStorage.getItem(this.cookieName) : this.$cookies.get(this.cookieName)
-    const wasTeamInboxVideoShown = Platform.is.electron ? localStorage.getItem(this.teamInboxVideoCookieName) : this.$cookies.get(this.teamInboxVideoCookieName)
 
     if (wasShown) {
       // If the button was already shown and user closed it, we don't need to show it again
       return
     }
 
-    // Only make the button visible if the team inbox video was already shown
-    this.isVisible = !!wasTeamInboxVideoShown
-
-    this.$VueEvent.listen('teaminbox-tutorial-video-closed', this.makeVisibleHandler)
-  },
-
-  beforeDestroy () {
-    this.$VueEvent.stop('teaminbox-tutorial-video-closed', this.makeVisibleHandler)
+    this.isVisible = true
   },
 
   data () {
@@ -80,11 +72,6 @@ export default {
   },
 
   methods: {
-    makeVisibleHandler () {
-      // Make the button visible after the user has watched the team inbox video
-      this.isVisible = true
-    },
-
     showLinesTutorial () {
       this.$navattic.openPopup(CID_AND_LINES_DEMO)
     },
