@@ -13,8 +13,5 @@ export default {
   },
   isTrial (state) {
     return state.profile?.company?.is_trial
-  },
-  isTalkLite (state) {
-    return state.is_focused_power_dialer
   }
 }

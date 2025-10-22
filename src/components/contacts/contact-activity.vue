@@ -260,7 +260,6 @@
         <span class="text-muted"
               v-if="showBottomCommunicationInfo">
           <router-link
-            v-if="!isTalkLite"
             :to="{ name: 'Communication', params: { contactId: contact.id , communicationId: communication.id }}">
             <information-circle-icon style="cursor: help;"
                                      color="#2196f3">
@@ -511,7 +510,6 @@ export default {
       'channelChangedFilterFields'
     ]),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
-    ...mapGetters('auth', ['isTalkLite']),
 
     getCommunicationClass () {
       if (this.communication.current_status2 === undefined) {
