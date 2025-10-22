@@ -90,3 +90,5 @@ export const REJECTION_REASON_NOT_MULTIMEDIA_MESSAGING_ENABLED = 44
 export const REJECTION_REASON_EMERGENCY_NUMBER = 45
 // Rejected to send calls by our system because of kyc restriction
 export const REJECTION_REASON_KYC_CALLS_OUTBOUND_RESTRICTION = 46
+// The traffic to this country is not allowed. Contact Support to get access to this country.
+export const REJECTION_REASON_BANNED_COUNTRY = 47

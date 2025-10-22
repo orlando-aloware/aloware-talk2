@@ -224,7 +224,7 @@ export default {
         case CommunicationRejectionReasons.REJECTION_REASON_MESSAGE_EMPTY:
           return 'Message body was required.'
         case CommunicationRejectionReasons.REJECTION_REASON_NUMBER_IS_INTERNATIONAL:
-          return 'The contact phone number was international.'
+          return 'The traffic to this country is not allowed. Contact Support to get access to this country.'
         case CommunicationRejectionReasons.REJECTION_REASON_FAX_NUMBER_NOT_FOUND:
           return 'We couldn\'t send a fax from a non-fax capable number.'
         case CommunicationRejectionReasons.REJECTION_REASON_INVALID_OR_WRONG_PHONE_NUMBER:
@@ -281,6 +281,8 @@ export default {
           return 'Emergency calling is not allowed.'
         case CommunicationRejectionReasons.REJECTION_REASON_KYC_CALLS_OUTBOUND_RESTRICTION:
           return 'Your trial plan does not allow you to make calls to this number. Submit your business information for verification to unlock calling features to other numbers.'
+        case CommunicationRejectionReasons.REJECTION_REASON_BANNED_COUNTRY:
+          return 'The traffic to this country is not allowed.'
       }
     },
 
