@@ -21,7 +21,7 @@
                             data-testid="contact-details-sequence"
                             :contact="contact"
                             :is-read-only="isReadOnly"
-                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
+                            v-if="showContactSequenceCard" />
           <contact-conversation-insights :contact="contact"
                                          data-testid="contact-conversation-insights"
                                          :is-read-only="isReadOnly"
@@ -51,12 +51,14 @@
                        :entity-object="contact"
                        :category="TagCategories.CAT_CONTACTS"
                        :is-read-only="isReadOnly" />
-          <contact-lists-card data-testid="contact-details-public-lists"
+          <contact-lists-card v-if="!isTalkLite"
+                              data-testid="contact-details-public-lists"
                               key="contact-public-lists-card"
                               :is-public-contact-list-card="true"
                               :contact="contact"
                               :is-read-only="isReadOnly" />
-          <contact-lists-card data-testid="contact-details-private-lists"
+          <contact-lists-card v-if="!isTalkLite"
+                              data-testid="contact-details-private-lists"
                               key="contact-private-lists-card"
                               :is-public-contact-list-card="false"
                               :contact="contact"
@@ -86,7 +88,10 @@
           <contact-ring-groups v-if="!hasCompanyTeamInboxEnabled"
                                data-testid="contact-details-ring-groups"
                                :is-read-only="isReadOnly" />
-          <contact-broadcast data-testid="contact-details-broadcast" />
+          <contact-broadcast
+            v-if="!isTalkLite"
+            data-testid="contact-details-broadcast"
+          />
         </template>
         <contact-save-bar data-testid="contact-details-save-bar" v-if="!noSaveBar || isReadOnly" />
       </div>
@@ -193,6 +198,7 @@ export default {
   },
 
   computed: {
+    ...mapGetters('auth', ['isTalkLite']),
     ...mapGetters('contacts', ['contact', 'contactClone']),
     ...mapState('cache', ['currentCompany']),
 
@@ -209,8 +215,16 @@ export default {
     },
 
     showAloAiControls () {
-      return this.isAloAiEnabled() &&
+      return !this.isTalkLite &&
+        this.isAloAiEnabled() &&
         this.contact && !this.contact.is_dnc &&
+        this.hasPermissionTo('update contact')
+    },
+
+    showContactSequenceCard () {
+      return !this.isTalkLite &&
+        this.contact &&
+        !this.contact.is_dnc &&
         this.hasPermissionTo('update contact')
     }
   },
