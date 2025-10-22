@@ -9,17 +9,13 @@
           :integrations="activeIntegrations"
           inline
         />
-        <contact-info-open-contact
-          v-if="teamInbox && !isTalkLite"
-          :contact="contact"
-        />
+        <contact-info-open-contact v-if="teamInbox" :contact="contact" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import ContactInfoAvatar from './header/contact-info-avatar.vue'
 import ContactInfoNameEditable from './header/contact-info-name-editable.vue'
 import ContactInfoOpenContact from './header/contact-info-open-contact.vue'
@@ -50,9 +46,6 @@ export default {
       type: Boolean,
       default: false
     }
-  },
-  computed: {
-    ...mapGetters('auth', ['isTalkLite'])
   }
 }
 </script>
