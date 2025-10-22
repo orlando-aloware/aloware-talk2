@@ -557,6 +557,11 @@ export default {
     },
 
     checkMentionMatchesUserAccessibility (mention) {
+      // check if mentioned user is the actual user
+      if (mention.mentioned_user_id !== this.profile.id) {
+        return false
+      }
+
       // checks if communication matches user communication visibility
       if (this.profile.communications_visibility === CommunicationAccessTypes.COMMUNICATIONS_OWNED_ONLY &&
         mention.mentioner_user_id &&

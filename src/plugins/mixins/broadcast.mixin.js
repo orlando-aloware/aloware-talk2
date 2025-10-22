@@ -380,6 +380,11 @@ export default {
           // }
           this.$VueEvent.fire('update_communication', event.communication)
         })
+        .listen('.mention.created', (event) => {
+          this.dispatchToMemoryMonitor('.mention.created', event)
+          console.log('>>> mention.created listener', event)
+          this.$VueEvent.fire('mention', event.mention)
+        })
         .listen('.recording_status.updated', (event) => {
           this.dispatchToMemoryMonitor('recording_status.updated', event)
           this.$VueEvent.fire('updated_recording_status', event)
@@ -441,17 +446,6 @@ export default {
         /**
          * End of Power Dialer Session Tasks
          */
-
-        .notification((notification) => {
-          this.dispatchToMemoryMonitor('notification', notification)
-          if (!this.profile.sleep_mode) {
-            switch (notification.type) {
-              case 'App\\Notifications\\MentionNotification':
-                this.$VueEvent.fire('mention', notification)
-                break
-            }
-          }
-        })
 
       window.Echo.private('company-' + this.profile.company_id)
         .listen('.company.updated', (event) => {
@@ -528,6 +522,11 @@ export default {
         .listen('.communication.deleted', (event) => {
           this.dispatchToMemoryMonitor('.communication.deleted', event)
           this.$VueEvent.fire('delete_communication', event.communication)
+        })
+        .listen('.mention.created', (event) => {
+          this.dispatchToMemoryMonitor('.mention.created', event)
+          console.log('>>> mention.created listener', event)
+          this.$VueEvent.fire('mention', event.mention)
         })
         .listen('.incoming_number.created', (event) => {
           this.dispatchToMemoryMonitor('.incoming_number.created', event)
