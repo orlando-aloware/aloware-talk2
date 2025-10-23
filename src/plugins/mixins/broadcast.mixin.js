@@ -380,11 +380,6 @@ export default {
           // }
           this.$VueEvent.fire('update_communication', event.communication)
         })
-        .listen('.mention.created', (event) => {
-          this.dispatchToMemoryMonitor('.mention.created', event)
-          console.log('>>> mention.created listener', event)
-          this.$VueEvent.fire('mention', event.mention)
-        })
         .listen('.recording_status.updated', (event) => {
           this.dispatchToMemoryMonitor('recording_status.updated', event)
           this.$VueEvent.fire('updated_recording_status', event)
@@ -525,7 +520,6 @@ export default {
         })
         .listen('.mention.created', (event) => {
           this.dispatchToMemoryMonitor('.mention.created', event)
-          console.log('>>> mention.created listener', event)
           this.$VueEvent.fire('mention', event.mention)
         })
         .listen('.incoming_number.created', (event) => {

@@ -348,7 +348,7 @@ export default {
         return null
       }
 
-      const inboxPath = `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+      const inboxPath = `/channels/inbox/all/contacts/${this.contactId}/communications/${this.communicationId}`
 
       // If TeamInbox is not enabled, use the original logic
       if (!this.hasCompanyTeamInboxEnabled) {
