@@ -442,17 +442,6 @@ export default {
          * End of Power Dialer Session Tasks
          */
 
-        .notification((notification) => {
-          this.dispatchToMemoryMonitor('notification', notification)
-          if (!this.profile.sleep_mode) {
-            switch (notification.type) {
-              case 'App\\Notifications\\MentionNotification':
-                this.$VueEvent.fire('mention', notification)
-                break
-            }
-          }
-        })
-
       window.Echo.private('company-' + this.profile.company_id)
         .listen('.company.updated', (event) => {
           this.dispatchToMemoryMonitor('.company.updated', event)
@@ -528,6 +517,10 @@ export default {
         .listen('.communication.deleted', (event) => {
           this.dispatchToMemoryMonitor('.communication.deleted', event)
           this.$VueEvent.fire('delete_communication', event.communication)
+        })
+        .listen('.mention.created', (event) => {
+          this.dispatchToMemoryMonitor('.mention.created', event)
+          this.$VueEvent.fire('mention', event.mention)
         })
         .listen('.incoming_number.created', (event) => {
           this.dispatchToMemoryMonitor('.incoming_number.created', event)
