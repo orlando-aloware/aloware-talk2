@@ -55,7 +55,7 @@ export const REJECTION_REASONS = [
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_NUMBER_IS_INTERNATIONAL,
-    message: 'Calls to this country are not allowed'
+    message: 'The traffic to this country is not allowed. Contact Support to get access to this country.'
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_INVALID_OR_WRONG_PHONE_NUMBER,
@@ -144,5 +144,9 @@ export const REJECTION_REASONS = [
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_KYC_CALLS_OUTBOUND_RESTRICTION,
     message: 'Your trial plan does not allow you to make calls to this number'
+  },
+  {
+    type: CommunicationRejectionReasons.REJECTION_REASON_BANNED_COUNTRY,
+    message: 'The traffic to this country is not allowed.'
   }
 ]

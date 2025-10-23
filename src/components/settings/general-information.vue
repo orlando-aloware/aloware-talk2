@@ -199,9 +199,7 @@ export default {
     },
 
     shouldDisplayRingGroup (id) {
-      const ringGroup = this.getRingGroup(id)
-
-      return !ringGroup?.call_waiting
+      return !!this.getRingGroup(id)
     }
   }
 }

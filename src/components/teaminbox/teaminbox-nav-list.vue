@@ -176,7 +176,7 @@ export default {
       this.inboxes.forEach(inbox => {
         const {
           teams,
-          call_waiting: callWaiting,
+          is_personal_inbox: isPersonalInbox,
           user_ids: userIds,
           team_ids: teamIds,
           watcher_user_ids: watcherUserIds,
@@ -192,9 +192,9 @@ export default {
           watcherTeamUserIds?.includes(this.profile.id) ||
           watcherTeamIds?.some(id => this.teamsIds.includes(id))
 
-        if (callWaiting && isConnected) {
+        if (isPersonalInbox && isConnected) {
           personal.push(inbox)
-        } else if (!callWaiting && isConnected) {
+        } else if (!isPersonalInbox && isConnected) {
           connected.push(inbox)
         } else if (isWatching) {
           watching.push(inbox)
@@ -233,8 +233,8 @@ export default {
         }
       ]
 
-      // Add "All Inboxes" only for demo/whitelisted companies
-      if (this.companyHasAccessToAllInboxes && !this.search) {
+      // Add "All Inboxes" only if not searching
+      if (!this.search) {
         navItems.unshift({
           id: INBOX_TYPE_ALL,
           name: 'All Inboxes',
@@ -393,8 +393,7 @@ export default {
         return null
       }
 
-      // If user has any inboxes, prioritize "All Inboxes" as the first option
-      if (this.companyHasAccessToAllInboxes && !this.search) {
+      if (!this.search) {
         const allInboxes = [
           ...this.parsedInboxes.personal,
           ...this.parsedInboxes.connected,
