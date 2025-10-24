@@ -1712,6 +1712,10 @@ export default {
         customParameters[key] = value
       })
 
+      // TODO: remove logs
+      console.log('[Dialer] setDialerCall - call.direction value:', call.direction)
+      console.log('[Dialer] setDialerCall - call object:', call)
+
       this.setDialerCall({
         from: call.parameters.From,
         to: call.parameters.To,

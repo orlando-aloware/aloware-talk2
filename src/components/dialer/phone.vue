@@ -1934,7 +1934,7 @@ export default {
       console.log('[Phone] - hasCallFishingCommunication:', this.hasCallFishingCommunication)
 
       return (!_.isEmpty(this.dialer.call) &&
-        (this.dialer.call.direction === 'INCOMING' || this.dialer.call.direction === 'inbound')) || // TODO: possible fix
+        this.dialer.call.direction === 'INCOMING') ||
         this.hasCallFishingCommunication
     },
 
