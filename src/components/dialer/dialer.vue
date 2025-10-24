@@ -409,6 +409,12 @@ export default {
       const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget
 
       if (shouldIgnoreCall) {
+        console.log('Ignoring inbound call')
+        console.table({
+          isWidget: this.isWidget,
+          isSalesforceWidget: this.isSalesforceWidget,
+          isHubSpotWidget: this.isHubSpotWidget
+        })
         call._connection.ignore()
         return
       }

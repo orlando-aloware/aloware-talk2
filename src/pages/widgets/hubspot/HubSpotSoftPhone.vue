@@ -346,6 +346,14 @@ export default {
               this.endActiveCall()
             }
           },
+          
+          onCreateEngagementFailed: () => {
+            // We don't use this event, but we define it to silence the warnings in the console
+          },
+
+          onCallerIdMatchFailed: () => {
+            // We don't use this event, but we define it to silence the warnings in the console
+          },
         }
       }
     }
@@ -1501,11 +1509,14 @@ export default {
     
     /**
      * Update the agent status in HubSpot if it changes in Aloware
+     * Only WINDOW mode should update HubSpot availability to prevent duplicate signals
      */
     'profile.agent_status' (newStatus) {
       this.callSdkOptions.isAvailable = this.isAgentAvailable
 
-      if (this.callExtensionsInitialized && this.extensions) {
+      // Only WINDOW mode should notify HubSpot of availability changes
+      // REMOTE mode just displays the UI state
+      if (this.callExtensionsInitialized && this.extensions && this.componentMode !== ComponentMode.REMOTE) {
         if (newStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS) {
           this.extensions.userAvailable()
         } else {
