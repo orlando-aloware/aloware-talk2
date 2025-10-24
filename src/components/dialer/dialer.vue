@@ -62,7 +62,7 @@ export default {
       loadingUnhold: false,
       loadingPark: false,
       loadingUnpark: false,
-      device: new TwilioDevice(null),
+      // device is now non-reactive (created in beforeCreate) // TODO: Test
       connection: null,
       warnings: [],
       hangupInterval: null,
@@ -127,6 +127,13 @@ export default {
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
     }
+  },
+
+  // TODO: Remove beforeCreate if not working
+  beforeCreate () {
+    // Create Twilio device as a non-reactive property
+    // This prevents Vue's Observer from wrapping it and breaking its internal event system
+    this.device = new TwilioDevice(null)
   },
 
   created () {
