@@ -596,7 +596,6 @@ export default {
       'setIsHubSpotWidget',
       'setHubspotDialNumber',
       'setDialerCommunication',
-      'setDialerCall',
       'setDialerContact',
       'setDialerCurrentStatus'
     ]),
@@ -1205,16 +1204,6 @@ export default {
       // Apply the returned state
       if (result.success) {
         this.setDialerCommunication(result.communication)
-        
-        // Set dialer.call with direction so the phone UI shows accept/reject buttons
-        // TODO: Maybe not needed
-        const callWithDirection = {
-          ...result.communication,
-          direction: 'INCOMING'
-        }
-        
-        this.setDialerCall(callWithDirection)
-        
         this.setDialerContact(result.contact)
         this.setDialerCurrentStatus(result.dialerStatus)
         this.displayState = result.displayState
