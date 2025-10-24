@@ -1154,7 +1154,7 @@ export default {
       }
     },
 
-    answerCall (communication = null) {
+    answerCall (communication = null, retryCount = 0) {
       if (!this.dialer.call) {
         return
       }
@@ -1178,6 +1178,16 @@ export default {
         }
         // accept the incoming connection and start two-way audio
         this.connection.accept()
+      } else if (retryCount < 10) {
+        // Twilio connection not ready yet, retry after a short delay (max 10 retries = ~2 seconds)
+        console.log(`[answerCall] Twilio connection not ready, retrying... (${retryCount + 1}/10)`)
+        setTimeout(() => {
+          this.answerCall(communication, retryCount + 1)
+        }, 300)
+      } else {
+        console.error('[answerCall] Twilio connection did not become ready after 10 retries')
+        this.$generalNotification('Unable to answer call. Please try again.', 'error', 3000, true)
+        this.setDialerCurrentStatus('READY')
       }
     },
 
