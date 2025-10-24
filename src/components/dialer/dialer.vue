@@ -408,6 +408,11 @@ export default {
     })
 
     this.device.on(WebrtcEvents.ERROR, (error) => {
+      // TODO: Remove logs
+      console.error('[Twilio] Device ERROR event:', error)
+      console.error('[Twilio] Error code:', error.code)
+      console.error('[Twilio] Error message:', error.message)
+      console.error('[Twilio] Error stack:', error.stack)
       this.removeUnownedLiveContactTask()
       this.handleError(error)
       this.backToDial('Talk-Device.OnError')

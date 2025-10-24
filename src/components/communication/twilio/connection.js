@@ -47,30 +47,58 @@ export default class TwilioConnection {
 
   _initEvents () {
     this._connection.on(Events.CONNECTION_ACCEPT, (connection) => {
+      // TODO: Remove logs
+      console.log('[WebRTC] Connection ACCEPTED:', connection.status())
       this._executeCallback(Events.CONNECTION_ACCEPT, [connection])
     })
     this._connection.on(Events.CONNECTION_CANCEL, () => {
+      // TODO: Remove logs
+      console.warn('[WebRTC] Connection CANCELLED')
       this._executeCallback(Events.CONNECTION_CANCEL)
     })
     this._connection.on(Events.CONNECTION_DISCONNECT, (connection) => {
+      // TODO: Remove logs
+      console.warn('[WebRTC] Connection DISCONNECTED:', {
+        status: connection.status(),
+        duration: connection.duration,
+        cause: connection.customParameters
+      })
       this._executeCallback(Events.CONNECTION_DISCONNECT, [connection])
     })
     this._connection.on(Events.CONNECTION_ERROR, (error) => {
+      // TODO: Remove logs
+      console.error('[WebRTC] Connection ERROR:', {
+        code: error.code,
+        message: error.message,
+        twilioError: error.twilioError,
+        causes: error.causes
+      })
       this._executeCallback(Events.CONNECTION_ERROR, [error])
     })
     this._connection.on(Events.CONNECTION_MUTE, (isMute, connection) => {
       this._executeCallback(Events.CONNECTION_MUTE, [isMute, connection])
     })
     this._connection.on(Events.CONNECTION_RECONNECTING, (error) => {
+      // TODO: Remove logs
+      console.warn('[WebRTC] Connection RECONNECTING:', {
+        code: error?.code,
+        message: error?.message
+      })
       this._executeCallback(Events.CONNECTION_RECONNECTING, [error])
     })
     this._connection.on(Events.CONNECTION_RECONNECTED, () => {
+      // TODO: Remove logs
+      console.log('[WebRTC] Connection RECONNECTED')
       this._executeCallback(Events.CONNECTION_RECONNECTED)
     })
     this._connection.on(Events.CONNECTION_REJECT, () => {
+      // TODO: Remove logs
+      console.warn('[WebRTC] Connection REJECTED')
       this._executeCallback(Events.CONNECTION_REJECT)
     })
     this._connection.on(Events.CONNECTION_RINGING, (hasEarlyMedia) => {
+      // TODO: Remove logs
+      console.log('[WebRTC] Connection RINGING, early media:', hasEarlyMedia)
       this._executeCallback(Events.CONNECTION_RINGING, [hasEarlyMedia])
     })
     this._connection.on(Events.CONNECTION_SAMPLE, (rtcSample) => {
@@ -80,9 +108,13 @@ export default class TwilioConnection {
       this._executeCallback(Events.CONNECTION_VOLUME, [inputVolume, outputVolume])
     })
     this._connection.on(Events.CONNECTION_WARNING, (warningName, warningData) => {
+      // TODO: Remove logs
+      console.warn('[WebRTC] Connection WARNING:', warningName, warningData)
       this._executeCallback(Events.CONNECTION_WARNING, [warningName, warningData])
     })
     this._connection.on(Events.CONNECTION_WARNING_CLEARED, (warningName) => {
+      // TODO: Remove logs
+      console.log('[WebRTC] Warning cleared:', warningName)
       this._executeCallback(Events.CONNECTION_WARNING_CLEARED, [warningName])
     })
     console.log('init connection events')
