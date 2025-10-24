@@ -789,6 +789,16 @@ export default {
         this.setDialerCurrentStatus('TOKEN_GENERATED')
         console.log('Twilio token', this.dialer.token)
 
+        // TODO: Remove - Decode and log token payload to verify identity
+        try {
+          const tokenParts = this.dialer.token.split('.')
+          const payload = JSON.parse(atob(tokenParts[1]))
+          console.log('[Twilio] Token identity from payload:', payload.grants?.identity)
+          console.log('[Twilio] Token grants:', payload.grants)
+        } catch (e) {
+          console.error('[Twilio] Failed to decode token:', e)
+        }
+
         // Reset retry count on successful token generation
         this.resetTokenRetryState()
 
