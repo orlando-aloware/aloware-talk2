@@ -377,6 +377,15 @@ export default {
       this.setDialerErrorDefault()
 
       console.log('Ready to start')
+
+      // TODO: Remove logs
+      console.log('[Twilio] Device registered and ready to receive calls')
+      console.log('[Twilio] Device identity:', this.device.identity)
+      console.log('[Twilio] Widget flags at registration:', {
+        isWidget: this.isWidget,
+        isHubSpotWidget: this.isHubSpotWidget,
+        isSalesforceWidget: this.isSalesforceWidget
+      })
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
       this.checkForcedStatus()
@@ -405,15 +414,19 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      /** TODO: Remove logs */
+      // TODO: Remove logs
       console.log('[Twilio] INCOMING call event received!', call)
+      console.log('[Twilio] Widget flags:', {
+        isWidget: this.isWidget,
+        isSalesforceWidget: this.isSalesforceWidget,
+        isHubSpotWidget: this.isHubSpotWidget
+      })
 
       // Only ignore calls for regular widgets (not Salesforce or HubSpot widgets)
       const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget
 
       if (shouldIgnoreCall) {
-        /** TODO: Remove logs */
-        console.log('Ignoring inbound call')
+        console.log('[Twilio] Ignoring inbound call - widget check failed')
         console.table({
           isWidget: this.isWidget,
           isSalesforceWidget: this.isSalesforceWidget,
