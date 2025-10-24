@@ -1927,6 +1927,12 @@ export default {
     },
 
     isPhoneCTAVisible () {
+      console.log('[Phone] isPhoneCTAVisible check:')
+      console.log('[Phone] - dialer.call:', this.dialer.call)
+      console.log('[Phone] - isEmpty:', _.isEmpty(this.dialer.call))
+      console.log('[Phone] - direction:', this.dialer.call?.direction)
+      console.log('[Phone] - hasCallFishingCommunication:', this.hasCallFishingCommunication)
+
       return (!_.isEmpty(this.dialer.call) &&
         this.dialer.call.direction === 'INCOMING') ||
         this.hasCallFishingCommunication

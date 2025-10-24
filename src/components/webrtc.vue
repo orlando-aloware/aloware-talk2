@@ -173,6 +173,10 @@ export default {
   },
 
   mounted () {
+    /** TODO: Remove logs **/
+    console.log('[Webrtc] Component mounted, dialer.call:', this.dialer.call)
+    console.log('[Webrtc] Full dialer state:', this.dialer)
+
     this.$VueEvent.fire('showLoadingPhone')
   },
 

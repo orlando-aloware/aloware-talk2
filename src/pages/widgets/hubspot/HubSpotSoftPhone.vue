@@ -1169,6 +1169,12 @@ export default {
      * Handle inbound calls from Aloware and notify HubSpot (WINDOW mode only)
      */
     async handleIncomingCall (communication) {
+      /** TODO: Remove Logs **/
+      console.log('[HubSpot Widget] handleIncomingCall called with:', communication)
+      console.log('[HubSpot Widget] Component mode:', this.componentMode)
+      console.log('[HubSpot Widget] Is authenticated:', this.authenticated)
+      console.log('[HubSpot Widget] Is agent available:', this.isAgentAvailable)
+      
       if (!this.authenticated) {
         console.log('[HubSpot Widget] User not authenticated, skipping inbound call')
         return
