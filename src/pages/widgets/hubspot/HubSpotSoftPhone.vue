@@ -1204,6 +1204,7 @@ export default {
       // Apply the returned state
       if (result.success) {
         this.setDialerCommunication(result.communication)
+        this.setDialerCall(result.communication)
         this.setDialerContact(result.contact)
         this.setDialerCurrentStatus(result.dialerStatus)
         this.displayState = result.displayState
