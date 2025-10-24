@@ -387,10 +387,15 @@ export default {
 
       // TODO: Remove logs
       console.log('[Twilio] Device registered and ready to receive calls')
+      console.log('[Twilio] Device object type:', typeof this.device)
+      console.log('[Twilio] Device constructor:', this.device?.constructor?.name)
+      console.log('[Twilio] Device instance check:', this.device instanceof TwilioDevice)
+      console.log('[Twilio] Device keys:', Object.keys(this.device || {}))
       console.log('[Twilio] Device identity:', this.device.identity)
       console.log('[Twilio] Device state after registration:', this.device.state)
       console.log('[Twilio] Device isBusy:', this.device.isBusy)
       console.log('[Twilio] Device calls:', this.device.calls)
+      console.log('[Twilio] Device.on method exists:', typeof this.device.on === 'function')
       console.log('[Twilio] Widget flags at registration:', {
         isWidget: this.isWidget,
         isHubSpotWidget: this.isHubSpotWidget,
@@ -398,6 +403,7 @@ export default {
       })
       console.log('[Twilio] Checking if INCOMING handler is registered...')
       console.log('[Twilio] Device _events object:', this.device._events)
+      console.log('[Twilio] Device eventNames:', this.device.eventNames ? this.device.eventNames() : 'no eventNames method')
 
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
@@ -834,7 +840,17 @@ export default {
           options.enableImprovedSignalingErrorPrecision = true
         }
         console.log('Edge locations', options.edge)
+        console.log('[Twilio] About to initialize device...')
+        console.log('[Twilio] Device before initialize:', this.device)
+        console.log('[Twilio] Device._is_initialized:', this.device._is_initialized)
+        console.log('[Twilio] Device._device before initialize:', this.device._device)
+        console.log('[Twilio] Device._callbacks:', this.device._callbacks)
+
         this.device.initialize(this.dialer.token, options)
+
+        console.log('[Twilio] Device after initialize:', this.device)
+        console.log('[Twilio] Device._device after initialize:', this.device._device)
+        console.log('[Twilio] Device._device.state:', this.device._device?.state)
 
         console.log('Reset device', reset)
         if (!reset) {
