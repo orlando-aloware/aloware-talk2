@@ -427,7 +427,6 @@ export default {
     console.log('[Twilio] Device identity:', this.device.identity)
     console.log('[Twilio] Device token (first 50 chars):', this.dialer.token?.substring(0, 50))
     console.log('[Twilio] WebrtcEvents.INCOMING:', WebrtcEvents.INCOMING)
-    console.log('[Twilio] Current event listeners:', this.device.listenerCount('incoming'))
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       // TODO: Remove logs
