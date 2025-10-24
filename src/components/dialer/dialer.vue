@@ -418,8 +418,14 @@ export default {
       this.backToDial('Talk-Device.OnError')
     })
 
+    // TODO: Remove logs
+    console.log('[Twilio] Registering INCOMING event handler')
+    console.log('[Twilio] Device object:', this.device)
+    console.log('[Twilio] WebrtcEvents.INCOMING:', WebrtcEvents.INCOMING)
+
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       // TODO: Remove logs
+      console.log('[Twilio] ========== INCOMING CALL EVENT FIRED ==========')
       console.log('[Twilio] INCOMING call event received!', call)
       console.log('[Twilio] Widget flags:', {
         isWidget: this.isWidget,
@@ -452,7 +458,12 @@ export default {
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
       console.log('Received call invite', call)
+      //
+      console.log('[Twilio] call.direction:', call.direction)
+      console.log('[Twilio] call._connection:', call._connection)
+      console.log('[Twilio] call._connection.direction:', call._connection?.direction)
       this.dialerCallPrep(call._connection)
+      console.log('[Twilio] After dialerCallPrep, dialer.call:', this.dialer.call)
       this.setDialerCurrentNumber(this.$options.filters.fixPhone(call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
       console.log('call information', call.callSid, call.from, this.dialer.currentNumber)

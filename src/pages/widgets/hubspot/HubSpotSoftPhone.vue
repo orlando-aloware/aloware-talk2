@@ -382,7 +382,7 @@ export default {
 
     // Determines if webrtc component should be shown (user authenticated and component ready)
     shouldShowWebrtc () {
-      return this.profile && this.initialized
+      return this.profile && this.initialized && this.componentMode === ComponentMode.WINDOW
     },
 
     // Shows loading spinner during dialer initialization
