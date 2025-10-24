@@ -291,6 +291,11 @@ export default {
             this.componentMode = data.iframeLocation
             this.hubspotPortalId = data.portalId
 
+            // Re-initialize BroadcastManager with the correct componentMode
+            if (this.broadcastManager) {
+              this.broadcastManager.initialize(this.componentMode, this.handleBroadcastMessage)
+            }
+
             const payload = {
               isLoggedIn: this.authenticated,
               isAvailable: this.isAgentAvailable,
