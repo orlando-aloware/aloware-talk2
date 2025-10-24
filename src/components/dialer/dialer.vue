@@ -412,6 +412,7 @@ export default {
       const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget
 
       if (shouldIgnoreCall) {
+        /** TODO: Remove logs */
         console.log('Ignoring inbound call')
         console.table({
           isWidget: this.isWidget,
