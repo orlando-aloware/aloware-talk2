@@ -405,6 +405,9 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+      /** TODO: Remove logs */
+      console.log('[Twilio] INCOMING call event received!', call)
+
       // Only ignore calls for regular widgets (not Salesforce or HubSpot widgets)
       const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget
 
@@ -418,6 +421,9 @@ export default {
         call._connection.ignore()
         return
       }
+
+      /** TODO: Remove logs */
+      console.log('[Twilio] Processing incoming call (not ignoring)')
 
       if (this.isOnPowerDialerSessionRoute) {
         return
