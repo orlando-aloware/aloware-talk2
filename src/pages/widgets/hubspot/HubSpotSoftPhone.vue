@@ -1205,7 +1205,16 @@ export default {
       // Apply the returned state
       if (result.success) {
         this.setDialerCommunication(result.communication)
-        this.setDialerCall(result.communication)
+        
+        // Add direction property for incoming calls so the phone UI can show accept/reject buttons
+        // TODO: This is a test fix
+        const callWithDirection = {
+          ...result.communication,
+          direction: 'INCOMING'
+        }
+        
+        this.setDialerCall(callWithDirection)
+        
         this.setDialerContact(result.contact)
         this.setDialerCurrentStatus(result.dialerStatus)
         this.displayState = result.displayState
