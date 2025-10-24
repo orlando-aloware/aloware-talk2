@@ -1208,10 +1208,6 @@ export default {
         this.setDialerContact(result.contact)
         this.setDialerCurrentStatus(result.dialerStatus)
         this.displayState = result.displayState
-        
-        // Note: We intentionally do NOT set dialer.call here. The Twilio call invite will arrive
-        // shortly after and set it properly with the Twilio connection object that has the accept()
-        // method. Setting it here would cause buttons to appear before Twilio is ready to accept.
       }
     },
 
