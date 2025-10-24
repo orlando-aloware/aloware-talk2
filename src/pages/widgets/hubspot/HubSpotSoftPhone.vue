@@ -389,6 +389,7 @@ export default {
         componentMode: this.componentMode,
         shouldShow: shouldShow
       })
+      
       return shouldShow
     },
 

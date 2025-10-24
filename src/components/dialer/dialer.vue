@@ -381,11 +381,17 @@ export default {
       // TODO: Remove logs
       console.log('[Twilio] Device registered and ready to receive calls')
       console.log('[Twilio] Device identity:', this.device.identity)
+      console.log('[Twilio] Device state after registration:', this.device.state)
+      console.log('[Twilio] Device isBusy:', this.device.isBusy)
+      console.log('[Twilio] Device calls:', this.device.calls)
       console.log('[Twilio] Widget flags at registration:', {
         isWidget: this.isWidget,
         isHubSpotWidget: this.isHubSpotWidget,
         isSalesforceWidget: this.isSalesforceWidget
       })
+      console.log('[Twilio] Checking if INCOMING handler is registered...')
+      console.log('[Twilio] Device _events object:', this.device._events)
+
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
       this.checkForcedStatus()
