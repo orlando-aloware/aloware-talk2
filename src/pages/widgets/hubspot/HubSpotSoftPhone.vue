@@ -1592,7 +1592,6 @@ export default {
   beforeDestroy () {
     // Clean up inbound call listener
     this.$VueEvent.stop('new_in_app_call', this.handleIncomingCall)
-    this.$VueEvent.stop('new_desktop_call', this.handleIncomingCall) // maybe it's treating as desktop call?
 
     // End any active call when the component is destroyed
     if (this.isHubspotIntegrationEnabled) {
@@ -1603,7 +1602,7 @@ export default {
   },
 
   async created () {
-    this.setIsWidget(true)
+    this.setIsWidget(false) // TODO: set back to false
     this.setIsHubSpotWidget(true)
 
     if (this.$route.query.small) {
@@ -1673,9 +1672,8 @@ export default {
     this.callExtensionsInitialized = true
     await this.initializeAuth()
 
-    // Set up listeners for inbound calls from Aloware
+    // Set up listener for inbound calls from Aloware
     this.$VueEvent.listen('new_in_app_call', this.handleIncomingCall)
-    this.$VueEvent.listen('new_desktop_call', this.handleIncomingCall) // maybe it's treating as desktop call?'
   }
 }
 </script>
