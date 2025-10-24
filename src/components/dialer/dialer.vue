@@ -93,7 +93,7 @@ export default {
 
     ...mapState('powerDialer', ['powerDialerTasks']),
 
-    ...mapState(['isWidget', 'isSalesforceWidget']),
+    ...mapState(['isWidget', 'isSalesforceWidget', 'isHubSpotWidget']),
 
     ...mapState('TeamInbox', ['activeInboxId']),
 
@@ -405,9 +405,10 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      // Avoid continuing with the incoming call if it's a widget,
-      // and ignore the call. Otherwise, Twilio will play the default incoming sound.
-      if (this.isSalesforceWidget ? false : this.isWidget) {
+      // Only ignore calls for regular widgets (not Salesforce or HubSpot widgets)
+      const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget
+
+      if (shouldIgnoreCall) {
         call._connection.ignore()
         return
       }
