@@ -596,6 +596,7 @@ export default {
       'setIsHubSpotWidget',
       'setHubspotDialNumber',
       'setDialerCommunication',
+      'setDialerCall',
       'setDialerContact',
       'setDialerCurrentStatus'
     ]),
