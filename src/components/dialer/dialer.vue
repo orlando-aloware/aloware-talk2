@@ -419,14 +419,23 @@ export default {
     })
 
     // TODO: Remove logs
+    const deviceInstanceId = `device-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     console.log('[Twilio] Registering INCOMING event handler')
+    console.log('[Twilio] Device instance ID:', deviceInstanceId)
     console.log('[Twilio] Device object:', this.device)
+    console.log('[Twilio] Device state:', this.device.state)
+    console.log('[Twilio] Device identity:', this.device.identity)
+    console.log('[Twilio] Device token (first 50 chars):', this.dialer.token?.substring(0, 50))
     console.log('[Twilio] WebrtcEvents.INCOMING:', WebrtcEvents.INCOMING)
+    console.log('[Twilio] Current event listeners:', this.device.listenerCount('incoming'))
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       // TODO: Remove logs
       console.log('[Twilio] ========== INCOMING CALL EVENT FIRED ==========')
+      console.log('[Twilio] Device instance ID that received call:', deviceInstanceId)
       console.log('[Twilio] INCOMING call event received!', call)
+      console.log('[Twilio] Call from:', call.from)
+      console.log('[Twilio] Call to:', call.to)
       console.log('[Twilio] Widget flags:', {
         isWidget: this.isWidget,
         isSalesforceWidget: this.isSalesforceWidget,
