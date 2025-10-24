@@ -1205,19 +1205,13 @@ export default {
       // Apply the returned state
       if (result.success) {
         this.setDialerCommunication(result.communication)
-        
-        // Add direction property for incoming calls so the phone UI can show accept/reject buttons
-        // TODO: This is a test fix
-        const callWithDirection = {
-          ...result.communication,
-          direction: 'INCOMING'
-        }
-        
-        this.setDialerCall(callWithDirection)
-        
         this.setDialerContact(result.contact)
         this.setDialerCurrentStatus(result.dialerStatus)
         this.displayState = result.displayState
+        
+        // Note: We intentionally do NOT set dialer.call here. The Twilio call invite will arrive
+        // shortly after and set it properly with the Twilio connection object that has the accept()
+        // method. Setting it here would cause buttons to appear before Twilio is ready to accept.
       }
     },
 
