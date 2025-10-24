@@ -216,7 +216,7 @@ export default {
     },
 
     processActionNotification (communication, type) {
-      if (this.isWidget && !this.isSalesforceWidget) {
+      if (this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget) { // TODO: maybe just show this instead
         return
       }
       const name = { data: '' }
