@@ -382,7 +382,14 @@ export default {
 
     // Determines if webrtc component should be shown (user authenticated and component ready)
     shouldShowWebrtc () {
-      return this.profile && this.initialized && this.componentMode === ComponentMode.WINDOW
+      const shouldShow = this.profile && this.initialized && this.componentMode === ComponentMode.WINDOW // TODO: ComponentMode maybe not needed?
+      console.log('[HubSpot Widget] shouldShowWebrtc check:', {
+        profile: !!this.profile,
+        initialized: this.initialized,
+        componentMode: this.componentMode,
+        shouldShow: shouldShow
+      })
+      return shouldShow
     },
 
     // Shows loading spinner during dialer initialization
