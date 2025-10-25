@@ -387,6 +387,11 @@ export default {
 
       // TODO: Remove logs
       console.log('[Twilio] Device registered and ready to receive calls')
+      console.log('[Twilio] Device._device.identity:', this.device._device?.identity)
+      console.log('[Twilio] Device._device.state:', this.device._device?.state)
+      console.log('[Twilio] Device._device._clientName:', this.device._device?._clientName)
+      console.log('[Twilio] Checking if multiple event listeners on _device...')
+      console.log('[Twilio] Device._device.listenerCount(incoming):', typeof this.device._device?.listenerCount === 'function' ? this.device._device.listenerCount('incoming') : 'N/A')
       console.log('[Twilio] Device object type:', typeof this.device)
       console.log('[Twilio] Device constructor:', this.device?.constructor?.name)
       console.log('[Twilio] Device instance check:', this.device instanceof TwilioDevice)
@@ -404,6 +409,15 @@ export default {
       console.log('[Twilio] Checking if INCOMING handler is registered...')
       console.log('[Twilio] Device _events object:', this.device._events)
       console.log('[Twilio] Device eventNames:', this.device.eventNames ? this.device.eventNames() : 'no eventNames method')
+
+      // Try to manually trigger a test to see if the event system is working
+      console.log('[Twilio] Testing if event system works by checking _callbacks array...')
+      console.log('[Twilio] Device._callbacks.incoming handlers:', this.device._callbacks?.incoming?.length || 0)
+      console.log('[Twilio] Device._device listenerCount for incoming:',
+        typeof this.device._device?.listenerCount === 'function'
+          ? this.device._device.listenerCount('incoming')
+          : 'listenerCount not available'
+      )
 
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
@@ -844,7 +858,8 @@ export default {
         console.log('[Twilio] Device before initialize:', this.device)
         console.log('[Twilio] Device._is_initialized:', this.device._is_initialized)
         console.log('[Twilio] Device._device before initialize:', this.device._device)
-        console.log('[Twilio] Device._callbacks:', this.device._callbacks)
+        console.log('[Twilio] Device._callbacks.incoming count:', this.device._callbacks?.incoming?.length || 0)
+        console.log('[Twilio] Device._callbacks.registered count:', this.device._callbacks?.registered?.length || 0)
 
         this.device.initialize(this.dialer.token, options)
 

@@ -63,15 +63,23 @@ export default class Device {
   }
 
   _initEvents () {
+    console.log('[Device Wrapper] _initEvents called - setting up event forwarding')
+    console.log('[Device Wrapper] _callbacks.incoming count:', this._callbacks.incoming?.length || 0)
+
     this._device.on(Events.REGISTERED, (device) => {
+      console.log('[Device Wrapper] REGISTERED event received from Twilio SDK')
       this._executeCallback(Events.REGISTERED, [this._device])
     })
 
     this._device.on(Events.UNREGISTERED, (device) => {
+      console.log('[Device Wrapper] UNREGISTERED event received from Twilio SDK')
       this._executeCallback(Events.UNREGISTERED, [device])
     })
 
     this._device.on(Events.INCOMING, (connection) => {
+      console.log('[Device Wrapper] ========== INCOMING event received from Twilio SDK! ==========')
+      console.log('[Device Wrapper] Connection object:', connection)
+      console.log('[Device Wrapper] Will execute', this._callbacks.incoming?.length || 0, 'callback(s)')
       this._executeCallback(Events.INCOMING, [this._createConnection(connection)])
     })
 
