@@ -156,7 +156,6 @@
 
     <!-- Start Webrtc -->
     <webrtc
-      v-if="shouldShowWebrtc"
       v-show='displayState === DisplayState.HIDE && !isLoadingDialer'
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
