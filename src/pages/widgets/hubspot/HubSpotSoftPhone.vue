@@ -1352,6 +1352,18 @@ export default {
         return
       }
 
+      // Prevent duplicate processing
+      // const communicationId = this.incomingCallData?.communication?.id
+      // if (this._processingAccept === communicationId) {
+      //   console.log('[HubSpot Widget] Already processing accept for communication:', communicationId)
+      //   return
+      // }
+      //
+      // this._processingAccept = communicationId
+      // setTimeout(() => {
+      //   this._processingAccept = null
+      // }, 2000) // Clear flag after 2 seconds
+
       const result = this.widgetService.acceptCall(this.incomingCallData, this.dialer, this.profile)
       console.log('[HubSpot Widget] acceptCall result:', result)
 
@@ -1663,7 +1675,7 @@ export default {
   },
 
   async created () {
-    this.setIsWidget(false) // TODO: set back to false
+    this.setIsWidget(true)
     this.setIsHubSpotWidget(true)
 
     if (this.$route.query.small) {

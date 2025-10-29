@@ -1277,6 +1277,9 @@ export default {
 
             console.log('[HubSpot Widget] Extracted fishing communication:', fishingComm)
 
+            // Clear fishing data immediately to prevent duplicate processing
+            this.clearDialerCallFishing()
+
             // Route to fishing handler
             this.answerCallFishing(fishingComm)
             return
@@ -2204,6 +2207,11 @@ export default {
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false, parkFromAnotherTab = false) {
+      console.log('[answerCallFishing] === ENTRY ===')
+      console.log('[answerCallFishing] Full communication object:', communication)
+      console.log('[answerCallFishing] Communication keys:', Object.keys(communication || {}))
+      console.log('[answerCallFishing] Parameters:', { shouldPark, shouldHangup, parkFromAnotherTab })
+
       this.setShowIncomingCallNotification(false)
 
       if (this.shouldPushPhoneRoute) {
@@ -2217,40 +2225,56 @@ export default {
 
       // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {
+        console.log('[answerCallFishing] Taking PARK COMBO path')
         this.parkCallCombo(true, false, communication, parkFromAnotherTab)
         return
       }
 
       // park the in-progress call and unpark the parked call
       if (shouldPark && parkedCall) {
+        console.log('[answerCallFishing] Taking PARK AND UNPARK path')
         this.parkCallCombo(false, true, parkedCall, parkFromAnotherTab)
         return
       }
 
       // hang-up the in-progress call and unpark the parked call
       if (shouldHangup && parkedCall) {
+        console.log('[answerCallFishing] Taking HANGUP WITH PARKED path')
         this.hangupCallCombo(false, true, parkedCall)
         return
       }
 
       // hangup the in-progress call and answer the incoming call
       if (shouldHangup && !parkedCall) {
+        console.log('[answerCallFishing] Taking HANGUP WITHOUT PARKED path')
         this.hangupCallCombo(true, false, communication)
         return
       }
 
-      console.log('answerCallFishing', {
-        connection: !!this.connection,
-        dialer_currentStatus: this.dialer.currentStatus,
-        communication_campaignId: communication.campaignId,
-        agent_status: this.agentStatus
+      console.log('[answerCallFishing] Taking NORMAL ANSWER path')
+      console.log('[answerCallFishing] Current state:', {
+        hasConnection: !!this.connection,
+        dialerCurrentStatus: this.dialer.currentStatus,
+        agentStatus: this.agentStatus,
+        willAcceptConnection: this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' && this.agentStatus === AgentStatus.AGENT_STATUS_RINGING
       })
 
       if (this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' && this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+        console.log('[answerCallFishing] ✓ Accepting existing Twilio connection')
         this.connection.accept()
       } else {
+        console.log('[answerCallFishing] ✓ Making outbound call to unpark')
+        console.log('[answerCallFishing] makeCall parameters:', {
+          currentNumber: 'call:' + communication.id,
+          campaignId: communication.campaignId,
+          contactName: communication.contactName,
+          companyName: communication.companyName,
+          contactId: communication.contactId
+        })
         this.makeCall('call:' + communication.id, communication.campaignId)
       }
+
+      console.log('[answerCallFishing] === EXIT ===')
     },
 
     saveCallIssue (warningName, warningData) {
