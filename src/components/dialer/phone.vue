@@ -2132,6 +2132,8 @@ export default {
   },
 
   mounted () {
+    console.log('MOUNTED phone.vue')
+
     this.checkIfIsWidget()
     this.setupDraggable()
     this.setupContactLocalTime()
@@ -2960,6 +2962,8 @@ export default {
   },
 
   beforeDestroy () {
+    console.log('MOUNTED beforeDestroy phone.vue')
+
     window.removeEventListener('resize', this.resizeHandler)
     this.$VueEvent.stop('showLoadingPhone', this.phoneListeners.showLoadingPhone)
     this.$VueEvent.stop('togglePhone', this.phoneListeners.togglePhone)
