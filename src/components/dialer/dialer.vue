@@ -2335,7 +2335,21 @@ export default {
       return communication
     },
 
+    ignoreMicrophonePermissionCheck () {
+      const ignoreMicrophoneCheckCompanyIds = process.env.IGNORE_MICROPHONE_CHECK_COMPANY_IDS
+
+      if (!ignoreMicrophoneCheckCompanyIds) {
+        return false
+      }
+
+      return ignoreMicrophoneCheckCompanyIds.split(',').includes(String(this.currentCompany?.id))
+    },
+
     async checkMicrophonePermission () {
+      if (this.ignoreMicrophonePermissionCheck()) {
+        return true
+      }
+
       // Check if the browser supports getUserMedia
       if (!navigator?.mediaDevices?.getUserMedia) {
         console.error('[checkMicrophonePermission] microphone not supported')
