@@ -2230,7 +2230,7 @@ export default {
         return false
       }
 
-      return ignoreMicrophoneCheckCompanyIds.split(',').includes(String(this.currentCompany?.id))
+      return Object.values(ignoreMicrophoneCheckCompanyIds).includes(this.currentCompany?.id)
     },
 
     async checkMicrophonePermission () {
