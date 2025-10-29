@@ -1324,7 +1324,45 @@ export default {
     },
 
     rejectCall () {
+      console.log('[rejectCall] Entry:', {
+        hasDialerCall: !!this.dialer.call,
+        isHubSpotWidget: this.isHubSpotWidget,
+        hasFishingData: !!_.get(this.dialer, 'callFishing.communication', null),
+        fishingCommunication: this.dialer.callFishing?.communication
+      })
+
       if (!this.dialer.call) {
+        // HubSpot widget special handling: check for fishing mode before returning
+        if (this.isHubSpotWidget) {
+          const hasFishingCommunication = _.get(this.dialer, 'callFishing.communication', null) !== null
+          console.log('[HubSpot Widget] rejectCall - No dialer.call, checking fishing mode:', hasFishingCommunication)
+
+          if (hasFishingCommunication) {
+            console.log('[HubSpot Widget] Rejecting fishing mode call, clearing fishing data')
+
+            const communicationId = this.dialer.callFishing.communication.id
+
+            // Call the backend API to reject the fishing mode call
+            talk2Api.V1.communication.agentForceTerminate(communicationId, {
+              reject: true
+            }).then(() => {
+              console.log('[HubSpot Widget] Successfully rejected fishing mode call on backend')
+            }).catch(error => {
+              console.error('[HubSpot Widget] Failed to reject fishing mode call:', error)
+            })
+
+            // Clear the fishing data
+            this.clearDialerCallFishing()
+
+            // Reset to ready state
+            this.setDialerCurrentStatus('READY')
+            return
+          } else {
+            console.log('[HubSpot Widget] No fishing communication, exiting early')
+          }
+        }
+
+        console.log('[rejectCall] Early return: no dialer.call')
         return
       }
 

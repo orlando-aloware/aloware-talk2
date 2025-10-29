@@ -673,6 +673,11 @@ export default {
           } else if (this.componentMode === ComponentMode.WINDOW) {
             // Decline the call in WINDOW mode
             this.$VueEvent.fire('rejectCall')
+            
+            // Reset display state to ready after rejecting
+            this.displayState = DisplayState.READY_FOR_CALLS
+            this.incomingCallData = null
+            this.activeCallData = null
           }
           break
 
