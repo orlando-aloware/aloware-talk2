@@ -83,8 +83,6 @@ export default {
   },
 
   mounted () {
-    console.log('MOUNTED communication-note.vue')
-
     if (this.autoFocus) {
       this.$refs.communicationNotes.focus()
     }
