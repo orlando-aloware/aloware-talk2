@@ -24,20 +24,13 @@
     <action-notification id="voicemail"
                          v-if="!isWidget" />
     <action-notification id="mention"
-                         v-if="!isWidget" />
+                         v-if="!isWidget" />\
     <action-notification id="incomingCall"
-                         v-if="isWidget ? (isSalesforceWidget || isHubSpotWidget) : true"
+                         v-if="isWidget ? isSalesforceWidget : true"
                          position="b-toaster-top-center" />
     <action-notification id="callFishing"
                          position="b-toaster-top-center"
-                         v-if="isWidget ? (isSalesforceWidget || isHubSpotWidget) : true" />
-
-<!--    <action-notification id="incomingCall"-->
-<!--                         v-if="isWidget ? isSalesforceWidget : true"-->
-<!--                         position="b-toaster-top-center" />-->
-<!--    <action-notification id="callFishing"-->
-<!--                         position="b-toaster-top-center"-->
-<!--                         v-if="isWidget ? isSalesforceWidget : true" />-->
+                         v-if="isWidget ? isSalesforceWidget : true" />
     <intercom v-if="isIntercomEnabled && !isWidget" />
   </div>
 </template>

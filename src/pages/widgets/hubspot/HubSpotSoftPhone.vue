@@ -605,7 +605,8 @@ export default {
       'setHubspotDialNumber',
       'setDialerCommunication',
       'setDialerContact',
-      'setDialerCurrentStatus'
+      'setDialerCurrentStatus',
+      'setDialerCallFishing'
     ]),
 
     ...mapActions('cache', [
@@ -635,7 +636,17 @@ export default {
 
         case BroadcastMessageTypes.ACCEPT_INBOUND_CALL:
           // Answer the call in WINDOW mode
+          console.log('[HubSpot Widget] ACCEPT_INBOUND_CALL broadcast received', {
+            componentMode: this.componentMode,
+            payload,
+            dialerCallFishing: this.dialer?.callFishing,
+            dialerCallFishingCommunication: this.dialer?.callFishing?.communication,
+            dialerCallFishingContact: this.dialer?.callFishing?.contact,
+            isHubSpotWidget: this.isHubSpotWidget,
+            fullDialerState: this.dialer
+          })
           if (this.componentMode === ComponentMode.WINDOW) {
+            console.log('[HubSpot Widget] Firing answerCall event from WINDOW mode')
             this.$VueEvent.fire('answerCall')
           }
           break
@@ -1202,6 +1213,34 @@ export default {
         return
       }
 
+      // Check for fishing mode and set dialer fishing data if needed
+      const ringGroup = this.ringGroups.find(rg => rg.id === communication.ring_group_id)
+      const isFishingMode = ringGroup?.should_queue && ringGroup?.fishing_mode
+
+      console.log('[HubSpot Widget] Fishing mode check:', {
+        ringGroupId: communication.ring_group_id,
+        ringGroup: ringGroup,
+        isFishingMode: isFishingMode
+      })
+
+      if (isFishingMode) {
+        console.log('[HubSpot Widget] Setting fishing mode data')
+        this.setDialerCallFishing({
+          communication: {
+            id: communication.id,
+            campaign_id: communication.campaign_id,
+            contact_id: communication.contact_id,
+            ring_group_id: communication.ring_group_id
+          },
+          contact: {
+            id: communication.contact?.id,
+            name: communication.contact?.name,
+            phone_number: communication.contact?.phone_number,
+            company_name: communication.contact?.company_name
+          }
+        })
+      }
+
       const result = this.widgetService.handleIncomingCall(
         communication,
         this.extensions,
@@ -1297,11 +1336,19 @@ export default {
      * Handles accept button click in REMOTE mode
      */
     handleAcceptCall () {
+      console.log('[HubSpot Widget] handleAcceptCall called', {
+        componentMode: this.componentMode,
+        incomingCallData: this.incomingCallData,
+        dialerState: this.dialer,
+        profileState: this.profile
+      })
+
       if (this.componentMode === ComponentMode.WINDOW) {
         return
       }
 
       const result = this.widgetService.acceptCall(this.incomingCallData, this.dialer, this.profile)
+      console.log('[HubSpot Widget] acceptCall result:', result)
 
       switch (result.action) {
         case 'show_active_call':
@@ -1313,6 +1360,7 @@ export default {
 
         case 'broadcast_accept':
           // Broadcast to WINDOW mode to accept the call
+          console.log('[HubSpot Widget] Broadcasting ACCEPT_INBOUND_CALL with:', result.broadcast.payload)
           this.broadcastManager?.broadcastAcceptInboundCall(result.broadcast.payload.communicationId, result.broadcast.payload.contactId)
           this.hideIncomingCallUI()
           break

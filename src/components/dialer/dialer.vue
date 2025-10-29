@@ -1246,7 +1246,48 @@ export default {
     },
 
     answerCall (communication = null, retryCount = 0) {
+      console.log('[answerCall] Entry:', {
+        communication,
+        hasDialerCall: !!this.dialer.call,
+        isHubSpotWidget: this.isHubSpotWidget,
+        hasFishingData: !!_.get(this.dialer, 'callFishing.communication', null),
+        fishingCommunication: this.dialer.callFishing?.communication,
+        dialerCurrentStatus: this.dialer.currentStatus
+      })
+
       if (!this.dialer.call) {
+        console.log('[answerCall] No dialer.call, checking HubSpot widget handling')
+
+        // HubSpot widget special handling: check for fishing mode before returning
+        if (this.isHubSpotWidget) {
+          const hasFishingCommunication = _.get(this.dialer, 'callFishing.communication', null) !== null
+          console.log('[HubSpot Widget] isHubSpotWidget=true, hasFishingCommunication:', hasFishingCommunication)
+
+          if (hasFishingCommunication) {
+            console.log('[HubSpot Widget] Detected fishing mode call, routing to answerCallFishing')
+
+            // Extract fishing data before it's lost
+            const fishingComm = {
+              id: this.dialer.callFishing.communication.id,
+              campaignId: this.dialer.callFishing.communication.campaign_id,
+              contactName: this.dialer.callFishing.contact?.name,
+              companyName: this.dialer.callFishing.contact?.company_name,
+              contactId: this.dialer.callFishing.communication.contact_id
+            }
+
+            console.log('[HubSpot Widget] Extracted fishing communication:', fishingComm)
+
+            // Route to fishing handler
+            this.answerCallFishing(fishingComm)
+            return
+          } else {
+            console.log('[HubSpot Widget] No fishing communication, exiting early')
+          }
+        } else {
+          console.log('[answerCall] Not HubSpot widget, exiting early')
+        }
+        // END TEST FISHING MODE CODE
+
         return
       }
 
