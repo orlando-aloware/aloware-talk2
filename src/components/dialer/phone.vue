@@ -1591,7 +1591,8 @@ export default {
       'callFishingQueue',
       'isCallBackButtonDisabled',
       'isWidget',
-      'isSalesforceWidget'
+      'isSalesforceWidget',
+      'isHubSpotWidget'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -1921,6 +1922,11 @@ export default {
     },
 
     isPhoneBodyVisible () {
+      // For HubSpot widget with fishing mode, always show the phone body
+      if (this.isHubSpotWidget && this.hasCallFishingCommunication) {
+        return this.screen === 'call'
+      }
+
       return this.screen === 'call' &&
         (!_.isEmpty(this.dialer.call) ||
           !this.hasCallFishingCommunication)
@@ -1932,6 +1938,14 @@ export default {
       console.log('[Phone] - isEmpty:', _.isEmpty(this.dialer.call))
       console.log('[Phone] - direction:', this.dialer.call?.direction)
       console.log('[Phone] - hasCallFishingCommunication:', this.hasCallFishingCommunication)
+      console.log('[Phone] - isHubSpotWidget:', this.isHubSpotWidget)
+
+      // For HubSpot widget, always show buttons when there's an incoming call or fishing call
+      // The buttons will be wired to the correct handlers (answerCall/rejectCall already handle fishing mode)
+      if (this.isHubSpotWidget && this.hasCallFishingCommunication) {
+        console.log('[Phone] - Showing CTA for HubSpot widget with fishing mode')
+        return true
+      }
 
       return (!_.isEmpty(this.dialer.call) &&
         this.dialer.call.direction === 'INCOMING') ||
