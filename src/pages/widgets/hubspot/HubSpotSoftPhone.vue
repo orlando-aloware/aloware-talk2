@@ -90,8 +90,15 @@
       </div>
 
       <hr class="section-divider">
-      <p><strong>Outbound Calls:</strong> Click on any phone number in HubSpot to start dialing.</p>
-      <p><strong>Inbound Calls:</strong> When you receive a call, it will automatically appear here for you to answer.</p>
+      
+      <template v-if="agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP">
+        <p><strong>Outbound Calls:</strong> Click on any phone number in HubSpot to start dialing.</p>
+        <p><strong>Inbound Calls:</strong> When you receive a call, it will automatically appear here for you to answer.</p>
+      </template>
+      
+      <template v-if="agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP">
+        <p><strong> Please proceed to wrap up your call in the Calling Window.</strong></p>
+      </template>
 
       <hr>
       <!-- Start User Information Section -->
@@ -819,6 +826,10 @@ export default {
             this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
             // Show active call UI when the agent is on call OR actively dialing/connected
             this.validateHasActiveCallStatus()
+          } else if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+            // For WRAP_UP status, show ready state (REMOTE doesn't handle wrap-up UI)
+            console.log('[REMOTE] Agent is in wrap-up - showing ready state')
+            this.displayState = DisplayState.READY_FOR_CALLS
           }
         }
         
