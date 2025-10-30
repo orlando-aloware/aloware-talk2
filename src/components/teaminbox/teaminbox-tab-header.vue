@@ -40,7 +40,8 @@
 
       <q-space></q-space>
 
-      <span class="cursor-pointer mr-2 comms-page-icon-position-fix"
+      <span v-if="!isTalkLite"
+            class="cursor-pointer mr-2 comms-page-icon-position-fix"
             :id="`teaminbox-tab-open-comms-page-icon-${_uid}`"
             @click="openCommunicationsPage">
         <watch-icon />
@@ -95,7 +96,7 @@ import SearchIcon from 'src/components/icons/search-icon.vue'
 import WatchIcon from 'src/components/icons/watch-icon.vue'
 import SearchInput from 'src/components/search-input.vue'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
 
@@ -136,6 +137,8 @@ export default {
     ...mapState(['isMobile']),
 
     ...mapFields('settings', ['isTeamInboxNavListCollapsed']),
+
+    ...mapGetters('auth', ['isTalkLite']),
 
     activeInboxUnreadCount () {
       if (!this.activeInbox?.id) {
