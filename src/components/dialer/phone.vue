@@ -1605,6 +1605,12 @@ export default {
     ]),
 
     isCallCompleted () {
+      // Don't show wrap-up buttons if we're still in the call setup/incoming flow
+      const isCallInProgress = ['RECEIVED_CALL_INVITE', 'ANSWERING_CALL', 'MAKING_CALL'].includes(this.dialer.currentStatus)
+      if (isCallInProgress) {
+        return false
+      }
+
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
     },
 
