@@ -680,6 +680,26 @@ export default {
         case BroadcastMessageTypes.CALL_CANCELLED:
           if (this.componentMode === ComponentMode.REMOTE) {
             this.hideIncomingCallUI()
+          } else if (this.componentMode === ComponentMode.WINDOW) {
+            // Handle CALL_CANCELLED broadcast from REMOTE mode
+            // Only process if we're not already rejecting (to avoid handling our own broadcast echo)
+            if (this.dialer?.currentStatus !== 'REJECTING_CALL') {
+              // Check if we have an incoming call (fishing mode or regular)
+              const hasFishingCall = this.dialer?.callFishing?.communication
+              const hasRegularIncomingCall = this.dialer?.call && this.dialer?.call.direction === 'INCOMING'
+              
+              if (hasFishingCall || hasRegularIncomingCall) {
+                console.log('[WINDOW] Received CALL_CANCELLED from REMOTE, rejecting call', {
+                  isFishing: !!hasFishingCall,
+                  isRegular: !!hasRegularIncomingCall
+                })
+                this.$VueEvent.fire('rejectCall')
+              } else {
+                console.log('[WINDOW] Received CALL_CANCELLED but no incoming call to reject')
+              }
+            } else {
+              console.log('[WINDOW] Received CALL_CANCELLED but already processing rejection (own broadcast echo)')
+            }
           }
           break
 
@@ -1646,15 +1666,27 @@ export default {
       if (this.componentMode === ComponentMode.WINDOW &&
           newStatus === DialerStatus.REJECTING_CALL &&
           (oldStatus === DialerStatus.RECEIVED_CALL_INVITE || oldStatus === DialerStatus.ANSWERING_CALL)) {
-        console.log('[WINDOW] Broadcasting CALL_CANCELLED for rejected incoming call')
-        this.broadcastManager?.broadcastCallCancelled(this.dialer?.communication?.id)
+        console.log('[WINDOW] Status changed to REJECTING_CALL - will broadcast on transition to READY')
       }
 
-      // When dialer becomes READY after rejecting a call, ensure WINDOW returns to HIDE state
+      // When dialer becomes READY after rejecting a call
       if (this.componentMode === ComponentMode.WINDOW &&
           newStatus === DialerStatus.READY &&
           oldStatus === DialerStatus.REJECTING_CALL) {
-        console.log('[WINDOW] Dialer ready after rejection - ensuring HIDE state')
+        console.log('[WINDOW] Dialer ready after rejection - broadcasting CALL_CANCELLED and ensuring HIDE state')
+        
+        // Broadcast CALL_CANCELLED now (communication might be cleared, but we stored the ID)
+        // For fishing mode, the communication is cleared before this transition
+        const commId = this.dialer?.communication?.id
+        if (commId) {
+          console.log('[WINDOW] Broadcasting CALL_CANCELLED with communication ID:', commId)
+          this.broadcastManager?.broadcastCallCancelled(commId)
+        } else {
+          console.log('[WINDOW] No communication ID available, broadcasting without ID')
+          this.broadcastManager?.broadcastCallCancelled()
+        }
+        
+        // Ensure WINDOW returns to HIDE state
         if (this.displayState !== DisplayState.HIDE) {
           this.displayState = DisplayState.HIDE
         }

@@ -1326,7 +1326,7 @@ export default {
       }
     },
 
-    rejectCall () {
+    async rejectCall () {
       console.log('[rejectCall] Entry:', {
         hasDialerCall: !!this.dialer.call,
         isHubSpotWidget: this.isHubSpotWidget,
@@ -1345,20 +1345,31 @@ export default {
 
             const communicationId = this.dialer.callFishing.communication.id
 
+            // Set status to REJECTING_CALL so HubSpot watcher can detect this is a rejection
+            this.setDialerCurrentStatus('REJECTING_CALL')
+
             // Call the backend API to reject the fishing mode call
-            talk2Api.V1.communication.agentForceTerminate(communicationId, {
-              reject: true
-            }).then(() => {
+            try {
+              await talk2Api.V1.communication.agentForceTerminate(communicationId, {
+                reject: true
+              })
               console.log('[HubSpot Widget] Successfully rejected fishing mode call on backend')
-            }).catch(error => {
+            } catch (error) {
               console.error('[HubSpot Widget] Failed to reject fishing mode call:', error)
-            })
+            } finally {
+              // Use nextTick to ensure REJECTING_CALL status is processed before clearing data
+              this.$nextTick(() => {
+                console.log('[HubSpot Widget] Clearing fishing data after REJECTING_CALL status processed')
+                // Clear the fishing data
+                this.clearDialerCallFishing()
 
-            // Clear the fishing data
-            this.clearDialerCallFishing()
+                // Clear the communication to return to clean ready state
+                this.setDialerCommunication()
 
-            // Reset to ready state
-            this.setDialerCurrentStatus('READY')
+                // Reset to ready state (phone watcher will handle screen change)
+                this.setDialerCurrentStatus('READY')
+              })
+            }
             return
           } else {
             console.log('[HubSpot Widget] No fishing communication, exiting early')
