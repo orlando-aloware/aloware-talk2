@@ -746,13 +746,27 @@ export default {
      * @param {string} requestId - Request ID from Remote
      */
     sendCurrentState (requestId) {
-        this.broadcastManager?.sendCurrentState({
-          requestId,
-          profile: this.profile,
-          dialer: this.dialer,
-          incomingCallData: this.incomingCallData,
-          activeCallData: this.activeCallData
-        })
+      // Check for fishing mode call
+      const hasFishingCall = this.dialer?.callFishing?.communication
+      
+      // Prepare payload with fishing mode consideration
+      const payload = {
+        requestId,
+        profile: this.profile,
+        dialer: this.dialer,
+        incomingCallData: this.incomingCallData,
+        activeCallData: this.activeCallData,
+        hasFishingCall: !!hasFishingCall
+      }
+      
+      console.log('[WINDOW] Sending current state:', {
+        hasFishingCall,
+        dialerStatus: this.dialer?.currentStatus,
+        agentStatus: this.profile?.agent_status,
+        communication: this.dialer?.communication
+      })
+      
+      this.broadcastManager?.sendCurrentState(payload)
     },
 
     /**
@@ -1803,6 +1817,16 @@ export default {
 
     // Set up listener for inbound calls from Aloware
     this.$VueEvent.listen('new_in_app_call', this.handleIncomingCall)
+
+    // REMOTE mode: Request current state from WINDOW to sync with any ongoing calls
+    // This handles the case where REMOTE loads after a call has already started
+    if (this.componentMode === ComponentMode.REMOTE) {
+      console.log('[REMOTE] Requesting current state from WINDOW after initialization')
+      setTimeout(() => {
+        const requestId = `state-req-${Date.now()}`
+        this.broadcastManager?.requestCurrentState(requestId)
+      }, 500) // Small delay to ensure WINDOW is ready to respond
+    }
   }
 }
 </script>

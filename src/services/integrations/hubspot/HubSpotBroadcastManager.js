@@ -188,7 +188,8 @@ class HubSpotBroadcastManager {
       profile,
       dialer,
       incomingCallData,
-      activeCallData
+      activeCallData,
+      hasFishingCall
     } = params
 
     const agentStatus = profile?.agent_status
@@ -199,8 +200,14 @@ class HubSpotBroadcastManager {
     let communication = null
     let contact = null
 
-    // Check for incoming call (ringing)
-    if (agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+    // Check for fishing mode incoming call first
+    if (hasFishingCall && dialer?.callFishing) {
+      hasActiveCall = true
+      callType = 'incoming'
+      communication = dialer.callFishing.communication
+      contact = dialer.callFishing.contact
+    } else if (agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+      // Check for incoming call (ringing)
       hasActiveCall = true
       callType = 'incoming'
       communication = dialer?.communication || incomingCallData?.communication
