@@ -660,9 +660,13 @@ export default {
           break
 
         case BroadcastMessageTypes.CALL_ENDED:
-          // Hide the active call UI and return to the ready state in REMOTE mode
+          // Hide the call UI (incoming or active) and return to the ready state in REMOTE mode
           if (this.componentMode === ComponentMode.REMOTE) {
-            this.hideActiveCallUI()
+            if (this.displayState === DisplayState.INCOMING_CALL) {
+              this.hideIncomingCallUI()
+            } else {
+              this.hideActiveCallUI()
+            }
           }
           break
 
@@ -1634,6 +1638,14 @@ export default {
 
         // Start with the initial 100ms delay
         setTimeout(() => attemptBroadcast(), 100)
+      }
+
+      // Broadcast CALL_CANCELLED to REMOTE mode when call is rejected in WINDOW mode
+      if (this.componentMode === ComponentMode.WINDOW &&
+          newStatus === DialerStatus.REJECTING_CALL &&
+          (oldStatus === DialerStatus.RECEIVED_CALL_INVITE || oldStatus === DialerStatus.ANSWERING_CALL)) {
+        console.log('[WINDOW] Broadcasting CALL_CANCELLED for rejected incoming call')
+        this.broadcastManager?.broadcastCallCancelled(this.dialer?.communication?.id)
       }
 
       // When the dialer becomes READY and the agent is in wrap-up, restore the wrap-up state
