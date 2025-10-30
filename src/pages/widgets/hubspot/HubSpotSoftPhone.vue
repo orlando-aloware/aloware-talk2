@@ -678,17 +678,8 @@ export default {
           break
 
         case BroadcastMessageTypes.CALL_CANCELLED:
-          // Hide the incoming call UI in REMOTE mode
           if (this.componentMode === ComponentMode.REMOTE) {
             this.hideIncomingCallUI()
-          } else if (this.componentMode === ComponentMode.WINDOW) {
-            // Decline the call in WINDOW mode
-            this.$VueEvent.fire('rejectCall')
-            
-            // Reset display state to ready after rejecting
-            this.displayState = DisplayState.READY_FOR_CALLS
-            this.incomingCallData = null
-            this.activeCallData = null
           }
           break
 
@@ -1657,6 +1648,16 @@ export default {
           (oldStatus === DialerStatus.RECEIVED_CALL_INVITE || oldStatus === DialerStatus.ANSWERING_CALL)) {
         console.log('[WINDOW] Broadcasting CALL_CANCELLED for rejected incoming call')
         this.broadcastManager?.broadcastCallCancelled(this.dialer?.communication?.id)
+      }
+
+      // When dialer becomes READY after rejecting a call, ensure WINDOW returns to HIDE state
+      if (this.componentMode === ComponentMode.WINDOW &&
+          newStatus === DialerStatus.READY &&
+          oldStatus === DialerStatus.REJECTING_CALL) {
+        console.log('[WINDOW] Dialer ready after rejection - ensuring HIDE state')
+        if (this.displayState !== DisplayState.HIDE) {
+          this.displayState = DisplayState.HIDE
+        }
       }
 
       // When the dialer becomes READY and the agent is in wrap-up, restore the wrap-up state

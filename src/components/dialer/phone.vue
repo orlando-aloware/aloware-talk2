@@ -432,12 +432,12 @@
                       @click="toggleRecordingStatus">
                 <template v-if="dialer.communication.should_record === true">
                   <record-icon :width="iconSizes.recording.width"
-                        :height="iconSizes.recording.height"
-                        v-show="dialer.recordingStatus === 'paused'">
+                               :height="iconSizes.recording.height"
+                               v-show="dialer.recordingStatus === 'paused'">
                   </record-icon>
                   <pause-record-icon :width="iconSizes.recording.width"
-                                    :height="iconSizes.recording.height"
-                                    v-show="dialer.recordingStatus === 'in-progress'">
+                                     :height="iconSizes.recording.height"
+                                     v-show="dialer.recordingStatus === 'in-progress'">
                   </pause-record-icon>
                 </template>
                 <template v-else>
@@ -1945,16 +1945,30 @@ export default {
       console.log('[Phone] - direction:', this.dialer.call?.direction)
       console.log('[Phone] - hasCallFishingCommunication:', this.hasCallFishingCommunication)
       console.log('[Phone] - isHubSpotWidget:', this.isHubSpotWidget)
+      console.log('[Phone] - currentStatus:', this.dialer.currentStatus)
 
-      // For HubSpot widget, always show buttons when there's an incoming call or fishing call
-      // The buttons will be wired to the correct handlers (answerCall/rejectCall already handle fishing mode)
-      if (this.isHubSpotWidget && this.hasCallFishingCommunication) {
-        console.log('[Phone] - Showing CTA for HubSpot widget with fishing mode')
-        return true
+      // For HubSpot widget, show buttons when:
+      // 1. There's active fishing communication, OR
+      // 2. We're in the process of connecting a fishing call (RECEIVED_CALL_INVITE or MAKING_CALL with communication but no call yet)
+      if (this.isHubSpotWidget) {
+        if (this.hasCallFishingCommunication) {
+          console.log('[Phone] - Showing CTA for HubSpot widget with fishing mode')
+          return true
+        }
+
+        // Keep showing buttons while transitioning from fishing call accept to actual connection
+        const isConnectingFishingCall = (this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' ||
+            this.dialer.currentStatus === 'MAKING_CALL') &&
+          this.dialer.communication &&
+          _.isEmpty(this.dialer.call)
+        if (isConnectingFishingCall) {
+          console.log('[Phone] - Showing CTA for HubSpot widget - connecting fishing call')
+          return true
+        }
       }
 
       return (!_.isEmpty(this.dialer.call) &&
-        this.dialer.call.direction === 'INCOMING') ||
+          this.dialer.call.direction === 'INCOMING') ||
         this.hasCallFishingCommunication
     },
 
@@ -1985,6 +1999,11 @@ export default {
     },
 
     isDeclineCallVisible () {
+      // For HubSpot widget, show Decline button for fishing mode calls
+      if (this.isHubSpotWidget && this.hasCallFishingCommunication) {
+        return true
+      }
+
       return this.dialer.call !== undefined ||
         !this.hasCallFishingCommunication
     },
