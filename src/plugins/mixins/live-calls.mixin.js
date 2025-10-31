@@ -222,11 +222,6 @@ export default {
         return false
       }
 
-      // first check if the communication object has `is_call_waiting` property
-      if (typeof this.communication.is_call_waiting === 'boolean') {
-        return this.communication.is_call_waiting
-      }
-
       const ringGroup = this.getRingGroup(this.communication.ring_group_id)
 
       if (!ringGroup) {
@@ -234,25 +229,6 @@ export default {
       }
 
       return this.isPersonalInbox && ringGroup.should_queue && ringGroup.fishing_mode
-    },
-
-    isFishingMode () {
-      if (isEmpty(this.communication)) {
-        return false
-      }
-
-      // first check if the communication object has `is_fishing_mode` property
-      if (typeof this.communication.is_fishing_mode === 'boolean') {
-        return this.communication.is_fishing_mode
-      }
-
-      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
-
-      if (!ringGroup) {
-        return false
-      }
-
-      return ringGroup.should_queue && ringGroup.fishing_mode
     },
 
     isPersonalInbox () {

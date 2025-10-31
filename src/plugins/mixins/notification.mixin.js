@@ -301,7 +301,8 @@ export default {
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
           if (ringGroup &&
-            communication.is_fishing_mode &&
+            ringGroup.should_queue &&
+            ringGroup.fishing_mode &&
             !ringGroup.experimental_fishing_mode_repeat_call_routing &&
             ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT &&
             this.user &&
@@ -316,7 +317,7 @@ export default {
             break
           }
 
-          const callType = communication.is_fishing_mode ? 'callFishing' : 'incomingCall'
+          const callType = (ringGroup?.should_queue && ringGroup?.fishing_mode) ? 'callFishing' : 'incomingCall'
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupId = communication.ring_group_id
           const ringGroupName = _.get(communication, 'ring_group.name', null)

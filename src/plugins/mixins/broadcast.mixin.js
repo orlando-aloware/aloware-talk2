@@ -138,7 +138,7 @@ export default {
             event.communication.owner = event.owner
           }
           console.log('.user.in-app.communication.new_call - event.communication', event.communication)
-          this.$VueEvent.fire('new_in_app_call', { communication: event.communication, 'isFishingMode': event.is_fishing_mode, 'isCallWaiting': event.is_call_waiting })
+          this.$VueEvent.fire('new_in_app_call', event.communication)
         })
         .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {
           this.dispatchToMemoryMonitor('.user.desktop.incoming_number.high_sms_volume', event)
