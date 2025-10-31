@@ -322,11 +322,6 @@ export default {
         ) {
           return true
         }
-
-        if (contactVisibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
-          // Fallback to owned only access for Team Inbox as CONTACTS_ACCESS_RING_GROUP is deprecated inside Team Inbox
-          contactVisibility = ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY
-        }
       }
 
       // users should always be able to see their own sent messages
@@ -379,21 +374,6 @@ export default {
         ) {
           return false
         }
-      }
-
-      // ring group only access
-      if (contactVisibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
-        // if user does not have unassigned access
-        if (this.isUserDoesntHaveUnassignedAccess(communication, 'communication')) {
-          return false
-        }
-
-        // if contact does not exist
-        if (!communication.contact) {
-          return false
-        }
-
-        // @todo for ring group only access (UI doesn't know that contact relationship with ring groups at this stage)
       }
 
       // ring group users only access
@@ -530,16 +510,6 @@ export default {
     },
 
     checkAgentContactVisibility (contact) {
-      // ring group only access
-      if (this.profile && this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
-        // if user does not have unassigned access
-        if (this.isUserDoesntHaveUnassignedAccess(contact, 'contact')) {
-          return false
-        }
-
-        // @todo for ring group only access (UI doesn't know that contact relationship with ring groups at this stage)
-      }
-
       // owned only access
       if (this.profile && this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY) {
         // if user does not have unassigned access
@@ -572,21 +542,6 @@ export default {
         mention.mentioner_user_id &&
         mention.mentioner_user_id !== this.profile.id) {
         return false
-      }
-
-      // ring group only access
-      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
-        // if contact does not exist
-        if (!mention.contact) {
-          return false
-        }
-
-        // if user does not have unassigned access
-        if (this.isUserDoesntHaveUnassignedAccess(mention, 'mention')) {
-          return false
-        }
-
-        // @todo for ring group only access (UI doesn't know that contact relationship with ring groups at this stage)
       }
 
       // owned only access

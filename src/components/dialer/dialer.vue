@@ -435,7 +435,7 @@ export default {
 
       if (communicationData) {
         if (this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
-          this.$VueEvent.fire('new_in_app_call', communicationData)
+          this.$VueEvent.fire('new_in_app_call', { communication: communicationData, 'isFishingMode': false, 'isCallWaiting': false })
           this.processActionNotification(communicationData, 'call')
           this.notificationShownFromCustomParams = true
         } else {
@@ -446,7 +446,7 @@ export default {
       this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
           if (!this.notificationShownFromCustomParams) {
-            this.$VueEvent.fire('new_in_app_call', res.data)
+            this.$VueEvent.fire('new_in_app_call', { communication: res.data, 'isFishingMode': res.data.is_fishing_mode, 'isCallWaiting': res.data.is_call_waiting })
             this.processActionNotification(res.data, 'call')
             this.pendingNotificationData = null
           }
@@ -2263,7 +2263,9 @@ export default {
         campaign_id: campaignId,
         campaign: {
           name: customParams?.CampaignName
-        }
+        },
+        is_fishing_mode: false,
+        is_call_waiting: false
       }
 
       console.log('Successfully built communication data from customParameters:', communication)
@@ -2277,7 +2279,7 @@ export default {
         return false
       }
 
-      return ignoreMicrophoneCheckCompanyIds.split(',').includes(String(this.currentCompany?.id))
+      return Object.values(ignoreMicrophoneCheckCompanyIds).includes(this.currentCompany?.id)
     },
 
     async checkMicrophonePermission () {
@@ -2334,7 +2336,7 @@ export default {
         oldStatus !== AgentStatus.AGENT_STATUS_RINGING &&
         this.pendingNotificationData &&
         !this.notificationShownFromCustomParams) {
-        this.$VueEvent.fire('new_in_app_call', this.pendingNotificationData)
+        this.$VueEvent.fire('new_in_app_call', { communication: this.pendingNotificationData, 'isFishingMode': false, 'isCallWaiting': false })
         this.processActionNotification(this.pendingNotificationData, 'call')
         this.notificationShownFromCustomParams = true
         this.pendingNotificationData = null
