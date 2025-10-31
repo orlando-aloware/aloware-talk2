@@ -49,7 +49,6 @@
             :options="statusOptionsWithLogout"
             emit-value
             map-options
-            :disable="shouldDisableStatusToggle"
             :loading="loadingAgentStatus"
             dense
             outlined
@@ -502,20 +501,6 @@ export default {
         default:
           return 'grey-6'
       }
-    },
-
-    /**
-     * Determines if status toggle should be disabled
-     */
-    shouldDisableStatusToggle () {
-      const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
-      const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
-      const isForcedDispositionOnWrapUp = (isForcedCallDisposition || isForcedContactDisposition) &&
-        this.dialer.currentStatus === DialerStatus.WRAP_UP
-
-      return this.loadingAgentStatus ||
-        [DialerStatus.RECEIVED_CALL_INVITE, DialerStatus.MAKING_CALL, DialerStatus.CALL_CONNECTED].includes(this.dialer.currentStatus) ||
-        this.isAgentOnCall || isForcedDispositionOnWrapUp
     },
 
     /**
