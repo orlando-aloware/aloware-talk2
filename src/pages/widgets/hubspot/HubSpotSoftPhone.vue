@@ -90,12 +90,12 @@
       </div>
 
       <hr class="section-divider">
-      
+
       <template v-if="agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP">
         <p><strong>Outbound Calls:</strong> Click on any phone number in HubSpot to start dialing.</p>
         <p><strong>Inbound Calls:</strong> When you receive a call, it will automatically appear here for you to answer.</p>
       </template>
-      
+
       <template v-if="agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP">
         <p><strong> Please proceed to wrap up your call in the Calling Window.</strong></p>
       </template>
@@ -333,7 +333,7 @@ export default {
               console.log('[HubSpot Widget] Ignoring outbound call - integration is disabled')
               return
             }
-            
+
             // Check for active, parked calls, or ringing
             const hasActiveOrParkedCall =
               this.isDialed ||
@@ -341,7 +341,7 @@ export default {
               this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
               this.dialer?.currentStatus === DialerStatus.RECEIVED_CALL_INVITE ||
               this.dialer?.parkedCall
-            
+
             if (hasActiveOrParkedCall) {
               console.log('[HubSpot Widget] Call in progress, ignoring outbound call')
               this.$generalNotification('You are already engaged in a call', 'warning', 2500, true)
@@ -358,14 +358,14 @@ export default {
               this.endActiveCall()
             }
           },
-          
+
           onCreateEngagementFailed: () => {
             // We don't use this event, but we define it to silence the warnings in the console
           },
 
           onCallerIdMatchFailed: () => {
             // We don't use this event, but we define it to silence the warnings in the console
-          },
+          }
         }
       }
     }
@@ -396,7 +396,7 @@ export default {
         componentMode: this.componentMode,
         shouldShow: shouldShow
       })
-      
+
       return shouldShow
     },
 
@@ -687,7 +687,7 @@ export default {
               // Check if we have an incoming call (fishing mode or regular)
               const hasFishingCall = this.dialer?.callFishing?.communication
               const hasRegularIncomingCall = this.dialer?.call && this.dialer?.call.direction === 'INCOMING'
-              
+
               if (hasFishingCall || hasRegularIncomingCall) {
                 console.log('[WINDOW] Received CALL_CANCELLED from REMOTE, rejecting call', {
                   isFishing: !!hasFishingCall,
@@ -739,7 +739,7 @@ export default {
           console.log('[HubSpot Widget] Unhandled broadcast message type:', type)
       }
     },
-    
+
     /**
      * Sends the current call state to REMOTE in response to REQUEST_CURRENT_STATE
      *
@@ -748,7 +748,7 @@ export default {
     sendCurrentState (requestId) {
       // Check for fishing mode call
       const hasFishingCall = this.dialer?.callFishing?.communication
-      
+
       // Prepare payload with fishing mode consideration
       const payload = {
         requestId,
@@ -758,15 +758,17 @@ export default {
         activeCallData: this.activeCallData,
         hasFishingCall: !!hasFishingCall
       }
-      
+
       console.log('[WINDOW] Sending current state:', {
         hasFishingCall,
         dialerStatus: this.dialer?.currentStatus,
         agentStatus: this.profile?.agent_status,
         communication: this.dialer?.communication
       })
-      
-      this.broadcastManager?.sendCurrentState(payload)
+
+      if (this.broadcastManager) {
+        this.broadcastManager.sendCurrentState(payload)
+      }
     },
 
     /**
@@ -825,7 +827,7 @@ export default {
         this.displayState = DisplayState.HUBSPOT_INTEGRATION_DISABLED
         return
       }
-      
+
       if (this.callExtensionsInitialized) {
         this.extensions.userLoggedIn()
         // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
@@ -833,7 +835,7 @@ export default {
           this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
         }
       }
-      
+
       /**
        * if empty, then onDialNumber event was not called - skip calling,
        * if not empty, then dialer was called, so we must dial the number
@@ -841,11 +843,18 @@ export default {
       if (!this.hubspotDialNumber) {
         // Check for incoming/active calls in REMOTE mode after page refresh
         if (this.componentMode === ComponentMode.REMOTE) {
-          // For RINGING status, request the current state from Window
+          // Request current state from WINDOW to sync with any ongoing calls (fishing mode, ringing, etc.)
+          // This handles the case where REMOTE loads after a call has already started
+          const requestId = `state-req-${Date.now()}`
+          console.log('[REMOTE] Requesting current state from WINDOW on user login', requestId)
+          if (this.broadcastManager) {
+            this.broadcastManager.requestCurrentState(requestId)
+          }
+
+          // Handle specific agent statuses
           if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_RINGING) {
-            console.log('[REMOTE] Agent is ringing - requesting current state from Window')
+            console.log('[REMOTE] Agent is ringing - showing ready state until state sync completes')
             this.displayState = DisplayState.READY_FOR_CALLS
-            this.broadcastManager?.requestCurrentState(`remote-${Date.now()}`)
           } else if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
             this.dialer?.currentStatus === DialerStatus.MAKING_CALL ||
             this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED) {
@@ -857,7 +866,7 @@ export default {
             this.displayState = DisplayState.READY_FOR_CALLS
           }
         }
-        
+
         // Don't change displayState if the agent is ringing, in wrap-up, showing incoming call, or showing active call UI
         // Also check dialer status for outbound calls that are in progress
         const shouldNotChangeToReady =
@@ -868,14 +877,14 @@ export default {
           this.dialer?.currentStatus === DialerStatus.CALL_CONNECTED ||
           this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL ||
           this.displayState === DisplayState.INCOMING_CALL
-        
+
         if (!shouldNotChangeToReady) {
           this.displayState = DisplayState.READY_FOR_CALLS
         }
-        
+
         return
       }
-      
+
       this.postDialNumber()
     },
 
@@ -919,7 +928,7 @@ export default {
         if (result.campaignId) {
           this.campaignId = result.campaignId
         }
-        
+
         if (result.contactDetails) {
           this.contactDetails = { ...this.contactDetails, ...result.contactDetails }
         }
@@ -1056,7 +1065,7 @@ export default {
         console.log('[HubSpot Widget] makeCall blocked - integration is disabled')
         return
       }
-      
+
       const result = this.widgetService.placeCall({
         campaignId: this.campaignId,
         hubspotDialNumber: this.hubspotDialNumber,
@@ -1124,8 +1133,8 @@ export default {
         this.extensions.callEnded()
 
         // Broadcast CALL_ENDED to REMOTE mode when the call ends in WINDOW mode
-        if (this.componentMode === ComponentMode.WINDOW) {
-          this.broadcastManager?.broadcastCallEnded(this.dialer?.communication?.id, Date.now())
+        if (this.componentMode === ComponentMode.WINDOW && this.broadcastManager) {
+          this.broadcastManager.broadcastCallEnded(this.dialer?.communication?.id, Date.now())
         }
 
         // In REMOTE mode, don't change the display state if showing active call UI - wait for broadcast
@@ -1133,7 +1142,7 @@ export default {
           console.log('[REMOTE] Skipping state change - active call UI is showing')
           return
         }
-        
+
         // Return to ready state when call is completed
         if (!this.dialer.parkedCall) {
           this.displayState = DisplayState.READY_FOR_CALLS
@@ -1238,7 +1247,7 @@ export default {
       console.log('[HubSpot Widget] Component mode:', this.componentMode)
       console.log('[HubSpot Widget] Is authenticated:', this.authenticated)
       console.log('[HubSpot Widget] Is agent available:', this.isAgentAvailable)
-      
+
       if (!this.authenticated) {
         console.log('[HubSpot Widget] User not authenticated, skipping inbound call')
         return
@@ -1334,7 +1343,7 @@ export default {
       }
 
       const result = this.widgetService.hideIncomingCall(this.dialer, this.profile)
-      
+
       if (result.shouldClearData) {
         this.incomingCallData = null
       }
@@ -1418,7 +1427,9 @@ export default {
         case 'broadcast_accept':
           // Broadcast to WINDOW mode to accept the call
           console.log('[HubSpot Widget] Broadcasting ACCEPT_INBOUND_CALL with:', result.broadcast.payload)
-          this.broadcastManager?.broadcastAcceptInboundCall(result.broadcast.payload.communicationId, result.broadcast.payload.contactId)
+          if (this.broadcastManager) {
+            this.broadcastManager.broadcastAcceptInboundCall(result.broadcast.payload.communicationId, result.broadcast.payload.contactId)
+          }
           this.hideIncomingCallUI()
           break
 
@@ -1447,9 +1458,11 @@ export default {
 
         case 'broadcast_decline':
           // Broadcast to WINDOW mode to decline the call
-          this.broadcastManager?.broadcastCallCancelled(
-            result.broadcast.payload.communicationId
-          )
+          if (this.broadcastManager) {
+            this.broadcastManager.broadcastCallCancelled(
+              result.broadcast.payload.communicationId
+            )
+          }
 
           // Fire reject event if needed
           if (result.fireRejectEvent) {
@@ -1525,7 +1538,6 @@ export default {
             communication: lastCall || this.dialer?.communication,
             contact: contact
           })
-          
         } else {
           this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
         }
@@ -1544,7 +1556,9 @@ export default {
         this.hubspotDialNumber
       )
 
-      this.broadcastManager?.broadcastCallConnected(data.communication, data.contact)
+      if (this.broadcastManager) {
+        this.broadcastManager.broadcastCallConnected(data.communication, data.contact)
+      }
     },
 
     /**
@@ -1554,7 +1568,9 @@ export default {
     reloadWidget () {
       console.log('[HubSpot Widget] Reload widget button clicked, broadcasting to other instance...')
 
-      this.broadcastManager?.broadcastWidgetReload('user_clicked_reload_button')
+      if (this.broadcastManager) {
+        this.broadcastManager.broadcastWidgetReload('user_clicked_reload_button')
+      }
 
       // Small delay to ensure the broadcast is sent before reloading
       setTimeout(() => {
@@ -1573,18 +1589,18 @@ export default {
 
       if (result.success) {
         this.contactDetails = { ...this.contactDetails, ...result.contactDetails }
-        
+
         if (result.campaignId) {
           this.campaignId = result.campaignId
         }
-        
+
         if (result.lastCall) {
           this.setProfile({ last_call: result.lastCall })
         }
       } else {
         this.$handleErrors(result.error?.response)
         this.displayState = DisplayState.CRITICAL_ERROR_HAPPENED
-        
+
         if (this.extensions) {
           this.extensions.callEnded()
         }
@@ -1630,7 +1646,7 @@ export default {
         this.setHubspotDialNumber(null)
       }
     },
-    
+
     /**
      * Update the agent status in HubSpot if it changes in Aloware
      * Only WINDOW mode should update HubSpot availability to prevent duplicate signals
@@ -1657,7 +1673,6 @@ export default {
       if (this.componentMode === ComponentMode.WINDOW &&
           newStatus === DialerStatus.CALL_CONNECTED &&
           oldStatus !== DialerStatus.CALL_CONNECTED) {
-
         // For unparked calls, the communication is loaded asynchronously after status changes
         // We need to wait for it to be loaded before broadcasting
         const attemptBroadcast = (retryCount = 0) => {
@@ -1688,18 +1703,20 @@ export default {
           newStatus === DialerStatus.READY &&
           oldStatus === DialerStatus.REJECTING_CALL) {
         console.log('[WINDOW] Dialer ready after rejection - broadcasting CALL_CANCELLED and ensuring HIDE state')
-        
+
         // Broadcast CALL_CANCELLED now (communication might be cleared, but we stored the ID)
         // For fishing mode, the communication is cleared before this transition
         const commId = this.dialer?.communication?.id
-        if (commId) {
-          console.log('[WINDOW] Broadcasting CALL_CANCELLED with communication ID:', commId)
-          this.broadcastManager?.broadcastCallCancelled(commId)
-        } else {
-          console.log('[WINDOW] No communication ID available, broadcasting without ID')
-          this.broadcastManager?.broadcastCallCancelled()
+        if (this.broadcastManager) {
+          if (commId) {
+            console.log('[WINDOW] Broadcasting CALL_CANCELLED with communication ID:', commId)
+            this.broadcastManager.broadcastCallCancelled(commId)
+          } else {
+            console.log('[WINDOW] No communication ID available, broadcasting without ID')
+            this.broadcastManager.broadcastCallCancelled()
+          }
         }
-        
+
         // Ensure WINDOW returns to HIDE state
         if (this.displayState !== DisplayState.HIDE) {
           this.displayState = DisplayState.HIDE
@@ -1741,7 +1758,9 @@ export default {
       this.endActiveCall()
     }
 
-    this.broadcastManager?.close()
+    if (this.broadcastManager) {
+      this.broadcastManager.close()
+    }
   },
 
   async created () {
@@ -1752,7 +1771,7 @@ export default {
       this.small = true
     }
   },
-  
+
   async mounted () {
     // Initialize service that handles all business logic for the HubSpot calling widget
     this.widgetService = new HubSpotWidgetService({
@@ -1817,16 +1836,6 @@ export default {
 
     // Set up listener for inbound calls from Aloware
     this.$VueEvent.listen('new_in_app_call', this.handleIncomingCall)
-
-    // REMOTE mode: Request current state from WINDOW to sync with any ongoing calls
-    // This handles the case where REMOTE loads after a call has already started
-    if (this.componentMode === ComponentMode.REMOTE) {
-      console.log('[REMOTE] Requesting current state from WINDOW after initialization')
-      setTimeout(() => {
-        const requestId = `state-req-${Date.now()}`
-        this.broadcastManager?.requestCurrentState(requestId)
-      }, 500) // Small delay to ensure WINDOW is ready to respond
-    }
   }
 }
 </script>
