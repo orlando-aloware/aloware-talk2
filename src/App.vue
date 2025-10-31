@@ -24,7 +24,7 @@
     <action-notification id="voicemail"
                          v-if="!isWidget" />
     <action-notification id="mention"
-                         v-if="!isWidget" />\
+                         v-if="!isWidget" />
     <action-notification id="incomingCall"
                          v-if="isWidget ? isSalesforceWidget : true"
                          position="b-toaster-top-center" />

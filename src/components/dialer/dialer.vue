@@ -377,41 +377,6 @@ export default {
       this.setDialerErrorDefault()
 
       console.log('Ready to start')
-
-      // TODO: Remove logs
-      console.log('[Twilio] Device registered and ready to receive calls')
-      console.log('[Twilio] Device._device.identity:', this.device._device?.identity)
-      console.log('[Twilio] Device._device.state:', this.device._device?.state)
-      console.log('[Twilio] Device._device._clientName:', this.device._device?._clientName)
-      console.log('[Twilio] Checking if multiple event listeners on _device...')
-      console.log('[Twilio] Device._device.listenerCount(incoming):', typeof this.device._device?.listenerCount === 'function' ? this.device._device.listenerCount('incoming') : 'N/A')
-      console.log('[Twilio] Device object type:', typeof this.device)
-      console.log('[Twilio] Device constructor:', this.device?.constructor?.name)
-      console.log('[Twilio] Device instance check:', this.device instanceof TwilioDevice)
-      console.log('[Twilio] Device keys:', Object.keys(this.device || {}))
-      console.log('[Twilio] Device identity:', this.device.identity)
-      console.log('[Twilio] Device state after registration:', this.device.state)
-      console.log('[Twilio] Device isBusy:', this.device.isBusy)
-      console.log('[Twilio] Device calls:', this.device.calls)
-      console.log('[Twilio] Device.on method exists:', typeof this.device.on === 'function')
-      console.log('[Twilio] Widget flags at registration:', {
-        isWidget: this.isWidget,
-        isHubSpotWidget: this.isHubSpotWidget,
-        isSalesforceWidget: this.isSalesforceWidget
-      })
-      console.log('[Twilio] Checking if INCOMING handler is registered...')
-      console.log('[Twilio] Device _events object:', this.device._events)
-      console.log('[Twilio] Device eventNames:', this.device.eventNames ? this.device.eventNames() : 'no eventNames method')
-
-      // Try to manually trigger a test to see if the event system is working
-      console.log('[Twilio] Testing if event system works by checking _callbacks array...')
-      console.log('[Twilio] Device._callbacks.incoming handlers:', this.device._callbacks?.incoming?.length || 0)
-      console.log('[Twilio] Device._device listenerCount for incoming:',
-        typeof this.device._device?.listenerCount === 'function'
-          ? this.device._device.listenerCount('incoming')
-          : 'listenerCount not available'
-      )
-
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
       this.checkForcedStatus()
@@ -434,55 +399,18 @@ export default {
     })
 
     this.device.on(WebrtcEvents.ERROR, (error) => {
-      // TODO: Remove logs
-      console.error('[Twilio] Device ERROR event:', error)
-      console.error('[Twilio] Error code:', error.code)
-      console.error('[Twilio] Error message:', error.message)
-      console.error('[Twilio] Error stack:', error.stack)
       this.removeUnownedLiveContactTask()
       this.handleError(error)
       this.backToDial('Talk-Device.OnError')
     })
 
-    // TODO: Remove logs
-    const deviceInstanceId = `device-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    console.log('[Twilio] Registering INCOMING event handler')
-    console.log('[Twilio] Device instance ID:', deviceInstanceId)
-    console.log('[Twilio] Device object:', this.device)
-    console.log('[Twilio] Device state:', this.device.state)
-    console.log('[Twilio] Device identity:', this.device.identity)
-    console.log('[Twilio] Device token (first 50 chars):', this.dialer.token?.substring(0, 50))
-    console.log('[Twilio] WebrtcEvents.INCOMING:', WebrtcEvents.INCOMING)
-
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      // TODO: Remove logs
-      console.log('[Twilio] ========== INCOMING CALL EVENT FIRED ==========')
-      console.log('[Twilio] Device instance ID that received call:', deviceInstanceId)
-      console.log('[Twilio] INCOMING call event received!', call)
-      console.log('[Twilio] Call from:', call.from)
-      console.log('[Twilio] Call to:', call.to)
-      console.log('[Twilio] Widget flags:', {
-        isWidget: this.isWidget,
-        isSalesforceWidget: this.isSalesforceWidget,
-        isHubSpotWidget: this.isHubSpotWidget
-      })
-
       // Only ignore calls for regular widgets (not Salesforce or HubSpot widgets)
       const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget
-
       if (shouldIgnoreCall) {
-        console.log('[Twilio] Ignoring inbound call - widget check failed')
-        console.table({
-          isWidget: this.isWidget,
-          isSalesforceWidget: this.isSalesforceWidget,
-          isHubSpotWidget: this.isHubSpotWidget
-        })
         call._connection.ignore()
         return
       }
-
-      /** TODO: Remove logs */
-      console.log('[Twilio] Processing incoming call (not ignoring)')
 
       if (this.isOnPowerDialerSessionRoute) {
         return
@@ -492,12 +420,7 @@ export default {
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
       console.log('Received call invite', call)
-      //
-      console.log('[Twilio] call.direction:', call.direction)
-      console.log('[Twilio] call._connection:', call._connection)
-      console.log('[Twilio] call._connection.direction:', call._connection?.direction)
       this.dialerCallPrep(call._connection)
-      console.log('[Twilio] After dialerCallPrep, dialer.call:', this.dialer.call)
       this.setDialerCurrentNumber(this.$options.filters.fixPhone(call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
       console.log('call information', call.callSid, call.from, this.dialer.currentNumber)
@@ -809,16 +732,6 @@ export default {
         this.setDialerCurrentStatus('TOKEN_GENERATED')
         console.log('Twilio token', this.dialer.token)
 
-        // TODO: Remove - Decode and log token payload to verify identity
-        try {
-          const tokenParts = this.dialer.token.split('.')
-          const payload = JSON.parse(atob(tokenParts[1]))
-          console.log('[Twilio] Token identity from payload:', payload.grants?.identity)
-          console.log('[Twilio] Token grants:', payload.grants)
-        } catch (e) {
-          console.error('[Twilio] Failed to decode token:', e)
-        }
-
         // Reset retry count on successful token generation
         this.resetTokenRetryState()
 
@@ -847,18 +760,7 @@ export default {
           options.enableImprovedSignalingErrorPrecision = true
         }
         console.log('Edge locations', options.edge)
-        console.log('[Twilio] About to initialize device...')
-        console.log('[Twilio] Device before initialize:', this.device)
-        console.log('[Twilio] Device._is_initialized:', this.device._is_initialized)
-        console.log('[Twilio] Device._device before initialize:', this.device._device)
-        console.log('[Twilio] Device._callbacks.incoming count:', this.device._callbacks?.incoming?.length || 0)
-        console.log('[Twilio] Device._callbacks.registered count:', this.device._callbacks?.registered?.length || 0)
-
         this.device.initialize(this.dialer.token, options)
-
-        console.log('[Twilio] Device after initialize:', this.device)
-        console.log('[Twilio] Device._device after initialize:', this.device._device)
-        console.log('[Twilio] Device._device.state:', this.device._device?.state)
 
         console.log('Reset device', reset)
         if (!reset) {
@@ -1245,24 +1147,11 @@ export default {
       }
     },
 
-    answerCall (communication = null, retryCount = 0) {
-      console.log('[answerCall] Entry:', {
-        communication,
-        hasDialerCall: !!this.dialer.call,
-        isHubSpotWidget: this.isHubSpotWidget,
-        hasFishingData: !!_.get(this.dialer, 'callFishing.communication', null),
-        fishingCommunication: this.dialer.callFishing?.communication,
-        dialerCurrentStatus: this.dialer.currentStatus
-      })
-
+    answerCall (communication = null) {
       if (!this.dialer.call) {
-        console.log('[answerCall] No dialer.call, checking HubSpot widget handling')
-
         // HubSpot widget special handling: check for fishing mode before returning
         if (this.isHubSpotWidget) {
           const hasFishingCommunication = _.get(this.dialer, 'callFishing.communication', null) !== null
-          console.log('[HubSpot Widget] isHubSpotWidget=true, hasFishingCommunication:', hasFishingCommunication)
-
           if (hasFishingCommunication) {
             console.log('[HubSpot Widget] Detected fishing mode call, routing to answerCallFishing')
 
@@ -1275,22 +1164,14 @@ export default {
               contactId: this.dialer.callFishing.communication.contact_id
             }
 
-            console.log('[HubSpot Widget] Extracted fishing communication:', fishingComm)
-
             // Clear fishing data immediately to prevent duplicate processing
             this.clearDialerCallFishing()
 
             // Route to fishing handler
             this.answerCallFishing(fishingComm)
             return
-          } else {
-            console.log('[HubSpot Widget] No fishing communication, exiting early')
           }
-        } else {
-          console.log('[answerCall] Not HubSpot widget, exiting early')
         }
-        // END TEST FISHING MODE CODE
-
         return
       }
 
@@ -1313,36 +1194,15 @@ export default {
         }
         // accept the incoming connection and start two-way audio
         this.connection.accept()
-      } else if (retryCount < 10) {
-        // Twilio connection not ready yet, retry after a short delay (max 10 retries = ~2 seconds)
-        console.log(`[answerCall] Twilio connection not ready, retrying... (${retryCount + 1}/10)`)
-        setTimeout(() => {
-          this.answerCall(communication, retryCount + 1)
-        }, 300)
-      } else {
-        console.error('[answerCall] Twilio connection did not become ready after 10 retries')
-        this.$generalNotification('Unable to answer call. Please try again.', 'error', 3000, true)
-        this.setDialerCurrentStatus('READY')
       }
     },
 
     async rejectCall () {
-      console.log('[rejectCall] Entry:', {
-        hasDialerCall: !!this.dialer.call,
-        isHubSpotWidget: this.isHubSpotWidget,
-        hasFishingData: !!_.get(this.dialer, 'callFishing.communication', null),
-        fishingCommunication: this.dialer.callFishing?.communication
-      })
-
       if (!this.dialer.call) {
         // HubSpot widget special handling: check for fishing mode before returning
         if (this.isHubSpotWidget) {
           const hasFishingCommunication = _.get(this.dialer, 'callFishing.communication', null) !== null
-          console.log('[HubSpot Widget] rejectCall - No dialer.call, checking fishing mode:', hasFishingCommunication)
-
           if (hasFishingCommunication) {
-            console.log('[HubSpot Widget] Rejecting fishing mode call, clearing fishing data')
-
             const communicationId = this.dialer.callFishing.communication.id
 
             // Set status to REJECTING_CALL so HubSpot watcher can detect this is a rejection
@@ -1353,13 +1213,11 @@ export default {
               await talk2Api.V1.communication.agentForceTerminate(communicationId, {
                 reject: true
               })
-              console.log('[HubSpot Widget] Successfully rejected fishing mode call on backend')
             } catch (error) {
               console.error('[HubSpot Widget] Failed to reject fishing mode call:', error)
             } finally {
               // Use nextTick to ensure REJECTING_CALL status is processed before clearing data
               this.$nextTick(() => {
-                console.log('[HubSpot Widget] Clearing fishing data after REJECTING_CALL status processed')
                 // Clear the fishing data
                 this.clearDialerCallFishing()
 
@@ -1371,12 +1229,8 @@ export default {
               })
             }
             return
-          } else {
-            console.log('[HubSpot Widget] No fishing communication, exiting early')
           }
         }
-
-        console.log('[rejectCall] Early return: no dialer.call')
         return
       }
 
@@ -1871,10 +1725,6 @@ export default {
         customParameters[key] = value
       })
 
-      // TODO: remove logs
-      console.log('[Dialer] setDialerCall - call.direction value:', call.direction)
-      console.log('[Dialer] setDialerCall - call object:', call)
-
       this.setDialerCall({
         from: call.parameters.From,
         to: call.parameters.To,
@@ -2218,11 +2068,6 @@ export default {
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false, parkFromAnotherTab = false) {
-      console.log('[answerCallFishing] === ENTRY ===')
-      console.log('[answerCallFishing] Full communication object:', communication)
-      console.log('[answerCallFishing] Communication keys:', Object.keys(communication || {}))
-      console.log('[answerCallFishing] Parameters:', { shouldPark, shouldHangup, parkFromAnotherTab })
-
       this.setShowIncomingCallNotification(false)
 
       if (this.shouldPushPhoneRoute) {
@@ -2236,56 +2081,33 @@ export default {
 
       // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {
-        console.log('[answerCallFishing] Taking PARK COMBO path')
         this.parkCallCombo(true, false, communication, parkFromAnotherTab)
         return
       }
 
       // park the in-progress call and unpark the parked call
       if (shouldPark && parkedCall) {
-        console.log('[answerCallFishing] Taking PARK AND UNPARK path')
         this.parkCallCombo(false, true, parkedCall, parkFromAnotherTab)
         return
       }
 
       // hang-up the in-progress call and unpark the parked call
       if (shouldHangup && parkedCall) {
-        console.log('[answerCallFishing] Taking HANGUP WITH PARKED path')
         this.hangupCallCombo(false, true, parkedCall)
         return
       }
 
       // hangup the in-progress call and answer the incoming call
       if (shouldHangup && !parkedCall) {
-        console.log('[answerCallFishing] Taking HANGUP WITHOUT PARKED path')
         this.hangupCallCombo(true, false, communication)
         return
       }
 
-      console.log('[answerCallFishing] Taking NORMAL ANSWER path')
-      console.log('[answerCallFishing] Current state:', {
-        hasConnection: !!this.connection,
-        dialerCurrentStatus: this.dialer.currentStatus,
-        agentStatus: this.agentStatus,
-        willAcceptConnection: this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' && this.agentStatus === AgentStatus.AGENT_STATUS_RINGING
-      })
-
       if (this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' && this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
-        console.log('[answerCallFishing] ✓ Accepting existing Twilio connection')
         this.connection.accept()
       } else {
-        console.log('[answerCallFishing] ✓ Making outbound call to unpark')
-        console.log('[answerCallFishing] makeCall parameters:', {
-          currentNumber: 'call:' + communication.id,
-          campaignId: communication.campaignId,
-          contactName: communication.contactName,
-          companyName: communication.companyName,
-          contactId: communication.contactId
-        })
         this.makeCall('call:' + communication.id, communication.campaignId)
       }
-
-      console.log('[answerCallFishing] === EXIT ===')
     },
 
     saveCallIssue (warningName, warningData) {

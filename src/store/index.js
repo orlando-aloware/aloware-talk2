@@ -1039,9 +1039,6 @@ export default function (/* { ssrContext } */) {
       },
 
       SET_DIALER_COMMUNICATION (state, communication) {
-        /** TODO: Remove log  */
-        console.log('[Vuex] Setting communication:', communication)
-
         if (communication && communication.tags) {
           communication.tag_ids = communication.tags.map((a) => a.id)
         } else if (communication && !communication.tags) {
@@ -1049,9 +1046,6 @@ export default function (/* { ssrContext } */) {
         }
 
         Vue.set(state.dialer, 'communication', communication)
-
-        /** TODO: Remove log  */
-        console.log('[VUEX] dialer.call is now:', state.dialer.call)
       },
 
       SET_DIALER_DEAL (state, dealId) {
