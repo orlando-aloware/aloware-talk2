@@ -169,7 +169,10 @@ export default {
       this.small = true
     }
 
-    this.listeners.newInAppCall = (communication, isFishingMode, isCallWaiting) => {
+    this.listeners.newInAppCall = (communication) => {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
+      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
+
       if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
@@ -180,7 +183,7 @@ export default {
         : 'call'
 
       // ignore call notifications if the call is not fishing mode and the user is in sleep mode
-      if (isFishingMode || isCallWaiting || !this.profile.sleep_mode) {
+      if (isFishingMode || !this.profile.sleep_mode) {
         this.processActionNotification(communication, communicationType)
 
         if (this.opencti_loaded) {

@@ -483,10 +483,6 @@ export default {
         return 'Call Waiting'
       }
 
-      if (this.isFishingMode) {
-        return 'Fishing Mode'
-      }
-
       return 'New Inbound Call'
     },
 
