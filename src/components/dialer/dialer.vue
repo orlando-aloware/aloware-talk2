@@ -1155,7 +1155,6 @@ export default {
           if (hasFishingCommunication) {
             console.log('[HubSpot Widget] Detected fishing mode call, routing to answerCallFishing')
 
-            // Extract fishing data before it's lost
             const fishingComm = {
               id: this.dialer.callFishing.communication.id,
               campaignId: this.dialer.callFishing.communication.campaign_id,
@@ -1164,11 +1163,9 @@ export default {
               contactId: this.dialer.callFishing.communication.contact_id
             }
 
-            // Clear fishing data immediately to prevent duplicate processing
             this.clearDialerCallFishing()
-
-            // Route to fishing handler
             this.answerCallFishing(fishingComm)
+
             return
           }
         }
@@ -1218,13 +1215,8 @@ export default {
             } finally {
               // Use nextTick to ensure REJECTING_CALL status is processed before clearing data
               this.$nextTick(() => {
-                // Clear the fishing data
                 this.clearDialerCallFishing()
-
-                // Clear the communication to return to clean ready state
                 this.setDialerCommunication()
-
-                // Reset to ready state (phone watcher will handle screen change)
                 this.setDialerCurrentStatus('READY')
               })
             }
@@ -2102,6 +2094,13 @@ export default {
         this.hangupCallCombo(true, false, communication)
         return
       }
+
+      console.log('answerCallFishing', {
+        connection: !!this.connection,
+        dialer_currentStatus: this.dialer.currentStatus,
+        communication_campaignId: communication.campaignId,
+        agent_status: this.agentStatus
+      })
 
       if (this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' && this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
         this.connection.accept()
