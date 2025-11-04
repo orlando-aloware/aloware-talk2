@@ -973,6 +973,11 @@ export default {
 
         this.onFetch(params, hasFilters, true)
         this.$emit('onFiltersCount', this.currentListFilters)
+
+        // Update the report immediately when socket event arrives
+        this.$nextTick(() => {
+          this.checkTaskAddedNotification()
+        })
       }
     }
 
@@ -1294,53 +1299,41 @@ export default {
      * Notifies summary of contacts added to PD list
      */
     checkTaskAddedNotification () {
-      const notifications = this.bulkAddNotifications(this.selectedListId)
+      let notifications = this.bulkAddNotifications(this.selectedListId)
       // Verify if notifications is not an array and set the status report
       if (!Array.isArray(notifications)) {
-        this.bulkAddStatusReport = notifications?.status_report
+        notifications = [notifications]
         return
       }
 
-      // notifications is an array and will receive the status report in batches
-      // get the identifier of the first notification
-      const identifier = notifications[0]?.status_report?.identifier
-      const batchSize = notifications[0]?.status_report?.batch_size ?? 1
-      // get the batches of notifications with the same identifier
-      const batches = notifications.filter(notification => notification.status_report.identifier === identifier)
-      // process the batches to get the total values for status report
-      const statusReport = batches.reduce((acc, notification) => {
-        const currentFail = notification.status_report.fail
+      const statusReport = notifications.reduce((acc, notification) => {
+        const currentNotification = notification.status_report
 
-        // Sum the fail values according to the keys
-        for (const [key, value] of Object.entries(currentFail)) {
-          acc.fail[key] = (acc.fail[key] || 0) + value
+        // Sum values
+        for (const name of ['fail', 'extra', 'success', 'info']) {
+          for (const [key, value] of Object.entries(currentNotification[name])) {
+            // for 'extra' do not sum 'settings'
+            if (name === 'extra' && ['settings'].includes(key)) {
+              continue
+            }
+
+            acc[name][key] = (acc[name][key] || 0) + value
+          }
         }
 
-        return {
-          info: {
-            selected: acc.info.selected + notification.status_report.info.selected
-          },
-          success: {
-            total: acc.success.total + notification.status_report.success.total
-          },
-          fail: acc.fail
-        }
+        return acc
       }, {
-        identifier: identifier,
-        batch_number: notifications[0]?.status_report?.batch_number,
         info: {
           selected: 0
         },
         success: {
           total: 0
         },
-        fail: {}
+        fail: {},
+        extra: {}
       })
 
-      // Set the status report to the component if is the last batch
-      if (batchSize > 1 && batchSize === batches.length) {
-        this.bulkAddStatusReport = statusReport
-      } else if (batchSize === 1) {
+      if (statusReport.info.selected > 0) {
         this.bulkAddStatusReport = statusReport
       }
     },
