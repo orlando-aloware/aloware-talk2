@@ -400,7 +400,7 @@ export default {
           enabled: true,
           compact: true
         })
-        return data?.data ?? []
+        return data
       } catch (error) {
         console.error('[fetchBots] error', error)
         return []
@@ -432,7 +432,7 @@ export default {
         const { data } = await talk2Api.V2.aloAiBot.getContactBotEnrollments(
           this.contact.id
         )
-        return data?.data ?? []
+        return data
       } catch (error) {
         console.error('[fetchContactBotEnrollments] error', error)
         return []

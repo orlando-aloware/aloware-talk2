@@ -541,7 +541,7 @@ export default {
         const { data } = await talk2Api.V2.aloAiBot.getContactBotEnrollments(
           this.contact.id
         )
-        return data?.data ?? []
+        return data
       } catch (error) {
         console.error('[fetchContactBotEnrollments] error', error)
         return []
