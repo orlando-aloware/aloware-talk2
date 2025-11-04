@@ -541,8 +541,7 @@ export default {
         const { data } = await talk2Api.V2.aloAiBot.getContactBotEnrollments(
           this.contact.id
         )
-        // Handle both wrapped and unwrapped responses
-        return Array.isArray(data) ? data : (data?.data ?? [])
+        return data?.data ?? []
       } catch (error) {
         console.error('[fetchContactBotEnrollments] error', error)
         return []
