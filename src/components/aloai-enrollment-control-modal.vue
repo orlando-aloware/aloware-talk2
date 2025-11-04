@@ -397,9 +397,10 @@ export default {
           return this.bots
         }
         const { data } = await talk2Api.V2.aloAiBot.getBots({
-          enabled: true
+          enabled: true,
+          compact: true
         })
-        return data?.data ?? []
+        return data
       } catch (error) {
         console.error('[fetchBots] error', error)
         return []
