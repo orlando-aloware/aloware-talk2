@@ -400,7 +400,7 @@ export default {
           enabled: true,
           compact: true
         })
-        return Array.isArray(data) ? data : (data?.data ?? [])
+        return data?.data ?? []
       } catch (error) {
         console.error('[fetchBots] error', error)
         return []
