@@ -767,8 +767,7 @@ export default {
     // })
 
     this.mainListeners.newInAppCall = (communication) => {
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
-      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
+      const isFishingMode = communication.is_fishing_mode
 
       if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
