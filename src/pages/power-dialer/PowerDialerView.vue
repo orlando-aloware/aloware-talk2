@@ -569,7 +569,7 @@ import ConfirmDialog from 'components/confirm-dialog'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import TrashOIcon from 'components/icons/trash-o-icon'
-import { get, isEmpty, isEqual } from 'lodash'
+import { get, isEmpty, isEqual, isNull } from 'lodash'
 import Breadcrumbs from 'src/components/breadcrumbs'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
@@ -1306,18 +1306,29 @@ export default {
         return
       }
 
+      if (notifications.length < 1) {
+        return
+      }
+
+      let totalItemsBeforeImport = null
+
       const statusReport = notifications.reduce((acc, notification) => {
         const currentNotification = notification.status_report
 
         // Sum values
         for (const name of ['fail', 'extra', 'success', 'info']) {
           for (const [key, value] of Object.entries(currentNotification[name])) {
-            // for 'extra' do not sum 'settings'
-            if (name === 'extra' && ['settings'].includes(key)) {
-              continue
-            }
+            // for 'extra' do not sum 'settings' and 'total_items_before_import'
+            if (name === 'extra' && ['settings', 'total_items_before_import'].includes(key)) {
+              acc[name][key] = value
 
-            acc[name][key] = (acc[name][key] || 0) + value
+              // remember found 'total_items_before_import' and use later
+              if (['total_items_before_import'].includes(key) && isNull(totalItemsBeforeImport)) {
+                totalItemsBeforeImport = value
+              }
+            } else {
+              acc[name][key] = (acc[name][key] || 0) + value
+            }
           }
         }
 
@@ -1333,9 +1344,11 @@ export default {
         extra: {}
       })
 
-      if (statusReport.info.selected > 0) {
-        this.bulkAddStatusReport = statusReport
+      if (!isNull(totalItemsBeforeImport)) {
+        statusReport.extra.total_items_before_import = totalItemsBeforeImport
       }
+
+      this.bulkAddStatusReport = statusReport
     },
 
     onTaskAddedNotificationClose () {
