@@ -203,7 +203,7 @@
                       <span class='font-weight-bold'>$</span>
                   </div>
                 </b-link>
-                </h6>
+              </h6>
               <p class='mb-1 d-flex' data-testid='integration-hubspot-amount'>
                 <span class='data-icon-label'>Amount: </span>
                 <span class='data-value ml-1'
