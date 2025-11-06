@@ -221,11 +221,17 @@ pipeline {
                                             terraform fmt
                                             '''
 
-                                            try {
-                                                sh "terraform workspace new ${branchName}"
-                                            } catch (Exception e) {
-                                                echo 'The workspace already exists, running TF Commands...'
+                                            def workspaceExists = sh(
+                                                script: "terraform workspace list | grep -w '${branchName}' || true",
+                                                returnStdout: true
+                                            ).trim()
+
+                                            if (workspaceExists) {
+                                                echo "Workspace '${branchName}' already exists, selecting it..."
                                                 sh "terraform workspace select ${branchName}"
+                                            } else {
+                                                echo "Creating new workspace '${branchName}'..."
+                                                sh "terraform workspace new ${branchName}"
                                             }
 
                                             sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
@@ -330,11 +336,17 @@ pipeline {
                                             terraform fmt
                                             """
 
-                                            try {
-                                                sh "terraform workspace new ${workspaceName}"
-                                            } catch (Exception e) {
-                                                echo 'The workspace already exists, running TF Commands...'
+                                            def workspaceExists = sh(
+                                                script: "terraform workspace list | grep -w '${workspaceName}' || true",
+                                                returnStdout: true
+                                            ).trim()
+
+                                            if (workspaceExists) {
+                                                echo "Workspace '${workspaceName}' already exists, selecting it..."
                                                 sh "terraform workspace select ${workspaceName}"
+                                            } else {
+                                                echo "Creating new workspace '${workspaceName}'..."
+                                                sh "terraform workspace new ${workspaceName}"
                                             }
 
                                             sh "AWS_PROFILE=staging terraform apply -var environment='develop' -var domainName='${STAGING_URL}' -var route53_zone='${STAGING_DOMAIN}' -var cachePolicyId='${STAGING_CACHE_POLICY_ID}' --auto-approve"
