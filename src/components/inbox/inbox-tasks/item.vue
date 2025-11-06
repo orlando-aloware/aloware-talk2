@@ -65,7 +65,7 @@
           <div class="truncated-text"
                :class="[appointmentReminderTextClass, hasUnreadsClass]"
                v-if="contact.last_communication.body !== null && isMention"
-               v-html="parsedBody">
+               v-html="parsedMention">
           </div>
 
           <div class="truncated-text"

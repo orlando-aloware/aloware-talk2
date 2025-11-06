@@ -88,7 +88,7 @@ export default {
 
   computed: {
     contactAccessTypeOptions () {
-      const options = [
+      return [
         {
           value: ContactAccessTypes.CONTACTS_ACCESS_EVERYONE,
           label: 'Everything',
@@ -102,32 +102,17 @@ export default {
             : 'Can only see contacts owned by users in any ring groups that this user belongs to.'
         },
         {
-          value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP,
-          label: this.hasCompanyTeamInboxEnabled && this.value === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP
-            ? 'Ring Group & Owned Only (DEPRECATED)'
-            : 'Ring Group & Owned Only',
-          description: this.hasCompanyTeamInboxEnabled && this.value === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP
-            ? 'This option is deprecated for team inbox users. Please pick any other option.'
-            : 'Can only see owned contacts and contacts that have interacted with the ring groups that this user belongs to.'
-        },
-        {
           value: ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY,
           label: 'Owned Only',
           description: 'Can only see their own contacts.'
         }
       ]
-
-      // For Team Inbox enabled companies: hide "Owned & Ring Group" option ONLY if it's not currently selected
-      if (this.hasCompanyTeamInboxEnabled && this.value !== ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
-        return options.filter(opt => opt.value !== ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP)
-      }
-
-      return options
     },
 
     optionsArray () {
       return this.isContactAccessType ? this.contactAccessTypeOptions : this.communicationAccessTypeOptions
     },
+
     placeholder () {
       switch (true) {
         case this.multiple && this.model.length < 1:
