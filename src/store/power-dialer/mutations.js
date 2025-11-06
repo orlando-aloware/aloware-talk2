@@ -234,17 +234,39 @@ export default {
       return
     }
 
-    const existingNotifications = state.bulkAddContactsNotification[contactListId]
+    let existingNotification = state.bulkAddContactsNotification[contactListId] ?? {}
 
-    if (Array.isArray(existingNotifications)) {
-      existingNotifications.push(value)
-
-      if (existingNotifications.length > 200) {
-        existingNotifications.shift()
-      }
-    } else {
-      state.bulkAddContactsNotification[contactListId] = [value]
+    if (!value?.status_report) {
+      return
     }
+
+    for (const name of ['fail', 'extra', 'success', 'info']) {
+      if (!value.status_report[name]) {
+        continue
+      }
+
+      if (!existingNotification[name]) {
+        existingNotification[name] = {}
+      }
+
+      for (const [key, val] of Object.entries(value.status_report[name])) {
+        // for 'extra' do not sum 'settings' and 'total_items_before_import'
+        if (name === 'extra' && ['settings', 'total_items_before_import'].includes(key)) {
+          // use 'total_items_before_import' from the first mention
+          if (key === 'total_items_before_import') {
+            if (!Object.prototype.hasOwnProperty.call(existingNotification[name], key)) {
+              existingNotification[name][key] = val
+            }
+          } else {
+            existingNotification[name][key] = val
+          }
+        } else {
+          existingNotification[name][key] = (existingNotification[name][key] || 0) + val
+        }
+      }
+    }
+
+    state.bulkAddContactsNotification[contactListId] = existingNotification
   },
 
   CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {
