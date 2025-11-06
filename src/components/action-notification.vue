@@ -595,8 +595,8 @@ export default {
       return this.isPersonalInbox ? 'Reject' : 'Ignore'
     },
 
-    isTeamInboxMention () {
-      return this.id === 'mention' && this.ringGroupId
+    isMention () {
+      return this.id === 'mention'
     }
   },
 
@@ -644,7 +644,7 @@ export default {
     ]),
 
     async updateTeamInboxLink (ringGroupId) {
-      if (this.isTeamInboxMention || await this.checkInboxAccess(ringGroupId)) {
+      if (this.isMention || await this.checkInboxAccess(ringGroupId)) {
         this.teamInboxLink = {
           path: `/team-inboxes/${ringGroupId}/contacts/${this.contactId}/communications`
         }
