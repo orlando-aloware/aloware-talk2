@@ -5,7 +5,7 @@ pipeline {
     options {
         disableConcurrentBuilds(abortPrevious: true)
     }
-
+    //Environment variables
     environment {
         DEV_DOMAIN = 'alodev.org'
         STAGING_DOMAIN = 'alostaging.com'
@@ -200,7 +200,7 @@ pipeline {
                                 }
                             }
                         }
-
+                        // Test
                         stage('[PR/Dev1] Deploy Talk2') {
                             when { not { branch 'master' } }
                             steps {
@@ -221,20 +221,25 @@ pipeline {
                                             terraform fmt
                                             '''
 
-                                            def workspaceExists = sh(
-                                                script: "terraform workspace list | grep -w '${branchName}' || true",
-                                                returnStdout: true
-                                            ).trim()
-
-                                            if (workspaceExists) {
-                                                echo "Workspace '${branchName}' already exists, selecting it..."
-                                                sh "terraform workspace select ${branchName}"
-                                            } else {
-                                                echo "Creating new workspace '${branchName}'..."
+                                            try {
                                                 sh "terraform workspace new ${branchName}"
+                                            } catch (Exception e) {
+                                                echo 'The workspace already exists, running TF Commands...'
+                                                sh "terraform workspace select ${branchName}"
                                             }
 
-                                            sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
+                                            try {
+                                                sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
+                                            } catch (err) {
+                                                echo "❗terraform apply failed or was interrupted. Cleaning resources..."
+
+                                                sh """
+                                                    set +e
+                                                    AWS_PROFILE=dev terraform destroy -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve || true
+                                                """
+
+                                                throw err
+                                            }
                                         }
 
                                         sh "AWS_PROFILE=dev ENV=dev1 yarn upload-s3"
@@ -336,17 +341,11 @@ pipeline {
                                             terraform fmt
                                             """
 
-                                            def workspaceExists = sh(
-                                                script: "terraform workspace list | grep -w '${workspaceName}' || true",
-                                                returnStdout: true
-                                            ).trim()
-
-                                            if (workspaceExists) {
-                                                echo "Workspace '${workspaceName}' already exists, selecting it..."
-                                                sh "terraform workspace select ${workspaceName}"
-                                            } else {
-                                                echo "Creating new workspace '${workspaceName}'..."
+                                            try {
                                                 sh "terraform workspace new ${workspaceName}"
+                                            } catch (Exception e) {
+                                                echo 'The workspace already exists, running TF Commands...'
+                                                sh "terraform workspace select ${workspaceName}"
                                             }
 
                                             sh "AWS_PROFILE=staging terraform apply -var environment='develop' -var domainName='${STAGING_URL}' -var route53_zone='${STAGING_DOMAIN}' -var cachePolicyId='${STAGING_CACHE_POLICY_ID}' --auto-approve"
