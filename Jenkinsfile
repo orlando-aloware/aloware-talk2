@@ -235,6 +235,7 @@ pipeline {
 
                                                 sh """
                                                     set +e
+                                                    AWS_PROFILE=dev terraform refresh -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' || true
                                                     AWS_PROFILE=dev terraform destroy -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve || true
                                                 """
 
