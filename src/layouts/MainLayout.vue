@@ -863,8 +863,8 @@ export default {
       }
     }
 
-    this.mainListeners.mention = (data) => {
-      if (this.checkMentionMatchesUserAccessibility(data)) {
+    this.mainListeners.mention = async (data) => {
+      if (await this.checkMentionMatchesUserAccessibility(data)) {
         this.processActionNotification(data, 'mention')
       }
     }
