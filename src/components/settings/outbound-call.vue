@@ -289,7 +289,9 @@ export default {
         this.user.outbound_calling_selector !== OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT &&
         !this.currentCompany?.force_outbound_line
       ) {
-        return false
+        return this.user.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_USER_ALWAYS_ASK
+          ? !this.availableAgentCampaigns.length
+          : false
       }
 
       if (!this.hasRole(COMPANY_AGENT)) {
@@ -312,13 +314,13 @@ export default {
     },
 
     invalidForcedOutboundLineErrorMessage () {
-      if (this.outboundLineSettingsDisabled) {
-        return this.availableAgentCampaigns.length > 0
-          ? 'You don\'t have access to your assigned outbound line. Please contact your company admin to fix this issue.'
-          : 'You don\'t have access to any lines. Please contact your company admin to be added to a Team Inbox before making calls.'
+      if (!this.availableAgentCampaigns.length) {
+        return 'You don\'t have access to any lines. Please contact your company admin to be added to a Team Inbox before making calls.'
       }
 
-      return 'The company default line is no longer available. Please select a different line.'
+      return this.outboundLineSettingsDisabled
+        ? 'You don\'t have access to your assigned outbound line. Please contact your company admin to fix this issue.'
+        : 'The company default line is no longer available. Please select a different line.'
     },
 
     shouldLimitAgentLinesVisibility () {
