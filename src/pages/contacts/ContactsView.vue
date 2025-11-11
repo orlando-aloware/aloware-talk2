@@ -1183,8 +1183,12 @@ export default {
         this.defaultIds.includes(this.id) ||
         this.isUpdatingList ||
         !this.listContactsLoaded ||
-        this.list.show_in_public_folder ||
+        (this.list.show_in_public_folder && !this.isAdminOrListOwner) ||
         this.list.type === this.ContactListTypes.DYNAMIC_REMOTE_LIST
+    },
+
+    isAdminOrListOwner () {
+      return this.isAdmin || (this.profile && this.profile.id === this.list?.folder?.created_by)
     },
 
     cleanedCurrentListFilters () {
