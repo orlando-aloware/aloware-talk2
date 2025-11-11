@@ -45,7 +45,7 @@
       <b-form-row v-if="showInvalidCompanyDefaultLineAlert" class="mt-n4">
         <b-col sm="12">
           <p class="form-helper-text text-danger">
-            The company default line is no longer available. Please select a different line.
+            {{ invalidForcedOutboundLineErrorMessage }}
           </p>
         </b-col>
       </b-form-row>
@@ -285,7 +285,10 @@ export default {
         return false
       }
 
-      if (this.user.outbound_calling_selector !== OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT) {
+      if (
+        this.user.outbound_calling_selector !== OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT &&
+        !this.currentCompany?.force_outbound_line
+      ) {
         return false
       }
 
@@ -306,6 +309,16 @@ export default {
       }
 
       return 'The previously selected line is no longer available. Please select a different line.'
+    },
+
+    invalidForcedOutboundLineErrorMessage () {
+      if (this.outboundLineSettingsDisabled) {
+        return this.availableAgentCampaigns.length > 0
+          ? 'You don\'t have access to your assigned outbound line. Please contact your company admin to fix this issue.'
+          : 'You don\'t have access to any lines. Please contact your company admin to be added to a Team Inbox before making calls.'
+      }
+
+      return 'The company default line is no longer available. Please select a different line.'
     },
 
     shouldLimitAgentLinesVisibility () {
