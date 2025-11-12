@@ -1257,7 +1257,7 @@ export default {
       if ((communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
         !INCOMING_STATUSES.includes(communication.current_status2)) && !isAddOrIntroduceOperation) {
         console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
-        this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+        this.closeCallNotifications(this.getNotificationType(communication), communication.id)
       }
 
       if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {

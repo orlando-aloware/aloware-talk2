@@ -84,7 +84,7 @@ export default {
       }
 
       // console.log('[Notif 1] Communication when event closeCallNotifications : ', communication)
-      this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+      this.closeCallNotifications(this.getNotificationType(communication), communication.id)
     },
 
     closeCallNotifications (type = 'incomingCall', communicationId = null, forceClose = false) {
@@ -178,8 +178,13 @@ export default {
       }
     },
 
-    getNotificationType (ringGroupId) {
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === ringGroupId)
+    getNotificationType (communication) {
+      if ('is_fishing_mode' in communication && typeof communication.is_fishing_mode === 'boolean') {
+        return communication.is_fishing_mode ? 'callFishing' : 'incomingCall'
+      }
+
+      // fallback to ring group
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
       return ringGroup &&
       ringGroup.should_queue &&
       ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
