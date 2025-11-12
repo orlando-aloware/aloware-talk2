@@ -767,8 +767,7 @@ export default {
     // })
 
     this.mainListeners.newInAppCall = (communication) => {
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
-      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
+      const isFishingMode = communication.is_fishing_mode
 
       if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
@@ -1266,7 +1265,7 @@ export default {
       if ((communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
         !INCOMING_STATUSES.includes(communication.current_status2)) && !isAddOrIntroduceOperation) {
         console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
-        this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+        this.closeCallNotifications(this.getNotificationType(communication), communication.id)
       }
 
       if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {

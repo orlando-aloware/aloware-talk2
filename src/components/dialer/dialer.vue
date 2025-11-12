@@ -2209,7 +2209,9 @@ export default {
         campaign_id: campaignId,
         campaign: {
           name: customParams?.CampaignName
-        }
+        },
+        is_fishing_mode: false,
+        is_call_waiting: false
       }
 
       console.log('Successfully built communication data from customParameters:', communication)
