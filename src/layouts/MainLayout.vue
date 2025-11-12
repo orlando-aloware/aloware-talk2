@@ -791,12 +791,13 @@ export default {
       // for non-fishing mode calls, ignore call notification if the current status is not `transferring`, or `queued`, or `ringing` or the user is in sleep mode
       // ignore call notifications if the call is not fishing mode and the user is in sleep mode
       // this is to avoid the annoying notification that pops up when the call comes in, and disappears after a few seconds
-      if (isFishingMode || !this.profile.sleep_mode || ![
-        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW
-      ].includes(communication.current_status2)
-      ) {
+      if (isFishingMode || (
+        !this.profile.sleep_mode && ![
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW
+        ].includes(communication.current_status2)
+      )) {
         this.processActionNotification(communication, communicationType)
       }
     }
