@@ -820,11 +820,48 @@ export default {
     }
   },
 
+  created () {
+    // Listen for file migration complete broadcast
+    this.$VueEvent.listen('communication.file.migrated', (event) => {
+      if (event.communication_id === this.communication.id && event.file_type === this.type) {
+        this.fetchFileUrl()
+      }
+    })
+  },
+
   mounted () {
     this.checkAndShowTranscriptionModal()
   },
 
+  beforeDestroy () {
+    this.$VueEvent.stop('communication.file.migrated')
+  },
+
   methods: {
+    updateFileData (data) {
+      this.fileUuid = this.getUuidFromURL(data.download_url)
+      this.filename = this.getFilenameFromURL(data.download_url)
+      this.remoteUrl = data.url
+      this.downloadUrl = data.download_url
+      this.mimeType = data.mimetype || ''
+      this.isMigrated = data.is_migrated
+    },
+
+    fetchFileUrl () {
+      const options = {
+        params: {
+          type: this.type
+        }
+      }
+
+      window.axios.get(`/api/v1/communication/${this.communication.id}/file-url`, options)
+        .then(res => {
+          this.updateFileData(res.data)
+        }).catch(err => {
+          console.log('Couldn\'t fetch call recording.', err)
+        })
+    },
+
     fetchSmartTranscriptionData () {
       this.isLoading = true
       this.show_form = true
@@ -841,23 +878,7 @@ export default {
         })
 
       // Fetch communication recording url.
-      let options = {
-        params: {
-          type: this.type
-        }
-      }
-
-      window.axios.get(`/api/v1/communication/${this.communication.id}/file-url`, options)
-        .then(res => {
-          this.fileUuid = this.getUuidFromURL(res.data.download_url)
-          this.filename = this.getFilenameFromURL(res.data.download_url)
-          this.remoteUrl = res.data.url
-          this.downloadUrl = res.data.download_url
-          this.mimeType = res.data.mimetype || ''
-          this.isMigrated = res.data.is_migrated
-        }).catch(err => {
-          console.log('Couldn\'t fetch call recording.', err)
-        })
+      this.fetchFileUrl()
     },
 
     /**
