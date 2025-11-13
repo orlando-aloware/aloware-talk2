@@ -1817,8 +1817,22 @@ export default {
     },
 
     leadNumberRaw () {
+      // Priority order: communication > callFishing > call.from (for incoming) / call.to (for outgoing)
       const leadNumber = _.get(this.dialer, 'communication.lead_number', null)
-      return !leadNumber ? _.get(this.dialer, 'callFishing.communication.lead_number', null) : leadNumber
+      if (leadNumber) return leadNumber
+
+      const fishingNumber = _.get(this.dialer, 'callFishing.communication.lead_number', null)
+      if (fishingNumber) return fishingNumber
+
+      // Fallback to call object during transition (prevents number from disappearing)
+      if (this.dialer.call) {
+        const callFrom = _.get(this.dialer, 'call.from', null)
+        const callTo = _.get(this.dialer, 'call.to', null)
+        // For incoming calls, use 'from', for outgoing use 'to'
+        return this.dialer.call.direction === 'INCOMING' ? callFrom : callTo
+      }
+
+      return null
     },
 
     leadNumber () {
