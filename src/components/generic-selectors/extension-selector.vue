@@ -35,8 +35,14 @@
       </template>
 
       <template v-slot:option="scope">
-        <q-item v-bind="scope.itemProps"
+        <q-item v-if="scope.opt.disable"
+                v-bind="scope.itemProps"
                 v-on="scope.itemEvents">
+          <q-item-label header class="text-size-xs">{{ scope.opt.name }}</q-item-label>
+        </q-item>
+        <q-item v-bind="scope.itemProps"
+                v-on="scope.itemEvents"
+                v-else>
           <q-item-section>
             <q-item-label v-html="scope.opt"/>
           </q-item-section>
@@ -100,12 +106,32 @@ export default {
       }
     },
 
-    availableExtensions () {
-      // find used extensions
-      const usedExtensions = this.users ? this.users.map(user => (user.extension) ? user.extension : null).filter(o => o !== null) : []
+    inUseExtensions () {
+      if (!this.users) {
+        return []
+      }
 
+      return this.users.map(user => (user.extension) ? user.extension : null)
+        .filter(o => o !== null)
+        .sort((a, b) => a - b)
+    },
+
+    groupedInUseExtensions () {
+      return [
+        {
+          name: 'In Use',
+          disable: true
+        },
+        ...this.inUseExtensions.map((ext) => ({
+          name: ext,
+          disable: true
+        }))
+      ]
+    },
+
+    availableExtensions () {
       // remove used extensions from available extensions
-      return this.allExtensions.filter((extension) => !usedExtensions.includes(extension))
+      return this.allExtensions.filter((extension) => !this.inUseExtensions.includes(extension))
     }
   },
 
@@ -124,14 +150,14 @@ export default {
     filterFn (val, update) {
       if (val === '') {
         update(() => {
-          this.options = this.availableExtensions.slice(0, 100)
+          this.options = this.combineExtensionsWithInUse(this.availableExtensions.slice(0, 100))
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.availableExtensions.filter(item => item.toLowerCase().indexOf(needle) > -1).slice(0, 100)
+        this.options = this.combineExtensionsWithInUse(this.availableExtensions.filter(item => item.toLowerCase().indexOf(needle) > -1).slice(0, 100))
       })
     },
 
@@ -153,12 +179,19 @@ export default {
       for (let i = extensionInitial; i < extensionLimit; i++) {
         this.allExtensions.push(i.toString())
       }
+    },
+
+    combineExtensionsWithInUse (extensions) {
+      return [
+        ...extensions,
+        ...this.groupedInUseExtensions
+      ]
     }
   },
 
   mounted () {
     this.loadExtensions()
-    this.options = this.availableExtensions.slice(0, 100)
+    this.options = this.combineExtensionsWithInUse(this.availableExtensions.slice(0, 100))
   },
 
   watch: {
