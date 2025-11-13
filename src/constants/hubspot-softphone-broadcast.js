@@ -52,6 +52,13 @@ export const BroadcastMessageTypes = Object.freeze({
   CALL_CANCELLED: 'CALL_CANCELLED',
 
   /**
+   * Sent when a call is answered from Aloware (not from the widget)
+   * This tells the REMOTE to dismiss any incoming call UI and show the "on call" state
+   * Direction: WINDOW -> REMOTE
+   */
+  ANSWERED_FROM_NON_WIDGET: 'ANSWERED_FROM_NON_WIDGET',
+
+  /**
    * Sent when Remote loads and needs current call state from Window
    * Direction: REMOTE -> WINDOW
    */

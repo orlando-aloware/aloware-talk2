@@ -663,6 +663,18 @@ export default {
           }
           break
 
+        case BroadcastMessageTypes.ANSWERED_FROM_NON_WIDGET:
+          if (this.componentMode === ComponentMode.REMOTE) {
+            console.log('[REMOTE] Received ANSWERED_FROM_NON_WIDGET - dismissing incoming call UI')
+            // Dismiss incoming call UI and clear data
+            this.hideIncomingCallUI()
+            this.clearDialerCallFishing()
+            this.setDialerCommunication()
+            // Return to ready state
+            this.displayState = DisplayState.READY_FOR_CALLS
+          }
+          break
+
         case BroadcastMessageTypes.REQUEST_CURRENT_STATE:
           // In WINDOW mode, send the current call state to Remote
           if (this.componentMode !== ComponentMode.REMOTE) {
@@ -1567,8 +1579,48 @@ export default {
      * Update the agent status in HubSpot if it changes in Aloware
      * Only WINDOW mode should update HubSpot availability to prevent duplicate signals
      */
-    'profile.agent_status' (newStatus) {
+    'profile.agent_status' (newStatus, oldStatus) {
       this.callSdkOptions.isAvailable = this.isAgentAvailable
+
+      // Handle agent going on call from Aloware (not from this widget)
+      // Show "agent on call" alert instead of blank screen
+      // Only trigger if:
+      // 1. No active widget call (dialer.call is empty)
+      // 2. Widget is not in an active calling state (CALLING_REMOTE_ACTIVE_CALL)
+      // 3. Widget is not currently showing webrtc (call in progress in widget)
+      // 4. Dialer is not in active call states (MAKING_CALL, CALL_CONNECTED, etc.)
+      const isWidgetInCall = this.dialer.call ||
+                             this.displayState === DisplayState.CALLING_REMOTE_ACTIVE_CALL ||
+                             [DialerStatus.MAKING_CALL, DialerStatus.CALL_CONNECTED, DialerStatus.ANSWERING_CALL].includes(this.dialer.currentStatus)
+
+      if (newStatus === AgentStatus.AGENT_STATUS_ON_CALL &&
+          oldStatus !== AgentStatus.AGENT_STATUS_ON_CALL &&
+          this.componentMode === ComponentMode.WINDOW &&
+          !isWidgetInCall) { // Only if widget is NOT in a call
+        console.log('[HubSpot Widget] Agent went on call from Aloware, showing agent on call alert')
+        this.displayState = DisplayState.SHOW_ALERT_AGENT_ON_CALL
+
+        // Broadcast ANSWERED_FROM_NON_WIDGET to REMOTE to dismiss any incoming call UI
+        // Since the call was answered in Aloware, we need to clear the remote's incoming call state
+        const communicationId = this.dialer?.communication?.id
+        if (this.broadcastManager) {
+          console.log('[WINDOW] Broadcasting ANSWERED_FROM_NON_WIDGET - call answered in Aloware')
+          this.broadcastManager.broadcastAnsweredFromNonWidget(communicationId)
+        }
+
+        // Clear fishing data and communication since call is not in this widget
+        this.clearDialerCallFishing()
+        this.setDialerCommunication()
+      }
+
+      // Handle agent finishing call from Aloware - return to ready state
+      if (oldStatus === AgentStatus.AGENT_STATUS_ON_CALL &&
+          newStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS &&
+          this.componentMode === ComponentMode.WINDOW &&
+          this.displayState === DisplayState.SHOW_ALERT_AGENT_ON_CALL) {
+        console.log('[HubSpot Widget] Agent finished call from Aloware, returning to ready state')
+        this.displayState = DisplayState.READY_FOR_CALLS
+      }
 
       // Only WINDOW mode should notify HubSpot of availability changes
       // REMOTE mode just displays the UI state

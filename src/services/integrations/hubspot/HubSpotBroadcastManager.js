@@ -165,6 +165,18 @@ class HubSpotBroadcastManager {
   }
 
   /**
+   * Broadcasts that a call was answered from Aloware (not from the widget)
+   * This tells the REMOTE to dismiss incoming call UI
+   *
+   * @param {number} communicationId - Communication ID
+   */
+  broadcastAnsweredFromNonWidget (communicationId) {
+    return this.publish(BroadcastMessageTypes.ANSWERED_FROM_NON_WIDGET, {
+      communicationId
+    })
+  }
+
+  /**
    * Requests current call state from the other instance
    *
    * @param {string} requestId - Unique request ID
