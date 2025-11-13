@@ -60,9 +60,14 @@ export default function ({ store }) {
     }
 
     const isSalesforceWidget = to.matched.some(route => route?.meta?.isSalesforceWidget)
+    const isHubspotWidget = isWidget && to.hash?.includes('app.hubspot.com')
 
     if (isSalesforceWidget) {
       store.commit('SET_IS_SALESFORCE_WIDGET', true)
+    }
+
+    if (isHubspotWidget) {
+      store.commit('SET_IS_HUBSPOT_WIDGET', true)
     }
 
     const record = to.matched.find(record => record.meta.title)

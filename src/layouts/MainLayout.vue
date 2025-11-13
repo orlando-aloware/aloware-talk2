@@ -442,6 +442,7 @@ export default {
       'showedKycReloadDialog',
       'statics',
       'isWidget',
+      'isHubspotWidget',
       'campaignsIsLoading'
     ]),
 
@@ -2840,14 +2841,17 @@ export default {
       }
     },
 
-    is_focused_power_dialer (to) {
-      if (to) {
-        this.$router.replace(
-          this.currentCompany.auto_dialer_enabled ? '/power-dialer' : '/stats'
-        ).catch(() => {
-          // We need it to avoid navigation error
-        })
+    is_focused_power_dialer (isFocusedPowerDialer) {
+      if (!isFocusedPowerDialer || this.isHubspotWidget) {
+        // Do not redirect if focused power dialer is not enabled or if it's a hubspot widget
+        return
       }
+
+      this.$router.replace(
+        this.currentCompany.auto_dialer_enabled ? '/power-dialer' : '/stats'
+      ).catch(() => {
+        // We need it to avoid navigation error
+      })
     },
 
     $route (to, from) {
