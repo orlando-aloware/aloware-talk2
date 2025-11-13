@@ -263,10 +263,6 @@ export default {
           this.dispatchToMemoryMonitor('recording_status.updated', event)
           this.$VueEvent.fire('updated_recording_status', event)
         })
-        .listen('.communication.file.migrated', (event) => {
-          this.dispatchToMemoryMonitor('.communication.file.migrated', event)
-          this.$VueEvent.fire('communication.file.migrated', event)
-        })
 
         /**
          * ------------------------------------
