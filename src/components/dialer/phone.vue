@@ -1605,6 +1605,13 @@ export default {
     ]),
 
     isCallCompleted () {
+      // HubSpot widget sets dialer.communication early (during incoming call phase) with a completed
+      // disposition_status2 from previous attempts or fishing mode. To prevent footer buttons from showing
+      // during incoming calls, only rely on terminal statuses for HubSpot widget, not disposition status.
+      if (this.isHubSpotWidget) {
+        return ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)
+      }
+
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
     },
 
