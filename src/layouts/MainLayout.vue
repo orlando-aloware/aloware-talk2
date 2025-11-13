@@ -442,7 +442,6 @@ export default {
       'showedKycReloadDialog',
       'statics',
       'isWidget',
-      'isHubspotWidget',
       'campaignsIsLoading'
     ]),
 
@@ -2842,7 +2841,7 @@ export default {
     },
 
     is_focused_power_dialer (isFocusedPowerDialer) {
-      if (!isFocusedPowerDialer || this.isHubspotWidget) {
+      if (!isFocusedPowerDialer || this.isWidget) {
         // Do not redirect if focused power dialer is not enabled or if it's a hubspot widget
         return
       }
