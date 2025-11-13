@@ -263,6 +263,10 @@ export default {
           this.dispatchToMemoryMonitor('recording_status.updated', event)
           this.$VueEvent.fire('updated_recording_status', event)
         })
+        .listen('.communication.file.migrated', (event) => {
+          this.dispatchToMemoryMonitor('.communication.file.migrated', event)
+          this.$VueEvent.fire('communication.file.migrated', event)
+        })
 
         /**
          * ------------------------------------
@@ -521,6 +525,10 @@ export default {
         .listen('.communication.deleted', (event) => {
           this.dispatchToMemoryMonitor('.communication.deleted', event)
           this.$VueEvent.fire('delete_communication', event.communication)
+        })
+        .listen('.communication.file.migrated', (event) => {
+          this.dispatchToMemoryMonitor('.communication.file.migrated', event)
+          this.$VueEvent.fire('communication.file.migrated', event)
         })
         .listen('.mention.created', (event) => {
           this.dispatchToMemoryMonitor('.mention.created', event)

@@ -131,36 +131,56 @@ export default {
 
   created () {
     this.onShow()
+
+    // Listen for file migration complete broadcast
+    this.$VueEvent.listen('communication.file.migrated', (event) => {
+      if (event.communication_id === this.communication.id && event.file_type === this.type) {
+        this.fetchFileUrl()
+      }
+    })
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('communication.file.migrated')
   },
 
   methods: {
+    updateFileData (data) {
+      console.log('Updating file data:', data)
+      this.fileUuid = this.getUuidFromURL(data.download_url)
+      this.filename = this.getFilenameFromURL(data.download_url)
+      this.remoteUrl = data.url
+      this.downloadUrl = data.download_url
+      this.mimeType = data.mimetype || ''
+      this.isMigrated = data.is_migrated
+      this.$emit('audio-file-updated', {
+        fileUuid: this.fileUuid,
+        isMigrated: this.isMigrated
+      })
+    },
+
+    fetchFileUrl () {
+      const options = {
+        params: {
+          type: this.type
+        }
+      }
+      this.$axios.get(`/api/v1/communication/${this.communication.id}/file-url`, options)
+        .then((response) => {
+          this.updateFileData(response.data)
+        }).catch(err => {
+          console.log(err)
+          this.loading = false
+          this.$handleErrors(err.response)
+        })
+    },
+
     onShow () {
       if (this.hasAudio && !this.isDeleted) {
         this.loading = true
         this.remoteUrl = null
         this.downloadUrl = null
-        const options = {
-          params: {
-            type: this.type
-          }
-        }
-        this.$axios.get(`/api/v1/communication/${this.communication.id}/file-url`, options)
-          .then((response) => {
-            this.fileUuid = this.getUuidFromURL(response.data.download_url)
-            this.filename = this.getFilenameFromURL(response.data.download_url)
-            this.remoteUrl = response.data.url
-            this.downloadUrl = response.data.download_url
-            this.mimeType = response.data.mimetype || ''
-            this.isMigrated = response.data.is_migrated
-            this.$emit('audio-file-updated', {
-              fileUuid: this.fileUuid,
-              isMigrated: this.isMigrated
-            })
-          }).catch(err => {
-            console.log(err)
-            this.loading = false
-            this.$handleErrors(err.response)
-          })
+        this.fetchFileUrl()
       }
     },
 
