@@ -1576,6 +1576,13 @@
         data-testid="comm-details-col"
         v-if="communication && communication.type === CommunicationTypes.CALL"
       >
+        <aloai-agent-call
+          v-if="communication.aloAiBotCall"
+          data-testid="comm-details-aloai-agent-call"
+          :class="isWidget || mobileView ? 'my-1' : 'mb-1'"
+          :aloAiBotCall="communication.aloAiBotCall"
+          :uniqueId="communication.id"
+        />
         <ring-group-snapshot
           data-testid="comm-details-ring-group-snapshot"
           :class="isWidget || mobileView ? 'my-1' : 'mb-1'"
@@ -1599,6 +1606,9 @@
 import CallDispositionSelector from 'components/call-disposition-selector'
 import CommunicationAudio from 'components/communication-audio'
 import CommunicationNote from 'components/communication-note'
+import AloaiAgentCall from 'components/communications/aloai-agent-call.vue'
+import CallTimeline from 'components/communications/call-timeline.vue'
+import CsatScore from 'components/communications/communications-table/csat-score.vue'
 import DownloadButton from 'components/download-button'
 import GenerateTranscriptionButton from 'components/generate-transcription-button'
 import EntityTags from 'components/generic-selectors/entity-tags'
@@ -1615,17 +1625,15 @@ import TranscriptionModal from 'src/components/communication/transcription-modal
 import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import talk2Api from 'src/plugins/api/api'
+import { removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 import { aclMixin, classicMixin, communicationInfoMixin, goBackMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-import { removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 import * as CommunicationCurrentStatus from '../constants/communication-current-status'
 import * as CommunicationDirections from '../constants/communication-direction'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
-import CsatScore from 'components/communications/communications-table/csat-score.vue'
-import CallTimeline from 'components/communications/call-timeline.vue'
 
 export default {
   name: 'communication-details',
@@ -1648,7 +1656,8 @@ export default {
     CloseIcon,
     UserDisplay,
     SparkleIcon,
-    CallTimeline
+    CallTimeline,
+    AloaiAgentCall
   },
 
   mixins: [

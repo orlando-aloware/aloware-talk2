@@ -766,7 +766,9 @@ export default {
     //   }
     // })
 
-    this.mainListeners.newInAppCall = ({ communication, isFishingMode, isCallWaiting }) => {
+    this.mainListeners.newInAppCall = (communication) => {
+      const isFishingMode = communication.is_fishing_mode
+
       if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
@@ -785,10 +787,16 @@ export default {
         }
       }
 
+      // for non-fishing mode calls, ignore call notification if the current status is not `transferring`, or `queued`, or `ringing` or the user is in sleep mode
       // ignore call notifications if the call is not fishing mode and the user is in sleep mode
-      if (isFishingMode || isCallWaiting || !this.profile.sleep_mode) {
-        communication.is_fishing_mode = isFishingMode
-        communication.is_call_waiting = isCallWaiting
+      // this is to avoid the annoying notification that pops up when the call comes in, and disappears after a few seconds
+      if (isFishingMode || (
+        !this.profile.sleep_mode && ![
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW
+        ].includes(communication.current_status2)
+      )) {
         this.processActionNotification(communication, communicationType)
       }
     }
@@ -862,8 +870,8 @@ export default {
       }
     }
 
-    this.mainListeners.mention = (data) => {
-      if (this.checkMentionMatchesUserAccessibility(data)) {
+    this.mainListeners.mention = async (data) => {
+      if (await this.checkMentionMatchesUserAccessibility(data)) {
         this.processActionNotification(data, 'mention')
       }
     }
@@ -1257,7 +1265,7 @@ export default {
       if ((communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
         !INCOMING_STATUSES.includes(communication.current_status2)) && !isAddOrIntroduceOperation) {
         console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
-        this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+        this.closeCallNotifications(this.getNotificationType(communication), communication.id)
       }
 
       if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {

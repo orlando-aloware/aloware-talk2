@@ -10,6 +10,7 @@ import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_ABANDONED, STATUS_DEADEND, STAT
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT, COMPANY_REPORTER_ACCESS } from 'src/constants/roles'
 import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 
 export default {
   mixins: [userMixin],
@@ -28,6 +29,9 @@ export default {
     ]),
     ...mapState([
       'ringGroups'
+    ]),
+    ...mapState('TeamInbox', [
+      'inboxes'
     ])
   },
 
@@ -526,7 +530,7 @@ export default {
       return true
     },
 
-    checkMentionMatchesUserAccessibility (mention) {
+    async checkMentionMatchesUserAccessibility (mention) {
       // check if mentioned user is the actual user
       if (mention.mentioned_user_id !== this.profile.id) {
         return false
@@ -560,6 +564,19 @@ export default {
         if (mention.contact &&
           mention.contact.user_id &&
           mention.contact.user_id !== this.profile.id) {
+          return false
+        }
+      }
+
+      // check team inbox access
+      if (mention.ring_group_id) {
+        // if on TeamInboxes page, check if user has access by checking the state
+        if (this.inboxes?.length && !this.inboxes.some((inbox) => inbox.id === mention.ring_group_id)) {
+          return false
+        }
+
+        // check access from api
+        if (!(await this.checkInboxAccess(mention.ring_group_id))) {
           return false
         }
       }
@@ -610,6 +627,21 @@ export default {
       return data.contact &&
         !data.contact.user_id &&
         !this.profile.can_view_unassigned_contacts
+    },
+
+    async checkInboxAccess (inboxId) {
+      const response = await talk2TeamInboxApi.inboxes.get({
+        params: {
+          inbox_ids: [inboxId]
+        }
+      })
+
+      const inboxes = response?.data?.data || []
+      if (typeof inboxes !== 'object' || inboxes.length === 0) {
+        return false
+      }
+
+      return inboxes.some(inbox => inbox.id === inboxId)
     }
   }
 }

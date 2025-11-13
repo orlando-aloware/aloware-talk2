@@ -193,12 +193,15 @@
                 flat bordered>
           <q-card-section>
             <q-card-section class='p-0'>
-              <h6 class='mb-2'>
+              <h6 class='mb-0'>
                 <b-link class='deals-title ml-0'
-                        :href="deal.link"
-                        data-testid='integration-hubspot-deal-link'
-                        target='_blank'>
-                  {{ deal.properties.dealname }}
+                          :href="deal.link"
+                          data-testid='integration-hubspot-deal-link'
+                          target='_blank'>
+                  <div class='d-flex justify-content-between align-items-center mb-2'>
+                      <span>{{ deal.properties.dealname }}</span>
+                      <span class='font-weight-bold'>$</span>
+                  </div>
                 </b-link>
               </h6>
               <p class='mb-1 d-flex' data-testid='integration-hubspot-amount'>

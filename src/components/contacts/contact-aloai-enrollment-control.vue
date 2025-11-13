@@ -276,7 +276,6 @@ export default {
 
   data () {
     return {
-      bots: [],
       botEnrollments: [],
       activeBotIndex: 0,
       isBusy: false,
@@ -317,7 +316,7 @@ export default {
         return null
       }
 
-      return this.bots.find(bot => bot.id === currentEnrollment.aloai_bot_id)
+      return currentEnrollment.bot
     },
     confirmDeletionMessage () {
       let name = this.contact.first_name || 'No Name'
@@ -360,24 +359,20 @@ export default {
       this.isBusy = true
       const previousActiveBotIndex = this.activeBotIndex
 
-      this.fetchBots(force)
-        .then((bots) => {
-          this.bots = bots
-          this.fetchContactBotEnrollments()
-            .then((botEnrollments) => {
-              this.botEnrollments = botEnrollments
+      this.fetchContactBotEnrollments()
+        .then((botEnrollments) => {
+          this.botEnrollments = botEnrollments
 
-              // Determine the new activeBotIndex based on:
-              if (previousActiveBotIndex === 0) {
-                this.activeBotIndex = 0 // First agent, keep it as 0
-              } else if (previousActiveBotIndex >= botEnrollments.length) {
-                this.activeBotIndex = botEnrollments.length - 1 // Last agent, move to the previous valid index
-              } else {
-                this.activeBotIndex = previousActiveBotIndex // Middle, keep the previous index
-              }
+          // Determine the new activeBotIndex based on:
+          if (previousActiveBotIndex === 0) {
+            this.activeBotIndex = 0 // First agent, keep it as 0
+          } else if (previousActiveBotIndex >= botEnrollments.length) {
+            this.activeBotIndex = botEnrollments.length - 1 // Last agent, move to the previous valid index
+          } else {
+            this.activeBotIndex = previousActiveBotIndex // Middle, keep the previous index
+          }
 
-              this.isBusy = false
-            })
+          this.isBusy = false
         })
     },
     prevAgent () {
@@ -540,18 +535,6 @@ export default {
           this.busyReEnrollBotId = null
           this.isBusy = false
         })
-    },
-    async fetchBots (force = false) {
-      try {
-        if (!force && this.bots.length > 0) {
-          return this.bots
-        }
-        const { data } = await talk2Api.V2.aloAiBot.getBots()
-        return data?.data ?? []
-      } catch (error) {
-        console.error('[fetchBots] error', error)
-        return []
-      }
     },
     async fetchContactBotEnrollments () {
       try {
