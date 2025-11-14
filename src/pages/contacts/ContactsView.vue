@@ -1388,7 +1388,6 @@ export default {
       'removeContactOpen',
       'setBulkDelete',
       'setMessageComposerMode',
-      'updateContactsList',
       'updateContactsListFilter',
       'setListContactsLoaded',
       'setPreviouslySavedListId',
@@ -1636,45 +1635,12 @@ export default {
           .put('/api/v2/contacts-list/' + this.selectedList.id, params)
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
-            this.updateContactsList(res.data.data)
             this.setCurrentListFilters(currentFilters)
             this.initialListFilters = currentFilters
             this.setPreviousListFilters(currentFilters)
             this.updateFilterHasChanges()
             this.isUpdatingList = false
             this.$generalNotification('Changes to contact list has been saved.')
-
-            if (this.listItems[this.selectedList.id] && this.listItems[this.selectedList.id].total) {
-              this.pinnedCountLoaded({
-                id: this.selectedList.id,
-                count: this.listItems[this.selectedList.id].total
-              })
-
-              return
-            }
-
-            if (this.list.type === this.ContactListTypes.DYNAMIC) {
-              this.setDataCount({
-                filter_groups: this.currentListFilters
-              }, null, true)
-              return
-            }
-
-            this.setDataCount({
-              filter_groups: [
-                {
-                  filters: {
-                    contact_lists: [
-                      {
-                        operator: OPERATORS.IS_ANY_OF,
-                        value: [this.list.id]
-                      }
-                    ]
-                  },
-                  is_conjunction: true
-                }
-              ]
-            }, null, true)
           })
           .catch((_err) => {
             console.log(_err)
