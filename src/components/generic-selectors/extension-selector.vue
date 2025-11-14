@@ -111,7 +111,7 @@ export default {
         return []
       }
 
-      return this.users.map(user => (user.extension) ? user.extension : null)
+      return this.users.map(user => user.extension)
         .filter(o => o !== null)
         .sort((a, b) => a - b)
     },
