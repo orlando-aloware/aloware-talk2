@@ -17,8 +17,6 @@
       <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ settingsTabHeaderName }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
-      <inbox-list-navigation v-if="(['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)) && !titleOnly" />
-      <inbox-channel-navigation v-if="(['Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)) && !titleOnly" />
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
                    :disabled="isRefreshDisabled"
@@ -36,9 +34,6 @@
           Check the article how to use the Broadcast
         </q-tooltip>
       </a>
-
-      <inbox-toggle-filters :should-show-unreads-toggle="true"
-                            v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage" />
     </div>
 
     <tutorial-video-button v-if="!isMobile" />
@@ -139,9 +134,6 @@ import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import RefreshIcon from 'components/icons/refresh-icon'
-import InboxChannelNavigation from 'components/inbox/inbox-channel-navigation'
-import InboxListNavigation from 'components/inbox/inbox-list-navigation'
-import InboxToggleFilters from 'components/inbox/inbox-toggle-filters'
 import MemoryMonitor from 'components/MemoryMonitor'
 import Profile from 'components/profile'
 import SharedLoginMenu from 'components/shared-login-menu'
@@ -182,8 +174,6 @@ export default {
     DialerErrorIcon,
     BackButton,
     SharedLoginMenu,
-    InboxChannelNavigation,
-    InboxListNavigation,
     ParkedCall,
     ContactAppHeader,
     ContactListNavigation,
@@ -194,7 +184,6 @@ export default {
     CompactBtn,
     RefreshIcon,
     HeaderHelp,
-    InboxToggleFilters,
     InformationCircleIcon,
     TutorialVideoButton,
     MemoryMonitor,
@@ -336,13 +325,6 @@ export default {
 
     isDialerDisabled () {
       return (!this.isDialerReady && !this.dialer.error.code) || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
-    },
-
-    isInInboxPage () {
-      const path = this.$route.path
-      return this.$route.name === 'Inbox' ||
-        path.includes('inbox') ||
-        path.includes('channels')
     },
 
     shouldShowUnreadsToggle () {
