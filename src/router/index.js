@@ -4,6 +4,7 @@ import Vue from 'vue'
 import VueGtagEsm from 'vue-gtag'
 import VueRouter from 'vue-router'
 import routes, { TEAMINBOXES_MENU_TITLE } from './routes'
+import { isLegacyInboxPath, parseLegacyInboxPath } from './helpers'
 
 // Override Vue Router's push method to handle navigation duplications gracefully
 const originalPush = VueRouter.prototype.push
@@ -54,11 +55,10 @@ export default function ({ store }) {
   Router.beforeEach((to, from, next) => {
     // Redirect old legacy inbox paths
     // Note: This handles old URLs that might still be accessed via direct links
-    const isBasePath = ['/', ''].includes(to.path)
-    const isLegacyInboxPath = isBasePath || to.path.startsWith('/channels')
+    const isLegacyInboxRoute = isLegacyInboxPath(to.path)
 
-    if (isLegacyInboxPath) {
-      const { id: contactId, communicationId, channel } = { ...to.params, ...to.query }
+    if (isLegacyInboxRoute) {
+      const { contactId, communicationId, channel } = parseLegacyInboxPath(to.path)
 
       if (contactId) {
         const routeChannel = channel === 'mentions' ? 'mentions' : 'communications'
