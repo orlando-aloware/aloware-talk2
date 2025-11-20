@@ -9,5 +9,9 @@ export default {
 
   setTimezones ({ commit }, value) {
     commit('SET_TIMEZONES', value)
+  },
+
+  setAgentStatuses ({ commit }, value) {
+    commit('SET_AGENT_STATUSES', value)
   }
 }

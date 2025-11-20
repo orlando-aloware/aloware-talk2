@@ -85,6 +85,7 @@ export default function (/* { ssrContext } */) {
       usage: null,
       dialer: {
         token: null,
+        taskRouterToken: null,
         call: null,
         isReady: false,
         currentStatus: null,
@@ -347,6 +348,10 @@ export default function (/* { ssrContext } */) {
 
       setDialerToken ({ commit }, token) {
         commit('SET_DIALER_TOKEN', token)
+      },
+
+      setDialerTaskRouterToken ({ commit }, token) {
+        commit('SET_DIALER_TASK_ROUTER_TOKEN', token)
       },
 
       setDialerCall ({ commit }, call) {
@@ -1011,6 +1016,10 @@ export default function (/* { ssrContext } */) {
         state.dialer.token = token
       },
 
+      SET_DIALER_TASK_ROUTER_TOKEN (state, token) {
+        state.dialer.taskRouterToken = token
+      },
+
       SET_DIALER_CALL (state, call) {
         state.dialer.call = call
       },
@@ -1028,6 +1037,12 @@ export default function (/* { ssrContext } */) {
           communication.tag_ids = communication.tags.map((a) => a.id)
         } else if (communication && !communication.tags) {
           communication.tag_ids = []
+        }
+
+        // if the current communication.call_wrap_up_options.user_id is not empty but the new communication.call_wrap_up_options.user_id is empty, use the current communication.call_wrap_up_options
+        // this is to prevent overwriting the current communication.call_wrap_up_options when API call gets the response after the communciation.updated event is received.
+        if (communication?.call_wrap_up_options?.user_id === null && ![null, undefined].includes(state.dialer?.communication?.call_wrap_up_options?.user_id)) {
+          communication.call_wrap_up_options = state.dialer.communication.call_wrap_up_options
         }
 
         Vue.set(state.dialer, 'communication', communication)

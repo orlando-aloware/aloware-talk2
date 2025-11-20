@@ -20,5 +20,9 @@ export default {
   RESET_VUEX (state) {
     // perform state reset
     state = Object.assign({}, CacheDefault.DEFAULT_STATE)
+  },
+
+  SET_AGENT_STATUSES (state, agentStatuses) {
+    state.agentStatuses = agentStatuses
   }
 }
