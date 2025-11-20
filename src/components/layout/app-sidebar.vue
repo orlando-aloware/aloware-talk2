@@ -19,15 +19,6 @@
     </div>
 
     <app-sidebar-nav-link
-      v-if="hasCompanyLegacyInboxEnabled"
-      :isActive="isActive('Inbox')"
-      :isSidebarExpanded="isSidebarExpanded"
-      :title="INBOXES_MENU_TITLE"
-      :to="{ name: 'Inbox' }"
-      icon="inbox"
-    />
-
-    <app-sidebar-nav-link
       v-if="hasCompanyTeamInboxEnabled"
       :isActive="isActive(TEAMINBOXES_MENU_TITLE)"
       :isSidebarExpanded="isSidebarExpanded"
