@@ -487,7 +487,7 @@ export default {
           return
         }
 
-        this.$router.push({ name: this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE })
+        this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
         return
       }
 

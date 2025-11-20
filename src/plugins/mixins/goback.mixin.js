@@ -14,7 +14,7 @@ export default {
       if (this.canGoBack) {
         this.$router.go(-1)
       } else if (forceGoBack) {
-        this.$router.push({ name: this.currentCompany?.enable_legacy_inbox ? 'Inbox' : TEAMINBOXES_MENU_TITLE })
+        this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
       }
     }
   }

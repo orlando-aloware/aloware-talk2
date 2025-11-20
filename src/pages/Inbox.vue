@@ -11,15 +11,6 @@
            v-if="isContactShow">
         <Contact />
       </div>
-      <team-inbox-info-modal
-        title="📬 The Old Inbox Is Being Retired — Meet Your New Team Inbox"
-        body="We're phasing out the legacy inbox to give you a faster, smarter way to manage calls and messages.<br/><br/>The new <strong>Team Inbox</strong> is now live — designed for better ownership, team collaboration, and real-time visibility."
-        cta-text="Open Team Inbox"
-        cookie-name="team-inbox-announcement"
-        :max-shows="maxShows"
-        v-if="hasCompanyLegacyInboxEnabled"
-        :destination-route="{ name: 'Team Inboxes' }"
-        :should-show-in-first-visit="true" />
     </div>
   </div>
 </template>

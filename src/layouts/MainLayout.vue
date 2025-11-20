@@ -1177,7 +1177,7 @@ export default {
     const checkInterval = 5 * 60 * 1000
 
     // Handled outdated company info which caused the refresh loop problem
-    if (this.profile?.company_id && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
+    if (this.profile?.company_id && !this.hasCompanyTeamInboxEnabled && !this.loading) {
       this.$axios.get('/api/v1/company/' + this.profile.company_id)
         .then((res) => {
           this.setCurrentCompany(res.data)
@@ -2868,7 +2868,7 @@ export default {
 
       this.checkDebounce()
 
-      if (this.profile?.company && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
+      if (this.profile?.company && !this.hasCompanyTeamInboxEnabled && !this.loading) {
         this.setCurrentCompany(this.profile.company)
       }
 
@@ -3014,8 +3014,7 @@ export default {
       }
 
       if (!val && this.$route.name === 'Phone') {
-        const name = this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE
-        this.$router.replace({ name })
+        this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
       }
 
       if (val) {

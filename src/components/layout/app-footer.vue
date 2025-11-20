@@ -10,17 +10,6 @@
       dense
       indicator-color="transparent"
     >
-
-      <app-footer-nav-link
-        v-if="hasCompanyLegacyInboxEnabled"
-        :isActive="tab === 'inbox'"
-        :title="INBOXES_MENU_TITLE" :to="{name: 'Inbox'}"
-      >
-        <template v-slot:icon="{active}">
-          <inbox-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" />
-        </template>
-      </app-footer-nav-link>
-
       <app-footer-nav-link
         v-if="hasCompanyTeamInboxEnabled"
         :isActive="tab === 'team-inboxes'"
@@ -172,12 +161,10 @@ import {
 } from 'src/router/routes'
 import { userMixin } from 'src/plugins/mixins'
 import AppFooterNavLink from 'components/layout/app-footer-nav-link.vue'
-import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon.vue'
 
 export default {
   name: 'app-footer',
   components: {
-    InboxMobileIcon,
     AppFooterNavLink,
     SettingsMobileIcon,
     MobilePhoneIcon,

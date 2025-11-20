@@ -62,18 +62,6 @@ export default {
     broadcastActivityParams () {
       const broadcastIds = this.value ? [this.value] : []
 
-      if (this.currentCompany?.enable_legacy_inbox) {
-        return {
-          name: 'Inbox Channel',
-          params: {
-            channel: 'all-communications'
-          },
-          query: {
-            broadcastIds
-          }
-        }
-      }
-
       return {
         path: '/communications/all',
         query: {

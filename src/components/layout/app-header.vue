@@ -314,8 +314,7 @@ export default {
           }
         }
 
-        const name = this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE
-        return { name }
+        return { name: TEAMINBOXES_MENU_TITLE }
       }
 
       return {

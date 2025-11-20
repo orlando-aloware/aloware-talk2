@@ -845,18 +845,6 @@ export default {
       this.popupOpen = false
       const broadcastIds = broadcasts.map(broadcast => broadcast.id)
 
-      if (this.currentCompany?.enable_legacy_inbox) {
-        return this.$router.push({
-          name: 'Inbox Channel',
-          params: {
-            channel: 'all-communications'
-          },
-          query: {
-            broadcastIds
-          }
-        })
-      }
-
       this.$router.push({
         path: '/communications/all',
         query: {
