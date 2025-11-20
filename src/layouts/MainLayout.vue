@@ -767,8 +767,7 @@ export default {
     // })
 
     this.mainListeners.newInAppCall = (communication) => {
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
-      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
+      const isFishingMode = communication.is_fishing_mode
 
       if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
@@ -788,8 +787,16 @@ export default {
         }
       }
 
+      // for non-fishing mode calls, ignore call notification if the current status is not `transferring`, or `queued`, or `ringing` or the user is in sleep mode
       // ignore call notifications if the call is not fishing mode and the user is in sleep mode
-      if (isFishingMode || !this.profile.sleep_mode) {
+      // this is to avoid the annoying notification that pops up when the call comes in, and disappears after a few seconds
+      if (isFishingMode || (
+        !this.profile.sleep_mode && ![
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW
+        ].includes(communication.current_status2)
+      )) {
         this.processActionNotification(communication, communicationType)
       }
     }
@@ -1258,7 +1265,7 @@ export default {
       if ((communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
         !INCOMING_STATUSES.includes(communication.current_status2)) && !isAddOrIntroduceOperation) {
         console.log('[Main 1] Communication when event closeCallNotifications : ', communication)
-        this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+        this.closeCallNotifications(this.getNotificationType(communication), communication.id)
       }
 
       if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {
@@ -2840,14 +2847,17 @@ export default {
       }
     },
 
-    is_focused_power_dialer (to) {
-      if (to) {
-        this.$router.replace(
-          this.currentCompany.auto_dialer_enabled ? '/power-dialer' : '/stats'
-        ).catch(() => {
-          // We need it to avoid navigation error
-        })
+    is_focused_power_dialer (isFocusedPowerDialer) {
+      if (!isFocusedPowerDialer || this.isWidget) {
+        // Do not redirect if focused power dialer is not enabled or if it's a hubspot widget
+        return
       }
+
+      this.$router.replace(
+        this.currentCompany.auto_dialer_enabled ? '/power-dialer' : '/stats'
+      ).catch(() => {
+        // We need it to avoid navigation error
+      })
     },
 
     $route (to, from) {

@@ -50,6 +50,7 @@
                        :repeats="viewMode === UNTHREADED ? item.repeats : null"
                        :is-live-call="isLiveCall(item)"
                        :team-inbox-id="getTeamInboxIdForCommunication(item)"
+                       :is-fishing-mode-call="item.is_fishing_mode"
                        :from-team-inbox="true"
                        :view-mode="viewMode"
                        :communication-id="item.id"

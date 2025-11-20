@@ -68,7 +68,7 @@
       </template>
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="no-results text-grey">
+          <q-item-section class="no-results text-grey" style="word-break: break-word;">
             {{ noResultsText }}
           </q-item-section>
         </q-item>
@@ -402,6 +402,10 @@ export default {
     },
 
     noResultsText () {
+      if (this.shouldLimitAgentLinesVisibility && !this.activeCampaignsAlphabeticalOrder.length) {
+        return 'You don\'t have access to any lines. Please contact your company admin to be added to a Team Inbox before making calls.'
+      }
+
       return !this.preSelectedTeamInboxLineId || this.showAllLines
         ? 'No results'
         : 'No lines found in this inbox'

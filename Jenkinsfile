@@ -5,7 +5,7 @@ pipeline {
     options {
         disableConcurrentBuilds(abortPrevious: true)
     }
-
+    //Environment variables
     environment {
         DEV_DOMAIN = 'alodev.org'
         STAGING_DOMAIN = 'alostaging.com'
@@ -200,7 +200,7 @@ pipeline {
                                 }
                             }
                         }
-
+                        // Test
                         stage('[PR/Dev1] Deploy Talk2') {
                             when { not { branch 'master' } }
                             steps {
@@ -228,7 +228,19 @@ pipeline {
                                                 sh "terraform workspace select ${branchName}"
                                             }
 
-                                            sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
+                                            try {
+                                                sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
+                                            } catch (err) {
+                                                echo "❗terraform apply failed or was interrupted. Cleaning resources..."
+
+                                                sh """
+                                                    set +e
+                                                    AWS_PROFILE=dev terraform refresh -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' || true
+                                                    AWS_PROFILE=dev terraform destroy -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve || true
+                                                """
+
+                                                throw err
+                                            }
                                         }
 
                                         sh "AWS_PROFILE=dev ENV=dev1 yarn upload-s3"
