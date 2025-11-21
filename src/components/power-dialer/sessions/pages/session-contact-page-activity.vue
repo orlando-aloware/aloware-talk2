@@ -154,15 +154,7 @@ export default {
       'tags'
     ]),
 
-    isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
-    },
-
     widthClass () {
-      if (this.isInbox) {
-        return 'w-less-330px'
-      }
-
       return 'w-less-500px'
     }
   },

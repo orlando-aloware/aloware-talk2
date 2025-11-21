@@ -559,12 +559,6 @@ export default {
       return this.$route.params.id === this.ongoingSession.listId
     },
 
-    isNotInInbox () {
-      const inboxRoutes = ['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task']
-
-      return this.$route.path.indexOf('channels/inbox') === -1 && !inboxRoutes.includes(this.$route.name)
-    },
-
     mainLayoutClass () {
       const pageClass = this.authenticated && !this.suspended ? `dashboard ${this.pageClass}` : 'guest'
       const modeClass = this.lightMode ? 'light-mode' : 'night-mode'
@@ -919,35 +913,33 @@ export default {
         return
       }
 
-      if (this.isNotInInbox) {
-        // Do not alter live contacts if it's in active mode
-        const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
+      // Do not alter live contacts if it's in active mode
+      const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
           ALL_INPROGRESS_STATUSES.includes(item.last_communication.current_status2))
 
-        if (isActiveInLiveContactsIndex >= 0) {
-          return
-        }
+      if (isActiveInLiveContactsIndex >= 0) {
+        return
+      }
 
-        const contact = this.$jsonClone(communication.contact)
-        const newCommunication = this.$jsonClone(communication)
-        const contactsWithV2Attributes = this.addV2ContactAttributes(contact, newCommunication, contact)
-        // add the v2 contact attributes that we need
-        Object.assign(contact, contactsWithV2Attributes)
+      const contact = this.$jsonClone(communication.contact)
+      const newCommunication = this.$jsonClone(communication)
+      const contactsWithV2Attributes = this.addV2ContactAttributes(contact, newCommunication, contact)
+      // add the v2 contact attributes that we need
+      Object.assign(contact, contactsWithV2Attributes)
 
-        const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+      const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
 
-        // check if communication is a live call
-        if (communication.type === CommunicationTypes.CALL &&
+      // check if communication is a live call
+      if (communication.type === CommunicationTypes.CALL &&
           ALL_DIRECTIONS.includes(communication.direction) &&
           ALL_INPROGRESS_STATUSES.includes(communication.current_status2)) {
-          const liveContacts = _.cloneDeep(this.liveContacts)
+        const liveContacts = _.cloneDeep(this.liveContacts)
 
-          if (!isInLiveContacts) {
-            liveContacts.push(contact)
-          }
-
-          this.processLiveContacts(liveContacts)
+        if (!isInLiveContacts) {
+          liveContacts.push(contact)
         }
+
+        this.processLiveContacts(liveContacts)
       }
     }
 
@@ -1272,7 +1264,7 @@ export default {
         return
       }
 
-      if (!this.isNotInInbox || !communication.contact_id) {
+      if (!communication.contact_id) {
         return
       }
 
@@ -2889,19 +2881,6 @@ export default {
       // reset search if contact is changed
       if (from.name === 'Contacts' && to.name === 'Contacts' && from.params.id !== to.params.id) {
         this.resetSearch()
-      }
-
-      const fromInboxToInboxContact = (from.name === 'Inbox' && this.$route.name === 'Inbox Contact')
-      const fromInboxContactToInbox = (from.name === 'Inbox Contact' && this.$route.name === 'Inbox')
-      if (!fromInboxToInboxContact &&
-        !fromInboxContactToInbox &&
-        to.name !== from.name) {
-        this.resetVuex(['inbox', 'non-cache'])
-      }
-
-      // reset My Contacts toggle to default
-      if (from.name === 'Inbox View' && from.name !== to.name) {
-        this.setInboxShowMyContacts(false)
       }
 
       if (to.name === 'Stats' && !this.metricsDataLoaded) {

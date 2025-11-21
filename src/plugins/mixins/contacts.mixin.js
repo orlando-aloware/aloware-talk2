@@ -991,17 +991,7 @@ export default {
       }
 
       this.listeners.newCommunication = (communication) => {
-        const excludeRouteNames = [
-          'Contact',
-          'Inbox',
-          'Inbox Contact Task',
-          'Inbox Channel Task Status',
-          'Inbox Contact',
-          'Inbox Contact Communication',
-          'Inbox Channel'
-        ]
-
-        if (excludeRouteNames.includes(this.$route.name)) {
+        if (this.$route.name === 'Contact') {
           return
         }
 

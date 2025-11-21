@@ -258,13 +258,6 @@ export default {
         case 'Communications Contact Task':
         case 'Communications Channel Task Status':
           return 'communications'
-        case 'Inbox':
-        case 'Inbox Channel':
-        case 'Inbox Contact':
-        case 'Inbox Contact Task':
-        case 'Inbox Channel Task Status':
-        case 'Inbox Contact Communication':
-          return 'inbox'
         case TEAMINBOXES_MENU_TITLE:
         case TEAMINBOXES_MENU_ITEMS_TITLE:
         case TEAMINBOXES_MENU_COMMUNICATIONS_TITLE:

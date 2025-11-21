@@ -3,7 +3,6 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { CONTACTS_ACCESS_EVERYONE } from 'src/constants/contact-access-types'
 import teamInboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
-import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import * as storage from 'src/plugins/helpers/storage'
@@ -1201,42 +1200,7 @@ export default {
           return
         }
 
-        const contactTaskStatus = this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase()
-        const isAllCurrentTaskStatus = this.$route.params.status === InboxTaskStatus.STATUS_ALL
-
-        // if contact status changes then redirect to the right url
-        if (this.$route.name === 'Inbox Contact Task' && contactTaskStatus !== this.$route.params.status && !isAllCurrentTaskStatus) {
-          this.$router.push({
-            name: 'Inbox Contact Task',
-            params: {
-              id: res.data.id,
-              channel: 'inbox',
-              status: contactTaskStatus
-            }
-          }).catch(err => {
-            console.log(err)
-          })
-        }
-
-        // if contact has no task status, then fallback to all status
-        if (this.$route.name === 'Inbox Contact Task' && !res.data.task_status) {
-          this.$router.push({
-            name: 'Inbox Contact Task',
-            params: {
-              id: res.data.id,
-              channel: 'inbox',
-              status: InboxTaskStatus.DEFAULT_STATUS
-            }
-          }).catch(err => {
-            console.log(err)
-          })
-        }
-
         this.processFetchedContactInfo(res.data, callback)
-
-        if (['Inbox Contact Task'].includes(this.$route.name)) {
-          this.setSelectedContact(res.data)
-        }
       }).catch((err) => {
         console.log('err: ', err)
         // this.loadingContactsFailed()

@@ -318,10 +318,6 @@ export default {
         return name === 'Lists'
       }
 
-      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
-        return true
-      }
-
       if ([TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && name === TEAMINBOXES_MENU_TITLE) {
         return true
       }

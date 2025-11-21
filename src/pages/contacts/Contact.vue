@@ -103,8 +103,8 @@ import {
   contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
-  inboxMixin,
-  teamInboxPropsMixin
+  teamInboxPropsMixin,
+  contactTaskMixin
 } from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -128,8 +128,8 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    inboxMixin,
-    teamInboxPropsMixin
+    teamInboxPropsMixin,
+    contactTaskMixin
   ],
 
   components: {
@@ -163,10 +163,6 @@ export default {
     ]),
 
     ...mapFields('settings', ['isContactDetailsCollapsed']),
-
-    isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
-    },
 
     isEmptyContact () {
       return Object.keys(this.contact).length === 0
@@ -334,8 +330,8 @@ export default {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
-      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE]
-      if (validRoutes.includes(this.$route.name)) {
+
+      if (['Contact', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
         this.fetchTaskCounts()
       }
     }
@@ -350,7 +346,7 @@ export default {
 
       this.contactListSidebarOpen = false
 
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()
@@ -375,7 +371,7 @@ export default {
         return
       }
 
-      if (!['Inbox Contact', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
+      if (TEAMINBOXES_MENU_COMMUNICATIONS_TITLE !== this.$route.name) {
         return
       }
 
