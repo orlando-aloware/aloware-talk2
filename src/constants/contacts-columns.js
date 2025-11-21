@@ -393,17 +393,6 @@ export const ALL_COLUMNS = [
     minWidth: 170
   },
   {
-    name: 'ring_groups',
-    relationName: 'ringGroups',
-    label: 'Ring Groups',
-    category: 2,
-    order: 35,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
     name: 'broadcasts',
     relationName: 'broadcasts',
     label: 'Broadcasts',
