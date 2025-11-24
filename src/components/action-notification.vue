@@ -348,12 +348,12 @@ export default {
         return null
       }
 
-      const inboxPath = `/channels/inbox/all/contacts/${this.contactId}/communications/${this.communicationId}`
+      const contactPath = `/contacts/${this.contactId}/communications/${this.communicationId}`
 
-      // If TeamInbox is not enabled, use the original logic
+      // If TeamInbox is not enabled, route to contacts page
       if (!this.hasCompanyTeamInboxEnabled) {
         return {
-          path: inboxPath
+          path: contactPath
         }
       }
 
@@ -368,22 +368,22 @@ export default {
           }
         }
 
-        // route mentions to legacy inbox if no teamInboxLink is provided
+        // route mentions to contacts page if no teamInboxLink is provided
         if (this.id === 'mention') {
           return {
-            path: inboxPath
+            path: contactPath
           }
         }
 
         return {
-          path: `/contacts/${this.contactId}/communications/${this.communicationId}`
+          path: contactPath
         }
       }
 
-      // route mentions to legacy inbox
+      // route mentions to contacts page
       if (this.id === 'mention') {
         return {
-          path: inboxPath
+          path: contactPath
         }
       }
 

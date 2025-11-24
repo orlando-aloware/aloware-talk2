@@ -326,10 +326,6 @@ export default {
       return (!this.isDialerReady && !this.dialer.error.code) || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
     },
 
-    shouldShowUnreadsToggle () {
-      return this.$route.path.includes('channels') && !this.$route.path.includes('inbox')
-    },
-
     isStatsPage () {
       return this.$route.name === 'Stats'
     },

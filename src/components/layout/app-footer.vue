@@ -244,10 +244,6 @@ export default {
       // this.updateTab()
     },
     getTab () {
-      if (['Inbox'].includes(this.$route.name) && this.$q.screen.lt.md) {
-        this.setShowContactsHeader(false)
-      }
-
       if (['Contacts', 'Phone', 'Stats', 'Power Dialer', 'Settings', 'Settings Tab'].includes(this.$route.name)) {
         this.setShowContactsHeader(true)
       }

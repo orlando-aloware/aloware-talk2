@@ -616,15 +616,13 @@ export default {
 
         this.fetchFailedNotification(err.response)
 
-        // inside Inbox
-        if (this.$route.name.includes('Inbox')) {
+        // inside Team Inboxes - stay on the current page
+        if (this.$route.name.includes(TEAMINBOXES_MENU_TITLE)) {
           return
         }
 
-        // not in Inbox
-        if (!this.$route.name.includes('Inbox')) {
-          this.$router.push({ path: '/contacts' })
-        }
+        // not in Team Inboxes - redirect to contacts page
+        this.$router.push({ path: '/contacts' })
       }).finally(() => {
         this.loadingContact = false
         this.loadingContactCommunications = false

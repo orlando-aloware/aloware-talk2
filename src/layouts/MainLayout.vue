@@ -896,7 +896,7 @@ export default {
 
       // only fetch the latest contact data when updated contact is also the selected contact
       // this is to avoid swarm of api request when numbers of contacts get updated
-      if (this.$route.path.indexOf('channels/inbox') === -1 && this.selectedContact &&
+      if (this.selectedContact &&
         parseInt(this.selectedContact.id) === parseInt(data.id)) {
         // just update the contact attributes
         const updatedContact = this.$jsonClone(this.selectedContact)
@@ -2905,10 +2905,11 @@ export default {
       }
 
       // padding top for mobile screen
-      // excluding inbox default page in smaller screen
+      // excluding team inbox page in smaller screen
       const isPhonePage = from.name === 'Phone' || this.mobilePhoneDrawer
-      const isSmallMobileInbox = this.$route.name.includes('Inbox') && this.$q.screen.lt.md
-      if (this.isMobile && isPhonePage && !isSmallMobileInbox) {
+      const isSmallMobileTeamInbox = this.$route.name.includes(TEAMINBOXES_MENU_TITLE) && this.$q.screen.lt.md
+
+      if (this.isMobile && isPhonePage && !isSmallMobileTeamInbox) {
         setTimeout(() => {
           if (this.$refs['page-container'].$el.style.paddingTop === '0px') {
             this.$refs['page-container'].$el.style.paddingTop = '58px'
