@@ -297,7 +297,7 @@ export default {
   watch: {
     'tab': _.debounce(function (newValue, oldValue) {
       if (!newValue) {
-        this.tab = 'inbox'
+        this.tab = 'team-inboxes'
       }
 
       if (this.tab === 'phone') {

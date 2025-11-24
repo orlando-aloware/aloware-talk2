@@ -2816,10 +2816,7 @@ export default {
     ...mapActions('inbox', [
       'setSelectedContact',
       'setLiveContacts',
-      'updateLiveContactLastCommProperties',
-      'setIsInboxFiltersLoaded',
-      'gettingTasksList',
-      'setInboxShowMyContacts'
+      'updateLiveContactLastCommProperties'
     ]),
     ...mapActions('TeamInbox', [
       'setTeamInboxCampaigns',
@@ -2917,11 +2914,6 @@ export default {
             this.$refs['page-container'].$el.style.paddingTop = '58px'
           }
         }, 50)
-      }
-
-      if (to.name === 'Inbox' && from.name.includes('Inbox')) {
-        this.setIsInboxFiltersLoaded(false)
-        this.gettingTasksList(true)
       }
 
       if (to.name === 'Suspended') {
