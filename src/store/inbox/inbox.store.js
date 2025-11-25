@@ -14,7 +14,6 @@ export default function () {
     channelChangedFilterFields: [],
 
     // Filter preferences
-    inboxShowMyContacts: true,
-    inboxShowUnreads: false
+    inboxShowMyContacts: true
   }
 }
