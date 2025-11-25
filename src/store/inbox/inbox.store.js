@@ -11,30 +11,10 @@ export default function () {
     communications: [],
 
     // Filter-related state
-    activeChannel: null,
-    appliedFilter: null,
-    channelClonedFilter: {},
     channelChangedFilterFields: [],
 
-    // Task counts
-    taskCounts: {
-      new: 0,
-      open: 0,
-      pending: 0,
-      closed: 0
-    },
-    inboxTaskCounts: {
-      new: 0,
-      open: 0,
-      pending: 0,
-      closed: 0
-    },
-
-    // Loading states
-    isLoadingOpenTaskCount: false,
-    isLoadingPendingTaskCount: false,
-
     // Filter preferences
+    inboxShowMyContacts: true,
     inboxShowUnreads: false
   }
 }

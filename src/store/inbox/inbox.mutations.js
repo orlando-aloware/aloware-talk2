@@ -47,28 +47,6 @@ export default {
     state.liveContacts.splice(liveContact.index, 1)
   },
 
-  // Task counts
-  SET_OPEN_TASK_COUNT: (state, count) => {
-    state.taskCounts = { ...state.taskCounts, open: count }
-  },
-  SET_PENDING_TASK_COUNT: (state, count) => {
-    state.taskCounts = { ...state.taskCounts, pending: count }
-  },
-  SET_INBOX_OPEN_TASK_COUNT: (state, count) => {
-    state.inboxTaskCounts = { ...state.inboxTaskCounts, open: count }
-  },
-  SET_INBOX_PENDING_TASK_COUNT: (state, count) => {
-    state.inboxTaskCounts = { ...state.inboxTaskCounts, pending: count }
-  },
-
-  // Loading states
-  SET_LOADING_OPEN_TASK_COUNT (state, loading) {
-    state.isLoadingOpenTaskCount = loading
-  },
-  SET_LOADING_PENDING_TASK_COUNT (state, loading) {
-    state.isLoadingPendingTaskCount = loading
-  },
-
   // Filter preferences
   SET_DEFAULT_SHOW_MY_CONTACTS (state, value) {
     state.inboxShowMyContacts = value

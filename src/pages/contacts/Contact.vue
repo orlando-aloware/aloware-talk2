@@ -103,8 +103,7 @@ import {
   contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
-  teamInboxPropsMixin,
-  contactTaskMixin
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -128,8 +127,7 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    teamInboxPropsMixin,
-    contactTaskMixin
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -329,10 +327,6 @@ export default {
     this.contactComponentListeners.contactTaskStatusUpdated = (contact) => {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
-      }
-
-      if (['Contact', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
-        this.fetchTaskCounts()
       }
     }
 
