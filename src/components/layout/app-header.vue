@@ -314,8 +314,7 @@ export default {
           }
         }
 
-        const name = this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE
-        return { name }
+        return { name: TEAMINBOXES_MENU_TITLE }
       }
 
       return {
@@ -325,10 +324,6 @@ export default {
 
     isDialerDisabled () {
       return (!this.isDialerReady && !this.dialer.error.code) || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
-    },
-
-    shouldShowUnreadsToggle () {
-      return this.$route.path.includes('channels') && !this.$route.path.includes('inbox')
     },
 
     isStatsPage () {

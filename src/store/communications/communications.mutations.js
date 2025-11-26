@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import _ from 'lodash'
-import * as InboxDefault from 'src/constants/inbox-default'
 
 export default {
   SET_CONTACT_ID: (state, id) => {
@@ -189,14 +188,10 @@ export default {
       return
     }
 
-    // exclude cached state for non-cache
-    const inboxDefaultState = Object.assign({}, InboxDefault.DEFAULT_STATE)
-
-    if (value.includes('non-cache')) {
-      delete inboxDefaultState.inboxShowMyContacts
+    // Reset to default state values (excluding cached state for non-cache)
+    if (!value.includes('non-cache')) {
+      state.inboxShowMyContacts = false
     }
-
-    state = Object.assign(state, inboxDefaultState)
   },
   SET_LOADING_OPEN_TASK_COUNT (state, loading) {
     state.isLoadingOpenTaskCount = loading
@@ -211,7 +206,7 @@ export default {
     state.inboxShowUnreads = value
   },
   SET_DEFAULT_SHOW_MY_CONTACTS (state, value) {
-    state.showMyContacts = InboxDefault.DEFAULT_STATE.showMyContacts
+    state.inboxShowMyContacts = false
   },
   SET_IS_INBOX_FILTERS_LOADED (state, value) {
     state.isInboxFiltersLoaded = value

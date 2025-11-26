@@ -130,7 +130,7 @@ export default {
           return
         }
 
-        this.$router.replace({ name: 'Inbox' })
+        this.$router.replace({ name: 'Contacts' })
       }
     }
 
@@ -183,7 +183,7 @@ export default {
     hasCompanyTeamInboxEnabled (enabled) {
       // Handle live updates when team inbox is disabled
       if (!enabled) {
-        this.$router.replace({ name: 'Inbox' })
+        this.$router.replace({ name: 'Contacts' })
       }
     },
 
