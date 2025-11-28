@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { fixCommunicationDateTime, fixDuration } from 'src/plugins/filters/datetime.filters';
+import { fixCommunicationDateTime, fixDuration } from 'src/plugins/filters/datetime.filters'
 
 export default {
   name: 'aloai-agent-call',
