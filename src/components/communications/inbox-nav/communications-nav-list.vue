@@ -151,9 +151,7 @@ export default {
     ]),
 
     isShowActive () {
-      const isMobileInboxRoutes = this.$q.screen.lt.md && this.inboxTaskAndCommRoutes.includes(this.$route.name)
-
-      return !this.$q.screen.lt.md || isMobileInboxRoutes
+      return !this.$q.screen.lt.md
     },
 
     communicationsChannels () {

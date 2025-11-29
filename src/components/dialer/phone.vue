@@ -302,7 +302,10 @@
                     {{ contactName | truncate(15) }}
                   </span>
                   <span v-else>{{ contactName | truncate(15) }}</span>
-                  <contact-integrations-link-icons :contact='contact' />
+                  <contact-integrations-link-icons
+                    v-if="contactHubspotLink"
+                    :hubspot-link="contactHubspotLink"
+                  />
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
                   <span class="d-inline-flex">{{ leadNumberRaw | fixPhone }}</span>
@@ -535,7 +538,10 @@
                             @click="goToContact">
                             {{ contactName | truncate(15) }}
                       </span>
-                      <contact-integrations-link-icons :contact='contact' />
+                      <contact-integrations-link-icons
+                        v-if="contactHubspotLink"
+                        :hubspot-link="contactHubspotLink"
+                      />
                     </p>
                     <p class="text-sm-left contact-phone mb-1"
                        v-if="contact">
@@ -2135,6 +2141,10 @@ export default {
       }
 
       return ''
+    },
+
+    contactHubspotLink () {
+      return this.contact?.integration_data?.hubspot?.link || null
     }
   },
 

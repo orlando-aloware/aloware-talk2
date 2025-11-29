@@ -137,7 +137,10 @@
                           {{ call.contact.name | ucwords }}
                         </router-link>
                       </div>
-                      <contact-integrations-link-icons :contact='call.contact' />
+                      <contact-integrations-link-icons
+                        v-if="contactHubspotLink"
+                        :hubspot-link="contactHubspotLink"
+                      />
                     </div>
 
                     <!-- lead number -->
@@ -364,7 +367,10 @@
                        v-if="call.contact">
                     <span>
                       {{ call.contact.name | capitalize }}
-                      <contact-integrations-link-icons :contact='call.contact' />
+                      <contact-integrations-link-icons
+                        v-if="contactHubspotLink"
+                        :hubspot-link="contactHubspotLink"
+                      />
                     </span>
 
                     <span>
@@ -557,6 +563,10 @@ export default {
 
     lastPage () {
       return Math.ceil(this.calls.length / this.pagination.perPage)
+    },
+
+    contactHubspotLink () {
+      return this.call?.contact?.integration_data?.hubspot?.link || null
     }
   },
 

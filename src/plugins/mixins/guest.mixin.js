@@ -80,9 +80,8 @@ export default {
   },
 
   beforeRouteEnter (to, from, next) {
-    store().dispatch('auth/check').then((response) => {
-      const hasLegacyInbox = response?.data?.user?.company?.enable_legacy_inbox
-      next({ name: hasLegacyInbox ? 'Inbox' : TEAMINBOXES_MENU_TITLE })
+    store().dispatch('auth/check').then(() => {
+      next({ name: TEAMINBOXES_MENU_TITLE })
     }).catch(() => {
       next()
     })

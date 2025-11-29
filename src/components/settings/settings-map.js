@@ -81,13 +81,6 @@ const SettingsMap = {
     hash_keyword: 'change-contact-ownership',
     visible: true
   },
-  'can_modify_contact_ring_groups': {
-    title: 'Allow Contact Ring Groups Modification',
-    description: 'If user is allowed to modify contact ring groups.',
-    route: '/settings/profile',
-    hash_keyword: 'can-modify-contact-ring-group',
-    visible: true
-  },
   'can_barge_and_whisper_on_call': {
     title: 'Allow Call Barge and Whisper',
     description: 'If user is allowed to barge and whisper on call.',

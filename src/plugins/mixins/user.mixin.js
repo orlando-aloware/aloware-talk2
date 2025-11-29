@@ -35,10 +35,6 @@ export default {
       return this.currentCompany?.team_inbox_enabled === true
     },
 
-    hasCompanyLegacyInboxEnabled () {
-      return this.currentCompany?.enable_legacy_inbox === true
-    },
-
     hasCompanyTeamInboxLineManagementEnhancementsEnabled () {
       return this.currentCompany?.team_inbox_line_management_enhancements === true
     },

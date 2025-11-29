@@ -99,7 +99,7 @@
                   <q-item-label>Transcript:</q-item-label>
                 </b-col>
                 <b-col class="col-12">
-                  <div class="text-muted" style="white-space: pre-wrap;">{{ aloAiBotCall.transcript }}</div>
+                  <div class="text-muted" style="white-space: pre-wrap;" v-html="formattedTranscript"></div>
                 </b-col>
               </b-form-row>
             </div>
@@ -129,6 +129,17 @@ export default {
     uniqueId: {
       type: [String, Number],
       required: true
+    }
+  },
+
+  computed: {
+    formattedTranscript () {
+      if (!this.aloAiBotCall?.transcript) {
+        return ''
+      }
+      return this.aloAiBotCall.transcript
+        .replace(/(Agent:)/g, '<strong>$1</strong>')
+        .replace(/(User:)/g, '<strong>$1</strong>')
     }
   }
 }
