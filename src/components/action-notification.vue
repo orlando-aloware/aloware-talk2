@@ -350,13 +350,6 @@ export default {
 
       const contactPath = `/contacts/${this.contactId}/communications/${this.communicationId}`
 
-      // If TeamInbox is not enabled, route to contacts page
-      if (!this.hasCompanyTeamInboxEnabled) {
-        return {
-          path: contactPath
-        }
-      }
-
       // If the communication has a ring group id, check teamInboxLink
       if (this.ringGroupId && this.ringGroupId !== '') {
         if (this.teamInboxLink) {

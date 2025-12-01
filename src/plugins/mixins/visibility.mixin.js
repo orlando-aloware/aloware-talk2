@@ -314,7 +314,7 @@ export default {
 
       let contactVisibility = this.profile.contacts_visibility
 
-      if (teamInbox && this.hasCompanyTeamInboxEnabled) {
+      if (teamInbox) {
         // For Team Inbox, check if the ring group has force_agent_visibility_limits.
         // If the ring group does not have force_agent_visibility_limits or the user is not a company agent,
         // then the user should be able to see the communication.

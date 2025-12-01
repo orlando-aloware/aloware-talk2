@@ -52,7 +52,6 @@
     <contact-activity-counts class="mb-2"
                              :summary="communicationsSummary.summaries"/>
     <contact-lines class="mb-2"/>
-    <contact-ring-groups v-if="!hasCompanyTeamInboxEnabled" class="mb-2" />
     <contact-broadcast class="mb-2" />
   </q-card>
 </template>
@@ -65,7 +64,6 @@ import ContactNotes from 'components/contacts/contact-notes'
 import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactActivityCounts from 'src/components/contacts/contact-activity-counts'
 import ContactLines from 'src/components/contacts/contact-lines'
-import ContactRingGroups from 'src/components/contacts/contact-ring-groups'
 import ContactBroadcast from 'src/components/contacts/contact-broadcast'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
 import TimerIcon from 'src/components/icons/timer-icon'
@@ -92,7 +90,6 @@ export default {
     ContactScheduledMessages,
     ContactActivityCounts,
     ContactLines,
-    ContactRingGroups,
     ContactBroadcast,
     TimerIcon,
     CalendarIcon

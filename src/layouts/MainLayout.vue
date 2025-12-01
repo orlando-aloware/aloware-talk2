@@ -1168,17 +1168,6 @@ export default {
     // check auth every 5 minutes
     const checkInterval = 5 * 60 * 1000
 
-    // Handled outdated company info which caused the refresh loop problem
-    if (this.profile?.company_id && !this.hasCompanyTeamInboxEnabled && !this.loading) {
-      this.$axios.get('/api/v1/company/' + this.profile.company_id)
-        .then((res) => {
-          this.setCurrentCompany(res.data)
-        })
-        .catch(err => {
-          console.error('Error fetching company info:', err)
-        })
-    }
-
     if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
         const now = new Date().getTime()
@@ -1702,8 +1691,8 @@ export default {
         this.getAttributeDictionaries()
         this.getMyQueueList()
 
-        if (this.hasCompanyTeamInboxEnabled && !this.loadingTeamInboxCampaigns) {
-          // Load Team Inbox campaigns if it's enabled
+        if (!this.loadingTeamInboxCampaigns) {
+          // Refresh Team Inbox campaigns
           getTeamInboxCampaigns(this)
         }
       })
@@ -2856,10 +2845,6 @@ export default {
       }
 
       this.checkDebounce()
-
-      if (this.profile?.company && !this.hasCompanyTeamInboxEnabled && !this.loading) {
-        this.setCurrentCompany(this.profile.company)
-      }
 
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
