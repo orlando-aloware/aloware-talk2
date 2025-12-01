@@ -46,7 +46,6 @@
 <script>
 
 import _ from 'lodash'
-import talk2Api from 'src/plugins/api/api'
 import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 import CommunicationDetails from 'components/communication-details'
 import { userMixin } from 'src/plugins/mixins'
@@ -85,16 +84,7 @@ export default {
       this.isLoadingCommunication = true
       this.hasError = false
 
-      // Check if we're in Team Inbox context
-      // For now, we use the same logic as before (company has team inbox enabled)
-      // But I think that this is not used at all honestly.
-      const isTeamInboxContext = this.hasCompanyTeamInboxEnabled
-
-      const apiCall = isTeamInboxContext
-        ? talk2TeamInboxApi.communication.show(id)
-        : talk2Api.V1.communication.get(id)
-
-      apiCall
+      talk2TeamInboxApi.communication.show(id)
         .then(res => {
           this.communication = res.data
         }).catch(err => {

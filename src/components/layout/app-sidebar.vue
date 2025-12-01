@@ -19,7 +19,6 @@
     </div>
 
     <app-sidebar-nav-link
-      v-if="hasCompanyTeamInboxEnabled"
       :isActive="isActive(TEAMINBOXES_MENU_TITLE)"
       :isSidebarExpanded="isSidebarExpanded"
       :title="TEAMINBOXES_MENU_TITLE"

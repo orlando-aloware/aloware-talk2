@@ -229,11 +229,6 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          // if (campaign) {
-          //   event.communication.campaign = campaign
-          // }
           this.$VueEvent.fire('new_communication', event.communication)
         })
         .listen('.communication.updated', (event) => {
@@ -252,11 +247,6 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          // if (campaign) {
-          //   event.communication.campaign = campaign
-          // }
           this.$VueEvent.fire('update_communication', event.communication)
         })
         .listen('.recording_status.updated', (event) => {
@@ -492,11 +482,6 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          // if (campaign) {
-          //   event.communication.campaign = campaign
-          // }
           this.$VueEvent.fire('new_communication', event.communication)
         })
         .listen('.communication.updated', (event) => {
@@ -515,11 +500,6 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          // if (campaign) {
-          //   event.communication.campaign = campaign
-          // }
           this.$VueEvent.fire('update_communication', event.communication)
         })
         .listen('.communication.deleted', (event) => {

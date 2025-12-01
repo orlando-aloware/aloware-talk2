@@ -11,7 +11,6 @@
       indicator-color="transparent"
     >
       <app-footer-nav-link
-        v-if="hasCompanyTeamInboxEnabled"
         :isActive="tab === 'team-inboxes'"
         :title="TEAMINBOXES_MENU_TITLE" :to="{name: 'Team Inboxes'}"
       >

@@ -96,10 +96,8 @@ export default {
         },
         {
           value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP_USERS,
-          label: this.hasCompanyTeamInboxEnabled ? 'Team Owned Only' : 'Ring Group Users Only',
-          description: this.hasCompanyTeamInboxEnabled
-            ? 'Can only see contacts owned by users in any teams that this user belongs to.'
-            : 'Can only see contacts owned by users in any ring groups that this user belongs to.'
+          label: 'Team Owned Only',
+          description: 'Can only see contacts owned by users in any teams that this user belongs to.'
         },
         {
           value: ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY,
