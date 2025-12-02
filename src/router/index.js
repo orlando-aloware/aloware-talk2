@@ -58,7 +58,7 @@ export default function ({ store }) {
       console.log('[Router] Restoring HubSpot widget route')
       return next('/widgets/hubspot-call-extension')
     }
-    
+
     // Redirect old legacy inbox paths
     // Note: This handles old URLs that might still be accessed via direct links
     const isLegacyInboxRoute = isLegacyInboxPath(to.path)
