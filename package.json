@@ -46,7 +46,7 @@
     "core-js": "^3.36.0",
     "countries-and-timezones": "^2.4.0",
     "country-state-city": "^3.2.1",
-    "countup.js": "^2.8.0",
+    "countup.js": "^2.9.0",
     "dhtmlx-scheduler": "^6.0.5",
     "dompurify": "^3.2.4",
     "dotenv": "^16.4.5",
