@@ -33,7 +33,6 @@ export default {
 
     doesRouteHasTutorial () {
       return [
-        'Inbox',
         'Contacts',
         'Wallboard',
         'Broadcasts',
@@ -44,14 +43,6 @@ export default {
 
     routeTutorialData () {
       const data = {
-        'Inbox': {
-          title: '📞 Explore Aloware Talk | Your Complete Guide',
-          cookieName: 'inbox',
-          videoUrl: 'https://www.youtube.com/embed/1YjuDUF53iQ?si=1qCnFh9y2D0gqZsc',
-          learnMoreLink: 'https://support.aloware.com/en/articles/9034164-logging-in-to-aloware-talk-a-step-by-step-guide-for-agents',
-          notes: '🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊',
-          shouldShowInFirstVisit: false
-        },
         'Contacts': {
           title: '📇 Unveil the Contacts Tab in Aloware!',
           cookieName: 'contacts',

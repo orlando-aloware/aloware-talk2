@@ -10,19 +10,7 @@
       dense
       indicator-color="transparent"
     >
-
       <app-footer-nav-link
-        v-if="hasCompanyLegacyInboxEnabled"
-        :isActive="tab === 'inbox'"
-        :title="INBOXES_MENU_TITLE" :to="{name: 'Inbox'}"
-      >
-        <template v-slot:icon="{active}">
-          <inbox-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" />
-        </template>
-      </app-footer-nav-link>
-
-      <app-footer-nav-link
-        v-if="hasCompanyTeamInboxEnabled"
         :isActive="tab === 'team-inboxes'"
         :title="TEAMINBOXES_MENU_TITLE" :to="{name: 'Team Inboxes'}"
       >
@@ -172,12 +160,10 @@ import {
 } from 'src/router/routes'
 import { userMixin } from 'src/plugins/mixins'
 import AppFooterNavLink from 'components/layout/app-footer-nav-link.vue'
-import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon.vue'
 
 export default {
   name: 'app-footer',
   components: {
-    InboxMobileIcon,
     AppFooterNavLink,
     SettingsMobileIcon,
     MobilePhoneIcon,
@@ -257,10 +243,6 @@ export default {
       // this.updateTab()
     },
     getTab () {
-      if (['Inbox'].includes(this.$route.name) && this.$q.screen.lt.md) {
-        this.setShowContactsHeader(false)
-      }
-
       if (['Contacts', 'Phone', 'Stats', 'Power Dialer', 'Settings', 'Settings Tab'].includes(this.$route.name)) {
         this.setShowContactsHeader(true)
       }
@@ -271,13 +253,6 @@ export default {
         case 'Communications Contact Task':
         case 'Communications Channel Task Status':
           return 'communications'
-        case 'Inbox':
-        case 'Inbox Channel':
-        case 'Inbox Contact':
-        case 'Inbox Contact Task':
-        case 'Inbox Channel Task Status':
-        case 'Inbox Contact Communication':
-          return 'inbox'
         case TEAMINBOXES_MENU_TITLE:
         case TEAMINBOXES_MENU_ITEMS_TITLE:
         case TEAMINBOXES_MENU_COMMUNICATIONS_TITLE:
@@ -317,7 +292,7 @@ export default {
   watch: {
     'tab': _.debounce(function (newValue, oldValue) {
       if (!newValue) {
-        this.tab = 'inbox'
+        this.tab = 'team-inboxes'
       }
 
       if (this.tab === 'phone') {

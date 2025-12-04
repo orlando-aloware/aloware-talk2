@@ -596,14 +596,6 @@ export default function (/* { ssrContext } */) {
           }
         }
 
-        if (['inbox', 'all'].some(item => value.includes(item)) || (value.length === 1 && value.includes('non-cache'))) {
-          commit('inbox/RESET_VUEX', value, { root: true })
-
-          if (!['non-cache', 'all'].some(item => value.includes(item))) {
-            return
-          }
-        }
-
         if (['stats', 'all'].some(item => value.includes(item)) || (value.length === 1 && value.includes('non-cache'))) {
           commit('stats/RESET_VUEX', value, { root: true })
 

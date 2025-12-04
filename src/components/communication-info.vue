@@ -230,7 +230,7 @@
                   target="_blank"
                   :href="getRingGroupURL(communication.ring_group_id)"
                   :id="`comm-ring-group-${_uid}`"
-                  v-if="communication.ring_group_id && this.hasCompanyTeamInboxEnabled"
+                  v-if="communication.ring_group_id"
                   @click="handleRingGroupClick(communication.ring_group_id, $event)">
                   <span class="text-blue cursor-pointer"
                         :title="getRingGroup(communication.ring_group_id).name">
@@ -243,9 +243,6 @@
                     {{ getRingGroup(communication.ring_group_id).name }}
                   </span>
                 </a>
-                <template v-else-if="!this.hasCompanyTeamInboxEnabled && communication.ring_group_id">
-                  Call waiting Queue
-                </template>
                 <target-users-tree class="w-100"
                                    :communication="communication"
                                    :is-form="true"/>
@@ -1026,7 +1023,6 @@ export default {
   computed: {
     ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState('inbox', ['liveContacts', 'contacts']),
     ...mapState('broadcast', ['broadcasts']),
 
     hasSMSReminder () {

@@ -539,28 +539,6 @@
         </div>
 
         <b-form-row class="mt-4"
-                    :id="`${SettingsMap.can_modify_contact_ring_groups.hash_keyword}-container`"
-                    v-if="isNotOwnSettings && user.role_name === 'Company Agent'">
-          <b-col sm="12" md="12">
-            <div>
-              <h5 class="form-label">Allow Contact Ring Groups Modification</h5>
-              <p class="form-helper-text">If you don't want to allow this user to modify the contact ring groups, please uncheck the checkbox below.</p>
-            </div>
-
-            <b-form-group label="" >
-              <b-form-checkbox
-                v-model="user.can_modify_contact_ring_groups"
-                :value="true"
-                :unchecked-value="false"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'can_modify_contact_ring_groups')"
-              >
-                Can modify contact ring groups
-              </b-form-checkbox>
-            </b-form-group>
-          </b-col>
-        </b-form-row>
-
-        <b-form-row class="mt-4"
                     :id="`${SettingsMap.can_barge_and_whisper_on_call.hash_keyword}-container`"
                     v-if="isNotOwnSettings && user.role_name === 'Company Agent'">
           <b-col sm="12"

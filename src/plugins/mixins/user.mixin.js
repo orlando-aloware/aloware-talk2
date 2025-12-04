@@ -31,21 +31,8 @@ export default {
       return storage.local.getItem('env') === 'production'
     },
 
-    hasCompanyTeamInboxEnabled () {
-      return this.currentCompany?.team_inbox_enabled === true
-    },
-
-    hasCompanyLegacyInboxEnabled () {
-      return this.currentCompany?.enable_legacy_inbox === true
-    },
-
-    hasCompanyTeamInboxLineManagementEnhancementsEnabled () {
-      return this.currentCompany?.team_inbox_line_management_enhancements === true
-    },
-
     hasCompanyTeamInboxLineManagementEnhancements () {
-      // This setting should only be enabled if the company has the team inbox enabled
-      return this.hasCompanyTeamInboxEnabled && this.hasCompanyTeamInboxLineManagementEnhancementsEnabled
+      return this.currentCompany?.team_inbox_line_management_enhancements === true
     },
 
     shouldSeeExperimentalAiFeatures () {

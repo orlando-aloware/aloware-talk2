@@ -112,28 +112,6 @@ export default {
   },
 
   mounted () {
-    // block direct access from non demo companies
-    if (!this.hasCompanyTeamInboxEnabled) {
-      if (this.$store.state.auth.is_focused_power_dialer) {
-        this.$router.replace(
-          this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
-        )
-      } else {
-        const { id: contactId, communicationId } = this.$route.params
-
-        if (contactId) {
-          const contactRoute = !communicationId
-            ? `/contacts/${contactId}`
-            : `/contacts/${contactId}/communications/${communicationId}`
-
-          this.$router.replace(contactRoute)
-          return
-        }
-
-        this.$router.replace({ name: 'Inbox' })
-      }
-    }
-
     this.resizeHandler()
   },
 
@@ -180,13 +158,6 @@ export default {
   },
 
   watch: {
-    hasCompanyTeamInboxEnabled (enabled) {
-      // Handle live updates when team inbox is disabled
-      if (!enabled) {
-        this.$router.replace({ name: 'Inbox' })
-      }
-    },
-
     '$q.screen.width' () {
       this.resizeHandler()
     },

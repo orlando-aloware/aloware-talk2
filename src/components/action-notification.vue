@@ -348,14 +348,7 @@ export default {
         return null
       }
 
-      const inboxPath = `/channels/inbox/all/contacts/${this.contactId}/communications/${this.communicationId}`
-
-      // If TeamInbox is not enabled, use the original logic
-      if (!this.hasCompanyTeamInboxEnabled) {
-        return {
-          path: inboxPath
-        }
-      }
+      const contactPath = `/contacts/${this.contactId}/communications/${this.communicationId}`
 
       // If the communication has a ring group id, check teamInboxLink
       if (this.ringGroupId && this.ringGroupId !== '') {
@@ -368,22 +361,22 @@ export default {
           }
         }
 
-        // route mentions to legacy inbox if no teamInboxLink is provided
+        // route mentions to contacts page if no teamInboxLink is provided
         if (this.id === 'mention') {
           return {
-            path: inboxPath
+            path: contactPath
           }
         }
 
         return {
-          path: `/contacts/${this.contactId}/communications/${this.communicationId}`
+          path: contactPath
         }
       }
 
-      // route mentions to legacy inbox
+      // route mentions to contacts page
       if (this.id === 'mention') {
         return {
-          path: inboxPath
+          path: contactPath
         }
       }
 

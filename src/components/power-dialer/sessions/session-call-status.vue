@@ -842,11 +842,16 @@ export default {
     },
 
     allTasksAreSkipped () {
-      if (this.powerDialerTasks.in_queue.length > 0) {
-        return this.skippedTasks.length === this.powerDialerTasks.in_queue.length
+      // If there are no tasks in queue, none are skipped
+      if (this.powerDialerTasks.in_queue.length === 0) {
+        return false
       }
 
-      return false
+      // Check if ALL tasks currently in the queue have been marked as skipped
+      // by verifying that each task's contact_list_item_id exists in the skippedTasks array
+      return this.powerDialerTasks.in_queue.every(task => {
+        return this.isTaskSkipped(task.contact_list_item_id)
+      })
     },
 
     canNextTask () {

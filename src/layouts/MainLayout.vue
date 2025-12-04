@@ -559,12 +559,6 @@ export default {
       return this.$route.params.id === this.ongoingSession.listId
     },
 
-    isNotInInbox () {
-      const inboxRoutes = ['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task']
-
-      return this.$route.path.indexOf('channels/inbox') === -1 && !inboxRoutes.includes(this.$route.name)
-    },
-
     mainLayoutClass () {
       const pageClass = this.authenticated && !this.suspended ? `dashboard ${this.pageClass}` : 'guest'
       const modeClass = this.lightMode ? 'light-mode' : 'night-mode'
@@ -902,7 +896,7 @@ export default {
 
       // only fetch the latest contact data when updated contact is also the selected contact
       // this is to avoid swarm of api request when numbers of contacts get updated
-      if (this.$route.path.indexOf('channels/inbox') === -1 && this.selectedContact &&
+      if (this.selectedContact &&
         parseInt(this.selectedContact.id) === parseInt(data.id)) {
         // just update the contact attributes
         const updatedContact = this.$jsonClone(this.selectedContact)
@@ -919,35 +913,33 @@ export default {
         return
       }
 
-      if (this.isNotInInbox) {
-        // Do not alter live contacts if it's in active mode
-        const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
+      // Do not alter live contacts if it's in active mode
+      const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
           ALL_INPROGRESS_STATUSES.includes(item.last_communication.current_status2))
 
-        if (isActiveInLiveContactsIndex >= 0) {
-          return
-        }
+      if (isActiveInLiveContactsIndex >= 0) {
+        return
+      }
 
-        const contact = this.$jsonClone(communication.contact)
-        const newCommunication = this.$jsonClone(communication)
-        const contactsWithV2Attributes = this.addV2ContactAttributes(contact, newCommunication, contact)
-        // add the v2 contact attributes that we need
-        Object.assign(contact, contactsWithV2Attributes)
+      const contact = this.$jsonClone(communication.contact)
+      const newCommunication = this.$jsonClone(communication)
+      const contactsWithV2Attributes = this.addV2ContactAttributes(contact, newCommunication, contact)
+      // add the v2 contact attributes that we need
+      Object.assign(contact, contactsWithV2Attributes)
 
-        const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+      const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
 
-        // check if communication is a live call
-        if (communication.type === CommunicationTypes.CALL &&
+      // check if communication is a live call
+      if (communication.type === CommunicationTypes.CALL &&
           ALL_DIRECTIONS.includes(communication.direction) &&
           ALL_INPROGRESS_STATUSES.includes(communication.current_status2)) {
-          const liveContacts = _.cloneDeep(this.liveContacts)
+        const liveContacts = _.cloneDeep(this.liveContacts)
 
-          if (!isInLiveContacts) {
-            liveContacts.push(contact)
-          }
-
-          this.processLiveContacts(liveContacts)
+        if (!isInLiveContacts) {
+          liveContacts.push(contact)
         }
+
+        this.processLiveContacts(liveContacts)
       }
     }
 
@@ -1176,17 +1168,6 @@ export default {
     // check auth every 5 minutes
     const checkInterval = 5 * 60 * 1000
 
-    // Handled outdated company info which caused the refresh loop problem
-    if (this.profile?.company_id && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
-      this.$axios.get('/api/v1/company/' + this.profile.company_id)
-        .then((res) => {
-          this.setCurrentCompany(res.data)
-        })
-        .catch(err => {
-          console.error('Error fetching company info:', err)
-        })
-    }
-
     if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
         const now = new Date().getTime()
@@ -1272,7 +1253,7 @@ export default {
         return
       }
 
-      if (!this.isNotInInbox || !communication.contact_id) {
+      if (!communication.contact_id) {
         return
       }
 
@@ -1710,8 +1691,8 @@ export default {
         this.getAttributeDictionaries()
         this.getMyQueueList()
 
-        if (this.hasCompanyTeamInboxEnabled && !this.loadingTeamInboxCampaigns) {
-          // Load Team Inbox campaigns if it's enabled
+        if (!this.loadingTeamInboxCampaigns) {
+          // Refresh Team Inbox campaigns
           getTeamInboxCampaigns(this)
         }
       })
@@ -2824,10 +2805,7 @@ export default {
     ...mapActions('inbox', [
       'setSelectedContact',
       'setLiveContacts',
-      'updateLiveContactLastCommProperties',
-      'setIsInboxFiltersLoaded',
-      'gettingTasksList',
-      'setInboxShowMyContacts'
+      'updateLiveContactLastCommProperties'
     ]),
     ...mapActions('TeamInbox', [
       'setTeamInboxCampaigns',
@@ -2868,10 +2846,6 @@ export default {
 
       this.checkDebounce()
 
-      if (this.profile?.company && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
-        this.setCurrentCompany(this.profile.company)
-      }
-
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
@@ -2889,19 +2863,6 @@ export default {
       // reset search if contact is changed
       if (from.name === 'Contacts' && to.name === 'Contacts' && from.params.id !== to.params.id) {
         this.resetSearch()
-      }
-
-      const fromInboxToInboxContact = (from.name === 'Inbox' && this.$route.name === 'Inbox Contact')
-      const fromInboxContactToInbox = (from.name === 'Inbox Contact' && this.$route.name === 'Inbox')
-      if (!fromInboxToInboxContact &&
-        !fromInboxContactToInbox &&
-        to.name !== from.name) {
-        this.resetVuex(['inbox', 'non-cache'])
-      }
-
-      // reset My Contacts toggle to default
-      if (from.name === 'Inbox View' && from.name !== to.name) {
-        this.setInboxShowMyContacts(false)
       }
 
       if (to.name === 'Stats' && !this.metricsDataLoaded) {
@@ -2929,20 +2890,16 @@ export default {
       }
 
       // padding top for mobile screen
-      // excluding inbox default page in smaller screen
+      // excluding team inbox page in smaller screen
       const isPhonePage = from.name === 'Phone' || this.mobilePhoneDrawer
-      const isSmallMobileInbox = this.$route.name.includes('Inbox') && this.$q.screen.lt.md
-      if (this.isMobile && isPhonePage && !isSmallMobileInbox) {
+      const isSmallMobileTeamInbox = this.$route.name.includes(TEAMINBOXES_MENU_TITLE) && this.$q.screen.lt.md
+
+      if (this.isMobile && isPhonePage && !isSmallMobileTeamInbox) {
         setTimeout(() => {
           if (this.$refs['page-container'].$el.style.paddingTop === '0px') {
             this.$refs['page-container'].$el.style.paddingTop = '58px'
           }
         }, 50)
-      }
-
-      if (to.name === 'Inbox' && from.name.includes('Inbox')) {
-        this.setIsInboxFiltersLoaded(false)
-        this.gettingTasksList(true)
       }
 
       if (to.name === 'Suspended') {
@@ -3014,8 +2971,7 @@ export default {
       }
 
       if (!val && this.$route.name === 'Phone') {
-        const name = this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE
-        this.$router.replace({ name })
+        this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
       }
 
       if (val) {

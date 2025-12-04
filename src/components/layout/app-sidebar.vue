@@ -19,16 +19,6 @@
     </div>
 
     <app-sidebar-nav-link
-      v-if="hasCompanyLegacyInboxEnabled"
-      :isActive="isActive('Inbox')"
-      :isSidebarExpanded="isSidebarExpanded"
-      :title="INBOXES_MENU_TITLE"
-      :to="{ name: 'Inbox' }"
-      icon="inbox"
-    />
-
-    <app-sidebar-nav-link
-      v-if="hasCompanyTeamInboxEnabled"
       :isActive="isActive(TEAMINBOXES_MENU_TITLE)"
       :isSidebarExpanded="isSidebarExpanded"
       :title="TEAMINBOXES_MENU_TITLE"
@@ -325,10 +315,6 @@ export default {
       // make Lists active when navigating from lists management
       if (this.$route.meta?.isFromListsManagement) {
         return name === 'Lists'
-      }
-
-      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
-        return true
       }
 
       if ([TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && name === TEAMINBOXES_MENU_TITLE) {
