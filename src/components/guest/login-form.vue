@@ -107,6 +107,8 @@ import { mapActions, mapState } from 'vuex'
 import { aclMixin, guestFormsMixin, recaptchaMixin } from 'src/plugins/mixins'
 import SecurityCode from 'components/guest/security-code'
 import * as storage from 'src/plugins/helpers/storage'
+import { BroadcastMessageTypes } from 'src/constants/hubspot-softphone-broadcast'
+import HubSpotBroadcastManager from 'src/services/integrations/hubspot/HubSpotBroadcastManager'
 
 export default {
   components: { SecurityCode },
@@ -121,7 +123,8 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState(['statics', 'staticsLoaded', 'isWidget'])
+    ...mapState(['statics', 'staticsLoaded', 'isWidget', 'isHubSpotWidget']),
+    ...mapState('cache', ['currentCompany'])
   },
 
   data () {
@@ -142,7 +145,8 @@ export default {
       verificationMessageType: 'success',
       verificationMessage: '',
       verificationRequestSent: false,
-      shouldShowAppLogo: false
+      shouldShowAppLogo: false,
+      hubspotLoginChannel: null
     }
   },
 
@@ -248,11 +252,98 @@ export default {
         redirectPath = decodeURIComponent(redirectQuery)
       }
 
+      // This will fix a redirect path if the app is in the HubSpot Extension Context
+      redirectPath = await this.getCorrectRedirectPathForContext(redirectPath, company)
+
       this.$emit('userLoggedIn')
+
+      // For HubSpot widgets: broadcast login and navigate with reload trigger
+      // Check if we're redirecting to the HubSpot widget (not if we're currently on it)
+      const isRedirectingToHubSpot = redirectPath.includes('hubspot-call-extension')
+      if (isRedirectingToHubSpot) {
+        // Use broadcast manager static method for one-time broadcast
+        console.log('[Login Form] Broadcasting login success via Broadcast Manager...')
+        await HubSpotBroadcastManager.sendOneTimeBroadcast(
+          BroadcastMessageTypes.USER_LOGGED_IN,
+          { timestamp: Date.now() }
+        )
+
+        // Navigate with from_login=true query param to trigger reload in the widget
+        // Small delay to ensure the broadcast is fully transmitted before the page unloaded
+        setTimeout(() => {
+          const url = `${window.location.origin}${redirectPath}${redirectPath.includes('?') ? '&' : '?'}from_login=true`
+          console.log('[Login Form] Navigating to:', url)
+          window.location.replace(url)
+        }, 100)
+        return
+      }
+
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
 
       this.resetUser()
+    },
+
+    /**
+     * Checks if the current context requires HubSpot extension redirect
+     *
+     * @returns {Object} - Object containing redirect decision and context info
+     */
+    checkHubSpotRedirectContext (company = null) {
+      // Check if we're in HubSpot extension mode or redirecting to HubSpot extension
+      const isHubSpotExtension = this.$route.name === 'HubSpot Call Extension' ||
+                                 this.$route.path.includes('hubspot-call-extension')
+
+      // Get the HubSpot domain from company settings
+      const hubspotDomain = company?.hubspot_company_ui_domain || this.$store?.state?.auth?.profile?.company?.hubspot_company_ui_domain || 'app.hubspot.com'
+
+      // Check if the user is coming from HubSpot calling window mode (popup/iframe)
+      // This handles scenarios like: https://app.hubspot.com/calling-integration-popup-ui/49267018
+      // or custom domains like: https://custom.hubspot.com/calling-integration-popup-ui/49267018
+      const referrerHasHubSpot = document.referrer && document.referrer.includes('hubspot-call-extension')
+      const referrerIsHubSpot = document.referrer && document.referrer.includes(hubspotDomain)
+
+      // Determine if any HubSpot extension conditions are met
+      const hasHubSpotConditions = isHubSpotExtension ||
+                                   this.$route.path.includes('hubspot-call-extension') ||
+                                   referrerHasHubSpot ||
+                                   referrerIsHubSpot
+
+      // Check if HubSpot integration is enabled
+      const isHubSpotEnabled = company?.hubspot_integration_enabled ?? this.$store?.state?.auth?.profile?.company?.hubspot_integration_enabled
+
+      // Determine if we should redirect to HubSpot extension
+      const shouldRedirect = hasHubSpotConditions && isHubSpotEnabled
+
+      return {
+        shouldRedirect,
+        hasHubSpotConditions,
+        isHubSpotEnabled,
+        hubspotDomain
+      }
+    },
+
+    /**
+     * Ensures the redirect path is correct for the current context
+     * This fixes issues where users in HubSpot extension mode get redirected to wrong pages
+     *
+     * @param {string} originalPath - The original redirect path from query parameters
+     * @param {object} company - The current company object
+     * @returns Promise<{string}> - The corrected redirect path
+     */
+    async getCorrectRedirectPathForContext (originalPath, company = null) {
+      // Wait for Vuex to resolve completely before checking HubSpot context
+      await this.$nextTick()
+
+      const hubSpotContext = this.checkHubSpotRedirectContext(company)
+
+      // Redirect to HubSpot extension if conditions are met and integration is enabled
+      if (hubSpotContext.shouldRedirect) {
+        return '/widgets/hubspot-call-extension'
+      }
+
+      // Return the original path for all other contexts
+      return originalPath
     },
 
     redirectTimeout () {
@@ -295,6 +386,24 @@ export default {
       }
     },
 
+    /**
+     * Handles login event from other HubSpot widget instance
+     * Redirects away from login page when another instance successfully logs in
+     */
+    onHubSpotLoginFromOtherInstance (event) {
+      const { type } = event.data
+
+      if (type === BroadcastMessageTypes.USER_LOGGED_IN) {
+        // Only navigate if we're not already authenticated to avoid reload loops
+        if (!this.authenticated) {
+          const redirectPath = this.$route.query.redirect || '/widgets/hubspot-call-extension'
+          window.location.replace(`${window.location.origin}${redirectPath}`)
+        } else {
+          console.log('[Login Form] Other instance logged in, but already authenticated - ignoring')
+        }
+      }
+    },
+
     ...mapActions('cache', [
       'setCurrentCompany'
     ]),
@@ -325,6 +434,29 @@ export default {
           this.shouldShowAppLogo = val
         }
       }
+    }
+  },
+
+  mounted () {
+    // Listen for login events from other HubSpot widget instances
+    // Initialize temporary listener if we're on the HubSpot widget OR redirecting to it
+    const redirectPath = this.$route.query?.redirect
+    const isHubSpotContext = this.isHubSpotWidget || (redirectPath && redirectPath.includes('hubspot-call-extension'))
+
+    if (isHubSpotContext) {
+      try {
+        // Use the broadcast manager static method for temporary listening
+        this.hubspotLoginChannel = HubSpotBroadcastManager.createTemporaryListener(this.onHubSpotLoginFromOtherInstance)
+      } catch (error) {
+        console.error('[Login Form] Failed to initialize login listener:', error)
+      }
+    }
+  },
+
+  beforeDestroy () {
+    if (this.hubspotLoginChannel) {
+      this.hubspotLoginChannel.close()
+      this.hubspotLoginChannel = null
     }
   }
 }

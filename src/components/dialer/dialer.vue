@@ -92,7 +92,7 @@ export default {
 
     ...mapState('powerDialer', ['powerDialerTasks']),
 
-    ...mapState(['isWidget', 'isSalesforceWidget']),
+    ...mapState(['isWidget', 'isSalesforceWidget', 'isHubSpotWidget']),
 
     ...mapState('TeamInbox', ['activeInboxId']),
 
@@ -404,9 +404,9 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      // Avoid continuing with the incoming call if it's a widget,
-      // and ignore the call. Otherwise, Twilio will play the default incoming sound.
-      if (this.isSalesforceWidget ? false : this.isWidget) {
+      // Only ignore calls for regular widgets (not Salesforce or HubSpot widgets)
+      const shouldIgnoreCall = this.isWidget && !this.isSalesforceWidget && !this.isHubSpotWidget
+      if (shouldIgnoreCall) {
         call._connection.ignore()
         return
       }
@@ -1143,6 +1143,26 @@ export default {
 
     answerCall (communication = null) {
       if (!this.dialer.call) {
+        // HubSpot widget special handling: check for fishing mode before returning
+        if (this.isHubSpotWidget) {
+          const hasFishingCommunication = _.get(this.dialer, 'callFishing.communication', null) !== null
+          if (hasFishingCommunication) {
+            console.log('[HubSpot Widget] Detected fishing mode call, routing to answerCallFishing')
+
+            const fishingComm = {
+              id: this.dialer.callFishing.communication.id,
+              campaignId: this.dialer.callFishing.communication.campaign_id,
+              contactName: this.dialer.callFishing.contact?.name,
+              companyName: this.dialer.callFishing.contact?.company_name,
+              contactId: this.dialer.callFishing.communication.contact_id
+            }
+
+            this.clearDialerCallFishing()
+            this.answerCallFishing(fishingComm)
+
+            return
+          }
+        }
         return
       }
 
@@ -1168,8 +1188,35 @@ export default {
       }
     },
 
-    rejectCall () {
+    async rejectCall () {
       if (!this.dialer.call) {
+        // HubSpot widget special handling: check for fishing mode before returning
+        if (this.isHubSpotWidget) {
+          const hasFishingCommunication = _.get(this.dialer, 'callFishing.communication', null) !== null
+          if (hasFishingCommunication) {
+            const communicationId = this.dialer.callFishing.communication.id
+
+            // Set status to REJECTING_CALL so HubSpot watcher can detect this is a rejection
+            this.setDialerCurrentStatus('REJECTING_CALL')
+
+            // Call the backend API to reject the fishing mode call
+            try {
+              await talk2Api.V1.communication.agentForceTerminate(communicationId, {
+                reject: true
+              })
+            } catch (error) {
+              console.error('[HubSpot Widget] Failed to reject fishing mode call:', error)
+            } finally {
+              // Use nextTick to ensure REJECTING_CALL status is processed before clearing data
+              this.$nextTick(() => {
+                this.clearDialerCallFishing()
+                this.setDialerCommunication()
+                this.setDialerCurrentStatus('READY')
+              })
+            }
+            return
+          }
+        }
         return
       }
 

@@ -67,7 +67,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
-    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget', 'isSalesforceWidget']),
+    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget', 'isSalesforceWidget', 'isHubSpotWidget']),
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)
