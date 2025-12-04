@@ -129,6 +129,7 @@
                  :current-page="fixedContactsData.current_page"
                  :last-page="fixedContactsData.last_page"
                  :total-rows="totalRows"
+                 :start-order="startOrder"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
                  @reordered="onColumnsReordered"
@@ -381,6 +382,10 @@
                   {{ contact[column.name] | displayBirthdate }}
                 </div>
                 <div class="ellipse"
+                     v-else-if="column.name.startsWith('csf_')">
+                  {{ getCustomFieldColumnValue(contact[column.name], column.name) }}
+                </div>
+                <div class="ellipse"
                      :class="getColumnClass(column.name, column.draggable)"
                      v-else>
                   {{ getColumnValue(contact[column.name]) }}
@@ -592,7 +597,7 @@ export default {
     },
 
     validColumns () {
-      return this.columns.filter(column => column.label !== 'Actions')
+      return this.columns.filter(column => column.label !== 'Actions' && column.name !== 'created_at_list')
     },
 
     addItemEndpoint () {
@@ -639,7 +644,8 @@ export default {
       myContacts: false,
       urlRoutePath: '/contacts/list/',
       showLimitCharactersError: false,
-      ContactListTypes
+      ContactListTypes,
+      startOrder: null
     }
   },
 
@@ -939,6 +945,10 @@ export default {
 
       this.setAllContactsSelected(false)
       this.onCheckedRows(items)
+    },
+
+    isSortFieldAvailable (sorts) {
+      return this.columns?.some(column => column.name === sorts?.orderBy)
     }
   },
 
@@ -952,6 +962,13 @@ export default {
     }
 
     this.setAddViewShowMyContacts(this.myContacts)
+
+    if (this.$route.query?.orderBy && this.isSortFieldAvailable({ orderBy: this.$route.query.orderBy })) {
+      this.startOrder = {
+        orderBy: this.$route.query.orderBy,
+        order: this.$route.query.order
+      }
+    }
   },
 
   watch: {

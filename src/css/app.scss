@@ -15116,6 +15116,12 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
   }
 }
 
+#session-contact-page {
+  .b-overlay {
+    z-index: 3 !important; // prevent loading overlays from overlapping open dialer
+  }
+}
+
 .power-dialer-session-toggle-button {
   z-index: 1;
   margin-top: -14px !important;

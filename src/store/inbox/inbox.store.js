@@ -1,123 +1,19 @@
-const DEFAULT_CHANNEL = {
-  label: 'Inbox',
-  value: 'inbox',
-  icon: 'inbox',
-  disabled: false,
-  default: true
-}
-
 export default function () {
   return {
-    selectedContactId: null,
-    selectedCommunication: null,
-    isGettingTasksList: false,
-    isFetchingContacts: false,
-    isChannelFilterOpen: false,
-    isSearcherOpen: false,
-    activeChannel: DEFAULT_CHANNEL,
-    navListItems: [
-      DEFAULT_CHANNEL,
-      {
-        label: 'Channels',
-        group: true,
-        value: '',
-        class: 'nav-list-group-title',
-        icon: '',
-        disabled: false
-      },
-      {
-        label: 'Calls',
-        value: 'calls',
-        icon: 'call',
-        disabled: false,
-        type: 'call',
-        answerStatus: 'all'
-      },
-      {
-        label: 'Messages',
-        value: 'messages',
-        icon: 'message',
-        disabled: false,
-        type: 'sms',
-        answerStatus: 'all'
-      },
-      {
-        label: 'Mentions',
-        value: 'mentions',
-        icon: 'mention',
-        disabled: false
-      },
-      {
-        label: 'Voicemails',
-        value: 'voicemails',
-        icon: 'voicemail',
-        disabled: false,
-        type: 'call',
-        answerStatus: 'voicemail'
-      },
-      {
-        label: 'Call Recordings',
-        value: 'recordings',
-        icon: 'record',
-        disabled: false,
-        type: 'call',
-        answerStatus: 'recorded'
-      },
-      {
-        label: 'All Communications',
-        value: 'all-communications',
-        icon: 'all-communications',
-        disabled: false,
-        type: 'all',
-        answerStatus: 'all'
-      },
-      {
-        label: 'My Personal Line',
-        value: 'my-personal-line',
-        icon: 'person',
-        disabled: false,
-        type: 'all',
-        answerStatus: 'all'
-      }
-    ],
-    communications: [],
-    communicationsCurrentPage: 0,
-    hasMoreCommunications: false,
-    contacts: [],
-    liveContacts: [], // contact task that are in live calls (incoming, in-progress or parked calls)
-    contactsCurrentPage: 0,
-    hasMoreContacts: false,
+    // Contact selection
     selectedContact: {},
-    taskCounts: {
-      new: 0,
-      open: 0,
-      pending: 0,
-      closed: 0
-    },
-    inboxTaskCounts: {
-      new: 0,
-      open: 0,
-      pending: 0,
-      closed: 0
-    },
-    channelClonedFilter: {},
+
+    // Live contacts in active calls
+    liveContacts: [],
+
+    // Contact and communication lists
+    contacts: [],
+    communications: [],
+
+    // Filter-related state
     channelChangedFilterFields: [],
-    isFilterModelFormShown: false,
-    isFilterDialogShown: false,
-    isFilterDialogShowFilters: false,
-    isFilterDialogForView: false,
-    selectedFilter: null,
-    appliedFilter: null,
-    isLoadingOpenTaskCount: false,
-    isLoadingPendingTaskCount: false,
-    inboxShowMyContacts: true,
-    inboxShowUnreads: false,
-    isInboxFiltersLoaded: true,
-    pinnedViews: [],
-    inboxPersonalFilters: [],
-    inboxCompanyFilters: [],
-    isEditingView: false,
-    showViewsList: false,
-    isInboxRefreshBtnLoading: false
+
+    // Filter preferences
+    inboxShowMyContacts: true
   }
 }

@@ -14,7 +14,7 @@
           ({{ totalTasksToBeAdded }} {{ fixMessage('task(s)', totalTasksToBeAdded) }} to be added)
         </span>
       </p>
-      <p class="m-0 font-weight-bold">
+      <p v-if="addedFromContact" class="m-0 font-weight-bold">
         {{ fixMessage('Contact(s)', addedFromContact) }} added
       </p>
       <ul>
@@ -242,14 +242,11 @@ export default {
       integrationReport.total_selected += this.fullReport?.extra?.total_selected || 0
 
       const creationSettings = this.fullReport?.extra?.settings || {}
-      const integrationDuplicates = integrationReport?.duplicates || 0
-      const duplicatePhoneNumbers = this.fullReport?.success?.duplicates || 0
 
       if (!creationSettings?.prevent_duplicates) {
-        this.fullReport.fail[DUPLICATED] = integrationDuplicates > duplicatePhoneNumbers ? integrationDuplicates : duplicatePhoneNumbers
+        this.fullReport.fail[DUPLICATED] = integrationReport?.duplicates || this.fullReport?.success?.duplicates || this.fullReport?.fail?.[DUPLICATED] || 0
       } else if (creationSettings?.prevent_duplicates) {
-        const duplicates = this.fullReport?.fail?.[DUPLICATED] || 0
-        this.fullReport.fail[DUPLICATED] = integrationReport.duplicates > duplicates ? integrationReport.duplicates : duplicates
+        this.fullReport.fail[DUPLICATED] = integrationReport.duplicates || this.fullReport?.fail?.[DUPLICATED] || 0
       }
 
       const createdContactsCount = integrationReport?.created_contacts_count || 0
@@ -307,6 +304,15 @@ export default {
       }
 
       this.buildReport()
+    },
+    statusReport: {
+      handler (newValue) {
+        // Only rebuild if modal is open and statusReport has changed
+        if (this.isOpen && Object.keys(newValue ?? {}).length > 0) {
+          this.buildReport()
+        }
+      },
+      deep: true
     }
   }
 }

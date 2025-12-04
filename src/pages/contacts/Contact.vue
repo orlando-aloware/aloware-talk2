@@ -2,7 +2,7 @@
   <b-overlay class="h-100 w-100"
              variant="white"
              rounded="sm"
-             :show="isShowContact"
+             :show="isShowContactOverlay"
              :opacity="0.85"
              v-if="authenticated">
     <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between"
@@ -103,7 +103,6 @@ import {
   contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
-  inboxMixin,
   teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
@@ -128,7 +127,6 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    inboxMixin,
     teamInboxPropsMixin
   ],
 
@@ -164,15 +162,11 @@ export default {
 
     ...mapFields('settings', ['isContactDetailsCollapsed']),
 
-    isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
-    },
-
     isEmptyContact () {
       return Object.keys(this.contact).length === 0
     },
 
-    isShowContact () {
+    isShowContactOverlay () {
       return this.changingSelectedContact || this.campaignsIsLoading ||
         this.usersIsLoading || !this.campaigns ||
         !this.users || !this.tags || this.leaving || this.loadingContact || this.isEmptyContact
@@ -206,7 +200,8 @@ export default {
       contactComponentListeners: {},
       ContactTaskStatus,
       CommunicationDirections,
-      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
+      fetchContactTimeout: null
     }
   },
 
@@ -256,11 +251,30 @@ export default {
       }
 
       this.isContactDetailsCollapsed = !this.isContactDetailsCollapsed
+    },
+
+    initFetchContactTimeout () {
+      this.fetchContactTimeout = setTimeout(() => {
+        if (this.isShowContactOverlay) {
+          // Send a warning to Sentry if the contact information is taking too long to fetch
+          window.Sentry.captureMessage('Slowness detected when fetching contact information', {
+            level: 'warning',
+            extra: {
+              contactId: this.contactId,
+              loadingContact: this.loadingContact,
+              loadingCampaigns: this.loadingCampaigns,
+              changingSelectedContact: this.changingSelectedContact,
+              loadingUsers: this.loadingUsers
+            }
+          })
+        }
+      }, 8000)
     }
   },
 
   mounted () {
     if (this.authenticated) {
+      this.initFetchContactTimeout()
       this.fetchContact()
     }
 
@@ -314,10 +328,6 @@ export default {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
-      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE]
-      if (validRoutes.includes(this.$route.name)) {
-        this.fetchTaskCounts()
-      }
     }
 
     this.$VueEvent.listen('contact_task_status_updated', this.contactComponentListeners.contactTaskStatusUpdated)
@@ -330,7 +340,7 @@ export default {
 
       this.contactListSidebarOpen = false
 
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()
@@ -355,7 +365,7 @@ export default {
         return
       }
 
-      if (!['Inbox Contact', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
+      if (TEAMINBOXES_MENU_COMMUNICATIONS_TITLE !== this.$route.name) {
         return
       }
 
@@ -398,6 +408,14 @@ export default {
       if (value && this.isMobile) {
         this.$VueEvent.fire('hide_mobile_footer', false)
       }
+    },
+
+    isShowContactOverlay (value) {
+      if (value) {
+        // Reset the timeout when the selected contact changes
+        clearTimeout(this.fetchContactTimeout)
+        this.initFetchContactTimeout()
+      }
     }
   },
 
@@ -406,6 +424,7 @@ export default {
   },
 
   beforeDestroy () {
+    clearTimeout(this.fetchContactTimeout)
     this.setIsContactMixinUsed(false)
     this.removeListeners()
     this.setContact({})

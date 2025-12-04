@@ -1281,6 +1281,14 @@ export default {
 
       // only start wrap up timer if there is a communication
       if (this.dialer.communication) {
+        // Skip wrap-up for barge/whisper calls
+        const isBargeOrWhisperCall = this.dialer?.isBargeOrWhisperCall
+
+        if (isBargeOrWhisperCall) {
+          this.backToDial('Talk-Device.OnDisconnect', false, true)
+          return
+        }
+
         const callWrapUpOptions = this.dialer.communication.call_wrap_up_options
         if (callWrapUpOptions['wrap_up'] && // if the backend says wrap it up
           callWrapUpOptions['user_id'] === this.profile.id && // and if the user who answered the call is trying to go to wrap up (prevents third-parties from going to wrap-up state)
@@ -1289,6 +1297,15 @@ export default {
           this.hasCallInProgressNotParked) &&
           !(this.parkFromAnotherTab || this.hungFromAnotherTab)) {
           this.startWrapUpTimer(this.dialer.communication.call_wrap_up_options['duration'])
+          return
+        }
+        const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
+            this.hasParkedAndInprogressCall ||
+            this.hasCallInProgressNotParked) &&
+          !(this.parkFromAnotherTab || this.hungFromAnotherTab)
+
+        if (shouldStartWrapUp) {
+          this.startWrapUpTimer()
           return
         }
       }
@@ -1925,6 +1942,7 @@ export default {
       this.setShowIncomingCallNotification(false)
       this.setDialerAiAgentWhisper(false)
       this.setDialerAiAgentTakeover(false)
+      this.setDialerIsBargeOrWhisperCall(false)
       this.notificationShownFromCustomParams = false
     },
 
@@ -2039,6 +2057,17 @@ export default {
     },
 
     backToDial (signature = 'Talk-BackToDial', forceStatus = false, ignoreForceDisposition = false) {
+      // Check if this is a barge/whisper call
+      const isBargeOrWhisperCall = this.dialer?.isBargeOrWhisperCall
+
+      // For barge/whisper calls, skip force disposition and reset immediately
+      if (isBargeOrWhisperCall) {
+        // Force agent status to available for barge/whisper calls
+        this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, true, 1, signature)
+        this.resetCall(signature)
+        return
+      }
+
       // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
       if (signature !== 'Talk-Connection.OnCancel') {
         this.resetAgentStatus(forceStatus, signature)
@@ -2360,7 +2389,8 @@ export default {
       'removeParkedCall',
       'setIsCallBackButtonDisabled',
       'setDialerAiAgentWhisper',
-      'setDialerAiAgentTakeover'
+      'setDialerAiAgentTakeover',
+      'setDialerIsBargeOrWhisperCall'
     ]),
 
     // Helper method to reset token retry state
@@ -2419,7 +2449,6 @@ export default {
 
       const communication = {
         id: parseInt(communicationData.Id) || null,
-        is_call_waiting: communicationData.CallWaiting,
         contact: {
           id: parseInt(customParams.ContactId) || null,
           name: customParams.ContactName,
@@ -2434,14 +2463,30 @@ export default {
         campaign_id: campaignId,
         campaign: {
           name: customParams?.CampaignName
-        }
+        },
+        is_fishing_mode: false,
+        is_call_waiting: false
       }
 
       console.log('Successfully built communication data from customParameters:', communication)
       return communication
     },
 
+    ignoreMicrophonePermissionCheck () {
+      const ignoreMicrophoneCheckCompanyIds = process.env.IGNORE_MICROPHONE_CHECK_COMPANY_IDS
+
+      if (!ignoreMicrophoneCheckCompanyIds) {
+        return false
+      }
+
+      return Object.values(ignoreMicrophoneCheckCompanyIds).includes(this.currentCompany?.id)
+    },
+
     async checkMicrophonePermission () {
+      if (this.ignoreMicrophonePermissionCheck()) {
+        return true
+      }
+
       // Check if the browser supports getUserMedia
       if (!navigator?.mediaDevices?.getUserMedia) {
         console.error('[checkMicrophonePermission] microphone not supported')

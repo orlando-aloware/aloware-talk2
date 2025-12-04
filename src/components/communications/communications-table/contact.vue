@@ -17,7 +17,12 @@
             Click to go to contact's page
           </b-tooltip>
         </router-link>
-        <contact-integrations-link-icons :contact='row.contact' class="ml-1 flex-shrink-0" background_opacity="0" />
+        <contact-integrations-link-icons
+          v-if="contactHubspotLink"
+          :hubspot-link="contactHubspotLink"
+          class="ml-1 flex-shrink-0"
+          background-opacity="0"
+        />
       </div>
     </div>
     <div class="deleted"
@@ -52,6 +57,12 @@ export default {
     row: {
       type: Object,
       required: false
+    }
+  },
+
+  computed: {
+    contactHubspotLink () {
+      return this.row?.contact?.integration_data?.hubspot?.link || null
     }
   },
 

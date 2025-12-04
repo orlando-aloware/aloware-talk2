@@ -259,7 +259,6 @@ export default {
     return {
       runningDateTime: null,
       runningDateTimeInterval: null,
-      isValidNotification: false,
       notificationListeners: {},
       AgentStatus,
       teamInboxLink: null
@@ -267,7 +266,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
+    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users', 'ringGroups']),
     ...mapState('cache', ['currentCompany']),
 
     isCall () {
@@ -287,10 +286,6 @@ export default {
 
       if (this.queue) {
         toastClass.data += ' has-clear-queues'
-      }
-
-      if (!this.isValidNotification) {
-        toastClass.data += ' hide'
       }
 
       return toastClass.data
@@ -353,12 +348,7 @@ export default {
         return null
       }
 
-      // If TeamInbox is not enabled, use the original logic
-      if (!this.hasCompanyTeamInboxEnabled) {
-        return {
-          path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
-        }
-      }
+      const contactPath = `/contacts/${this.contactId}/communications/${this.communicationId}`
 
       // If the communication has a ring group id, check teamInboxLink
       if (this.ringGroupId && this.ringGroupId !== '') {
@@ -371,8 +361,22 @@ export default {
           }
         }
 
+        // route mentions to contacts page if no teamInboxLink is provided
+        if (this.id === 'mention') {
+          return {
+            path: contactPath
+          }
+        }
+
         return {
-          path: `/contacts/${this.contactId}/communications/${this.communicationId}`
+          path: contactPath
+        }
+      }
+
+      // route mentions to contacts page
+      if (this.id === 'mention') {
+        return {
+          path: contactPath
         }
       }
 
@@ -470,6 +474,10 @@ export default {
 
       if (this.isCallWaiting) {
         return 'Call Waiting'
+      }
+
+      if (this.isFishingMode) {
+        return 'Fishing Mode'
       }
 
       return 'New Inbound Call'
@@ -582,6 +590,10 @@ export default {
         return ''
       }
       return this.isPersonalInbox ? 'Reject' : 'Ignore'
+    },
+
+    isMention () {
+      return this.id === 'mention'
     }
   },
 
@@ -629,7 +641,7 @@ export default {
     ]),
 
     async updateTeamInboxLink (ringGroupId) {
-      if (await this.checkInboxAccess(ringGroupId)) {
+      if (this.isMention || await this.checkInboxAccess(ringGroupId)) {
         this.teamInboxLink = {
           path: `/team-inboxes/${ringGroupId}/contacts/${this.contactId}/communications`
         }
@@ -648,7 +660,6 @@ export default {
 
     onShow () {
       console.log('Communication when event Show notification triggers: ', this.communication)
-      this.isValidNotification = false
       this.stopNotificationListeners()
       this.startNotificationListeners()
     },
@@ -687,8 +698,11 @@ export default {
         return
       }
 
-      this.isValidNotification = true
-      const shouldPlayFishingNotificationSound = this.id === 'callFishing' && this.currentCompany.fishing_mode_notification_sound
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+      const isPersonalInbox = ringGroup?.is_personal_inbox
+
+      const shouldPlayFishingNotificationSound = this.id === 'callFishing' &&
+        ((!isPersonalInbox && this.currentCompany.fishing_mode_notification_sound) || (isPersonalInbox && !this.isAgentOrDialerOnCall))
       this.playAudio(shouldPlayFishingNotificationSound)
     },
 
@@ -763,6 +777,7 @@ export default {
 
       if (this.id === 'callFishing') {
         this.handleAnswerCommunication()
+        this.closeCallNotifications(this.id, this.communicationId)
         return
       }
 
@@ -771,11 +786,14 @@ export default {
     },
 
     async ignoreFishing () {
-      if (this.communication?.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled) {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+
+      if (ringGroup?.is_personal_inbox) {
         try {
+          // Force terminate for personal inboxes, since there is no other agents to take the call
           await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
         } catch (error) {
-          console.error('Failed to force terminate communication:', error)
+          console.error('Failed to force terminate communication on personal inbox:', error)
         }
       }
 
@@ -789,9 +807,16 @@ export default {
       this.$closeActionNotification('callFishing')
     },
 
-    rejectCall () {
-      if (this.id !== 'callFishing' ||
-        (this.id === 'callFishing' &&
+    async rejectCall () {
+      const isCallFishing = this.id === 'callFishing'
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+
+      if (isCallFishing && ringGroup?.is_personal_inbox) {
+        await this.ignoreFishing()
+      }
+
+      if (!isCallFishing ||
+        (isCallFishing &&
           (!this.queue ||
             (this.queue && !this.queue.length))
         )
@@ -802,11 +827,9 @@ export default {
 
       this.$VueEvent.fire('rejectCall')
 
-      if (this.id === 'callFishing') {
+      if (isCallFishing) {
         this.$VueEvent.fire('hidePhone')
-      }
 
-      if (this.id === 'callFishing') {
         if (this.queue && this.queue.length) {
           this.switchCallFishingFromQueue()
         } else {

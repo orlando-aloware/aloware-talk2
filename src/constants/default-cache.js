@@ -19,6 +19,7 @@ export const DEFAULT_STATE = {
     'TeamInbox.activeSort',
     'settings.isSidebarCollapsed',
     'settings.isTeamInboxNavListCollapsed',
-    'settings.isContactDetailsCollapsed'
+    'settings.isContactDetailsCollapsed',
+    'settings.contactsListSortPreference'
   ]
 }

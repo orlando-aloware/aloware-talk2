@@ -188,6 +188,7 @@ import CompactBtn from 'components/compact-btn.vue'
 import { GROUP_CONTACT_COMM_METADATA, GROUP_CONTACT_LOCATION, GROUP_CONTACT_RELEVANCE, GROUP_PRIMARY_INFO } from 'src/constants/contact-filter-groups'
 import talk2Api from 'src/plugins/api/api'
 import { aclMixin } from 'src/plugins/mixins'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 
 export default {
 
@@ -313,15 +314,37 @@ export default {
             : (filterA < filterB ? -1 : 0)
         }
 
-        const filters = !groupId
-          ? this.filtersFiltered.filter(list => !list.group_id || list.group_id.length < 1)
-          : this.filtersFiltered.filter(list => list.group_id === groupId)
+        const filters = this.filtersFiltered.filter((filter) => {
+          if (filter.key === 'created_at_list') {
+            // show created_at_list filter only for lists
+            if (!this.isContactListsOrPowerDialer || [ContactListTypes.DYNAMIC, ContactListTypes.DYNAMIC_REMOTE_LIST].includes(this.selectedList?.type)) {
+              return false
+            }
+
+            // rename label to match current route
+            filter.label = 'Date Added to ' + (this.isPowerDialer ? 'Power Dialer' : 'List')
+          }
+
+          if (!groupId) {
+            return !filter.group_id || filter.group_id.length < 1
+          }
+
+          return filter.group_id === groupId
+        })
 
         return {
           filters: filters.sort(compare),
           label: label.data
         }
       }
+    },
+
+    isPowerDialer () {
+      return this.$route.name === 'Power Dialer'
+    },
+
+    isContactListsOrPowerDialer () {
+      return this.$route.meta?.page === 'Contacts List' || this.isPowerDialer
     }
   },
 

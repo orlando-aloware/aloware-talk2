@@ -189,6 +189,11 @@ export default {
     lastCallSource: {
       type: String,
       default: null
+    },
+
+    isFishingModeCall: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -206,9 +211,7 @@ export default {
         current_status2: this.currentStatus,
         disposition_status2: this.dispositionStatus,
         last_call_source: this.lastCallSource,
-        campaign: {
-          call_waiting_ring_group_id: this.campaign ? this.campaign.call_waiting_ring_group_id : this.getCampaign(this.campaignId)?.call_waiting_ring_group_id
-        }
+        is_fishing_mode: this.isFishingModeCall
       }
     },
 

@@ -17,7 +17,7 @@
         <b-overlay data-testid="power-dialer-add-modal-overlay"
                    :show="loading > 0">
           <div data-testid="power-dialer-add-modal-converting-message">
-            You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
+            You're converting <strong>{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
           </div>
 
           <hr>
@@ -149,7 +149,7 @@
         <b-overlay data-testid="power-dialer-add-modal-overlay"
                    :show="loading > 0">
           <div data-testid="power-dialer-add-modal-converting-message">
-            You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
+            You're converting <strong>{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
           </div>
 
           <hr>
@@ -479,7 +479,12 @@ export default {
       } else if (this.requestParams.selected_all) {
         description += this.selectedAllCount
       } else if (this.count !== null) {
-        description += this.$options.filters.numFormat(this.count)
+        description += '~' + this.$options.filters.numFormat(this.count)
+      }
+
+      // For integrations that can't determine count, show generic text
+      if (this.mode === 'integration' && this.count === null) {
+        return 'contacts'
       }
 
       description += (this.count === 1 ? ' contact' : ' contacts')

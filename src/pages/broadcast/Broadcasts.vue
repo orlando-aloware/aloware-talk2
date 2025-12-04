@@ -285,6 +285,20 @@
                   {{ row[col.field] | fixDateTime }}
                 </td>
                 <td :key="`c-${colIndex}`"
+                    v-else-if="col.name === 'notes'">
+                  <div class="text-left">
+                    <span v-if="row.notes"
+                          v-html="$options.filters.nl2br(row.notes)"
+                          class="text-greyish">
+                    </span>
+                    <span v-else class="text-muted">-</span>
+                  </div>
+                  <q-tooltip anchor="top middle"
+                             v-if="(row['notes'] || '').length > 0">
+                    <span v-html="$options.filters.nl2br(row.notes)" />
+                  </q-tooltip>
+                </td>
+                <td :key="`c-${colIndex}`"
                     :class="col.draggable ? 'sorted-column' : ''"
                     v-else>
                   {{ row[col.field] }}
@@ -620,6 +634,7 @@ export default {
           'campaign_id',
           'throttle_limit',
           'date_created',
+          'notes',
           'actions'
         ],
         extraLargeDesktop: [
@@ -636,6 +651,7 @@ export default {
           'campaign_id',
           'throttle_limit',
           'date_created',
+          'notes',
           'actions'
         ]
       }
@@ -828,18 +844,6 @@ export default {
       this.contextMenuOpen = false
       this.popupOpen = false
       const broadcastIds = broadcasts.map(broadcast => broadcast.id)
-
-      if (this.currentCompany?.enable_legacy_inbox) {
-        return this.$router.push({
-          name: 'Inbox Channel',
-          params: {
-            channel: 'all-communications'
-          },
-          query: {
-            broadcastIds
-          }
-        })
-      }
 
       this.$router.push({
         path: '/communications/all',

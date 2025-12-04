@@ -60,12 +60,12 @@
                                                :generic-styling="false"
                                                :disable="shouldDisableListSelector"
                                                :integration="selectedIntegration ?? ''"
-                                               @change="onListSelectorChange"/>
+                                               @change="onListSelectorChange" />
                 </div>
 
                 <div class="d-flex align-items-center pt-3">
                     <button class="btn btn-block btn-primary mt-0"
-                            :disabled="!list || isLoading"
+                            :disabled="!canProceed || isLoading"
                             @click="onSubmit">
                         Next
                     </button>
@@ -144,6 +144,14 @@ export default {
 
     shouldDisableListSelector () {
       return this.selectedIntegration === null
+    },
+
+    canProceed () {
+      return this.list !== null
+    },
+
+    getIntegration () {
+      return this.selectedIntegration?.toLowerCase()
     },
 
     filteredEnabledIntegrations () {

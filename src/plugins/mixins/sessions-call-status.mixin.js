@@ -218,6 +218,11 @@ export default {
     },
 
     isForcedToDisposeAndNotDisposed () {
+      // Skip force disposal for barge/whisper calls
+      if (this.isBargeOrWhisperCall) {
+        return false
+      }
+
       return this.dialer.communication && this.isNotDisposed
     },
 
@@ -238,6 +243,11 @@ export default {
       }
 
       return true
+    },
+
+    // Check if the current call is a barge or whisper call
+    isBargeOrWhisperCall () {
+      return this.dialer?.isBargeOrWhisperCall || false
     }
   },
 

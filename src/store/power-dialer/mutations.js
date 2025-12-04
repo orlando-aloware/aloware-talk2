@@ -228,18 +228,45 @@ export default {
   },
 
   STORE_BULK_ACTION_NOTIFICATION (state, value) {
-    // verify if the bulk action is a batch action and store it in an array if it is
-    if (value?.status_report?.batch_size > 1) {
-      if (state.bulkAddContactsNotification[value.contact_list_id]) {
-        state.bulkAddContactsNotification[value.contact_list_id].unshift(value)
-        return
-      }
-      state.bulkAddContactsNotification[value.contact_list_id] = [value]
+    const contactListId = value?.contact_list_id
+
+    if (!contactListId) {
       return
     }
 
-    // if not a batch action, store it as a single object
-    state.bulkAddContactsNotification[value.contact_list_id] = value
+    let existingNotification = state.bulkAddContactsNotification[contactListId] ?? {}
+
+    if (!value?.status_report) {
+      return
+    }
+
+    for (const name of ['fail', 'extra', 'success', 'info']) {
+      if (!value.status_report[name]) {
+        continue
+      }
+
+      if (!existingNotification[name]) {
+        existingNotification[name] = {}
+      }
+
+      for (const [key, val] of Object.entries(value.status_report[name])) {
+        // for 'extra' do not sum 'settings' and 'total_items_before_import'
+        if (name === 'extra' && ['settings', 'total_items_before_import'].includes(key)) {
+          // use 'total_items_before_import' from the first mention
+          if (key === 'total_items_before_import') {
+            if (!Object.prototype.hasOwnProperty.call(existingNotification[name], key)) {
+              existingNotification[name][key] = val
+            }
+          } else {
+            existingNotification[name][key] = val
+          }
+        } else {
+          existingNotification[name][key] = (existingNotification[name][key] || 0) + val
+        }
+      }
+    }
+
+    state.bulkAddContactsNotification[contactListId] = existingNotification
   },
 
   CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {

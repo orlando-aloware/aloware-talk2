@@ -10,6 +10,7 @@ import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_ABANDONED, STATUS_DEADEND, STAT
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { COMPANY_AGENT, COMPANY_REPORTER_ACCESS } from 'src/constants/roles'
 import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
+import talk2TeamInboxApi from 'src/plugins/api/teamInboxApi'
 
 export default {
   mixins: [userMixin],
@@ -28,6 +29,9 @@ export default {
     ]),
     ...mapState([
       'ringGroups'
+    ]),
+    ...mapState('TeamInbox', [
+      'inboxes'
     ])
   },
 
@@ -310,7 +314,7 @@ export default {
 
       let contactVisibility = this.profile.contacts_visibility
 
-      if (teamInbox && this.hasCompanyTeamInboxEnabled) {
+      if (teamInbox) {
         // For Team Inbox, check if the ring group has force_agent_visibility_limits.
         // If the ring group does not have force_agent_visibility_limits or the user is not a company agent,
         // then the user should be able to see the communication.
@@ -321,11 +325,6 @@ export default {
           !communicationRingGroup?.force_agent_visibility_limits
         ) {
           return true
-        }
-
-        if (contactVisibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
-          // Fallback to owned only access for Team Inbox as CONTACTS_ACCESS_RING_GROUP is deprecated inside Team Inbox
-          contactVisibility = ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY
         }
       }
 
@@ -379,21 +378,6 @@ export default {
         ) {
           return false
         }
-      }
-
-      // ring group only access
-      if (contactVisibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
-        // if user does not have unassigned access
-        if (this.isUserDoesntHaveUnassignedAccess(communication, 'communication')) {
-          return false
-        }
-
-        // if contact does not exist
-        if (!communication.contact) {
-          return false
-        }
-
-        // @todo for ring group only access (UI doesn't know that contact relationship with ring groups at this stage)
       }
 
       // ring group users only access
@@ -530,16 +514,6 @@ export default {
     },
 
     checkAgentContactVisibility (contact) {
-      // ring group only access
-      if (this.profile && this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
-        // if user does not have unassigned access
-        if (this.isUserDoesntHaveUnassignedAccess(contact, 'contact')) {
-          return false
-        }
-
-        // @todo for ring group only access (UI doesn't know that contact relationship with ring groups at this stage)
-      }
-
       // owned only access
       if (this.profile && this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY) {
         // if user does not have unassigned access
@@ -556,27 +530,22 @@ export default {
       return true
     },
 
-    checkMentionMatchesUserAccessibility (mention) {
+    async checkMentionMatchesUserAccessibility (mention) {
+      // check if mentioned user is the actual user
+      if (mention.mentioned_user_id !== this.profile.id) {
+        return false
+      }
+
+      // do not show when the mentioner is the actual user
+      if (mention.mentioner_user_id === this.profile.id) {
+        return false
+      }
+
       // checks if communication matches user communication visibility
       if (this.profile.communications_visibility === CommunicationAccessTypes.COMMUNICATIONS_OWNED_ONLY &&
         mention.mentioner_user_id &&
         mention.mentioner_user_id !== this.profile.id) {
         return false
-      }
-
-      // ring group only access
-      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
-        // if contact does not exist
-        if (!mention.contact) {
-          return false
-        }
-
-        // if user does not have unassigned access
-        if (this.isUserDoesntHaveUnassignedAccess(mention, 'mention')) {
-          return false
-        }
-
-        // @todo for ring group only access (UI doesn't know that contact relationship with ring groups at this stage)
       }
 
       // owned only access
@@ -595,6 +564,19 @@ export default {
         if (mention.contact &&
           mention.contact.user_id &&
           mention.contact.user_id !== this.profile.id) {
+          return false
+        }
+      }
+
+      // check team inbox access
+      if (mention.ring_group_id) {
+        // if on TeamInboxes page, check if user has access by checking the state
+        if (this.inboxes?.length && !this.inboxes.some((inbox) => inbox.id === mention.ring_group_id)) {
+          return false
+        }
+
+        // check access from api
+        if (!(await this.checkInboxAccess(mention.ring_group_id))) {
           return false
         }
       }
@@ -645,6 +627,21 @@ export default {
       return data.contact &&
         !data.contact.user_id &&
         !this.profile.can_view_unassigned_contacts
+    },
+
+    async checkInboxAccess (inboxId) {
+      const response = await talk2TeamInboxApi.inboxes.get({
+        params: {
+          inbox_ids: [inboxId]
+        }
+      })
+
+      const inboxes = response?.data?.data || []
+      if (typeof inboxes !== 'object' || inboxes.length === 0) {
+        return false
+      }
+
+      return inboxes.some(inbox => inbox.id === inboxId)
     }
   }
 }

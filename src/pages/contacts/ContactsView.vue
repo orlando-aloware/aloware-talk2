@@ -397,6 +397,7 @@
                  :last-page="fixedContactsData.last_page"
                  :useEmptySlot="canSeeAddContacts && canAddContacts && isEmpty"
                  :total-rows="totalRows"
+                 :start-order="startOrder"
                  v-if="listItemsHasData"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
@@ -676,6 +677,10 @@
                   {{ contact[column.name] | displayBirthdate }}
                 </div>
                 <div class="ellipse"
+                     v-else-if="column.name.startsWith('csf_')">
+                  {{ getCustomFieldColumnValue(contact[column.name], column.name) }}
+                </div>
+                <div class="ellipse"
                      :class="getColumnClass(column.name, column.draggable)"
                      v-else>
                   {{ getColumnValue(contact[column.name]) }}
@@ -782,6 +787,7 @@ import _ from 'lodash'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
@@ -962,7 +968,8 @@ export default {
       openAloAiEnrollmentModal: false,
       showAssignContacts: false,
       showLimitCharactersError: false,
-      CONTACTS_STRING_KEYS
+      CONTACTS_STRING_KEYS,
+      currentDatatableSorts: null
     }
   },
 
@@ -999,6 +1006,8 @@ export default {
     ...mapState('auth', [
       'profile'
     ]),
+
+    ...mapFields('settings', ['contactsListSortPreference']),
 
     dynamicListHubSpotMessage () {
       let text = 'This is a list managed by HubSpot.'
@@ -1174,8 +1183,12 @@ export default {
         this.defaultIds.includes(this.id) ||
         this.isUpdatingList ||
         !this.listContactsLoaded ||
-        this.list.show_in_public_folder ||
+        (this.list.show_in_public_folder && !this.isAdminOrListOwner) ||
         this.list.type === this.ContactListTypes.DYNAMIC_REMOTE_LIST
+    },
+
+    isAdminOrListOwner () {
+      return this.isAdmin || (this.profile && this.profile.id === this.list?.folder?.created_by)
     },
 
     cleanedCurrentListFilters () {
@@ -1224,6 +1237,18 @@ export default {
         return ''
       }
       return `${user.first_name} ${user.last_name}`.trim()
+    },
+
+    sortKey () {
+      // if viewing a Contact List, save sorting preference per List
+      // else save sorting preferences for Contacts page
+      return this.$route.meta?.page === 'Contacts List' && this.$route.params?.id
+        ? this.$route.params.id
+        : 'contacts'
+    },
+
+    startOrder () {
+      return this.contactsListSortPreference[this.sortKey]
     }
   },
 
@@ -1322,6 +1347,10 @@ export default {
       this.openAloAiBotContactsEnrollmentModal(mode)
     }
 
+    this.viewListeners.datatableSortsUpdated = (sorts) => {
+      this.currentDatatableSorts = sorts
+    }
+
     this.$VueEvent.listen('contact_list_import_hubspot', this.viewListeners.listenDynamicListUpdate)
     this.$VueEvent.listen('contact_list_import_salesforce', this.viewListeners.listenDynamicListUpdate)
     this.$VueEvent.listen('contact_list_import_failed', this.viewListeners.listenDynamicListUpdateFailed)
@@ -1332,6 +1361,8 @@ export default {
     // Listeners for "more" options on contact selection
     this.$VueEvent.listen('addToPowerDialer', this.viewListeners.addToPowerDialer)
     this.$VueEvent.listen('addToAloAi', this.viewListeners.addToAloAi)
+
+    this.$VueEvent.listen('datatable_sorts_updated', this.viewListeners.datatableSortsUpdated)
   },
 
   methods: {
@@ -1357,7 +1388,6 @@ export default {
       'removeContactOpen',
       'setBulkDelete',
       'setMessageComposerMode',
-      'updateContactsList',
       'updateContactsListFilter',
       'setListContactsLoaded',
       'setPreviouslySavedListId',
@@ -1395,6 +1425,7 @@ export default {
     },
 
     onSortByField (sorts) {
+      this.contactsListSortPreference[this.sortKey] = sorts
       this.$emit('sort', sorts)
     },
 
@@ -1604,45 +1635,12 @@ export default {
           .put('/api/v2/contacts-list/' + this.selectedList.id, params)
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
-            this.updateContactsList(res.data.data)
             this.setCurrentListFilters(currentFilters)
             this.initialListFilters = currentFilters
             this.setPreviousListFilters(currentFilters)
             this.updateFilterHasChanges()
             this.isUpdatingList = false
             this.$generalNotification('Changes to contact list has been saved.')
-
-            if (this.listItems[this.selectedList.id] && this.listItems[this.selectedList.id].total) {
-              this.pinnedCountLoaded({
-                id: this.selectedList.id,
-                count: this.listItems[this.selectedList.id].total
-              })
-
-              return
-            }
-
-            if (this.list.type === this.ContactListTypes.DYNAMIC) {
-              this.setDataCount({
-                filter_groups: this.currentListFilters
-              }, null, true)
-              return
-            }
-
-            this.setDataCount({
-              filter_groups: [
-                {
-                  filters: {
-                    contact_lists: [
-                      {
-                        operator: OPERATORS.IS_ANY_OF,
-                        value: [this.list.id]
-                      }
-                    ]
-                  },
-                  is_conjunction: true
-                }
-              ]
-            }, null, true)
           })
           .catch((_err) => {
             console.log(_err)
@@ -1712,7 +1710,16 @@ export default {
     },
 
     onAddContactsToList () {
-      this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
+      // if sort was updated in datatable, use the updated sort
+      let query
+      if (this.currentDatatableSorts) {
+        query = {
+          orderBy: this.currentDatatableSorts.orderBy,
+          order: this.currentDatatableSorts.order
+        }
+      }
+
+      this.$router.push({ path: `/contacts/list/${this.$route.params.id}/add`, query: query })
     },
 
     discardList () {
@@ -2128,6 +2135,7 @@ export default {
     this.$VueEvent.stop('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
     this.$VueEvent.stop('addToPowerDialer', this.viewListeners.addToPowerDialer)
     this.$VueEvent.stop('addToAloAi', this.viewListeners.addToAloAi)
+    this.$VueEvent.stop('datatable_sorts_updated', this.viewListeners.datatableSortsUpdated)
   }
 }
 </script>

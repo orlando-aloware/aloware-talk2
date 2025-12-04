@@ -2,7 +2,7 @@
   <span class="cursor-pointer"
         data-testid="comm-whisper-button-whisper-span"
         :id="`action-whisper-${_uid}`"
-        v-if="userCanBargeAndWhisper(communication)"
+        v-if="canBargeAndWhisper(communication)"
         @click="dialog">
     <ear-icon :height="iconHeight"
               :width="iconWidth"/>
@@ -83,6 +83,9 @@ export default {
     },
 
     whisper () {
+      // Set flag to indicate this is a whisper call
+      this.$store.dispatch('setDialerIsBargeOrWhisperCall', true)
+
       this.$VueEvent.fire('make_new_call', {
         phone_number: `whisper:${this.communication.id}`
       })

@@ -4,7 +4,6 @@
     "env_production": ".env.prod",
     "env_staging": ".env.staging",
     "env_dev1": ".env.dev1",
-    "env_dev2": ".env.dev2",
     "common_root_object": "none",
     "create_env_files": false,
     "add_env_to_gitignore": true

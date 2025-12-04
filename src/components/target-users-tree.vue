@@ -19,7 +19,6 @@
           :nodes="generateTargetUsersTree"
           node-key="label"
           selected-color="primary"
-          :expanded="[]"
           data-testid="target-users-tree">
         </q-tree>
       </template>
@@ -92,14 +91,14 @@ export default {
         return []
       }
 
-      if (!this.communication.target_users) {
+      if (!this.communication.target_users_data) {
         return []
       }
 
       const data = []
       const layerNumber = { data: 0 }
       const users = { user: null }
-      for (users.user of this.communication.target_users) {
+      for (users.user of this.communication.target_users_data) {
         layerNumber.data++
         const entry = {
           id: layerNumber.data,
@@ -148,7 +147,7 @@ export default {
   methods: {
     generateAttemptingUsersTree (attemptingUsers) {
       if (!attemptingUsers) {
-        return
+        return []
       }
 
       const data = []
@@ -164,7 +163,6 @@ export default {
           label: this.getUserName(user.data)
         })
       }
-
       // return the tree
       return data
     }

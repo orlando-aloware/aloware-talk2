@@ -24,9 +24,9 @@
 <script>
 import Contact from 'pages/contacts/Contact'
 import TeamInboxSide from 'components/teaminbox/teaminbox-side'
-import { aclMixin, userMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
+import { aclMixin, userMixin, teamInboxPropsMixin, TeamInboxMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { TEAMINBOXES_MENU_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { mapFields } from 'vuex-map-fields'
 import { debounce } from 'lodash'
 import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
@@ -38,7 +38,8 @@ export default {
   mixins: [
     userMixin,
     aclMixin,
-    teamInboxPropsMixin
+    teamInboxPropsMixin,
+    TeamInboxMixin
   ],
 
   components: {
@@ -111,33 +112,6 @@ export default {
   },
 
   mounted () {
-    // block direct access from non demo companies
-    if (!this.hasCompanyTeamInboxEnabled) {
-      if (this.$store.state.auth.is_focused_power_dialer) {
-        this.$router.replace(
-          this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
-        )
-      } else {
-        const { id: contactId, communicationId } = this.$route.params
-
-        if (contactId) {
-          const contactRoute = !communicationId
-            ? `/contacts/${contactId}`
-            : `/contacts/${contactId}/communications/${communicationId}`
-
-          this.$router.replace(contactRoute)
-          return
-        }
-
-        this.$router.replace({ name: 'Inbox' })
-      }
-    }
-
-    if (this.isAllInboxesRoute && !this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)) {
-      this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
-      return
-    }
-
     this.resizeHandler()
   },
 
@@ -184,13 +158,6 @@ export default {
   },
 
   watch: {
-    hasCompanyTeamInboxEnabled (enabled) {
-      // Handle live updates when team inbox is disabled
-      if (!enabled) {
-        this.$router.replace({ name: 'Inbox' })
-      }
-    },
-
     '$q.screen.width' () {
       this.resizeHandler()
     },

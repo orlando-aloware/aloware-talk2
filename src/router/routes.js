@@ -1,7 +1,6 @@
 const MainLayout = () => import('layouts/MainLayout.vue')
 const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
-const Inbox = () => import('pages/Inbox.vue')
 const TeamInbox = () => import('pages/TeamInbox.vue')
 const CommunicationsView = () => import('src/pages/CommunicationsView.vue')
 const Contact = () => import('src/pages/contacts/Contact.vue')
@@ -122,80 +121,6 @@ const routes = [
             component: Contact,
             meta: {
               title: TEAMINBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          }
-        ]
-      },
-      {
-        path: '',
-        name: 'Inbox',
-        component: Inbox,
-        meta: {
-          title: INBOXES_MENU_TITLE,
-          isInbox: true
-        },
-        children: [
-          {
-            path: 'channels/:channel/:status/contacts/:id',
-            name: 'Inbox Contact Task',
-            component: Contact,
-            meta: {
-              title: INBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          },
-          {
-            path: 'channels/:channel/:status',
-            name: 'Inbox Channel Task Status',
-            component: Contact,
-            meta: {
-              title: INBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          },
-          {
-            path: 'channels/:channel/contacts/:id/communications/:communicationId',
-            name: 'Inbox Contact',
-            component: Contact,
-            meta: {
-              title: INBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          },
-          {
-            path: 'channels/:channel/:status/contacts/:id/communications/:communicationId',
-            name: 'Inbox Contact Communication',
-            component: Contact,
-            meta: {
-              title: INBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          },
-          {
-            path: 'channels/:channel',
-            name: 'Inbox Channel',
-            component: Inbox,
-            meta: {
-              title: INBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          },
-          {
-            path: 'channels/view/:viewId/:status',
-            name: 'Inbox View',
-            component: Inbox,
-            meta: {
-              title: INBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          },
-          {
-            path: 'channels/view/:viewId/:status/contacts/:id',
-            name: 'Inbox View Contact Task',
-            component: Contact,
-            meta: {
-              title: INBOXES_MENU_TITLE,
               isInbox: true
             }
           }

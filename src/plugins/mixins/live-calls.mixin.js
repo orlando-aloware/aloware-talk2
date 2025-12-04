@@ -1,11 +1,12 @@
 import _, { isEmpty } from 'lodash'
-import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { agentMixin, notificationMixin, userMixin } from 'src/plugins/mixins/index'
+import talk2Api from '../api/api'
+
 export default {
   mixins: [
     agentMixin,
@@ -142,6 +143,10 @@ export default {
         return false
       }
 
+      if ('is_fishing_mode' in this.communication && typeof this.communication.is_fishing_mode === 'boolean') {
+        return this.communication.is_fishing_mode
+      }
+
       const ringGroup = this.getRingGroup(this.communication.ring_group_id)
 
       return ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
@@ -221,11 +226,41 @@ export default {
         return false
       }
 
-      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
+      // first check if the communication object has `is_call_waiting` property
+      if ('is_call_waiting' in this.communication && typeof this.communication.is_call_waiting === 'boolean') {
+        return this.communication.is_call_waiting
+      }
+
+      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      if (!ringGroup) {
+        return false
+      }
+
+      return this.isPersonalInbox && ringGroup.should_queue && ringGroup.fishing_mode
     },
 
     isPersonalInbox () {
-      return this.communication.campaign?.call_waiting_ring_group_id && this.hasCompanyTeamInboxEnabled
+      return this.getRingGroup(this.communication.ring_group_id)?.is_personal_inbox
+    },
+
+    isFishingMode () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
+      // first check if the communication object has `is_fishing_mode` property
+      if ('is_fishing_mode' in this.communication && typeof this.communication.is_fishing_mode === 'boolean') {
+        return this.communication.is_fishing_mode
+      }
+
+      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      if (!ringGroup) {
+        return false
+      }
+
+      return ringGroup.should_queue && ringGroup.fishing_mode
     }
   },
 
@@ -243,6 +278,7 @@ export default {
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
     },
+
     onAcceptCall (e) {
       if ((this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') || this.isAgentOnCall) {
         this.showIncomingCallMenu = true
@@ -274,6 +310,10 @@ export default {
             this.$VueEvent.fire('endWrapUp')
           }
 
+          if (this.isPersonalInbox) {
+            this.closeCallNotifications('callFishing', this.communication.id, true)
+          }
+
           this.$VueEvent.fire('answerCallFishing', data)
           this.setShowPhone(true)
           this.isAnsweringCall = false
@@ -292,13 +332,21 @@ export default {
       this.setShowPhone(true)
       e.stopImmediatePropagation()
     },
+
     onRejectCall (e) {
       this.isRejecting = true
+
       if (this.isCallFishingMode && this.isCallFishing) {
         this.removeFromCallFishingQueue(this.communication.id)
         this.isRejecting = false
         this.processRemoveFromNotification(this.communication)
+
+        if (this.isPersonalInbox) {
+          this.closeCallNotifications('callFishing', this.communication.id, true)
+        }
+
         e.stopImmediatePropagation()
+        this.ignoreFishingIfPersonalInbox()
         return
       }
 
@@ -314,10 +362,12 @@ export default {
       this.processRemoveFromNotification(this.communication)
       e.stopImmediatePropagation()
     },
+
     onHangUpCall (e) {
       this.$VueEvent.fire('hangupCall')
       e.stopImmediatePropagation()
     },
+
     onUnparkCall (e) {
       if ((this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') || this.isAgentOnCall) {
         this.showParkedCallMenu = true
@@ -334,6 +384,19 @@ export default {
       e.stopImmediatePropagation()
     },
 
+    async ignoreFishingIfPersonalInbox () {
+      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      if (ringGroup?.is_personal_inbox) {
+        try {
+          // Force terminate for personal inboxes, since there is no other agents to take the call
+          await talk2Api.V1.communication.agentForceTerminate(this.communication.id, { reject: true })
+        } catch (error) {
+          console.error('Failed to force terminate communication on personal inbox:', error)
+        }
+      }
+    },
+
     onParkCurrentCallAndConnect () {
       this.showParkedCallMenu = false
 
@@ -343,6 +406,7 @@ export default {
 
       this.answerCommunication(true, true)
     },
+
     onHangupCurrentCallAndConnect () {
       this.showParkedCallMenu = false
 
@@ -352,14 +416,17 @@ export default {
 
       this.answerCommunication(false, true)
     },
+
     onParkCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
       this.answerCommunication(true, false)
     },
+
     onHangUpCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
       this.answerCommunication(false, true)
     },
+
     async answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
@@ -376,6 +443,10 @@ export default {
       }
 
       await this.fetchCurrentCommunicationIfNeeded(data)
+
+      if (this.isPersonalInbox) {
+        this.closeCallNotifications('callFishing', this.communication.id, true)
+      }
 
       this.$VueEvent.fire('answerCallFishing', data)
       this.setShowPhone(true)

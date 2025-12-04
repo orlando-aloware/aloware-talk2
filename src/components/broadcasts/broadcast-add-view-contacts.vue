@@ -50,7 +50,8 @@
                     hide-bottom-space
                     :placeholder="!source.integration.name ? 'Select an integration' : ''"
                     :options="filteredEnabledIntegrations"
-                    v-model="source.integration.name">
+                    :value="source.integration?.name"
+                    @input="onIntegrationNameInput">
           </q-select>
         </div>
 
@@ -63,6 +64,11 @@
                                    v-if="source.integration.name"
                                    @change="onIntegrationListChanged"/>
       </template>
+
+      <div v-if="!contactsCountValid && hasSelectedContactList"
+           class="text-negative text-caption q-mt-sm">
+        This list contains no contacts. Please select a valid list with contacts to proceed
+      </div>
     </div>
   </div>
 </template>
@@ -99,6 +105,11 @@ export default {
       type: Object,
       required: false,
       default: () => ({})
+    },
+
+    contactsCountValid: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -106,12 +117,16 @@ export default {
     isValid () {
       switch (this.optionSelected) {
         case 'list':
-          return !!this.source.list.id || !isEmpty(this.source.filters)
+          return (!!this.source.list.id || !isEmpty(this.source.filters)) && this.contactsCountValid
         case 'integration':
-          return !isEmpty(this.source.integration?.list)
+          return !isEmpty(this.source.integration?.list) && this.contactsCountValid
         default:
           return false
       }
+    },
+
+    hasSelectedContactList () {
+      return this.optionSelected && (this.source.integration?.list || this.source.list?.id || this.source.filters)
     },
 
     options () {
@@ -162,7 +177,7 @@ export default {
       this.optionSelected = 'integration'
     }
 
-    this.source = this.defaultSource
+    this.source = { ...this.source, ...this.defaultSource }
   },
 
   methods: {
@@ -235,6 +250,10 @@ export default {
         list: {},
         integration: {}
       }
+    },
+
+    onIntegrationNameInput (value) {
+      this.$set(this.source.integration, 'name', value)
     }
   },
 
@@ -246,7 +265,10 @@ export default {
     source: {
       deep: true,
       handler (value) {
-        this.$emit('source-updated', value)
+        // Only emit if we have meaningful data
+        if (this.source.integration?.name || this.source.list?.id || this.source.list?.filters) {
+          this.$emit('source-updated', value)
+        }
       }
     }
   }

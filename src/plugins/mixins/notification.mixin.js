@@ -84,7 +84,7 @@ export default {
       }
 
       // console.log('[Notif 1] Communication when event closeCallNotifications : ', communication)
-      this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+      this.closeCallNotifications(this.getNotificationType(communication), communication.id)
     },
 
     closeCallNotifications (type = 'incomingCall', communicationId = null, forceClose = false) {
@@ -124,7 +124,10 @@ export default {
       const callFishingQueue = { data: _.get(this.notifications, 'callFishing.queue', null) }
       callFishingQueue.data = callFishingQueue.data && callFishingQueue.data.constructor === Array && callFishingQueue.data.length
 
-      if (type === 'callFishing' && this.currentCompany.fishing_mode_notification_sound) {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.ringGroupId)
+      const isPersonalInbox = ringGroup?.is_personal_inbox
+
+      if (type === 'callFishing' && (this.currentCompany.fishing_mode_notification_sound || isPersonalInbox || forceClose)) {
         this.stopAudio()
       }
 
@@ -175,8 +178,13 @@ export default {
       }
     },
 
-    getNotificationType (ringGroupId) {
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === ringGroupId)
+    getNotificationType (communication) {
+      if ('is_fishing_mode' in communication && typeof communication.is_fishing_mode === 'boolean') {
+        return communication.is_fishing_mode ? 'callFishing' : 'incomingCall'
+      }
+
+      // fallback to ring group
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
       return ringGroup &&
       ringGroup.should_queue &&
       ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
@@ -298,8 +306,7 @@ export default {
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
           if (ringGroup &&
-            ringGroup.should_queue &&
-            ringGroup.fishing_mode &&
+            communication.is_fishing_mode &&
             !ringGroup.experimental_fishing_mode_repeat_call_routing &&
             ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT &&
             this.user &&
@@ -309,13 +316,12 @@ export default {
               'ringGroup': ringGroup,
               'user.profile.id': this.user?.profile?.id,
               'communication.id': communication?.id,
-              'communication.contact.user_id': communication?.contact?.user_id,
-              'communication.is_call_waiting': communication?.is_call_waiting
+              'communication.contact.user_id': communication?.contact?.user_id
             })
             break
           }
 
-          const callType = (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) || communication.is_call_waiting ? 'callFishing' : 'incomingCall'
+          const callType = communication.is_fishing_mode ? 'callFishing' : 'incomingCall'
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupId = communication.ring_group_id
           const ringGroupName = _.get(communication, 'ring_group.name', null)

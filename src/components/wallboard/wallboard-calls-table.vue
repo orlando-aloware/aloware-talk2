@@ -137,7 +137,10 @@
                           {{ call.contact.name | ucwords }}
                         </router-link>
                       </div>
-                      <contact-integrations-link-icons :contact='call.contact' />
+                      <contact-integrations-link-icons
+                        v-if="contactHubspotLink"
+                        :hubspot-link="contactHubspotLink"
+                      />
                     </div>
 
                     <!-- lead number -->
@@ -204,39 +207,39 @@
               <!-- attempting -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'attempting_users'">
-                <span v-if="call.attempting_users && call.attempting_users.length > 0">
+                <span v-if="call.attempting_users_data && call.attempting_users_data.length > 0">
                   <ul class="list list-unstyled inset mb-0">
                     <div v-if="!showMoreList.includes(call.id)">
                       <li class="pb-1"
-                          :key="attemptingUser"
+                          :key="attemptingUser.id"
                           v-for="attemptingUser in getAttemptingUsers(call, 3)">
                         <a target="_blank"
                            :href="getUserActivityURL(attemptingUser)"
                            v-if="hasRole('Company Admin')">
-                          <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
-                                :title="getUserName(getUser(attemptingUser))">
-                            <user-display :user-id="attemptingUser" />
+                          <span :class="getAttemptingClass(attemptingUser.id, call.disposition_status2, call.user_id)"
+                                :title="getUserName(attemptingUser)">
+                            <user-display :user="attemptingUser" />
                           </span>
                         </a>
                         <span v-else>
-                          <user-display :user-id="attemptingUser" />
+                          <user-display :user="attemptingUser" />
                         </span>
                       </li>
                     </div>
                     <div v-else>
                       <li class="pb-1"
-                          :key="attemptingUser"
+                          :key="attemptingUser.id"
                           v-for="attemptingUser in getAttemptingUsers(call)">
                         <a target="_blank"
                            :href="getUserActivityURL(attemptingUser)"
                            v-if="hasRole('Company Admin')">
-                          <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
-                                :title="getUserName(getUser(attemptingUser))">
-                            <user-display :user-id="attemptingUser" />
+                          <span :class="getAttemptingClass(attemptingUser.id, call.disposition_status2, call.user_id)"
+                                :title="getUserName(attemptingUser)">
+                            <user-display :user="attemptingUser" />
                           </span>
                         </a>
                         <span v-else>
-                          <user-display :user-id="attemptingUser" />
+                          <user-display :user="attemptingUser" />
                         </span>
                       </li>
                     </div>
@@ -270,10 +273,10 @@
                   <a target="_blank"
                      :href="getUserURL(call.user_id)"
                      v-if="hasRole('Company Admin')">
-                    <user-display :user-id="call.user_id" />
+                    <user-display :user-id="call.user_id" :user="call.user"/>
                   </a>
                   <span v-else>
-                    <user-display :user-id="call.user_id" />
+                    <user-display :user-id="call.user_id" :user="call.user"/>
                   </span>
                 </div>
                 <div v-else>
@@ -364,7 +367,10 @@
                        v-if="call.contact">
                     <span>
                       {{ call.contact.name | capitalize }}
-                      <contact-integrations-link-icons :contact='call.contact' />
+                      <contact-integrations-link-icons
+                        v-if="contactHubspotLink"
+                        :hubspot-link="contactHubspotLink"
+                      />
                     </span>
 
                     <span>
@@ -557,6 +563,10 @@ export default {
 
     lastPage () {
       return Math.ceil(this.calls.length / this.pagination.perPage)
+    },
+
+    contactHubspotLink () {
+      return this.call?.contact?.integration_data?.hubspot?.link || null
     }
   },
 
@@ -652,6 +662,12 @@ export default {
       const users = size
         ? communication.attempting_users.slice(0, size)
         : communication.attempting_users
+
+      if (communication.attempting_users_data) {
+        return size
+          ? communication.attempting_users_data.slice(0, size)
+          : communication.attempting_users_data
+      }
 
       return users.filter(user => this.getUser(user)?.id)
     }

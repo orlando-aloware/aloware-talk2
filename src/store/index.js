@@ -113,7 +113,8 @@ export default function (/* { ssrContext } */) {
           code: null
         },
         aiAgentWhisper: false,
-        aiAgentTakeover: false
+        aiAgentTakeover: false,
+        isBargeOrWhisperCall: false
       },
       warnings: [],
       shouldIntroduce: false,
@@ -326,7 +327,8 @@ export default function (/* { ssrContext } */) {
       showAccountSelector: false,
       showAccountSelectorFullscreen: false,
       showAccountSelectorFirstLoad: false,
-      accesses: []
+      accesses: [],
+      attributeDictionaries: []
     },
 
     getters: {
@@ -593,14 +595,6 @@ export default function (/* { ssrContext } */) {
       resetVuex ({ commit }, value) {
         if (['contacts', 'all'].some(item => value.includes(item)) || (value.length === 1 && value.includes('non-cache'))) {
           commit('contacts/RESET_VUEX', value, { root: true })
-
-          if (!['non-cache', 'all'].some(item => value.includes(item))) {
-            return
-          }
-        }
-
-        if (['inbox', 'all'].some(item => value.includes(item)) || (value.length === 1 && value.includes('non-cache'))) {
-          commit('inbox/RESET_VUEX', value, { root: true })
 
           if (!['non-cache', 'all'].some(item => value.includes(item))) {
             return
@@ -1000,6 +994,10 @@ export default function (/* { ssrContext } */) {
 
       setDialerAiAgentTakeover ({ commit }, value) {
         commit('SET_DIALER_AI_AGENT_TAKEOVER', value)
+      },
+
+      setDialerIsBargeOrWhisperCall ({ commit }, value) {
+        commit('SET_DIALER_IS_BARGE_OR_WHISPER_CALL', value)
       }
     },
 
@@ -1871,6 +1869,10 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_AI_AGENT_TAKEOVER (state, value) {
         state.dialer.aiAgentTakeover = value
+      },
+
+      SET_DIALER_IS_BARGE_OR_WHISPER_CALL (state, value) {
+        state.dialer.isBargeOrWhisperCall = value
       },
 
       updateField

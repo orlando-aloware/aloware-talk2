@@ -6,7 +6,8 @@
           <div class="font-weight-bold flex-grow-0 session-call-status lex-0 ml-2"
                style="max-width: 176px">
             <q-chip color="grey-50"
-                    class="p-0">
+                    class="p-0"
+                    data-testid="session-status-chip-minimized">
               <div :class="`text-15 text-lowercase text-capitalize px-2`"
                    v-html="statusDisplayText">
               </div>
@@ -14,7 +15,7 @@
           </div>
 
           <div class="d-flex p-0 flex-grow-1">
-            <div class="text-18 font-weight-bold">
+            <div class="text-18 font-weight-bold" data-testid="contact-full-name-minimized">
               {{ fullName }}
             </div>
           </div>
@@ -27,6 +28,7 @@
                  outline
                  no-caps
                  color="grey-4"
+                 data-testid="dispositions-button"
                  @click="onDispositionsClick"
           >
             <div class="text-13 text-black">
@@ -45,6 +47,7 @@
                  :color="pauseButtonColor"
                  :disabled="toggleEnd"
                  :class="pauseButtonClass"
+                 data-testid="pause-session-button"
                  @click="onTogglePause">
 
             <pause-icon class="mr-2"
@@ -63,6 +66,7 @@
                  :disable="isEndSessionDisabled"
                  :color="endSessionButtonColor"
                  :class="endSessionButtonClass"
+                 data-testid="end-session-button"
                  @click="onToggleEnd">
 
             <end-call-icon class="mr-2"
@@ -80,6 +84,7 @@
                  no-wrap
                  no-caps
                  :disabled="isRecordDisabled"
+                 data-testid="toggle-recording-button"
                  @click="onToggleRecording">
 
             <stop-icon class="mr-2"
@@ -104,6 +109,7 @@
                  outline
                  :color="isHoldDisabled ? 'grey-8' : 'grey-4'"
                  :disabled="isHoldDisabled"
+                 data-testid="toggle-hold-button"
                  @click="onToggleHold">
             <un-hold-icon class="mr-1"
                         color="#F2997A"
@@ -123,6 +129,7 @@
                  no-caps
                  color="red-7"
                  v-if="statusCallConnected"
+                 data-testid="hangup-call-button"
                  @click="hangupCall">
             <hangup-icon class="mr-1"
                         color="white"/>
@@ -138,6 +145,7 @@
                  :class="canNextTask ? 'border border-danger' : ''"
                  :color="canNextTask ? 'grey-4' : 'grey-8'"
                  :disabled="!canNextTask"
+                 data-testid="next-task-button"
                  @click="onNextTask(false, true)">
             <play-bar-icon class="mr-1"
                          :color="canNextTask ? '#FF3B3B' : '#62666E'"
@@ -158,7 +166,8 @@
           <div class="font-weight-bold flex-grow-1 session-call-status"
                style="max-width: 176px;">
             <q-chip color="grey-50"
-                    class="p-0">
+                    class="p-0"
+                    data-testid="session-status-chip">
               <div :class="`text-15 text-lowercase text-capitalize px-2`"
                    v-html="statusDisplayText">
               </div>
@@ -168,6 +177,7 @@
                  size="sm"
                  color="success"
                  v-if="showStartDialingButton"
+                 data-testid="start-dialing-button"
                  @click="startDialing">
             <q-tooltip content-class="bg-grey-light11"
                        anchor="bottom middle"
@@ -193,6 +203,7 @@
                  outline
                  :color="!isHoldDisabled ? 'grey-4' : 'grey-8'"
                  :disabled="isHoldDisabled"
+                 data-testid="toggle-hold-button-expanded"
                  @click="onToggleHold">
             <un-hold-icon class="mr-1"
                         color="#F2997A"
@@ -214,7 +225,8 @@
             left
             :auto-close="true"
             :disable="redialDropdownDisabled"
-            :color="!redialDropdownDisabled ? 'blue-7' : 'grey-8'">
+            :color="!redialDropdownDisabled ? 'blue-7' : 'grey-8'"
+            data-testid="redial-dropdown">
             <template v-slot:label>
               <refresh-icon class="mr-2"
                            color="white"/>
@@ -237,6 +249,7 @@
                       v-close-popup
                       :disable="option.value === 'now' ? !canRedialNow : !canRedialLater"
                       :color="canRedialNow || canRedialLater  ? 'blue-7' : 'grey-8'"
+                      :data-testid="`redial-${option.value}-option`"
                       @click="onRedial(option.redial)">
                 <q-item-section>
                   <q-item-label class="ml-2">
@@ -260,6 +273,7 @@
                  no-caps
                  color="red-7"
                  v-if="statusCallConnected"
+                 data-testid="hangup-call-button-expanded"
                  @click="hangupCall">
             <hangup-icon class="mr-1"
                         color="white"/>
@@ -275,6 +289,7 @@
                  :class="canNextTask ? 'border border-danger' : ''"
                  :color="canNextTask ? 'grey-4' : 'grey-8'"
                  :disabled="!canNextTask"
+                 data-testid="next-task-button-expanded"
                  @click="onNextTask(false, true)">
             <q-tooltip content-class="bg-grey-light11"
                        anchor="bottom middle"
@@ -292,13 +307,15 @@
                       text="..."
                       right size="sm"
                       variant="white"
-                      no-caret>
+                      no-caret
+                      data-testid="contacts-options-dropdown">
             <template #button-content>
               <i class="fa fa-ellipsis-h"/>
             </template>
             <b-dropdown-item v-if="hasPermissionTo('toggle block contact') && !(taskToCall?.is_dnc)"
                              href="#"
                              :disabled="isProcessingDNC"
+                             data-testid="dnc-contact-option"
                              @click="dncContact">
               <q-spinner-bars v-if="isProcessingDNC"
                               class="mr-1"
@@ -308,18 +325,21 @@
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              :disabled="!statusCallConnected"
+                             data-testid="dial-pad-option"
                              @click="openDialPad">
               <dial-pad-icon/>
               Dial Pad
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              :disabled="!statusCallConnected"
+                             data-testid="add-contact-option"
                              @click="openAdd">
               <add-user-icon color="#62666E"/>
               Add
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              :disabled="!statusCallConnected"
+                             data-testid="transfer-call-option"
                              @click="openTransfer">
               <transfer-icon color="#62666E"/>
               Transfer
@@ -330,8 +350,8 @@
 
       <div class="d-flex align-items-center p-0">
         <div class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
-          {{ fullName }}
-          <span class="text-15 text-subtitle1">
+          <span data-testid="contact-full-name">{{ fullName }}</span>
+          <span class="text-15 text-subtitle1" data-testid="contact-phone-number">
             {{ phoneNumber }}
           </span>
         </div>
@@ -339,7 +359,8 @@
 
       <div class="d-flex align-items-center p-0 justify-content-between flex-wrap px-3">
         <div class="flex-grow-1 text-14 text-subtitle1 text-capitalize py-0 m-1"
-             v-if="timezone">
+             v-if="timezone"
+             data-testid="contact-timezone">
           <drop-icon width="18px"
                     height="18px"
                     class="mr-0 py-0"
@@ -354,7 +375,14 @@
                outline
                no-caps
                :disabled="isRecordDisabled"
+               data-testid="toggle-recording-button-expanded"
                @click="onToggleRecording">
+          <q-tooltip content-class="bg-grey-light11 text-nowrap"
+                     anchor="bottom middle"
+                     self="center middle"
+                     v-if="isRecordDisabled && recordDisabledTooltip">
+            {{ recordDisabledTooltip }}
+          </q-tooltip>
 
           <stop-icon class="mr-2"
                     color="#62666E"
@@ -373,7 +401,7 @@
       <div class="d-flex align-items-center p-0 pt-2 pb-2 justify-content-between flex-wrap px-3">
         <div class="flex-grow-1 text-16 text-capitalize text-weight-normal m-1">
 
-          <div id="session-list-name">
+          <div id="session-list-name" data-testid="session-list-name">
             {{ selectedListName }}
           </div>
 
@@ -387,7 +415,7 @@
           </b-popover>
 
           <span class="text-subtitle2 text-grey"/>
-          <div class="text-10 pt-1">
+          <div class="text-10 pt-1" data-testid="session-line-name">
             <headphone-icon width="12px"
                            height="12px"
                            class="mr-0 py-0"
@@ -407,6 +435,7 @@
                  :color="pauseButtonColor"
                  :disabled="toggleEnd"
                  :class="pauseButtonClass"
+                 data-testid="pause-session-button-bottom"
                  @click="onTogglePause">
 
             <pause-icon class="mr-2"
@@ -425,6 +454,7 @@
                  :disable="isEndSessionDisabled"
                  :color="endSessionButtonColor"
                  :class="endSessionButtonClass"
+                 data-testid="end-session-button-bottom"
                  @click="onToggleEnd">
             <q-tooltip content-class="bg-grey-light11"
                        anchor="bottom middle"
@@ -503,6 +533,15 @@ import PlayBarIcon from 'components/icons/play-bar-icon.vue'
 
 const PD_PAUSED_PROP_NAME = 'is_power_dialer_paused'
 
+const RECORD_DISABLED_REASONS = {
+  ACCOUNT_FORCED_DISABLED: 'Recording is disabled at account level',
+  ACCOUNT_FORCED_ALWAYS_RECORD: 'Recording is set to always record at account level',
+  USER_LEVEL_DISABLED: 'Recording is disabled at user level',
+  CALL_NOT_CONNECTED: 'Call is not in progress',
+  BUSY: 'Processing',
+  LINE_LEVEL: 'Recording following line settings'
+}
+
 export default {
   name: 'SessionCallStatus',
 
@@ -553,7 +592,8 @@ export default {
       loadingHold: false,
       loadingUnhold: false,
       isRedialClicked: false,
-      isProcessingDNC: false
+      isProcessingDNC: false,
+      loadingToggleRecordingStatus: false
     }
   },
 
@@ -698,10 +738,49 @@ export default {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
     },
 
+    recordDisabledReason () {
+      if (this.loadingToggleRecordingStatus) {
+        return RECORD_DISABLED_REASONS.BUSY
+      }
+
+      // disable if call not connected or is completed
+      if (!this.statusCallConnected || this.isCallCompleted) {
+        return RECORD_DISABLED_REASONS.CALL_NOT_CONNECTED
+      }
+
+      // if following company settings
+      if ((this.currentCompany?.force_outbound_recording || this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_DEFAULT)) {
+        // force disabled at account level
+        if (this.currentCompany?.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER) {
+          return RECORD_DISABLED_REASONS.ACCOUNT_FORCED_DISABLED
+        }
+
+        // force enabled at account level
+        if (this.currentCompany?.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS) {
+          return RECORD_DISABLED_REASONS.ACCOUNT_FORCED_ALWAYS_RECORD
+        }
+      }
+
+      // disabled at user level
+      if (this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER) {
+        return RECORD_DISABLED_REASONS.USER_LEVEL_DISABLED
+      }
+
+      // enabled at user level
+      if (this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS) {
+        return null
+      }
+
+      // following line level settings
+      return RECORD_DISABLED_REASONS.LINE_LEVEL
+    },
+
     isRecordDisabled () {
-      return this.statusCallConnected ||
-        this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER ||
-        (this.profile.company.force_outbound_recording && this.profile.company.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER)
+      return this.recordDisabledReason !== null
+    },
+
+    recordDisabledTooltip () {
+      return this.recordDisabledReason || ''
     },
 
     isCallCompleted () {
@@ -763,11 +842,16 @@ export default {
     },
 
     allTasksAreSkipped () {
-      if (this.powerDialerTasks.in_queue.length > 0) {
-        return this.skippedTasks.length === this.powerDialerTasks.in_queue.length
+      // If there are no tasks in queue, none are skipped
+      if (this.powerDialerTasks.in_queue.length === 0) {
+        return false
       }
 
-      return false
+      // Check if ALL tasks currently in the queue have been marked as skipped
+      // by verifying that each task's contact_list_item_id exists in the skippedTasks array
+      return this.powerDialerTasks.in_queue.every(task => {
+        return this.isTaskSkipped(task.contact_list_item_id)
+      })
     },
 
     canNextTask () {
@@ -1351,7 +1435,11 @@ export default {
     },
 
     onToggleRecording () {
+      this.loadingToggleRecordingStatus = true
       this.$VueEvent.fire('toggleRecordingStatus')
+      setTimeout(() => {
+        this.loadingToggleRecordingStatus = false
+      }, 1000)
     },
 
     onTogglePause () {
@@ -1464,6 +1552,16 @@ export default {
           }
           break
         case 'WRAP_UP':
+          // Check if this is a barge/whisper call
+          const isBargeOrWhisperCall = this.dialer?.isBargeOrWhisperCall
+
+          // Skip force disposal for barge/whisper calls
+          if (isBargeOrWhisperCall) {
+            this.wrapUp = false
+            this.$VueEvent.fire('endWrapUp')
+            return
+          }
+
           // if task is manually skipped through the Next button (or no wrap up)
           // end the wrap up
           if (this.skipWrapUp || (this.redialRequired && this.wrapUpSeconds === -1 && !this.isForcedToDisposeAndNotDisposed)) {

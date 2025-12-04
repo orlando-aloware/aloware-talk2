@@ -258,7 +258,10 @@ export default {
       event.preventDefault()
       // If the contact is already enrolled, confirm we want to re-enroll
       if (this.isEnrolled(bot.id)) {
-        this.$bvModal.msgBoxConfirm('Re-enrolling this contact will count as a new enrollment and charged accordingly. Continue?', {
+        const confirmMessage = bot.type === AloAi.TYPE_VOICE
+          ? 'This will begin a new call session, billed per minute. Would you like to continue?'
+          : 'Re-enrolling this contact will count as a new enrollment and charged accordingly. Continue?'
+        this.$bvModal.msgBoxConfirm(confirmMessage, {
           title: 'Warning',
           size: 'sm',
           buttonSize: 'sm',
@@ -394,9 +397,10 @@ export default {
           return this.bots
         }
         const { data } = await talk2Api.V2.aloAiBot.getBots({
-          enabled: true
+          enabled: true,
+          compact: true
         })
-        return data?.data ?? []
+        return data
       } catch (error) {
         console.error('[fetchBots] error', error)
         return []

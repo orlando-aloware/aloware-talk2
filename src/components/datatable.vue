@@ -57,6 +57,9 @@
                 </div>
                 <span class="handle-label"
                       :class="{ 'pl-2': column.label === 'Actions' }">
+                  <q-tooltip v-if="column.tooltip">
+                    {{ column.tooltip }}
+                  </q-tooltip>
                   {{ column.label }}
                 </span>
                 <div class="sorter-container"
@@ -302,6 +305,7 @@ export default {
           newItems[index].sortable = found.sortable
           newItems[index].maxWidth = found.maxWidth
           newItems[index].minWidth = found.minWidth
+          newItems[index].tooltip = found.tooltip
         }
       }
 
@@ -376,6 +380,14 @@ export default {
       return [
         isDisabledClass
       ]
+    },
+
+    isContactsAdd () {
+      return this.$route.name === 'Contacts' && this.$route.path.includes('/add')
+    },
+
+    isPowerDialerAdd () {
+      return this.$route?.meta?.id?.includes('power-dialer-add')
     }
   },
 
@@ -533,11 +545,13 @@ export default {
        - second click: {sort: column, order: 'desc'}
        - third click: {sort: column, order: ''}
       */
-      let sorts = Object.assign({}, this.getColumnSorts(column))
+      const sorts = Object.assign({}, this.getColumnSorts(column))
 
       if (sorts.orderBy !== this.sorts.orderBy) {
-        this.sorts.order = 'asc'
+        sorts.order = 'asc'
       }
+
+      this.sorts = sorts
 
       setTimeout(() => {
         this.$emit('sort', sorts)
@@ -625,20 +639,37 @@ export default {
           button.setAttribute('data-testid', 'datatable-pagination-page-' + pageNumber)
         })
       })
+    },
+
+    isColumnInFixedColumns (columnName) {
+      return this.fixedColumns?.some(column => column.name === columnName)
+    },
+
+    onResetSorts () {
+      this.sorts = {}
+    },
+
+    assignStartingSortsWithDefaultFallback (startOrder = null) {
+      // apply a custom starting order if defined and if available in fixedColumns
+      if (startOrder && this.isColumnInFixedColumns(startOrder.orderBy)) {
+        this.sorts = this.startOrder
+        return
+      }
+
+      this.sorts.orderBy = this.defaultContactDateFilter
+      this.sorts.order = this.customSortOptions ? '' : 'desc'
     }
+  },
+
+  created () {
+    this.$VueEvent.listen('datatable-reset-sorts', this.onResetSorts)
   },
 
   mounted () {
     this.lastScrollTop = this.$refs.scrollableArea.scrollTop
     this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
 
-    // apply a custom starting order if defined
-    if (this.startOrder) {
-      this.sorts = this.startOrder
-    } else {
-      this.sorts.orderBy = this.defaultContactDateFilter
-      this.sorts.order = this.customSortOptions ? '' : 'desc'
-    }
+    this.assignStartingSortsWithDefaultFallback(this.startOrder)
 
     document.addEventListener('mouseup', this.onResizerMouseUp)
     document.addEventListener('mousemove', this.onResizeMouseMove)
@@ -654,6 +685,8 @@ export default {
 
     document.removeEventListener('mouseup', this.onResizerMouseUp)
     document.removeEventListener('mousemove', this.onResizeMouseMove)
+
+    this.$VueEvent.stop('datatable-reset-sorts', this.onResetSorts)
   },
 
   watch: {
@@ -667,7 +700,7 @@ export default {
 
     startOrder (newVal) {
       if (newVal) {
-        this.sorts = newVal
+        this.assignStartingSortsWithDefaultFallback(newVal)
       }
     },
 
@@ -675,6 +708,10 @@ export default {
       if (this.isLoading) {
         this.resetScroll()
       }
+    },
+
+    sorts: function () {
+      this.$VueEvent.fire('datatable_sorts_updated', this.sorts)
     }
   }
 }

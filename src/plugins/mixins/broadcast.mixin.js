@@ -5,6 +5,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import * as storage from 'src/plugins/helpers/storage'
 import userMixin from 'src/plugins/mixins/user.mixin'
 import { mapActions, mapState } from 'vuex'
+import { Platform } from 'quasar'
 
 export default {
   mixins: [userMixin],
@@ -140,13 +141,6 @@ export default {
           console.log('.user.in-app.communication.new_call - event.communication', event.communication)
           this.$VueEvent.fire('new_in_app_call', event.communication)
         })
-        .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {
-          this.dispatchToMemoryMonitor('.user.desktop.incoming_number.high_sms_volume', event)
-          const incomingNumber = event.incoming_number
-          const contact = event.contact
-          const direction = event.direction
-          this.$VueEvent.fire('desktop_high_sms_volume', { incomingNumber, contact, direction })
-        })
         .listen('.user.in-app.communication.answered_call', (event) => {
           this.dispatchToMemoryMonitor('.user.in-app.communication.answered_call', event)
           if (event.tags) {
@@ -215,121 +209,6 @@ export default {
           }
           this.$VueEvent.fire('new_in_app_fax', event.communication)
         })
-        .listen('.user.desktop.contact.contact_assigned', (event) => {
-          this.dispatchToMemoryMonitor('.user.desktop.contact.contact_assigned', event)
-          if (event.tags) {
-            event.contact.tags = event.tags
-            event.contact.tag_ids = event.contact.tags.map((a) => a.id)
-          }
-          if (event.user) {
-            event.contact.user = event.user
-          }
-          this.$VueEvent.fire('new_desktop_contact_assigned', event.contact)
-        })
-        .listen('.user.desktop.appointment', (event) => {
-          this.dispatchToMemoryMonitor('.user.desktop.appointment', event)
-          this.$VueEvent.fire('new_desktop_appointment', {
-            engagement: event.engagement,
-            contact: event.contact,
-            timeDiff: event.timeDiff,
-            unit: event.unit
-          })
-        })
-        .listen('.user.desktop.reminder', (event) => {
-          this.dispatchToMemoryMonitor('.user.desktop.reminder', event)
-          this.$VueEvent.fire('new_desktop_reminder', {
-            engagement: event.engagement,
-            contact: event.contact,
-            timeDiff: event.timeDiff,
-            unit: event.unit
-          })
-        })
-        .listen('.user.desktop.communication.new_call', (event) => {
-          this.dispatchToMemoryMonitor('.user.desktop.communication.new_call', event)
-          if (event.tags) {
-            event.communication.tags = event.tags
-            event.communication.tag_ids = event.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            event.communication.contact = event.contact
-          }
-          if (event.contact_tags) {
-            event.communication.contact.tags = event.contact_tags
-          }
-          if (event.owner) {
-            event.communication.owner = event.owner
-          }
-          console.log('.user.desktop.communication.new_call - event.communication', event.communication)
-          this.$VueEvent.fire('new_desktop_call', event.communication)
-        })
-        .listen('.user.desktop.communication.answered_call', (event) => {
-          this.dispatchToMemoryMonitor('.user.desktop.communication.answered_call', event)
-          if (event.tags) {
-            event.communication.tags = event.tags
-            event.communication.tag_ids = event.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            event.communication.contact = event.contact
-          }
-          if (event.contact_tags) {
-            event.communication.contact.tags = event.contact_tags
-          }
-          if (event.owner) {
-            event.communication.owner = event.owner
-          }
-          this.$VueEvent.fire('new_answered_call', event.communication)
-        })
-        .listen('.user.desktop.communication.new_sms', (event) => {
-          this.dispatchToMemoryMonitor('.user.desktop.communication.new_sms', event)
-          if (event.tags) {
-            event.communication.tags = event.tags
-            event.communication.tag_ids = event.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            event.communication.contact = event.contact
-          }
-          if (event.contact_tags) {
-            event.communication.contact.tags = event.contact_tags
-          }
-          if (event.owner) {
-            event.communication.owner = event.owner
-          }
-          this.$VueEvent.fire('new_desktop_sms', event.communication)
-        })
-        .listen('.user.desktop.communication.new_voicemail', (event) => {
-          this.dispatchToMemoryMonitor('.user.desktop.communication.new_voicemail', event)
-          if (event.tags) {
-            event.communication.tags = event.tags
-            event.communication.tag_ids = event.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            event.communication.contact = event.contact
-          }
-          if (event.contact_tags) {
-            event.communication.contact.tags = event.contact_tags
-          }
-          if (event.owner) {
-            event.communication.owner = event.owner
-          }
-          this.$VueEvent.fire('new_desktop_voicemail', event.communication)
-        })
-        .listen('.user.desktop.communication.new_fax', (event) => {
-          this.dispatchToMemoryMonitor('.user.desktop.communication.new_fax', event)
-          if (event.tags) {
-            event.communication.tags = event.tags
-            event.communication.tag_ids = event.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            event.communication.contact = event.contact
-          }
-          if (event.contact_tags) {
-            event.communication.contact.tags = event.contact_tags
-          }
-          if (event.owner) {
-            event.communication.owner = event.owner
-          }
-          this.$VueEvent.fire('new_desktop_fax', event.communication)
-        })
         .listen('.user.logout', (event) => {
           this.dispatchToMemoryMonitor('.user.logout', event)
           this.$VueEvent.fire('user_logout', event)
@@ -350,11 +229,6 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          // if (campaign) {
-          //   event.communication.campaign = campaign
-          // }
           this.$VueEvent.fire('new_communication', event.communication)
         })
         .listen('.communication.updated', (event) => {
@@ -373,16 +247,15 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          // if (campaign) {
-          //   event.communication.campaign = campaign
-          // }
           this.$VueEvent.fire('update_communication', event.communication)
         })
         .listen('.recording_status.updated', (event) => {
           this.dispatchToMemoryMonitor('recording_status.updated', event)
           this.$VueEvent.fire('updated_recording_status', event)
+        })
+        .listen('.communication.file.migrated', (event) => {
+          this.dispatchToMemoryMonitor('.communication.file.migrated', event)
+          this.$VueEvent.fire('communication.file.migrated', event)
         })
 
         /**
@@ -442,17 +315,131 @@ export default {
          * End of Power Dialer Session Tasks
          */
 
-        .notification((notification) => {
-          this.dispatchToMemoryMonitor('notification', notification)
-          if (!this.profile.sleep_mode) {
-            switch (notification.type) {
-              case 'App\\Notifications\\MentionNotification':
-                this.$VueEvent.fire('mention', notification)
-                break
+      if (Platform.is.electron) {
+        window.Echo.private('user-' + userId)
+          .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.incoming_number.high_sms_volume', event)
+            const incomingNumber = event.incoming_number
+            const contact = event.contact
+            const direction = event.direction
+            this.$VueEvent.fire('desktop_high_sms_volume', { incomingNumber, contact, direction })
+          })
+          .listen('.user.desktop.contact.contact_assigned', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.contact.contact_assigned', event)
+            if (event.tags) {
+              event.contact.tags = event.tags
+              event.contact.tag_ids = event.contact.tags.map((a) => a.id)
             }
-          }
-        })
-
+            if (event.user) {
+              event.contact.user = event.user
+            }
+            this.$VueEvent.fire('new_desktop_contact_assigned', event.contact)
+          })
+          .listen('.user.desktop.appointment', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.appointment', event)
+            this.$VueEvent.fire('new_desktop_appointment', {
+              engagement: event.engagement,
+              contact: event.contact,
+              timeDiff: event.timeDiff,
+              unit: event.unit
+            })
+          })
+          .listen('.user.desktop.reminder', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.reminder', event)
+            this.$VueEvent.fire('new_desktop_reminder', {
+              engagement: event.engagement,
+              contact: event.contact,
+              timeDiff: event.timeDiff,
+              unit: event.unit
+            })
+          })
+          .listen('.user.desktop.communication.new_call', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.new_call', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            console.log('.user.desktop.communication.new_call - event.communication', event.communication)
+            this.$VueEvent.fire('new_desktop_call', event.communication)
+          })
+          .listen('.user.desktop.communication.answered_call', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.answered_call', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            this.$VueEvent.fire('new_answered_call', event.communication)
+          })
+          .listen('.user.desktop.communication.new_sms', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.new_sms', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            this.$VueEvent.fire('new_desktop_sms', event.communication)
+          })
+          .listen('.user.desktop.communication.new_voicemail', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.new_voicemail', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            this.$VueEvent.fire('new_desktop_voicemail', event.communication)
+          })
+          .listen('.user.desktop.communication.new_fax', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.new_fax', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            this.$VueEvent.fire('new_desktop_fax', event.communication)
+          })
+      }
       window.Echo.private('company-' + this.profile.company_id)
         .listen('.company.updated', (event) => {
           this.dispatchToMemoryMonitor('.company.updated', event)
@@ -495,11 +482,6 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          // if (campaign) {
-          //   event.communication.campaign = campaign
-          // }
           this.$VueEvent.fire('new_communication', event.communication)
         })
         .listen('.communication.updated', (event) => {
@@ -518,16 +500,19 @@ export default {
           if (event.owner) {
             event.communication.owner = event.owner
           }
-          // const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
-          // const campaign = campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          // if (campaign) {
-          //   event.communication.campaign = campaign
-          // }
           this.$VueEvent.fire('update_communication', event.communication)
         })
         .listen('.communication.deleted', (event) => {
           this.dispatchToMemoryMonitor('.communication.deleted', event)
           this.$VueEvent.fire('delete_communication', event.communication)
+        })
+        .listen('.communication.file.migrated', (event) => {
+          this.dispatchToMemoryMonitor('.communication.file.migrated', event)
+          this.$VueEvent.fire('communication.file.migrated', event)
+        })
+        .listen('.mention.created', (event) => {
+          this.dispatchToMemoryMonitor('.mention.created', event)
+          this.$VueEvent.fire('mention', event.mention)
         })
         .listen('.incoming_number.created', (event) => {
           this.dispatchToMemoryMonitor('.incoming_number.created', event)

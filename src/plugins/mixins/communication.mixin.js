@@ -10,12 +10,18 @@ export default {
         currentStatus === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
     },
 
-    userCanBargeAndWhisper (communication) {
-      return (this.hasRole('Company Admin') || this.hasPermissionTo('barge and whisper on call')) &&
-        ![AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_SENTRY].includes(this.agentStatus) &&
-        communication.type === CommunicationTypes.CALL &&
-        this.isCallInProgress(communication.disposition_status2, communication.current_status2) &&
-        this.profile.id !== communication.user_id
+    canBargeAndWhisper (communication) {
+      const hasPermission = this.hasRole('Company Admin') || this.hasPermissionTo('barge and whisper on call')
+      const isCall = communication.type === CommunicationTypes.CALL
+      const isCallInProgress = this.isCallInProgress(communication.disposition_status2, communication.current_status2)
+      const isAgentOnCall = [AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_SENTRY].includes(this.agentStatus)
+      const isAgentNotTheCaller = this.profile.id !== communication.user_id
+
+      return isCall && // is a call
+        hasPermission && // has permission to barge and whisper on call
+        isCallInProgress && // is call in progress
+        isAgentNotTheCaller && // communication user is not the current user
+        !isAgentOnCall // user is not on a call
     },
 
     canUnparkCommunication (communication) {

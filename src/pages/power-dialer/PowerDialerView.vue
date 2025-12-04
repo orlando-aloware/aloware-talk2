@@ -451,9 +451,13 @@
                   {{ contact[column.name] | displayBirthdate }}
                 </div>
                 <div class="ellipse"
+                     v-else-if="column.name.startsWith('csf_')">
+                  {{ getCustomFieldColumnValue(contact[column.name], column.name) }}
+                </div>
+                <div class="ellipse"
                      :class="getColumnClass(column.name, column.draggable)"
                      v-else>
-                  {{ getColumnValue(contact[column.name]) }}
+                  {{ getColumnValue(contact[column.name], contact, column.name) }}
                 </div>
               </td>
             </template>
@@ -707,6 +711,12 @@ export default {
     }
 
     this.init()
+
+    // Set timeout to clear initialization flag after all watchers have had a chance to fire
+    this.initializationTimeout = setTimeout(() => {
+      this.isInitializing = false
+      console.log('🎯 PowerDialerView: initialization phase completed')
+    }, 500)
   },
 
   computed: {
@@ -932,7 +942,10 @@ export default {
       hasFilters: false,
       pdViewListeners: {},
       bulkAddStatusReport: {},
-      currentList: null
+      currentList: null,
+      isInitializing: true,
+      initializationTimeout: null,
+      currentDatatableSorts: null
     }
   },
 
@@ -960,13 +973,21 @@ export default {
 
         this.onFetch(params, hasFilters, true)
         this.$emit('onFiltersCount', this.currentListFilters)
+
+        // Update the report immediately when socket event arrives
+        this.$nextTick(() => {
+          this.checkTaskAddedNotification()
+        })
       }
     }
 
-    this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
+    this.pdViewListeners.datatableSortsUpdated = (sorts) => {
+      this.currentDatatableSorts = sorts
+    }
+
     this.$VueEvent.listen('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
-    this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
     this.$VueEvent.listen('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
+    this.$VueEvent.listen('datatable_sorts_updated', this.pdViewListeners.datatableSortsUpdated)
 
     // clean filters every time that this page is loaded
     window.localStorage.removeItem('current_pd_filters')
@@ -1052,13 +1073,34 @@ export default {
     },
 
     onAddContactsToList () {
+      let query
+
+      // if sort was updated in datatable, use the updated sort
+      if (this.currentDatatableSorts) {
+        query = {
+          orderBy: this.currentDatatableSorts.orderBy,
+          order: this.currentDatatableSorts.order
+        }
+      } else if (this.currentListSorts) {
+        query = {
+          orderBy: this.currentListSorts.orderBy,
+          order: this.currentListSorts.order
+        }
+      }
+
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
-        this.$router.push(`/power-dialer/list/add`)
+        this.$router.push({
+          path: `/power-dialer/list/add`,
+          query
+        })
 
         return
       }
 
-      this.$router.push(`/power-dialer/list/${this.$route.params.id}/add`)
+      this.$router.push({
+        path: `/power-dialer/list/${this.$route.params.id}/add`,
+        query
+      })
     },
 
     onColumnsReordered (nextColumns) {
@@ -1257,55 +1299,7 @@ export default {
      * Notifies summary of contacts added to PD list
      */
     checkTaskAddedNotification () {
-      const notifications = this.bulkAddNotifications(this.selectedListId)
-      // Verify if notifications is not an array and set the status report
-      if (!Array.isArray(notifications)) {
-        this.bulkAddStatusReport = notifications?.status_report
-        return
-      }
-
-      // notifications is an array and will receive the status report in batches
-      // get the identifier of the first notification
-      const identifier = notifications[0]?.status_report?.identifier
-      const batchSize = notifications[0]?.status_report?.batch_size ?? 1
-      // get the batches of notifications with the same identifier
-      const batches = notifications.filter(notification => notification.status_report.identifier === identifier)
-      // process the batches to get the total values for status report
-      const statusReport = batches.reduce((acc, notification) => {
-        const currentFail = notification.status_report.fail
-
-        // Sum the fail values according to the keys
-        for (const [key, value] of Object.entries(currentFail)) {
-          acc.fail[key] = (acc.fail[key] || 0) + value
-        }
-
-        return {
-          info: {
-            selected: acc.info.selected + notification.status_report.info.selected
-          },
-          success: {
-            total: acc.success.total + notification.status_report.success.total
-          },
-          fail: acc.fail
-        }
-      }, {
-        identifier: identifier,
-        batch_number: notifications[0]?.status_report?.batch_number,
-        info: {
-          selected: 0
-        },
-        success: {
-          total: 0
-        },
-        fail: {}
-      })
-
-      // Set the status report to the component if is the last batch
-      if (batchSize > 1 && batchSize === batches.length) {
-        this.bulkAddStatusReport = statusReport
-      } else if (batchSize === 1) {
-        this.bulkAddStatusReport = statusReport
-      }
+      this.bulkAddStatusReport = this.bulkAddNotifications(this.selectedListId) ?? {}
     },
 
     onTaskAddedNotificationClose () {
@@ -1317,8 +1311,8 @@ export default {
   watch: {
     '$route.params.filter': {
       handler () {
-        console.log('🎯 PowerDialerView: $route.params.filter watcher triggered', { route: this.$route.name })
-        if (!this.$route.name.includes('Contact')) {
+        console.log('🎯 PowerDialerView: $route.params.filter watcher triggered', { route: this.$route.name, isInitializing: this.isInitializing })
+        if (!this.$route.name.includes('Contact') && !this.isInitializing) {
           console.log('🎯 PowerDialerView: calling init(false) from $route.params.filter watcher')
           this.init(false)
         }
@@ -1327,8 +1321,8 @@ export default {
     },
 
     '$route.params.id': function (newId, oldId) {
-      console.log('🎯 PowerDialerView: $route.params.id watcher triggered', { newId, oldId, route: this.$route.name })
-      if (!this.$route.name.includes('Contact')) {
+      console.log('🎯 PowerDialerView: $route.params.id watcher triggered', { newId, oldId, route: this.$route.name, isInitializing: this.isInitializing })
+      if (!this.$route.name.includes('Contact') && !this.isInitializing) {
         console.log('🎯 PowerDialerView: calling init(true) from $route.params.id watcher')
         this.init(true)
       }
@@ -1340,14 +1334,38 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function (val) {
-        console.log('🎯 PowerDialerView: currentListFilters watcher triggered', { route: this.$route.name, filtersCount: this.filtersCount })
         if (this.$route.name === 'Power Dialer') {
           const hasFilters = this.filtersCount > 0
 
-          let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          console.log('🎯 PowerDialerView: calling onFetch from currentListFilters watcher')
-          this.onFetch(params, hasFilters, true)
-          this.$emit('onFiltersCount', this.currentListFilters)
+          const params = this.$jsonClone(typeof this.currentListFilters === 'string' ? {} : this.currentListFilters)
+
+          const csfFields = this.computedColumns.reduce((acc, column) => {
+            if (column.name.startsWith('csf_')) {
+              acc.push(column.name)
+            }
+            return acc
+          }, [])
+          if (csfFields.length > 0) {
+            params.csf_fields = csfFields
+          }
+
+          // Only call onFetch if not in initialization phase or if this is the final initialization call
+          if (!this.isInitializing) {
+            this.onFetch(params, hasFilters, true)
+            this.$emit('onFiltersCount', this.currentListFilters)
+          } else {
+            // Schedule the fetch to happen after initialization is complete
+            if (this.initializationTimeout) {
+              clearTimeout(this.initializationTimeout)
+            }
+
+            this.initializationTimeout = setTimeout(() => {
+              this.isInitializing = false
+              console.log('🎯 PowerDialerView: initialization completed, executing final fetch')
+              this.onFetch(params, hasFilters, true)
+              this.$emit('onFiltersCount', this.currentListFilters)
+            }, 500)
+          }
         }
       }
     },
@@ -1373,12 +1391,26 @@ export default {
     filteredList () {
       if (this.filteredList?.id !== this.currentList?.id) {
         this.currentList = { ...this.filteredList }
+
+        this.sorts = this.currentList.sort_by ? {
+          orderBy: this.currentList.sort_by,
+          order: this.currentList.sort_order
+        } : null
       }
     }
   },
 
   beforeDestroy () {
     this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
+    this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
+
+    // Clean up initialization timeout
+    if (this.initializationTimeout) {
+      clearTimeout(this.initializationTimeout)
+      this.initializationTimeout = null
+    }
+
+    this.$VueEvent.stop('datatable_sorts_updated', this.pdViewListeners.datatableSortsUpdated)
   }
 }
 </script>

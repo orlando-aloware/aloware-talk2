@@ -158,7 +158,7 @@
 import { mapActions, mapGetters } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
-import { CONTACT_FIELD_DEFINITIONS, ContactFieldsHelper, DEFAULT_FIELD_ORDER } from 'src/constants/contact-fields-definitions'
+import { CONTACT_FIELD_DEFINITIONS, ContactFieldsHelper } from 'src/constants/contact-fields-definitions'
 import LocationStateSelector from 'src/components/contacts/location-state-selector'
 import LocationCountrySelector from 'src/components/contacts/location-country-selector'
 import ContactInputField from 'src/components/contacts/contact-input-field'
@@ -173,6 +173,7 @@ import { ContactAttributeTypeEnum } from 'components/contacts/contact-attributes
 import LeadSourceSelector from 'components/generic-selectors/lead-source-selector.vue'
 import SettingIcon from 'components/icons/setting-o-icon'
 import SettingsMap from 'components/settings/settings-map'
+import { INTAKE_SOURCE } from 'src/constants/contacts-intake-source'
 
 export default {
   name: 'contact-information',
@@ -263,7 +264,7 @@ export default {
     },
 
     visibleFields () {
-      const selectedFields = this.profile.setting_contact_fields || DEFAULT_FIELD_ORDER
+      const selectedFields = this.profile.setting_contact_fields || ContactFieldsHelper.getDefaultFieldOrderWithCustomAttributes(this.contactAttributes)
       return selectedFields.map(fieldKey => {
         // Handle custom attributes
         if (fieldKey.startsWith('custom_attribute_')) {
@@ -520,9 +521,13 @@ export default {
      * Get formatted field value with appropriate filter
      */
     getFormattedFieldValue (field) {
-      const value = this.getFieldValue(field)
+      let value = this.getFieldValue(field)
 
       if (field.filter && this.$options.filters[field.filter]) {
+        if (field.key === CONTACT_FIELD_DEFINITIONS.intake_source.key) {
+          value = INTAKE_SOURCE[value?.toLowerCase()] || value
+        }
+
         return this.$options.filters[field.filter](value)
       }
 

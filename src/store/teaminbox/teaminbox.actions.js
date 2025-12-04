@@ -107,6 +107,7 @@ export default {
         commit('SET_CONTACTS_LAST_USED_LINE', { inboxId, contactId, lastLineUsed })
       }
     }
+    commit('SET_CONTACTS_LAST_USED_LINES_UPDATED_AT', new Date().getTime())
   },
   setTeamInboxCampaigns: ({ commit }, data) => {
     commit('SET_TEAM_INBOX_CAMPAIGNS', data)

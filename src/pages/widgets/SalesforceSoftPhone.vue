@@ -183,7 +183,7 @@ export default {
         : 'call'
 
       // ignore call notifications if the call is not fishing mode and the user is in sleep mode
-      if ((isFishingMode || communication.is_call_waiting) || !this.profile.sleep_mode) {
+      if (isFishingMode || !this.profile.sleep_mode) {
         this.processActionNotification(communication, communicationType)
 
         if (this.opencti_loaded) {

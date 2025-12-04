@@ -535,6 +535,43 @@
               </b-col>
             </b-form-row>
             <hr />
+            <!--TRAFFIC TYPE-->
+            <b-form-row
+              v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
+              data-testid="comm-details-traffic-type-row"
+            >
+              <b-col
+                class="pl-0 pr-0"
+                data-testid="comm-details-traffic-type-col"
+              >
+                <q-item-label>Traffic Type: </q-item-label>
+              </b-col>
+              <b-col
+                cols="7"
+                data-testid="comm-details-traffic-type-col"
+              >
+                <div class="d-flex align-items-center">
+                  {{ communication.is_international ? 'International' : 'Local' }}
+                  <q-icon
+                    v-if="communication.is_international && isAdminOrBillingAdmin"
+                    class="ml-1 text-primary cursor-pointer"
+                    name="info"
+                    size="16px"
+                    @click="onOpenInternationalPricingInClassicClicked"
+                  >
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      max-width="200px"
+                      data-testid="comm-details-traffic-type-tooltip"
+                    >
+                      Click to view international pricing
+                    </q-tooltip>
+                  </q-icon>
+                </div>
+              </b-col>
+            </b-form-row>
+            <hr />
             <div v-if="[CommunicationTypes.CALL].includes(communication.type)">
               <b-form-row data-testid="comm-details-disposition-row">
                 <b-col
@@ -625,7 +662,7 @@
                     <li
                       class="pb-1"
                       :key="attemptingUser.id + '-user-' + index"
-                      v-for="(attemptingUser, index) in communication.attempting_users"
+                      v-for="(attemptingUser, index) in communication.attempting_users_data"
                     >
                       <div
                         class="flex items-center mr-1 h-100"
@@ -633,7 +670,7 @@
                       >
                         <span
                           class="text-blue cursor-pointer"
-                          :class="getAttemptingClass(attemptingUser.d, communication.disposition_status2, communication.user_id)"
+                          :class="getAttemptingClass(attemptingUser.id, communication.disposition_status2, communication.user_id)"
                           :title="getUserName(attemptingUser)"
                         >
                           <user-display :user="attemptingUser" />
@@ -867,13 +904,10 @@
                 data-testid="comm-details-ring-group-col"
               >
                 <div class="d-flex align-items-center">
-                  <span v-if="usedRingGroup && usedRingGroup.call_waiting && !hasCompanyTeamInboxEnabled">
-                    Call waiting Queue
-                  </span>
                   <div class="flex items-center mr-1 h-100"
                        data-testid="comm-details-ring-group-open-rg-in-classic"
                        @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
-                       v-else-if="usedRingGroup">
+                       v-if="usedRingGroup">
                     <span class="text-blue cursor-pointer"
                           :title="usedRingGroup.name">
                       <q-tooltip anchor="top middle"
@@ -1542,6 +1576,13 @@
         data-testid="comm-details-col"
         v-if="communication && communication.type === CommunicationTypes.CALL"
       >
+        <aloai-agent-call
+          v-if="communication.aloAiBotCall"
+          data-testid="comm-details-aloai-agent-call"
+          :class="isWidget || mobileView ? 'my-1' : 'mb-1'"
+          :aloAiBotCall="communication.aloAiBotCall"
+          :uniqueId="communication.id"
+        />
         <ring-group-snapshot
           data-testid="comm-details-ring-group-snapshot"
           :class="isWidget || mobileView ? 'my-1' : 'mb-1'"
@@ -1555,6 +1596,7 @@
           :call-issues="Object.values(communication?.call_quality_summary || {})"
           :user="communication.user"
         />
+        <call-timeline v-if="communication.call_timeline && communication.call_timeline.length > 0" :timeline="communication.call_timeline" />
       </b-col>
     </b-row>
   </div>
@@ -1564,6 +1606,9 @@
 import CallDispositionSelector from 'components/call-disposition-selector'
 import CommunicationAudio from 'components/communication-audio'
 import CommunicationNote from 'components/communication-note'
+import AloaiAgentCall from 'components/communications/aloai-agent-call.vue'
+import CallTimeline from 'components/communications/call-timeline.vue'
+import CsatScore from 'components/communications/communications-table/csat-score.vue'
 import DownloadButton from 'components/download-button'
 import GenerateTranscriptionButton from 'components/generate-transcription-button'
 import EntityTags from 'components/generic-selectors/entity-tags'
@@ -1580,16 +1625,15 @@ import TranscriptionModal from 'src/components/communication/transcription-modal
 import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import talk2Api from 'src/plugins/api/api'
+import { removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 import { aclMixin, classicMixin, communicationInfoMixin, goBackMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-import { removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 import * as CommunicationCurrentStatus from '../constants/communication-current-status'
 import * as CommunicationDirections from '../constants/communication-direction'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
-import CsatScore from 'components/communications/communications-table/csat-score.vue'
 
 export default {
   name: 'communication-details',
@@ -1611,7 +1655,9 @@ export default {
     GenerateTranscriptionButton,
     CloseIcon,
     UserDisplay,
-    SparkleIcon
+    SparkleIcon,
+    CallTimeline,
+    AloaiAgentCall
   },
 
   mixins: [
@@ -1920,6 +1966,10 @@ export default {
 
     onOpenBroadcastInClassicClicked (broadcastId) {
       window.open(this.getClassicUrlBroadcastActivity(broadcastId), '_blank')
+    },
+
+    onOpenInternationalPricingInClassicClicked () {
+      window.open(this.getInternationalPricingURL(), '_blank')
     },
 
     isAttachmentImage (mimeType) {

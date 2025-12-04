@@ -1,6 +1,6 @@
 {
   "name": "aloware-talk2",
-  "version": "1.71.3",
+  "version": "1.74.0",
   "description": "Aloware Agent Interface",
   "productName": "Talk",
   "author": "Aloware <support@aloware.com>",
@@ -23,7 +23,7 @@
     "deploy-win": "quasar build -d -m electron -T win -b builder -P always",
     "deploy-win32": "quasar build -d -m electron -T win32 -b builder -P always",
     "prepare": "husky",
-    "upload-s3": "bash -c 'export AWS_PROFILE=${AWS_PROFILE:-default}; export AWS_REGION=${AWS_REGION:-us-west-2}; export WORKSPACE=${WORKSPACE:-.}; if [ \"$ENV\" = \"prod\" ]; then export TALK_URL=${TALK_URL:-talk.aloware.com}; s3-spa-upload ./production/spa $TALK_URL -m s3-spa-upload.config.json; elif [ \"$ENV\" = \"dev1\" ]; then export TALK_URL=${TALK_URL:-talk.alodev.org}; s3-spa-upload ./dev1/spa $TALK_URL -m s3-spa-upload.config.json; elif [ \"$ENV\" = \"dev2\" ]; then export TALK_URL=${TALK2_URL:-talk2.alodev.org}; s3-spa-upload ./dev2/spa $TALK_URL -m s3-spa-upload.config.json; elif [ \"$ENV\" = \"staging\" ]; then export TALK_URL=${STAGING_URL:-talk.alostaging.com}; s3-spa-upload ./staging/spa $TALK_URL -m s3-spa-upload.config.json; else echo \"Unknown environment: $ENV\"; exit 1; fi'"
+    "upload-s3": "bash -c 'export AWS_PROFILE=${AWS_PROFILE:-default}; export AWS_REGION=${AWS_REGION:-us-west-2}; export WORKSPACE=${WORKSPACE:-.}; if [ \"$ENV\" = \"prod\" ]; then export TALK_URL=${TALK_URL:-talk.aloware.com}; s3-spa-upload ./production/spa $TALK_URL -m s3-spa-upload.config.json; elif [ \"$ENV\" = \"dev1\" ]; then export TALK_URL=${TALK_URL:-talk.alodev.org}; s3-spa-upload ./dev1/spa $TALK_URL -m s3-spa-upload.config.json; elif [ \"$ENV\" = \"staging\" ]; then export TALK_URL=${STAGING_URL:-talk.alostaging.com}; s3-spa-upload ./staging/spa $TALK_URL -m s3-spa-upload.config.json; else echo \"Unknown environment: $ENV\"; exit 1; fi'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-common-types": "6.6.0",
@@ -38,7 +38,7 @@
     "@sentry/webpack-plugin": "^1.21.0",
     "@twilio/voice-sdk": "2.13.0",
     "@vue-bootstrap-components/vue-bootstrap-autocomplete": "^2.15.3",
-    "axios": "^1.6.7",
+    "axios": "^1.12.0",
     "bootstrap": "^4.6.1",
     "bootstrap-vue": "^2.23.1",
     "bowser": "^2.11.0",
@@ -76,7 +76,7 @@
     "v-calendar": "2.4.1",
     "vue": "^2.7.16",
     "vue-at": "^2.5.0-beta",
-    "vue-business-hours": "github:aloware/vue-business-hours",
+    "vue-business-hours": "git+https://github.com/aloware/vue-business-hours.git",
     "vue-cookies": "^1.8.3",
     "vue-countup-v2": "^4.0.0",
     "vue-ctk-date-time-picker": "^2.5.0",

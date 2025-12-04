@@ -2,7 +2,7 @@
   <span class="cursor-pointer"
         data-testid="comm-barge-comm-button-dialog-click"
         :id="`action-barge-${_uid}`"
-        v-if="userCanBargeAndWhisper(communication)"
+        v-if="canBargeAndWhisper(communication)"
         @click="dialog">
     <volume-high-icon data-testid="comm-barge-comm-button-volume-high-icon-2"
                       :height="iconHeight"
@@ -84,6 +84,9 @@ export default {
     },
 
     barge () {
+      // Set flag to indicate this is a barge call
+      this.$store.dispatch('setDialerIsBargeOrWhisperCall', true)
+
       this.$VueEvent.fire('make_new_call', {
         phone_number: `barge:${this.communication.id}`
       })
