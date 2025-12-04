@@ -580,9 +580,11 @@ export default {
       }
     }, 24 * 60 * 60 * 1000)
 
-    this.getTaskRouteToken()
+    if (this.currentCompany.use_new_engine === true) {
+      this.getTaskRouteToken()
 
-    this.getAgentStatuses()
+      this.getAgentStatuses()
+    }
   },
 
   methods: {

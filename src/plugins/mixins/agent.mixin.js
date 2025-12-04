@@ -13,6 +13,7 @@ export default {
   computed: {
     ...mapState(['oldAgentStatus']),
     ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState('cache', ['currentCompany']),
 
     agentStatus () {
       return _.get(this.profile, 'agent_status', null)
@@ -106,8 +107,7 @@ export default {
       if (!this.authenticated) {
         return
       }
-      // @TODO: check if the account is using the new engine later
-      if (this.profile.company_id === 3920) {
+      if (this.currentCompany?.use_new_engine === true) {
         console.log('Updating activity [api]: ', val)
         this.$VueEvent.fire('update_activity', { status: val })
       } else {
