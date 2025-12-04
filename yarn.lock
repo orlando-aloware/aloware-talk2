@@ -13700,8 +13700,8 @@ vue-at@^2.5.0-beta:
   integrity sha512-c17Rn8vVTXp/rvWV76jNB2PVx534eqIAP5/Tv1twCt0ebtRPIgNaJJwSaoRVISQ6vM6m3+owmtpAG1qr5g9fyQ==
 
 "vue-business-hours@github:aloware/vue-business-hours":
-  version "1.4.3"
-  resolved "https://codeload.github.com/aloware/vue-business-hours/tar.gz/72822bacb0d6493e0e8dfec3c53f2f9d85ba1baa"
+  version "1.4.4"
+  resolved "https://codeload.github.com/aloware/vue-business-hours/tar.gz/d85e662781b363364cedee64f2ed558557beb978"
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^1.2.26"
     "@fortawesome/free-solid-svg-icons" "^6.5.2"
