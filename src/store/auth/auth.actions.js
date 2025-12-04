@@ -26,12 +26,14 @@ const check = async (authModule, payload, skipSetAuthenticated) => {
     }
 
     const user = response.data.user
-    user.settings?.forEach(setting => {
-      // Map setting name to user property
-      const { name, value } = setting
-      user[`setting_${name}`] = value
-    })
-    delete user.settings
+    if (user.settings) {
+      user.settings.forEach(setting => {
+        // Map setting name to user property
+        const { name, value } = setting
+        user[`setting_${name}`] = value
+      })
+      delete user.settings
+    }
 
     commit('SET_PROFILE', user)
     setRouterType(authModule)
