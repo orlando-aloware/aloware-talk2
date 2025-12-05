@@ -13665,10 +13665,10 @@ vm-browserify@^1.0.1:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
-vue-at@^2.5.0-beta:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/vue-at/-/vue-at-2.5.1.tgz#4a977ffbcb5d6fbc18c402515407188a12e57b23"
-  integrity sha512-c17Rn8vVTXp/rvWV76jNB2PVx534eqIAP5/Tv1twCt0ebtRPIgNaJJwSaoRVISQ6vM6m3+owmtpAG1qr5g9fyQ==
+vue-at@^2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/vue-at/-/vue-at-2.5.2.tgz#8abb8668448908b7214514894ce81019b8ba5401"
+  integrity sha512-06FFK8V/VIS3appZf/l65H9ijmoVDrL1GHm/O/zRpHADGUulmOLa7OP3O3u6ab49n4HNJySQqYedPGqJz8EpQw==
 
 "vue-business-hours@git+https://github.com/aloware/vue-business-hours.git":
   version "1.4.4"
