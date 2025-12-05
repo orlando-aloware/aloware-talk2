@@ -29,16 +29,16 @@
 </template>
 
 <script>
-import GiphyClient from 'giphy-js-sdk-core'
-import _ from 'lodash'
+import { GiphyFetch } from '@giphy/js-fetch-api'
 import SearchIcon from 'components/icons/search-icon'
+import _ from 'lodash'
 
 export default {
   name: 'search-giphy',
   components: { SearchIcon },
   data () {
     return {
-      client: GiphyClient(process.env.GIPHY_API_KEY),
+      client: new GiphyFetch(process.env.GIPHY_API_KEY),
       gifs_loading: false,
       search_text: null,
       gifs_arr: [],
@@ -70,32 +70,38 @@ export default {
       }
 
       this.gifs_loading = true
-      this.client.search('gifs', {
-        q: this.search_text,
+      this.client.search(this.search_text, {
         offset: this.page * this.per_page,
         limit: this.per_page
       }).then((res) => {
         this.gifs_loading = false
-        this.total_pages = res.pagination.count
+        // Calculate total pages from total count
+        this.total_pages = Math.ceil((res.pagination.total_count || 0) / this.per_page)
         this.addGifs(res.data)
       }).catch((err) => {
         console.log(err)
-        this.$handleErrors(err.response)
+        this.gifs_loading = false
+        if (err && err.response) {
+          this.$handleErrors(err.response)
+        }
       })
     },
     trendingGiphy () {
       this.gifs_loading = true
-      this.client.trending('gifs', {
+      this.client.trending({
         offset: this.trending_page * this.per_page,
         limit: this.per_page
       }).then((res) => {
         this.gifs_loading = false
-        this.total_trending_pages = res.pagination.count
+        // Calculate total pages from total count
+        this.total_trending_pages = Math.ceil((res.pagination.total_count || 0) / this.per_page)
         this.addGifs(res.data)
-        //
       }).catch((err) => {
         console.log(err)
-        this.$handleErrors(err.response)
+        this.gifs_loading = false
+        if (err && err.response) {
+          this.$handleErrors(err.response)
+        }
       })
     },
     loadMoreGiphy () {
@@ -119,9 +125,8 @@ export default {
         src: gif.images.downsized.url
       }))
 
-      const gif = { data: null }
-      for (gif.data of newGifs) {
-        this.gifs_arr.push(gif.data)
+      for (const gif of newGifs) {
+        this.gifs_arr.push(gif)
       }
     },
     findGif: _.debounce(function () {

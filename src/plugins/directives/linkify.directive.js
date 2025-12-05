@@ -91,14 +91,15 @@ function processHtmlContent (el, target) {
 
   // Collect all text nodes first (to avoid modifying tree while walking)
   const textNodes = []
-  let node
-  while (node = walker.nextNode()) {
+  let node = walker.nextNode()
+  while (node) {
     if (node.textContent.trim()) {
       textNodes.push({
         node: node,
         text: node.textContent
       })
     }
+    node = walker.nextNode()
   }
 
   // Process each text node
