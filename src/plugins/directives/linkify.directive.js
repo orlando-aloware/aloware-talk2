@@ -62,7 +62,7 @@ function processPlainText (el, target) {
     const linkText = originalText.substring(link.start, link.end)
     const href = link.href || link.value
     const escapedLinkText = escapeHtml(linkText)
-    html += `<a href="${escapeHtml(href)}" target="${target}" rel="noopener noreferrer">${escapedLinkText}</a>`
+    html += `<a href="${escapeHtml(href)}" target="${target}" rel="noopener noreferrer" class="linkified">${escapedLinkText}</a>`
 
     lastIndex = link.end
   })
@@ -125,7 +125,7 @@ function processHtmlContent (el, target) {
       const linkText = text.substring(link.start, link.end)
       const href = link.href || link.value
       const escapedLinkText = escapeHtml(linkText)
-      html += `<a href="${escapeHtml(href)}" target="${target}" rel="noopener noreferrer">${escapedLinkText}</a>`
+      html += `<a href="${escapeHtml(href)}" target="${target}" rel="noopener noreferrer" class="linkified">${escapedLinkText}</a>`
 
       lastIndex = link.end
     })
