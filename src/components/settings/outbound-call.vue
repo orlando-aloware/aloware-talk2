@@ -16,7 +16,29 @@
         <b-col sm="12"
                md="12">
           <div>
-            <h5 class="form-label">Caller ID</h5>
+            <h5 class="form-label">Caller ID
+              <span
+                v-if="hasCompanyTeamInboxLineManagementEnhancements"
+                class="mx-1"
+              >
+                <information-circle-icon color="#2F80ED" />
+                <q-tooltip
+                  anchor="center start"
+                  self="center left"
+                  :offset="[-20, 10]"
+                >
+                  <div>
+                    <span class="d-flex font-weight-bold">How Caller ID Works</span>
+                    <ul class="mb-0 pl-3">
+                      <li>When calling inside a Team Inbox, the system prioritizes the <strong>last used line in that inbox</strong> instead of the Caller ID you selected.</li>
+                      <li>If the last used line in the inbox <strong>matches your Caller ID selection</strong>, the system auto-dials.</li>
+                      <li>If the inbox has <strong>only one line</strong>, the system auto-dials using that line.</li>
+                      <li>Your Caller ID setting is mainly used when making calls <strong>from the dialer outside the Team Inbox</strong>.</li>
+                    </ul>
+                  </div>
+                </q-tooltip>
+              </span>
+            </h5>
             <p class="form-helper-text">Decide what line is used when this user makes an outbound call.</p>
           </div>
           <p class="text-bold fs-12"
@@ -173,6 +195,7 @@ import { aclMixin, settingsMixin, kycMixin, userMixin } from 'src/plugins/mixins
 import UserVmDropLibrary from 'components/user-vm-drop-library'
 import SettingsMap from 'components/settings/settings-map'
 import OutboundGreeting from 'components/settings/outbound-greeting.vue'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { required } from 'vuelidate/lib/validators'
 import {
   OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT,
@@ -187,7 +210,7 @@ export default {
 
   mixins: [aclMixin, settingsMixin, kycMixin, userMixin],
 
-  components: { UserVmDropLibrary, LineSelector, OutboundGreeting },
+  components: { UserVmDropLibrary, LineSelector, OutboundGreeting, InformationCircleIcon },
 
   props: {
     user: {
