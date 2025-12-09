@@ -3299,14 +3299,14 @@
   dependencies:
     "@types/node" "*"
 
-"@vue-bootstrap-components/vue-bootstrap-autocomplete@^2.15.3":
-  version "2.15.3"
-  resolved "https://registry.yarnpkg.com/@vue-bootstrap-components/vue-bootstrap-autocomplete/-/vue-bootstrap-autocomplete-2.15.3.tgz#eb7254ef64909624b891c381ebdaceb78bad2627"
-  integrity sha512-UEUPDiLJQ3JYEkCi1qIBQ8hlYkjbWfhSC4cxWK5TZSmkVQc71A2CzV65/rwtNzC7jOnmgj7Hmvqnul6SF9F3Ow==
+"@vue-bootstrap-components/vue-bootstrap-autocomplete@^2.17.0":
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/@vue-bootstrap-components/vue-bootstrap-autocomplete/-/vue-bootstrap-autocomplete-2.17.0.tgz#0e042114f3ec18b3449a5fafc857d0a8274e8f91"
+  integrity sha512-3k9aRcKnYXQlBra6ad1qHPNQPJKqp9eMCjPSUAxg4BuYY9T244AkZVfYim3J9N0bsRPwtxltvftVz3c/MTcJzg==
   dependencies:
     lodash "^4.17.20"
     resize-observer-polyfill "^1.5.0"
-    vue "^2.7.8"
+    vue "^2.7.16"
 
 "@vue/compiler-sfc@2.7.16":
   version "2.7.16"
@@ -13840,7 +13840,7 @@ vue2-daterange-picker@^0.6.8:
   dependencies:
     vue "^2.6.10"
 
-vue@^2.6.10, vue@^2.6.11, vue@^2.6.9, vue@^2.7.1, vue@^2.7.16, vue@^2.7.8:
+vue@^2.6.10, vue@^2.6.11, vue@^2.6.9, vue@^2.7.1, vue@^2.7.16:
   version "2.7.16"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.7.16.tgz#98c60de9def99c0e3da8dae59b304ead43b967c9"
   integrity sha512-4gCtFXaAA3zYZdTp5s4Hl2sozuySsgz4jy1EnpBHNfpMa9dK1ZCG7viqBPCwXtmgc8nHqUsAu3G4gtmXkkY3Sw==
