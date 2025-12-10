@@ -138,8 +138,8 @@
                         </router-link>
                       </div>
                       <contact-integrations-link-icons
-                        v-if="contactHubspotLink"
-                        :hubspot-link="contactHubspotLink"
+                        v-if="getCallContactHubspotLink(call)"
+                        :hubspot-link="getCallContactHubspotLink(call)"
                       />
                     </div>
 
@@ -368,8 +368,8 @@
                     <span>
                       {{ call.contact.name | capitalize }}
                       <contact-integrations-link-icons
-                        v-if="contactHubspotLink"
-                        :hubspot-link="contactHubspotLink"
+                        v-if="getCallContactHubspotLink(call)"
+                        :hubspot-link="getCallContactHubspotLink(call)"
                       />
                     </span>
 
@@ -563,16 +563,16 @@ export default {
 
     lastPage () {
       return Math.ceil(this.calls.length / this.pagination.perPage)
-    },
-
-    contactHubspotLink () {
-      return this.call?.contact?.integration_data?.hubspot?.link || null
     }
   },
 
   methods: {
     isParkedCall,
     isLiveCall,
+
+    getCallContactHubspotLink (call) {
+      return call?.contact?.integration_data?.hubspot?.link || null
+    },
 
     onPaginated (pageData) {
       this.pagination = {
