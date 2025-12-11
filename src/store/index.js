@@ -1474,6 +1474,34 @@ export default function (/* { ssrContext } */) {
         }
       },
 
+      UPDATE_USERS_STATUS_BATCH (state, agentsStatusList) {
+        // Create a Map for O(1) lookups instead of O(n) .find() calls
+        const statusMap = new Map()
+        for (const agent of agentsStatusList) {
+          statusMap.set(agent.user_id, agent)
+        }
+
+        // Update users in a single pass, mutating properties directly
+        // This is more efficient than calling Vue.set for each property
+        for (let i = 0; i < state.users.length; i++) {
+          const user = state.users[i]
+          const status = statusMap.get(user.id)
+
+          if (status) {
+            const shouldUpdateState = user.agent_status !== status.agent_status ||
+              user.last_agent_status_change !== status.last_agent_status_change ||
+              user.updated_at !== status.last_agent_status_change
+
+            if (shouldUpdateState) {
+              user.agent_status = status.agent_status
+              user.last_agent_status_change = status.last_agent_status_change
+              user.updated_at = status.last_agent_status_change
+              state.users[i] = user
+            }
+          }
+        }
+      },
+
       DELETE_USER (state, user) {
         const found = state.users.find((wf) => wf.id === user.id)
         if (found) {
