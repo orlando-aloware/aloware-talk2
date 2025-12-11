@@ -51,6 +51,14 @@ export default {
       }
     },
 
+    userMissedCallBehaviourValidator (rule, value, callback) {
+      if (this.profile.missed_calls_settings.missed_call_handling_mode === MissedCallBehaviors.MISSED_CALL_BEHAVIOR_VOICEMAIL && !this.profile.missed_calls_settings.voicemail_file) {
+        callback(new Error('Please upload a voicemail file'))
+      } else {
+        callback()
+      }
+    },
+
     userOutboundCampaignValidator (rule, value, callback) {
       if (this.user.outbound_calling_selector === 1 && !this.user.read_only_access && this.user.answer_by !== (AnswerTypes.BY_NONE + 2) && !this.user.default_outbound_campaign_id) {
         callback(new Error('Please select an outbound line'))
@@ -321,6 +329,14 @@ export default {
         } else {
           callback(new Error('Voicemail message must not be empty'))
         }
+      } else {
+        callback()
+      }
+    },
+
+    validateMissedCallVoicemail (rule, value, callback) {
+      if (this.user.missed_calls_settings.missed_call_handling_mode === MissedCallBehaviors.MISSED_CALL_BEHAVIOR_VOICEMAIL && this.user.missed_calls_settings.voicemail_file === null) {
+        callback(new Error('Please upload a voicemail file for Personal Voicemail.'))
       } else {
         callback()
       }

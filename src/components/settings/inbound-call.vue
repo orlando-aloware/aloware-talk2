@@ -48,6 +48,80 @@
         </b-col>
       </b-form-row>
 
+      <div :id="`${SettingsMap.missed_calls_settings.hash_keyword}-container`">
+        <b-form-row class="mt-4">
+          <b-col sm="12" md="12">
+            <div>
+              <h5 class="form-label">Personal Voicemail</h5>
+              <p class="form-helper-text">Should {{ statics.name }} take a voicemail when this user is not available and their extension is dialed?</p>
+            </div>
+            <p class="text-bold fs-12">When a direct call is missed:</p>
+            <b-form-group label="" v-slot="{ ariaDescribedby }">
+              <b-form-radio-group
+                id="radio-slots"
+                name="radio-options-slots"
+                v-model="missedCallHandlingMode"
+                :options="options"
+                :aria-describedby="ariaDescribedby"
+                @input="(eventPayload) => onUpdateFields(eventPayload, 'missedCallHandlingMode')">
+              </b-form-radio-group>
+            </b-form-group>
+          </b-col>
+        </b-form-row>
+        <div v-if="user.missed_calls_settings && user.missed_calls_settings.missed_call_handling_mode === MISSED_CALL_BEHAVIOR_VOICEMAIL">
+          <b-card
+            header-tag="header"
+            footer-tag="footer"
+            v-if="user.missed_calls_settings.voicemail_file !== null">
+            <div>
+              <audio
+                  ref="vmAudio"
+                  id="vm-audio-file"
+                  controls>
+                <source :src="`${baseUrl}/static/uploaded_file/${user.missed_calls_settings.voicemail_file}`">
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+
+            <template #footer>
+              <b-button size="sm"
+                        variant="primary"
+                        :disabled="isDeletingMissedCallVMAudioFile"
+                        @click="playMissedCallVMAudioFile">
+                <i class="fa fa-play"></i> Play
+              </b-button>
+              <b-button size="sm"
+                        variant="danger"
+                        class="ml-2"
+                        :disabled="isDeletingMissedCallVMAudioFile"
+                        @click="deleteMissedCallVMFile">
+                <q-spinner-bars v-if="isDeletingMissedCallVMAudioFile" color="white" />
+                <i class="fa fa-trash" v-else></i>
+                {{ isDeletingMissedCallVMAudioFile ? 'Removing File...' : 'Remove File' }}
+              </b-button>
+            </template>
+          </b-card>
+          <b-card-group deck v-if="!user.missed_calls_settings.voicemail_file">
+            <audio-recorder :upload-url="missedCallVMUploadUrl"
+                            @recordedAudioUploaded="applyMissedCallVMAudioFile">
+            </audio-recorder>
+
+            <b-card title="Upload an audio file" header-tag="header" footer-tag="footer">
+              <file-uploader accepted-file-types=".mp3, .wav"
+                             :upload-url="missedCallVMUploadUrl"
+                             @fileUploaded="fileUploaded">
+                <template slot="description">
+                  <div class="text-center mt-2 notice">
+                    <p class="mb-0">Supports MP3/WAV only.</p>
+                    <p class="mb-0">Max. files size for images is 8MB</p>
+                  </div>
+                </template>
+              </file-uploader>
+            </b-card>
+          </b-card-group>
+        </div>
+      </div>
+
       <b-form-row class="mt-4"
                   :id="`${SettingsMap.operating_states_limit.hash_keyword}-container`"
                   v-if="isAdmin">
@@ -310,12 +384,16 @@
 
 <script>
 import _ from 'lodash'
+import { MISSED_CALL_BEHAVIOR_NOTHING, MISSED_CALL_BEHAVIOR_VOICEMAIL } from 'src/constants/missed-call-behavior'
 import ExtensionSelector from 'components/generic-selectors/extension-selector'
 import MessageTemplates from 'components/message-composer/options/message-templates'
 import CalendarTodayIcon from 'components/icons/calendar-today-icon'
 import Variables from 'components/message-composer/options/variables'
 import VariableIcon from 'components/icons/variable-icon'
 import UsAreaCodeSelector from 'components/generic-selectors/us-area-code-selector'
+import AudioRecorder from 'components/audio-recorder'
+import talk2Api from 'src/plugins/api/api'
+import FileUploader from 'components/file-uploader'
 import { mapActions, mapState } from 'vuex'
 import { aclMixin, settingsMixin, kycMixin } from 'src/plugins/mixins'
 import SettingsMap from 'components/settings/settings-map'
@@ -325,7 +403,7 @@ export default {
 
   mixins: [aclMixin, settingsMixin, kycMixin],
 
-  components: { UsAreaCodeSelector, VariableIcon, Variables, CalendarTodayIcon, MessageTemplates, ExtensionSelector },
+  components: { FileUploader, AudioRecorder, UsAreaCodeSelector, VariableIcon, Variables, CalendarTodayIcon, MessageTemplates, ExtensionSelector },
 
   props: {
     user: {
@@ -346,6 +424,12 @@ export default {
 
   computed: {
     ...mapState('settings', ['userClone', 'changedUserProperties']),
+    baseUrl () {
+      return window.axios.defaults.baseURL
+    },
+    missedCallVMUploadUrl () {
+      return `${window.axios.defaults.baseURL}/api/v1/user/${this.user.id}/missed-call-voicemail`
+    },
     shouldMessageIfCallCompleted () {
       return this.user.should_message_caller_if_completed === 1
     },
@@ -370,6 +454,7 @@ export default {
   data () {
     return {
       isLoadingOperatingHours: false,
+      isDeletingMissedCallVMAudioFile: false,
       disableAreaCodeRouting: true,
       disableGeoRouting: true,
       checkAllUS: false,
@@ -378,12 +463,19 @@ export default {
         us: [],
         ca: []
       },
+      options: [
+        { text: 'Do Nothing', value: MISSED_CALL_BEHAVIOR_NOTHING },
+        { text: 'Voicemail', value: MISSED_CALL_BEHAVIOR_VOICEMAIL }
+      ],
       states: {
         us: ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'],
         ca: ['AB', 'BC', 'MB', 'NB', 'NL', 'NT', 'NS', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT']
       },
+      MISSED_CALL_BEHAVIOR_VOICEMAIL,
+      MISSED_CALL_BEHAVIOR_NOTHING,
       timeIncrement: 30,
       SettingsMap,
+      missedCallHandlingMode: null,
       operatingHours: null
     }
   },
@@ -433,8 +525,28 @@ export default {
         }
       })
     },
+    playMissedCallVMAudioFile () {
+      this.$refs.vmAudio.play()
+    },
+    deleteMissedCallVMFile () {
+      this.isDeletingMissedCallVMAudioFile = true
+      return talk2Api.V1.user.deleteMissedCallVM(this.user.id).then(response => {
+        this.isDeletingMissedCallVMAudioFile = false
+        this.user.missed_calls_settings.voicemail_file = null
+        this.$generalNotification('Missed call voicemail has been successfully deleted.', 'success')
+      }).catch(err => {
+        this.isDeletingMissedCallVMAudioFile = false
+        this.$generalNotification(err.response, 'error')
+      })
+    },
+    applyMissedCallVMAudioFile (audio) {
+      this.user.missed_calls_settings.voicemail_file = audio.uid
+    },
+    fileUploaded (file) {
+      this.user.missed_calls_settings.voicemail_file = file['file_name']
+    },
     onUpdateFields (value, prop) {
-      if (!['disableGeoRouting', 'disableAreaCodeRouting', 'checkAllUS', 'checkAllCA', 'operating_hours', 'operating_states_limit.us', 'operating_states_limit.ca', 'operatingHours'].includes(prop)) {
+      if (!['disableGeoRouting', 'disableAreaCodeRouting', 'checkAllUS', 'checkAllCA', 'operating_hours', 'missed_calls_settings.missed_call_handling_mode', 'operating_states_limit.us', 'operating_states_limit.ca', 'missedCallHandlingMode', 'operatingHours'].includes(prop)) {
         const newValue = value || this.user[prop]
         this.user[prop] = newValue
         this.updateChangedUserProperties({
@@ -490,6 +602,14 @@ export default {
         this.updateChangedUserProperties({
           name: 'operating_hours.' + key,
           value: value[key]
+        })
+      }
+
+      if (prop === 'missedCallHandlingMode') {
+        this.user['missed_calls_settings'] = { ...this.user.missed_calls_settings, 'missed_call_handling_mode': value }
+        this.updateChangedUserProperties({
+          name: 'missed_calls_settings.missed_call_handling_mode',
+          value: value
         })
       }
 
@@ -583,6 +703,9 @@ export default {
         this.checkAllCA = value.length === this.states.ca.length
       }
     },
+    'user.missed_calls_settings.missed_call_handling_mode': function (value) {
+      this.missedCallHandlingMode = value
+    },
     'userClone': function (value) {
       this.resetDisableGeoRouting(value)
     },
@@ -599,6 +722,7 @@ export default {
       this.disableGeoRouting = false
     }
 
+    this.missedCallHandlingMode = this.user.missed_calls_settings.missed_call_handling_mode
     this.operatingHours = { ...this.user.operating_hours }
   }
 }

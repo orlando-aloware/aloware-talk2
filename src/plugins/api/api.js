@@ -512,6 +512,14 @@ const talk2Api = {
 
       diagnosis (id) {
         return window.axios.get(`${suffixV1}diagnosis/user/${id}`)
+      },
+
+      uploadMissedCallVM (id, params) {
+        return window.axios.post(`${suffixV1}user/${id}/missed-call-voicemail`, params)
+      },
+
+      deleteMissedCallVM (id) {
+        return window.axios.delete(`${suffixV1}user/${id}/missed-call-voicemail`)
       }
     },
 
