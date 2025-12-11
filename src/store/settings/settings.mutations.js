@@ -22,10 +22,6 @@ export default {
         } else {
           hasChanges.data = JSON.stringify(state.userClone[name]) !== JSON.stringify(value)
         }
-
-        break
-      case name === 'missed_calls_settings.missed_call_handling_mode':
-        hasChanges.data = state.userClone.missed_calls_settings['missed_call_handling_mode'] !== value
         break
       case name === 'myCalls':
         hasChanges.data = (state.userClone['calls_inapp_notifs'] ||
