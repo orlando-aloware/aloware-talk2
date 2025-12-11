@@ -190,13 +190,6 @@ const SettingsMap = {
     hash_keyword: 'working-hours',
     visible: true
   },
-  'missed_calls_settings': {
-    title: 'Personal Voicemail',
-    description: 'Determine action when a direct call is missed.',
-    route: '/settings/inbound-call',
-    hash_keyword: 'personal-voicemail',
-    visible: true
-  },
   'operating_states_limit': {
     title: 'Operating States',
     description: 'Do not enable geo-routing for this user.',
