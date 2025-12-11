@@ -1,6 +1,14 @@
 <template>
   <div>
     <microphone-permission-modal ref="microphonePermissionModal" />
+    <reservation-modal
+      v-model="showReservationModal"
+      :contact-name="reservationContactName"
+      :reservation-type="reservationType"
+      @accepted="onReservationAccepted"
+      @rejected="onReservationRejected"
+      @hidden="onReservationModalHidden"
+    />
   </div>
 </template>
 
@@ -27,16 +35,20 @@ import * as CommunicationDispositionStatus from '../../constants/communication-d
 import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry-types'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
+import * as TaskRouterEvents from '../../constants/taskrouter-events'
 import TwilioDevice from '../communication/twilio/device'
 import MicrophonePermissionModal from './microphone-permission-modal.vue'
+import ReservationModal from './reservation-modal.vue'
 import { isIvrOrDeadEndCampaign } from 'src/plugins/helpers/campaigns'
 import { ALL_INBOXES_ID } from 'src/store/teaminbox/teaminbox.store'
+import { BY_PHONE_NUMBER } from '../../constants/answer-types'
 
 export default {
   name: 'dialer',
 
   components: {
-    MicrophonePermissionModal
+    MicrophonePermissionModal,
+    ReservationModal
   },
 
   mixins: [
@@ -68,6 +80,7 @@ export default {
       hangupInterval: null,
       activeConnectionInterval: null,
       dialerListeners: {},
+      workerListeners: {},
       AgentStatus,
       WebrtcEvents,
       CommunicationDispositionStatus,
@@ -79,12 +92,15 @@ export default {
       tokenRetryTimeout: null,
       maxTokenRetries: 3,
       baseRetryDelay: 1000, // 1 second base delay
-      notificationShownFromCustomParams: false
+      notificationShownFromCustomParams: false,
+      reservation: null,
+      task: null,
+      showReservationModal: false
     }
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany', 'profile']),
+    ...mapState('cache', ['currentCompany', 'profile', 'agentStatuses']),
 
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups', 'campaigns']),
 
@@ -125,6 +141,18 @@ export default {
 
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
+    },
+
+    reservationContactName () {
+      if (this.task?.attributes?.contact_info) {
+        const contactInfo = this.task.attributes.contact_info
+        return contactInfo.name + ' ' + contactInfo.phone
+      }
+      return ''
+    },
+
+    reservationType () {
+      return this.task?.attributes?.task_type || 'inbound call'
     }
   },
 
@@ -201,6 +229,12 @@ export default {
     }
 
     this.dialerListeners.endWrapUp = () => {
+      // check if the task is available
+      if (this.task) {
+        this.task.complete('Wrap up finished')
+        this.task = null
+      }
+
       if (this.dialer.currentStatus !== 'WRAP_UP') {
         return
       }
@@ -209,6 +243,13 @@ export default {
     }
 
     this.dialerListeners.forceEndWrapUp = () => {
+      // check if the task is available
+      console.log('Talk-DialerListeners-ForceEndWrapUp', this.task)
+      if (this.task) {
+        this.task.complete('Force wrap up finished')
+        this.task = null
+      }
+
       if (this.dialer.currentStatus !== 'WRAP_UP') {
         return
       }
@@ -348,6 +389,15 @@ export default {
       }
     }
 
+    this.workerListeners.updateActivity = (event) => {
+      console.log('Talk-Dialer: Update activity', event)
+      // find the activity in the agentStatuses array
+      const activity = this.agentStatuses.find(activity => activity.status === event.status)
+      if (activity) {
+        this.device.updateActivity(activity.sid)
+      }
+    }
+
     this.startDialerEvents()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -424,6 +474,8 @@ export default {
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
       console.log('call information', call.callSid, call.from, this.dialer.currentNumber)
 
+      this.connection.accept()
+
       // restore app when a call comes
       if (this.$q.platform.is.electron) {
         this.$q.electron.ipcRenderer.send('restore_app')
@@ -464,6 +516,61 @@ export default {
       this.$closeActionNotification('incomingCall')
     })
 
+    this.device.on(TaskRouterEvents.RESERVATION_CREATED, (reservation) => {
+      reservation.on(TaskRouterEvents.RESERVATION_ACCEPTED, (reservation) => {
+        this.reservationAccepted(reservation)
+      })
+      reservation.on(TaskRouterEvents.RESERVATION_CANCELED, (reservation) => {
+        this.reservationCanceled(reservation)
+      })
+      reservation.on(TaskRouterEvents.RESERVATION_COMPLETED, (reservation) => {
+        this.reservationCompleted(reservation)
+      })
+      reservation.on(TaskRouterEvents.RESERVATION_REJECTED, (reservation) => {
+        this.reservationRejected(reservation)
+      })
+      reservation.on(TaskRouterEvents.RESERVATION_RESCINDED, (reservation) => {
+        this.reservationRescinded(reservation)
+      })
+      reservation.on(TaskRouterEvents.RESERVATION_TIMEOUT, (reservation) => {
+        this.reservationTimeout(reservation)
+      })
+      reservation.on(TaskRouterEvents.RESERVATION_WRAP_UP, (reservation) => {
+        this.reservationWrapUp(reservation)
+      })
+
+      console.log('Talk-Device: Reservation created', reservation)
+      // Show confirmation dialog for reservation if the agent is not answering the call via a PSTN
+      if (this.profile.answer_by !== BY_PHONE_NUMBER) {
+        this.reservation = reservation
+        this.task = reservation.task
+        this.showReservationModal = true
+        this.$bvToast.show('reservation-confirmation-dialog')
+      }
+    })
+
+    this.device.on(TaskRouterEvents.RESERVATION_FAILED, (reservation) => {
+      console.log('Talk-Device: Reservation failed', reservation)
+      this.reservation = null
+      this.task = null
+      this.showReservationModal = false
+    })
+
+    this.device.on(TaskRouterEvents.ACTIVITY_UPDATED, (worker) => {
+      // find the activity in the agentStatuses array
+      const activity = this.agentStatuses.find(activity => activity.sid === worker.activity.sid)
+      console.log('Talk-Device: Activity updated', activity)
+      if (activity) {
+        const profile = this.profile
+        profile.agent_status = activity.status
+        this.$VueEvent.fire('user_updated', profile)
+      }
+    })
+
+    this.device.on(TaskRouterEvents.READY, (worker) => {
+      console.log('Talk-Device: Worker ready', worker)
+    })
+
     this.getDesktopToken()
 
     // ping getDesktopToken every 24 hours
@@ -472,9 +579,120 @@ export default {
         this.getDesktopToken(true)
       }
     }, 24 * 60 * 60 * 1000)
+
+    if (this.currentCompany.use_new_engine === true) {
+      this.getTaskRouteToken()
+
+      this.getAgentStatuses()
+    }
   },
 
   methods: {
+    reservationAccepted (reservation) {
+      if (this.reservation?.sid !== reservation.sid) {
+        return
+      }
+      console.log('Talk-Device: Reservation accepted', reservation)
+      // get the communication ID and the line_id ID from the reservation's task attributes
+      const communicationId = reservation.task.attributes.communication_id
+      const lineID = reservation.task.attributes.line_id
+      const taskType = reservation.task.attributes.task_type
+      this.showReservationModal = false
+      this.$bvToast.hide('reservation-confirmation-dialog')
+      let destination = 'task_router:' + reservation.task.sid + ':' + taskType + ':' + communicationId
+      this.makeCall(destination, lineID)
+      console.log('Talk-Device: Reservation accepted > makeCall', destination, lineID)
+    },
+    reservationCanceled (reservation) {
+      if (this.reservation?.sid !== reservation.sid) {
+        console.log('Talk-Device: Reservation canceled > reservation.sid !== reservation.sid', this.reservation?.sid, reservation.sid)
+        return
+      }
+      this.reservation = null
+      this.task = null
+      this.showReservationModal = false
+      this.$bvToast.hide('reservation-confirmation-dialog')
+      console.log('Talk-Device: Reservation canceled', reservation)
+    },
+    reservationCompleted (reservation) {
+      if (this.reservation?.sid !== reservation.sid) {
+        console.log('Talk-Device: Reservation completed > reservation.sid !== reservation.sid', this.reservation?.sid, reservation.sid)
+        return
+      }
+      this.reservation = null
+      this.showReservationModal = false
+      this.$bvToast.hide('reservation-confirmation-dialog')
+      console.log('Talk-Device: Reservation completed', reservation)
+    },
+    reservationRejected (reservation) {
+      if (this.reservation?.sid !== reservation.sid) {
+        console.log('Talk-Device: Reservation rejected > reservation.sid !== reservation.sid', this.reservation?.sid, reservation.sid)
+        return
+      }
+      this.reservation = null
+      this.task = null
+      this.showReservationModal = false
+      this.$bvToast.hide('reservation-confirmation-dialog')
+      console.log('Talk-Device: Reservation rejected', reservation)
+    },
+    reservationRescinded (reservation) {
+      if (this.reservation?.sid !== reservation.sid) {
+        console.log('Talk-Device: Reservation rescinded > reservation.sid !== reservation.sid', this.reservation?.sid, reservation.sid)
+        return
+      }
+      this.reservation = null
+      this.task = null
+      this.showReservationModal = false
+      this.$bvToast.hide('reservation-confirmation-dialog')
+      console.log('Talk-Device: Reservation rescinded', reservation)
+    },
+    reservationTimeout (reservation) {
+      if (this.reservation?.sid !== reservation.sid) {
+        console.log('Talk-Device: Reservation timeout > reservation.sid !== reservation.sid', this.reservation?.sid, reservation.sid)
+        return
+      }
+      this.reservation = null
+      this.task = null
+      this.showReservationModal = false
+      this.$bvToast.hide('reservation-confirmation-dialog')
+      console.log('Talk-Device: Reservation timeout', reservation)
+    },
+    reservationWrapUp (reservation) {
+      if (this.reservation?.sid !== reservation.sid) {
+        console.log('Talk-Device: Reservation wrap up > reservation.sid !== reservation.sid', this.reservation?.sid, reservation.sid)
+        return
+      }
+      this.reservation = null
+      this.showReservationModal = false
+      this.$bvToast.hide('reservation-confirmation-dialog')
+      console.log('Talk-Device: Reservation wrap up', reservation)
+    },
+
+    // ReservationModal event handlers
+    onReservationAccepted () {
+      console.log('ReservationModal: Reservation accepted', this.reservation)
+      this.reservation.accept()
+    },
+
+    onReservationRejected () {
+      console.log('ReservationModal: Reservation rejected', this.reservation)
+      this.reservation.reject()
+    },
+
+    onReservationModalHidden () {
+      console.log('ReservationModal: Modal hidden')
+      this.showReservationModal = false
+    },
+    getAgentStatuses () {
+      this.$axios.get('/api/v1/dialer/agent-statuses')
+        .then(response => {
+          console.log('Talk-Dialer: Agent statuses', response.data)
+          this.setAgentStatuses(response.data)
+        })
+        .catch(error => {
+          console.log('Talk-Dialer: Agent statuses error', error)
+        })
+    },
     checkForcedStatus () {
       if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
         return
@@ -535,6 +753,7 @@ export default {
       this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
       this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
       this.$VueEvent.listen('colleague_status_notification', this.dialerListeners.colleagueStatusNotification)
+      this.$VueEvent.listen('update_activity', this.workerListeners.updateActivity)
     },
 
     stopDialerEvents () {
@@ -782,6 +1001,13 @@ export default {
       })
     },
 
+    getTaskRouteToken () {
+      return this.$axios.post('/api/v1/dialer/task-router-token').then(res => {
+        this.setDialerTaskRouterToken(res.data)
+        this.device.initializeTaskRouter(res.data)
+      })
+    },
+
     shouldIncludeRingGroupId (isFromDialer, outboundCampaign) {
       if (isFromDialer) {
         // Call is made directly from dialer, so we don't need to include the ring group id
@@ -837,7 +1063,7 @@ export default {
       // reject ongoing call if there is one
       this.rejectCall()
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL && !isCallWaiting && !shouldAnswer) {
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL && !isCallWaiting && !shouldAnswer && !this.reservation) {
         console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
         return
       }
@@ -1065,6 +1291,16 @@ export default {
           return
         }
 
+        const callWrapUpOptions = this.dialer.communication.call_wrap_up_options
+        if (callWrapUpOptions['wrap_up'] && // if the backend says wrap it up
+          callWrapUpOptions['user_id'] === this.profile.id && // and if the user who answered the call is trying to go to wrap up (prevents third-parties from going to wrap-up state)
+          (this.hasNoParkedAndInprogressCall ||
+          this.hasParkedAndInprogressCall ||
+          this.hasCallInProgressNotParked) &&
+          !(this.parkFromAnotherTab || this.hungFromAnotherTab)) {
+          this.startWrapUpTimer(this.dialer.communication.call_wrap_up_options['duration'])
+          return
+        }
         const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
             this.hasParkedAndInprogressCall ||
             this.hasCallInProgressNotParked) &&
@@ -1074,6 +1310,12 @@ export default {
           this.startWrapUpTimer()
           return
         }
+      }
+
+      // check if the task is available
+      if (this.task) {
+        this.task.complete('Call ended')
+        this.task = null
       }
 
       // Handle parked call from another tab
@@ -1804,8 +2046,12 @@ export default {
       clearInterval(this.$options.callDurationInterval)
     },
 
-    startWrapUpTimer () {
+    startWrapUpTimer (duration = null) {
       this.setDialerCurrentStatus('WRAP_UP')
+      // check if the task is available
+      if (this.task) {
+        this.task.wrapUp()
+      }
 
       // when communication is rejected by app, skip wrap-up
       if (this.dialer.communication?.rejected_by_app) {
@@ -1813,22 +2059,24 @@ export default {
         return
       }
 
-      const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
-        ? this.currentCompany.wrap_up_seconds
-        : this.profile.wrap_up_seconds
-      console.log('Wrap-up time: ' + wrapUpTimer)
+      if (duration === null) {
+        duration = this.currentCompany && this.currentCompany.force_wrap_up
+          ? this.currentCompany.wrap_up_seconds
+          : this.profile.wrap_up_seconds
+      }
+      console.log('Wrap-up time: ' + duration)
 
-      if (wrapUpTimer < 0 || this.isBargingOrWhispering) {
+      if (duration < 0 || this.isBargingOrWhispering) {
         this.backToDial('Talk-StartWrapUpTimer')
         return
       }
 
-      if (wrapUpTimer === 0) {
+      if (duration === 0) {
         this.stopWrapUpTimer()
         return
       }
 
-      this.setDialerWrapUpDuration(wrapUpTimer)
+      this.setDialerWrapUpDuration(duration)
       this.setDialerWrapUpTimer(this.secondsToHms(this.dialer.wrapUpDuration))
       this.$options.wrapUpDurationInterval = setInterval(this.countWrapUpDuration, 1000)
     },
@@ -1836,6 +2084,11 @@ export default {
     stopWrapUpTimer () {
       this.setDialerWrapUpDuration(0)
       this.setDialerWrapUpTimer('')
+      // check if the task is available
+      if (this.task) {
+        this.task.complete('Wrap up timer expired')
+        this.task = null
+      }
       clearInterval(this.$options.wrapUpDurationInterval)
     },
 
@@ -2148,8 +2401,11 @@ export default {
         })
     },
 
+    ...mapActions('cache', ['setAgentStatuses']),
+
     ...mapActions([
       'setDialerToken',
+      'setDialerTaskRouterToken',
       'setDialerCall',
       'setDialerParkedCall',
       'setDialerIsReady',

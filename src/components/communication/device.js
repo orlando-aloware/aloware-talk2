@@ -1,8 +1,10 @@
 import * as Carriers from '../../constants/carriers'
 import * as Events from '../../constants/webrtc-events'
+import * as TaskRouterEvents from '../../constants/taskrouter-events'
 import DeviceError from './twilio/error'
 import TwilioConnection from './twilio/connection'
 const TwilioClientDevice = require('@twilio/voice-sdk').Device
+const TwilioTaskRouterWorker = require('twilio-taskrouter').Worker
 
 export default class Device {
   constructor (carrier) {
@@ -15,10 +17,16 @@ export default class Device {
       disconnect: [],
       connect: [],
       cancel: [],
-      tokenWillExpire: []
+      tokenWillExpire: [],
+      reservationCreated: [],
+      reservationFailed: [],
+      activityUpdated: [],
+      ready: []
     }
     this._device = null
     this._is_initialized = false
+    this._worker = null
+    this._is_task_router_initialized = false
   }
 
   _executeCallback (cbName, args = []) {
@@ -54,12 +62,37 @@ export default class Device {
     this._initEvents()
   }
 
+  initializeTaskRouter (token, options = {}) {
+    if (this._is_task_router_initialized) {
+      return
+    }
+
+    console.log('Initialize task router', token, options)
+    this._worker = new TwilioTaskRouterWorker(token, options)
+    this._is_task_router_initialized = true
+    this._initTaskRouterEvents()
+  }
+
   register () {
     if (this._device.state !== Events.UNREGISTERED) {
       return
     }
 
     this._device.register()
+  }
+
+  updateActivity (activitySid) {
+    // find the activity in the activities array of the worker
+    const activity = this._worker.activities.get(activitySid)
+    if (!activity) {
+      return
+    }
+    console.log('Talk-Device: Update activity', activity)
+    activity.setAsCurrent().then(() => {
+      console.log('Talk-Device: Activity set as current', activity)
+    }).catch((error) => {
+      console.log('Talk-Device: Activity set as current error', error)
+    })
   }
 
   _initEvents () {
@@ -93,6 +126,21 @@ export default class Device {
 
     this._device.on(Events.TOKEN_WILL_EXPIRE, () => {
       this._executeCallback(Events.TOKEN_WILL_EXPIRE)
+    })
+  }
+
+  _initTaskRouterEvents () {
+    this._worker.on(TaskRouterEvents.RESERVATION_CREATED, (reservation) => {
+      this._executeCallback(TaskRouterEvents.RESERVATION_CREATED, [reservation])
+    })
+    this._worker.on(TaskRouterEvents.RESERVATION_FAILED, (reservation) => {
+      this._executeCallback(TaskRouterEvents.RESERVATION_FAILED, [reservation])
+    })
+    this._worker.on(TaskRouterEvents.ACTIVITY_UPDATED, (worker) => {
+      this._executeCallback(TaskRouterEvents.ACTIVITY_UPDATED, [worker])
+    })
+    this._worker.on(TaskRouterEvents.READY, (worker) => {
+      this._executeCallback(TaskRouterEvents.READY, [worker])
     })
   }
 }

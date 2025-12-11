@@ -13,6 +13,7 @@ export default {
   computed: {
     ...mapState(['oldAgentStatus']),
     ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState('cache', ['currentCompany']),
 
     agentStatus () {
       return _.get(this.profile, 'agent_status', null)
@@ -106,42 +107,47 @@ export default {
       if (!this.authenticated) {
         return
       }
-      if (val !== undefined && ![AgentStatus.AGENT_STATUS_ON_WRAP_UP, AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_RINGING].includes(val)) {
-        console.log('Setting old agent status [api]: ', val)
-        this.setOldAgentStatus(val)
-      }
-      console.log('Changing agent status [api]: ', val)
+      if (this.currentCompany?.use_new_engine === true) {
+        console.log('Updating activity [api]: ', val)
+        this.$VueEvent.fire('update_activity', { status: val })
+      } else {
+        if (val !== undefined && ![AgentStatus.AGENT_STATUS_ON_WRAP_UP, AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_RINGING].includes(val)) {
+          console.log('Setting old agent status [api]: ', val)
+          this.setOldAgentStatus(val)
+        }
+        console.log('Changing agent status [api]: ', val)
 
-      // make sure that the session is valid
-      if (this.profile) {
-        this.loadingAgentStatus = true
-        this.$axios.post('/api/v1/user/' + this.profile.id + '/agent-status', {
-          agent_status: val
-        }, {
-          headers: {
-            'Signature': signature
-          }
-        }).then(({ data }) => {
-          this.loadingAgentStatus = false
-          if (forceStatus && val !== data.agent_status) {
-            console.log(`Requested Agent status value (${val}) and API response value (${data.agent_status}) is not the same. Retrying request...`)
-            this.changeAgentStatus(val, forceStatus, 1, signature)
-            return
-          }
-          this.setAgentStatus(data.agent_status)
-          this.$VueEvent.fire('user_updated', data)
-          console.log('Changed agent status [api]: ', data.agent_status)
-        }).catch(err => {
-          changeAgentStatusTry++
-          // error
-          console.log('An error occurred while changing agent status [api]', err)
-          // check if we have found the communication after 3 retries
-          if (changeAgentStatusTry > 3) {
+        // make sure that the session is valid
+        if (this.profile) {
+          this.loadingAgentStatus = true
+          this.$axios.post('/api/v1/user/' + this.profile.id + '/agent-status', {
+            agent_status: val
+          }, {
+            headers: {
+              'Signature': signature
+            }
+          }).then(({ data }) => {
             this.loadingAgentStatus = false
-          } else {
-            this.changeAgentStatus(val, forceStatus, changeAgentStatusTry, signature)
-          }
-        })
+            if (forceStatus && val !== data.agent_status) {
+              console.log(`Requested Agent status value (${val}) and API response value (${data.agent_status}) is not the same. Retrying request...`)
+              this.changeAgentStatus(val, forceStatus, 1, signature)
+              return
+            }
+            this.setAgentStatus(data.agent_status)
+            this.$VueEvent.fire('user_updated', data)
+            console.log('Changed agent status [api]: ', data.agent_status)
+          }).catch(err => {
+            changeAgentStatusTry++
+            // error
+            console.log('An error occurred while changing agent status [api]', err)
+            // check if we have found the communication after 3 retries
+            if (changeAgentStatusTry > 3) {
+              this.loadingAgentStatus = false
+            } else {
+              this.changeAgentStatus(val, forceStatus, changeAgentStatusTry, signature)
+            }
+          })
+        }
       }
     }, 500),
 

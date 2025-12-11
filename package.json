@@ -71,6 +71,7 @@
     "storage-factory": "^0.2.0",
     "stylus": "github:stylus/stylus#0.54.8",
     "textarea-caret": "^3.1.0",
+    "twilio-taskrouter": "^2.1.0",
     "uuid": "^8.3.2",
     "v-calendar": "2.4.1",
     "vue": "^2.7.16",

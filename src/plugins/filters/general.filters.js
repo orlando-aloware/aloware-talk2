@@ -483,6 +483,10 @@ const fixPhone = (
     return phoneNumber
   }
 
+  if (phoneNumber.includes('task_router:')) {
+    return phoneNumber
+  }
+
   // sip uri used instead of phone number
   if (phoneNumber.indexOf('@') > -1) {
     return phoneNumber
