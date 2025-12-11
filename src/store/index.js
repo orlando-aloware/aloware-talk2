@@ -58,6 +58,7 @@ export default function (/* { ssrContext } */) {
     state: {
       isWidget: false,
       isSalesforceWidget: false,
+      isHubSpotWidget: false,
       showMenu: false,
       filter: {},
       tags: [],
@@ -346,6 +347,10 @@ export default function (/* { ssrContext } */) {
 
       setIsSalesforceWidget ({ commit }, value) {
         commit('SET_IS_SALESFORCE_WIDGET', value)
+      },
+
+      setIsHubSpotWidget ({ commit }, value) {
+        commit('SET_IS_HUBSPOT_WIDGET', value)
       },
 
       setDialerToken ({ commit }, token) {
@@ -1008,6 +1013,10 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_SALESFORCE_WIDGET (state, value) {
         state.isSalesforceWidget = value
+      },
+
+      SET_IS_HUBSPOT_WIDGET (state, value) {
+        state.isHubSpotWidget = value
       },
 
       SET_DIALER_TOKEN (state, token) {
