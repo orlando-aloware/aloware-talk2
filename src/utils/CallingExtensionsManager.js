@@ -1,7 +1,4 @@
 // src/utils/CallingExtensionsManager.js
-// @deprecated - This file is currently used for the HubSpot-specific code in Dialer.vue, which will be removed in the future.
-// Instead, please use HubSpotCallingExtensionsClient.js (and HubSpotSoftPhone.vue) of managing HubSpot Calling Extensions SDK
-
 import CallingExtensions from '@hubspot/calling-extensions-sdk'
 
 class CallingExtensionsManager {

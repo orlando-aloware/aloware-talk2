@@ -435,12 +435,12 @@
                       @click="toggleRecordingStatus">
                 <template v-if="dialer.communication.should_record === true">
                   <record-icon :width="iconSizes.recording.width"
-                               :height="iconSizes.recording.height"
-                               v-show="dialer.recordingStatus === 'paused'">
+                        :height="iconSizes.recording.height"
+                        v-show="dialer.recordingStatus === 'paused'">
                   </record-icon>
                   <pause-record-icon :width="iconSizes.recording.width"
-                                     :height="iconSizes.recording.height"
-                                     v-show="dialer.recordingStatus === 'in-progress'">
+                                    :height="iconSizes.recording.height"
+                                    v-show="dialer.recordingStatus === 'in-progress'">
                   </pause-record-icon>
                 </template>
                 <template v-else>
@@ -1597,8 +1597,7 @@ export default {
       'callFishingQueue',
       'isCallBackButtonDisabled',
       'isWidget',
-      'isSalesforceWidget',
-      'isHubSpotWidget'
+      'isSalesforceWidget'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -1611,13 +1610,6 @@ export default {
     ]),
 
     isCallCompleted () {
-      // HubSpot widget sets dialer.communication early (during incoming call phase) with a completed
-      // disposition_status2 from previous attempts or fishing mode. To prevent footer buttons from showing
-      // during incoming calls, only rely on terminal statuses for HubSpot widget, not disposition status.
-      if (this.isHubSpotWidget) {
-        return ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)
-      }
-
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
     },
 
@@ -1823,22 +1815,8 @@ export default {
     },
 
     leadNumberRaw () {
-      // Priority order: communication > callFishing > call.from (for incoming) / call.to (for outgoing)
       const leadNumber = _.get(this.dialer, 'communication.lead_number', null)
-      if (leadNumber) return leadNumber
-
-      const fishingNumber = _.get(this.dialer, 'callFishing.communication.lead_number', null)
-      if (fishingNumber) return fishingNumber
-
-      // Fallback to call object during transition (prevents number from disappearing)
-      if (this.dialer.call) {
-        const callFrom = _.get(this.dialer, 'call.from', null)
-        const callTo = _.get(this.dialer, 'call.to', null)
-        // For incoming calls, use 'from', for outgoing use 'to'
-        return this.dialer.call.direction === 'INCOMING' ? callFrom : callTo
-      }
-
-      return null
+      return !leadNumber ? _.get(this.dialer, 'callFishing.communication.lead_number', null) : leadNumber
     },
 
     leadNumber () {
@@ -1949,36 +1927,15 @@ export default {
     },
 
     isPhoneBodyVisible () {
-      // For HubSpot widget with fishing mode, always show the phone body
-      if (this.isHubSpotWidget && this.hasCallFishingCommunication) {
-        return this.screen === 'call'
-      }
-
       return this.screen === 'call' &&
         (!_.isEmpty(this.dialer.call) ||
           !this.hasCallFishingCommunication)
     },
 
     isPhoneCTAVisible () {
-      // For HubSpot widget, show buttons when there's active fishing communication,or we're in the process of connecting a fishing call
-      if (this.isHubSpotWidget) {
-        if (this.hasCallFishingCommunication) {
-          return true
-        }
-
-        // Keep showing buttons while transitioning from fishing call accept to actual connection
-        const isConnectingFishingCall = (this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' ||
-            this.dialer.currentStatus === 'MAKING_CALL') &&
-          this.dialer.communication &&
-          _.isEmpty(this.dialer.call)
-        if (isConnectingFishingCall) {
-          return true
-        }
-      }
-
       return (!_.isEmpty(this.dialer.call) &&
-          this.dialer.call.direction === 'INCOMING') ||
-          this.hasCallFishingCommunication
+        this.dialer.call.direction === 'INCOMING') ||
+        this.hasCallFishingCommunication
     },
 
     isHangupCallVisible () {
@@ -2008,11 +1965,6 @@ export default {
     },
 
     isDeclineCallVisible () {
-      // For HubSpot widget, show Decline button for fishing mode calls
-      if (this.isHubSpotWidget && this.hasCallFishingCommunication) {
-        return true
-      }
-
       return this.dialer.call !== undefined ||
         !this.hasCallFishingCommunication
     },
