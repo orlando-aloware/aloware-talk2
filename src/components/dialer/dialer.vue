@@ -1292,13 +1292,13 @@ export default {
         }
 
         const callWrapUpOptions = this.dialer.communication.call_wrap_up_options
-        if (callWrapUpOptions['wrap_up'] && // if the backend says wrap it up
+        if (callWrapUpOptions && callWrapUpOptions['wrap_up'] && // if the backend says wrap it up
           callWrapUpOptions['user_id'] === this.profile.id && // and if the user who answered the call is trying to go to wrap up (prevents third-parties from going to wrap-up state)
           (this.hasNoParkedAndInprogressCall ||
           this.hasParkedAndInprogressCall ||
           this.hasCallInProgressNotParked) &&
           !(this.parkFromAnotherTab || this.hungFromAnotherTab)) {
-          this.startWrapUpTimer(this.dialer.communication.call_wrap_up_options['duration'])
+          this.startWrapUpTimer(callWrapUpOptions['duration'])
           return
         }
         const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
