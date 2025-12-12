@@ -474,8 +474,6 @@ export default {
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
       console.log('call information', call.callSid, call.from, this.dialer.currentNumber)
 
-      this.connection.accept()
-
       // restore app when a call comes
       if (this.$q.platform.is.electron) {
         this.$q.electron.ipcRenderer.send('restore_app')
