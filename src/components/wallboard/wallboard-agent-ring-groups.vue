@@ -15,8 +15,8 @@
                  :target="`rg-more-${_uid}`"
                  v-if="ringGroups.length > 1">
         <span class="d-block mb-1"
-              :key="ringGroup.id"
-              v-for="ringGroup in userRingGroups">
+              v-for="(ringGroup, i) in userRingGroups"
+              :key="i">
           {{ ringGroup.name }}
         </span>
       </b-popover>

@@ -96,7 +96,7 @@ export default {
     // deleted communication event
     this.$VueEvent.listen('delete_communication', this.deleteCall)
 
-    this.addUsersPoll()
+    this.startUsersPoll()
   },
 
   methods: {

@@ -4,17 +4,22 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   data () {
     return {
-      pollingInterval: 5, // in seconds
-      usersPollInterval: null
+      pollingInterval: 7, // in seconds
+      usersPollTimeout: null
     }
   },
 
   methods: {
-    ...mapMutations(['UPDATE_USER_STATUS']),
+    ...mapMutations(['UPDATE_USERS_STATUS_BATCH']),
 
-    addUsersPoll () {
-      // runs after 'polling_interval' seconds the app is initiated, every 'polling_interval' seconds
-      this.usersPollInterval = setInterval(() => {
+    startUsersPoll () {
+      // Start the first poll immediately, subsequent polls will be scheduled after completion
+      this.pollUsers()
+    },
+
+    scheduleNextPoll () {
+      // Schedule the next poll after pollingInterval seconds
+      this.usersPollTimeout = setTimeout(() => {
         this.pollUsers()
       }, this.pollingInterval * 1000)
     },
@@ -22,24 +27,19 @@ export default {
     pollUsers () {
       console.log('Polling agents status...')
 
-      talk2Api.V1.company.getAgentsStatus().then((result) => {
-        // update agent_status of every user
-
-        for (const user of result.data) {
-          // wrap with timeout to avoid blocking the main thread
-          setTimeout(() => {
-            this.UPDATE_USER_STATUS(user)
-
-            if (this.profile.company_id === user.company_id) {
-              this.$VueEvent.fire('agent_status_updated', user)
-            }
-          })
-        }
-      })
+      talk2Api.V1.company.getAgentsStatus()
+        .then((result) => {
+          // batch update all agent statuses at once for better performance
+          this.UPDATE_USERS_STATUS_BATCH(result.data)
+        })
+        .finally(() => {
+          // Schedule next poll after request completes (success or failure)
+          this.scheduleNextPoll()
+        })
     }
   },
 
   beforeDestroy () {
-    clearInterval(this.usersPollInterval)
+    clearTimeout(this.usersPollTimeout)
   }
 }
