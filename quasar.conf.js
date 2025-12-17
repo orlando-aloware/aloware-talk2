@@ -87,22 +87,21 @@ module.exports = function (ctx) {
           exclude: /node_modules/
         })
 
-        // COMMENTED OUT FOR TESTING - Sentry plugin
-        // if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
-        //   const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-        //   const sentryPluginInstance = new SentryWebpackPlugin({
-        //     authToken: process.env.SENTRY_AUTH_TOKEN,
-        //     org: process.env.SENTRY_ORG,
-        //     project: process.env.SENTRY_PROJECT,
-        //     // release: process.env.SENTRY_VERSION,
+        if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
+          const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+          const sentryPluginInstance = new SentryWebpackPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            // release: process.env.SENTRY_VERSION,
 
-        //     // webpack specific configuration
-        //     include: cfg.output.path,
-        //     ignore: ['node_modules']
-        //   })
+            // webpack specific configuration
+            include: cfg.output.path,
+            ignore: ['node_modules']
+          })
 
-        //   cfg.plugins.push(sentryPluginInstance)
-        // }
+          cfg.plugins.push(sentryPluginInstance)
+        }
       }
     },
 
@@ -227,7 +226,16 @@ module.exports = function (ctx) {
         // https://www.electron.build/configuration/configuration
         appId: 'com.aloware.talk2',
         mac: {
-          target: ['dmg', 'zip'],
+          target: [
+            {
+              target: 'dmg',
+              arch: 'universal'
+            },
+            {
+              target: 'zip',
+              arch: 'universal'
+            }
+          ],
           type: 'distribution',
           category: 'public.app-category.business',
           entitlements: './src-electron/build/entitlements.mac.plist',
@@ -264,22 +272,21 @@ module.exports = function (ctx) {
       nodeIntegration: true,
 
       extendWebpack (cfg) {
-        // COMMENTED OUT FOR TESTING - Sentry plugin
-        // if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
-        //   const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-        //   const sentryPluginInstance = new SentryWebpackPlugin({
-        //     authToken: process.env.SENTRY_AUTH_TOKEN,
-        //     org: process.env.SENTRY_ORG,
-        //     project: process.env.SENTRY_PROJECT,
-        //     // release: process.env.SENTRY_VERSION,
+        if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
+          const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+          const sentryPluginInstance = new SentryWebpackPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            // release: process.env.SENTRY_VERSION,
 
-        //     // webpack specific configuration
-        //     include: cfg.output.path,
-        //     ignore: ['node_modules']
-        //   })
+            // webpack specific configuration
+            include: cfg.output.path,
+            ignore: ['node_modules']
+          })
 
-        //   cfg.plugins.push(sentryPluginInstance)
-        // }
+          cfg.plugins.push(sentryPluginInstance)
+        }
       }
     }
   }
