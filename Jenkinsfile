@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     options {
-        disableConcurrentBuilds(abortPrevious: false)
+        disableConcurrentBuilds(abortPrevious: true)
     }
     //Environment variables
     environment {
