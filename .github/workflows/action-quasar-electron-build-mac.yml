@@ -190,6 +190,7 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.aws_secret_access_key }}
           aws configure set default.region ${{ secrets.aws_bucket_region }}
 
-      - name: Upload Renamed macOS DMG to S3
-        run: |
-          aws s3 cp "./${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg" "s3://${{ secrets.aws_bucket }}/latest/${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg" --acl public-read
+      # COMMENTED OUT FOR TESTING - Remove comment after verifying build works on macOS-14
+      # - name: Upload Renamed macOS DMG to S3
+      #   run: |
+      #     aws s3 cp "./${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg" "s3://${{ secrets.aws_bucket }}/latest/${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg" --acl public-read
