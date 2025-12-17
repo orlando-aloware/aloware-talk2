@@ -13772,10 +13772,10 @@ vue-countup-v2@^4.0.0:
   resolved "https://registry.yarnpkg.com/vue-countup-v2/-/vue-countup-v2-4.0.0.tgz#061a1ac8ee4aa207bb9d23d2bcc1d53a5f7c3675"
   integrity sha512-XjKeHo1ndRlJtXvHd6B1eWOpbrJDdNU3rdYZwVPv2YlUXbvthsBT4kms5Fc/mn9RdXPrMX2H/ktAAQtKjWFisw==
 
-vue-ctk-date-time-picker@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/vue-ctk-date-time-picker/-/vue-ctk-date-time-picker-2.5.0.tgz#22d6e4b4199326bfb0bf0b869e7450f4c16a6239"
-  integrity sha512-s4AO+5xnPlX+LD5UPQcjLBnv8MwcEJKlKUnkTLQeXRV0xqpH9pWRe6aJ8N2+506mEN6b7iwhlFox6uKKdtK+gw==
+vue-ctk-date-time-picker@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/vue-ctk-date-time-picker/-/vue-ctk-date-time-picker-2.6.1.tgz#d9c87d8473f7263a19a4b171de8bb8a1900be621"
+  integrity sha512-WTPM+aljZF1SzxVd+Cw0rw/g6Bjb6UnZMQYQlJPHISkavGlZ6waQf1EaMh/AXWx/JGd4WTlUQPkokvxkMN0DAw==
   dependencies:
     moment "^2.24.0"
     moment-range "^4.0.1"
