@@ -1,0 +1,2 @@
+export const TAGS_DEPRECATION_MESSAGE = `We are migrating the behavior of <b>contact tags</b> into <b>lists</b> soon. Please <a class="alert-link text-decoration-underline" href="${window.location.origin}/contacts">click here</a> to utilize the <b>list page.</b>`
+export const TAGS_DEPRECATION_IMPORT_CONTACTS_MESSAGE = `<b>Contact imports</b> will now generate a <b>List</b> in addition to a tag.  We will <b>migrate contact tags</b> to <b>lists</b> soon."`

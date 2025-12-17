@@ -1,0 +1,4 @@
+{
+  "index.html": "no-cache, no-store, must-revalidate",
+  "*": "max-age=31536000,immutable"
+}

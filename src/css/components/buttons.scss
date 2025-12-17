@@ -1,0 +1,222 @@
+.f-btn--cancel {
+  background-color: $grey-80;
+  color: $white;
+}
+
+.modal-content {
+  border-radius: 8px !important;
+}
+
+.t-badge {
+  padding: 1px;
+  &__warning {
+    background-color: $red-50 !important;
+  }
+}
+
+.t-badge-name {
+  padding: 0px;
+}
+
+.t-grouped-buttons {
+  background-color: $grey-60;
+  padding: 2px 0px;
+  display: inline-block;
+  border-radius: 6px;
+  a.link {
+    //display: inline-flex;
+    text-decoration: none;
+  }
+  &__btn {
+    background-color: $grey-60;
+    padding: 4px 10px;
+    color: $grey-90;
+    display: inline-flex;
+    margin: 1px 0;
+    height: 26px;
+    border-radius: 5px;
+
+    .t__badge {
+      background-color: $grey-70;
+      font-size: 10px;
+      line-height: 16px;
+      padding: 0px 5px;
+      margin: 1px 5px;
+      border-radius: 5px;
+      color: $grey-90;
+      height: 16px;
+      top: 0px;
+      position: relative;
+    }
+
+    .t-badge-name {
+      font-size: 14px;
+    }
+  }
+  &__btn:active,
+  &__btn.active {
+    background-color: $primary;
+    border-radius: 5px;
+    color: $white;
+    .t__badge {
+      background-color: lighten($primary, 12%);
+      color: $white;
+    }
+  }
+
+  &__btn:hover {
+    background-color: lighten($primary, 10%);
+    border-radius: 5px;
+    color: $white;
+    .t__badge {
+      background-color: lighten($primary, 12%);
+      color: $white;
+    }
+  }
+
+}
+
+.start-dial-button {
+  border-radius: 6px;
+  height: 28px;
+  width: 121px;
+  font-size: 13px;
+  .q-btn__wrapper {
+    top: -2px;
+  }
+}
+
+.sessions-button {
+  border-radius: 6px;
+  height: 28px;
+  width: 121px;
+  font-size: 13px;
+  &.no-outline {
+    .q-btn__wrapper {
+      top: 0px !important;
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+  }
+  &.free-width {
+    width: auto !important;
+  }
+  .q-btn {
+    &__wrapper {
+      top: -2px;
+    }
+    &__content {
+      flex-wrap: nowrap;
+    }
+  }
+}
+
+.dropdown {
+
+  &.show {
+    .dropdown-toggle {
+      border: $primary solid 1px !important;
+    }
+  }
+  .dropdown-toggle {
+    border-radius: 6px;
+  }
+}
+
+.t-expansion-panels {
+  .t-expansion-panel {
+    padding: 14px 5px;
+    position: relative;
+
+    &:hover {
+      .dropdown {
+        &.t-btn-floater {
+          &__top {
+            .btn {
+              display: block;
+            }
+            display: block;
+          }
+          &__bottom {
+            display: block;
+          }
+        }
+      }
+    }
+    .dropdown {
+      &.t-btn-floater {
+
+        &__bottom {
+          position: absolute;
+          bottom: 12px;
+          right: 15px;
+          height: 15px;
+          width: 15px;
+          display: none;
+        }
+        &__top {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+
+          .btn {
+            display: none;
+            padding: 0 5px !important;
+            border: 0 !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+.chip-ellipsis {
+  .q-chip {
+    &.active {
+      background-color: $primary !important;
+      color: $white;
+      .q-chip__content {
+        .chip-label {
+          color: $white !important;
+        }
+      }
+    }
+  }
+  .dropdown {
+    ul {
+      li {
+        &.active {
+          background-color: $primary;
+          border-radius: 8px;
+          a {
+            color: $white;
+            &:hover {
+              color: black;
+            }
+          }
+
+        }
+      }
+    }
+  }
+}
+
+.contact-sidebar-list-wrapper {
+  &.hide-toggle {
+    .q-expansion-item__toggle-focus,
+    .q-focusable {
+      display: none;
+    }
+
+    #bs-folder-options {
+      margin-top: -8px;
+      right: 0;
+      display: inline;
+      position: absolute;
+    }
+  }
+}
+
+.btn-rounded {
+  border-radius: 6px;
+}

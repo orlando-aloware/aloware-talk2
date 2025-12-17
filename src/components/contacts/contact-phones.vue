@@ -1,0 +1,223 @@
+<template>
+  <div class="w-100"
+       v-if="contact">
+    <b-card class="border-0 w-100"
+            data-testid="contact-phones-card"
+            no-body>
+      <b-card-body :class="bodyClass" data-testid="contact-phones-body">
+        <div class="w-100">
+          <h4>All Numbers</h4>
+          <contact-phones-list-items data-testid="contact-phones-list-items"
+                                     :phones="sortedPhones"
+                                     :is-read-only="isReadOnly"
+                                     @edit="onEditPhone"
+                                     @delete="onDeletePhone"
+                                     @composerMedia="setComposerVariables"
+                                     @call="onCall"/>
+          <b-link ref="phone_form"
+                  href="#"
+                  class="custom-link text-decoration-none"
+                  data-testid="contact-phones-add-phone-button"
+                  :disabled="isReadOnly"
+                  @click="onAddPhone">
+            <plus-circle-icon />
+            Add Phone Number
+          </b-link>
+
+          <q-menu content-class="mx-height-300"
+                  ref="templatesMenu"
+                  no-parent-event
+                  no-focus
+                  :offset="[284, -105]"
+                  data-testid="contact-phones-form-menu"
+                  v-model="showPhonesForm">
+            <div class="row no-wrap q-pa-md">
+              <contact-phones-form :phones="sortedPhones"
+                                   :phone="phone"
+                                   data-testid="contact-phones-form"
+                                   @close="onClosePhoneForm">
+              </contact-phones-form>
+            </div>
+          </q-menu>
+        </div>
+      </b-card-body>
+    </b-card>
+  </div>
+</template>
+
+<script>
+import { mapActions, mapGetters } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
+import talk2Api from 'src/plugins/api/api'
+import ContactPhonesForm from 'src/components/forms/contact-phones-form'
+import PlusCircleIcon from 'components/icons/plus-circle-icon'
+import ContactPhonesListItems from 'src/components/contacts/contact-phones-list-items'
+import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
+import _ from 'lodash'
+
+export default {
+  name: 'contact-phones',
+
+  mixins: [aclMixin],
+
+  props: {
+    noBottomPadding: {
+      type: Boolean,
+      default: false
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  components: {
+    ContactPhonesListItems,
+    PlusCircleIcon,
+    ContactPhonesForm
+  },
+
+  computed: {
+    ...mapGetters('contacts', [
+      'contact',
+      'contactPhoneNumbers'
+    ]),
+
+    sortedPhones () {
+      // Create a copy of the array before sorting
+      const phoneNumbersCopy = [...this.contactPhoneNumbers]
+
+      // move primary phone to the top
+      return phoneNumbersCopy.sort((a, b) => {
+        if (a.phone_number === this.contact.phone_number) return -1
+        if (b.phone_number === this.contact.phone_number) return 1
+        return 0
+      })
+    },
+
+    bodyClass () {
+      const paddingClass = this.noBottomPadding ? 'pb-0' : ''
+
+      return [
+        paddingClass
+      ]
+    }
+  },
+
+  data () {
+    return {
+      showPhonesForm: false,
+      LRN_TYPE_LANDLINE,
+      LRN_TYPE_WIRELESS,
+      LRN_TYPE_VOIP,
+      LRN_TYPE_OTHER,
+      phone: {
+        id: null,
+        title: '',
+        number: '',
+        isPrimary: false,
+        isOptedOut: false
+      }
+    }
+  },
+
+  methods: {
+    ...mapActions('contacts', [
+      'setContactSelectedPhone',
+      'setMessageComposerMode',
+      'setMessageComposerSmsPhoneNumber',
+      'removeContactPhoneNumber'
+    ]),
+
+    onAddPhone () {
+      this.setContactSelectedPhone(null)
+      this.phone = {
+        id: null,
+        title: '',
+        number: '',
+        isPrimary: 0
+      }
+      this.showPhonesForm = true
+    },
+
+    onEditPhone (phone) {
+      this.setContactSelectedPhone(phone)
+      this.phone = {
+        id: phone.id,
+        title: phone.title,
+        number: phone.phone_number,
+        isPrimary: phone.phone_number === this.contact.phone_number || false,
+        isOptedOut: phone.is_opted_out
+      }
+      this.showPhonesForm = true
+    },
+
+    onClosePhoneForm () {
+      this.showPhonesForm = false
+    },
+
+    onDeletePhone (phone) {
+      this.$bvModal.msgBoxConfirm('Do you wish to delete this phone number?', {
+        buttonSize: 'sm',
+        okTitle: 'Yes, delete',
+        cancelTitle: 'No, keep'
+      }).then(confirm => {
+        if (confirm) {
+          this.isDeleting = true
+          talk2Api.V1.contact.deletePhone(this.contact.id, phone.id)
+            .then(response => {
+              this.removeContactPhoneNumber(phone)
+              this.$generalNotification('Phone number has been deleted.')
+            }).catch(error => {
+              console.log(error)
+              this.$handleErrors(error.response)
+            }).finally(() => {
+              this.isDeleting = false
+            })
+        }
+      })
+    },
+
+    onCall (phone) {
+      const data = {
+        currentNumber: phone.phone_number,
+        contactName: this.contact.name,
+        companyName: this.contact.company_name,
+        contactId: this.contact.id,
+        contactTimezone: this.contact.timezone
+      }
+
+      if (this.isMobile) {
+        this.setShowPhone(true)
+
+        setTimeout(() => {
+          this.$VueEvent.fire('changePhoneNumber', data)
+        }, 100)
+
+        return
+      }
+
+      this.$VueEvent.fire('callContact', data)
+    },
+
+    setComposerVariables (mode, phone) {
+      this.setMessageComposerMode(mode)
+      this.setMessageComposerSmsPhoneNumber(phone.phone_number)
+    }
+  },
+
+  watch: {
+    'contact.id': _.debounce(function () {
+      const contactId = this.contact?.id
+
+      if (contactId && this.$route.params.id === contactId.toString()) {
+        talk2Api.V1.contact.getPhoneNumbers()
+          .catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
+          })
+      }
+    }, 500)
+  }
+}
+</script>

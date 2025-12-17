@@ -1,0 +1,20 @@
+export const DEFAULT_SETTING_VALUES = {
+  call_disposition_ids: [],
+  campaign_id: null,
+  company_id: null,
+  contact_disposition_ids: [],
+  is_company_scope: 0,
+  metric_options: [],
+  name: null,
+  script_id: null,
+  skip_outside_daytime_hours: 1,
+  min_redials: 0,
+  force_immediate_redial: 0,
+  successful_call_disposition_ids: [],
+  force_sms: 0,
+  skip_redial_warmup_period: 0,
+  user_id: null,
+  warmup_period_in_seconds: 0,
+  order: 1,
+  vm_drop_ids: []
+}

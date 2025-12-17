@@ -1,0 +1,155 @@
+<template>
+  <section class="row w-100 h-100 mx-0">
+    <login-large-screens-info
+      class="col-7 px-0"
+      :xmasEnabled="isXmasBannerEnabled" />
+    <login-form class="col-12 col-lg-5 px-0"/>
+  </section>
+</template>
+
+<script>
+import {
+  guestMixin,
+  aclMixin,
+  classicMixin,
+  settingsMixin,
+  htmlMixin
+} from 'boot/mixins'
+import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
+import LoginForm from 'components/guest/login-form'
+import { mapActions, mapState } from 'vuex'
+import * as storage from 'src/plugins/helpers/storage'
+import talk2Api from 'src/plugins/api/api'
+
+export default {
+  name: 'login',
+
+  mixins: [
+    guestMixin,
+    aclMixin,
+    classicMixin,
+    settingsMixin,
+    htmlMixin
+  ],
+
+  components: { LoginForm, LoginLargeScreensInfo },
+
+  computed: {
+    ...mapState('auth', ['profile', 'shouldRedirectToLogin']),
+    ...mapState(['statics'])
+  },
+
+  methods: {
+    ...mapActions(['setStatics', 'setStaticsLoaded']),
+    ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
+    ...mapActions(['resetVuex', 'setUsage']),
+    ...mapActions('cache', ['setCurrentCompany']),
+    async validateCookieUser () {
+      this.getSharedCookie().then(sharedCookie => {
+        if (sharedCookie) {
+          const response = this.getCookieUser()
+          if (response) {
+            response.then(res => {
+              this.cookieUserValidated(res)
+            })
+          }
+        }
+      })
+    },
+    async cookieUserValidated ({ data: { data } }) {
+      const { usage, company } = data
+      this.resetVuex(['all'])
+      this.setCurrentCompany(company)
+      this.setUsage(usage)
+
+      this.getSharedCookie().then(sharedCookie => {
+        storage.local.setItem('shared_cookie', sharedCookie)
+      })
+
+      storage.local.setItem('company_id', company.id)
+
+      window.location.reload()
+    },
+
+    redirectTimeout () {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve()
+        }, 2000)
+      })
+    },
+
+    async getStatics () {
+      this.setStaticsLoaded(false)
+      await talk2Api.V1.statics.get(this.currentCompany?.id)
+        .then(res => {
+          this.setStatics(res.data)
+        })
+        .catch(err => {
+          this.setPageTitle('Login - Talk')
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+        .finally(() => {
+          this.setStaticsLoaded(true)
+        })
+    }
+  },
+
+  created () {
+    this.validateCookieUser()
+    this.getStatics()
+  },
+
+  async beforeCreate () {
+    this.$store.commit('SET_STATICS_LOADED', false)
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+@import '../css/breakpoints.scss';
+.login-form-bg {
+  background: url('../../public/bg/login_form_bg.png') no-repeat top left;
+  background-size: cover;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-carousel {
+  .login-slide-heading {
+    height: 62px;
+    color: #FFFFFF;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 0.29px;
+    line-height: 31px;
+    text-align: center;
+  }
+  .q-carousel__navigation-icon--active {
+    color: #00BF4A !important;
+  }
+  .q-carousel__navigation-icon--inactive {
+    color: #D2D2D2 !important;
+  }
+}
+
+.login-form {
+  .login-submit {
+    height: 50px;
+    width: 148px;
+    border-radius: 8px;
+    border-color: transparent;
+    background-color: #00BF4A;
+    color: #fff;
+  }
+}
+@include screen('xs') {
+  .login-form-logo {
+    width: 65%;
+  }
+}
+</style>

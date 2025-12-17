@@ -1,0 +1,829 @@
+import Echo from 'laravel-echo'
+import _ from 'lodash'
+import { getWebSocketCredentials } from 'src/boot/helpers'
+import * as ChannelType from 'src/constants/inbox-channels'
+import * as storage from 'src/plugins/helpers/storage'
+import userMixin from 'src/plugins/mixins/user.mixin'
+import { mapActions, mapState } from 'vuex'
+import { Platform } from 'quasar'
+
+export default {
+  mixins: [userMixin],
+  computed: {
+    ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState('cache', ['currentCompany']),
+    ...mapState(['campaigns', 'filters', 'dialer']),
+    ...mapState('inbox', [
+      'communications',
+      'channelChangedFilterFields'
+    ])
+  },
+  methods: {
+    ...mapActions([
+      'setUserStatus',
+      'newRingGroup',
+      'updateRingGroup',
+      'deleteRingGroup',
+      'newCampaign',
+      'updateCampaign',
+      'deleteCampaign',
+      'newFilter',
+      'updateFilter',
+      'deleteFilter',
+      'newWorkflow',
+      'updateWorkflow',
+      'deleteWorkflow',
+      'newTag',
+      'updateTag',
+      'deleteTag',
+      'newDispositionStatus',
+      'updateDispositionStatus',
+      'deleteDispositionStatus',
+      'newBulkCallDisposition',
+      'newCallDisposition',
+      'newActivityType',
+      'deleteActivityType',
+      'updateCallDisposition',
+      'deleteCallDisposition'
+    ]),
+    ...mapActions('cache', ['setCurrentCompany']),
+    broadcastInit () {
+      console.log('initiating broadcast')
+
+      /**
+       * Echo exposes an expressive API for subscribing to channels and listening
+       * for events that are broadcast by Laravel. Echo and event broadcasting
+       * allows your team to easily build robust real-time web applications.
+       */
+      const broadcastDriver = 'soketi'
+
+      window.Echo = this.initEcho(broadcastDriver)
+      this.broadcastListen()
+    },
+    initEcho (broadcastDriver) {
+      console.log('broadcast initiated with ' + broadcastDriver)
+      const { WS_APP_KEY, WS_CLUSTER, WS_HOST } = getWebSocketCredentials()
+      return new Echo({
+        authEndpoint: `${process.env.API_URL}/broadcasting/auth`,
+        broadcaster: 'pusher',
+        key: WS_APP_KEY,
+        cluster: WS_CLUSTER,
+        wsHost: WS_HOST,
+        wssHost: WS_HOST,
+        encrypted: true,
+        forceTLS: true,
+        auth: {
+          headers: {
+            Authorization: `Bearer ${storage.local.getItem('api_token')}`,
+            driver: broadcastDriver
+          }
+        },
+        enabledTransports: ['ws', 'wss'],
+        disableStats: true
+      })
+    },
+    broadcastListen () {
+      const userId = _.get(this.profile, 'id', null)
+
+      if (!userId) {
+        return
+      }
+
+      window.Echo.private('user-' + userId)
+        .listen('.user.status.updated', (event) => {
+          this.dispatchToMemoryMonitor('.user.status.updated', event)
+          this.setUserStatus(event.status)
+        })
+        .listen('.user.in-app.contact.contact_assigned', (event) => {
+          this.dispatchToMemoryMonitor('.user.in-app.contact.contact_assigned', event)
+          if (event.tags) {
+            event.contact.tags = event.tags
+            event.contact.tag_ids = event.contact.tags.map((a) => a.id)
+          }
+          if (event.user) {
+            event.contact.user = event.user
+          }
+          this.$VueEvent.fire('new_in_app_contact_assigned', event.contact)
+        })
+        .listen('.user.in-app.appointment', (event) => {
+          this.dispatchToMemoryMonitor('.user.in-app.appointment', event)
+          this.$VueEvent.fire('new_in_app_appointment', {
+            engagement: event.engagement,
+            contact: event.contact,
+            timeDiff: event.time_diff,
+            unit: event.unit
+          })
+        })
+        .listen('.user.in-app.reminder', (event) => {
+          this.dispatchToMemoryMonitor('.user.in-app.reminder', event)
+          this.$VueEvent.fire('new_in_app_reminder', {
+            engagement: event.engagement,
+            contact: event.contact,
+            timeDiff: event.timeDiff,
+            unit: event.unit
+          })
+        })
+        .listen('.user.in-app.communication.new_call', (event) => {
+          this.dispatchToMemoryMonitor('.user.in-app.communication.new_call', event)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          console.log('.user.in-app.communication.new_call - event.communication', event.communication)
+          this.$VueEvent.fire('new_in_app_call', event.communication)
+        })
+        .listen('.user.in-app.communication.answered_call', (event) => {
+          this.dispatchToMemoryMonitor('.user.in-app.communication.answered_call', event)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('answered_in_app_call', event.communication)
+        })
+        .listen('.user.in-app.communication.new_sms', (event) => {
+          this.dispatchToMemoryMonitor('.user.in-app.communication.new_sms', event)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_in_app_sms', event.communication)
+        })
+        .listen('.user.in-app.communication.new_voicemail', (event) => {
+          this.dispatchToMemoryMonitor('.user.in-app.communication.new_voicemail', event)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_in_app_voicemail', event.communication)
+        })
+        .listen('.user.in-app.communication.new_fax', (event) => {
+          this.dispatchToMemoryMonitor('.user.in-app.communication.new_fax', event)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+          }
+          if (event.contact_tags && event.communication && event.communication.contact) {
+            event.communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_in_app_fax', event.communication)
+        })
+        .listen('.user.logout', (event) => {
+          this.dispatchToMemoryMonitor('.user.logout', event)
+          this.$VueEvent.fire('user_logout', event)
+        })
+        .listen('.communication.created', (event) => {
+          this.dispatchToMemoryMonitor('.communication.created', event)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_communication', event.communication)
+        })
+        .listen('.communication.updated', (event) => {
+          this.dispatchToMemoryMonitor('.communication.updated', event)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('update_communication', event.communication)
+        })
+        .listen('.recording_status.updated', (event) => {
+          this.dispatchToMemoryMonitor('recording_status.updated', event)
+          this.$VueEvent.fire('updated_recording_status', event)
+        })
+        .listen('.communication.file.migrated', (event) => {
+          this.dispatchToMemoryMonitor('.communication.file.migrated', event)
+          this.$VueEvent.fire('communication.file.migrated', event)
+        })
+
+        /**
+         * ------------------------------------
+         * Power Dialer Session Tasks
+         * ------------------------------------
+         */
+        .listen('.user.contact_list_item.created', (event) => {
+          this.dispatchToMemoryMonitor('.user.contact_list_item.created', event)
+          window.VueEvent.fire('contact_list_item_created', event.contact_list_item)
+        })
+        .listen('.user.contact_list_item.updated', (event) => {
+          this.dispatchToMemoryMonitor('.user.contact_list_item.updated', event)
+          window.VueEvent.fire('contact_list_item_updated', event.contact_list_item)
+        })
+        .listen('.user.contact_list_item.deleting', (event) => {
+          this.dispatchToMemoryMonitor('.user.contact_list_item.deleting', event)
+          window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
+        })
+        .listen('.user.session_metrics_calculation', (event) => {
+          this.dispatchToMemoryMonitor('.user.session_metrics_calculation', event)
+          window.VueEvent.fire('metric_sessions_update', event)
+        })
+        .listen('.bulk_contact_list_items.created', (event) => {
+          this.dispatchToMemoryMonitor('.bulk_contact_list_items.created', event)
+          window.VueEvent.fire('contact_list_bulk_created', event)
+        })
+        .listen('.bulk_contact_list_items.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.bulk_contact_list_items.deleted', event)
+          window.VueEvent.fire('contact_list_bulk_deleted', event)
+        })
+        .listen('.bulk_contacts.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.bulk_contacts.deleted', event)
+          window.VueEvent.fire('contacts_bulk_deleted', event)
+        })
+        .listen('.export-events', (event) => {
+          this.dispatchToMemoryMonitor('.export-events', event)
+          window.VueEvent.fire('export_event_updates', event)
+        })
+        .listen('.bulk_contacts.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.bulk_contacts.deleted', event)
+          window.VueEvent.fire('bulk_contacts_deleted', event)
+        })
+        .listen('.bulk_tags.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.bulk_tags.deleted', event)
+          window.VueEvent.fire('bulk_tags_deleted', event)
+        })
+        .listen('.power_dialer_contact.removed', event => {
+          this.dispatchToMemoryMonitor('.power_dialer_contact.removed', event)
+          window.VueEvent.fire('power_dialer_contact_removed', event.contact_id)
+        })
+        .listen('.colleague_status.notification', (event) => {
+          this.dispatchToMemoryMonitor('.colleague_status.notification', event)
+          this.$VueEvent.fire('colleague_status_notification', event)
+        })
+        /**
+         * End of Power Dialer Session Tasks
+         */
+
+      if (Platform.is.electron) {
+        window.Echo.private('user-' + userId)
+          .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.incoming_number.high_sms_volume', event)
+            const incomingNumber = event.incoming_number
+            const contact = event.contact
+            const direction = event.direction
+            this.$VueEvent.fire('desktop_high_sms_volume', { incomingNumber, contact, direction })
+          })
+          .listen('.user.desktop.contact.contact_assigned', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.contact.contact_assigned', event)
+            if (event.tags) {
+              event.contact.tags = event.tags
+              event.contact.tag_ids = event.contact.tags.map((a) => a.id)
+            }
+            if (event.user) {
+              event.contact.user = event.user
+            }
+            this.$VueEvent.fire('new_desktop_contact_assigned', event.contact)
+          })
+          .listen('.user.desktop.appointment', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.appointment', event)
+            this.$VueEvent.fire('new_desktop_appointment', {
+              engagement: event.engagement,
+              contact: event.contact,
+              timeDiff: event.timeDiff,
+              unit: event.unit
+            })
+          })
+          .listen('.user.desktop.reminder', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.reminder', event)
+            this.$VueEvent.fire('new_desktop_reminder', {
+              engagement: event.engagement,
+              contact: event.contact,
+              timeDiff: event.timeDiff,
+              unit: event.unit
+            })
+          })
+          .listen('.user.desktop.communication.new_call', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.new_call', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            console.log('.user.desktop.communication.new_call - event.communication', event.communication)
+            this.$VueEvent.fire('new_desktop_call', event.communication)
+          })
+          .listen('.user.desktop.communication.answered_call', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.answered_call', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            this.$VueEvent.fire('new_answered_call', event.communication)
+          })
+          .listen('.user.desktop.communication.new_sms', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.new_sms', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            this.$VueEvent.fire('new_desktop_sms', event.communication)
+          })
+          .listen('.user.desktop.communication.new_voicemail', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.new_voicemail', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            this.$VueEvent.fire('new_desktop_voicemail', event.communication)
+          })
+          .listen('.user.desktop.communication.new_fax', (event) => {
+            this.dispatchToMemoryMonitor('.user.desktop.communication.new_fax', event)
+            if (event.tags) {
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
+            }
+            if (event.contact) {
+              event.communication.contact = event.contact
+            }
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+            if (event.owner) {
+              event.communication.owner = event.owner
+            }
+            this.$VueEvent.fire('new_desktop_fax', event.communication)
+          })
+      }
+      window.Echo.private('company-' + this.profile.company_id)
+        .listen('.company.updated', (event) => {
+          this.dispatchToMemoryMonitor('.company.updated', event)
+          if (this.currentCompany && this.currentCompany.id === event.company.id) {
+            this.setCurrentCompany(event.company)
+            this.$VueEvent.fire('company_updated', event.company)
+          }
+        })
+        .listen('.call.parked', (event) => {
+          this.dispatchToMemoryMonitor('.call.parked', event)
+          console.log('Call parked event received from another tab', event)
+          if (event.communication_id) {
+            this.$VueEvent.fire('call_parked_from_another_tab', {
+              communicationId: event.communication_id
+            })
+          }
+        })
+        .listen('.call.hung_up', (event) => {
+          this.dispatchToMemoryMonitor('.call.hung_up', event)
+          console.log('Call hung up event received from another tab', event)
+          if (event.communication_id) {
+            this.$VueEvent.fire('call_hung_up_from_another_tab', {
+              communicationId: event.communication_id
+            })
+          }
+        })
+        .listen('.communication.created', (event) => {
+          this.dispatchToMemoryMonitor('.communication.created', event)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('new_communication', event.communication)
+        })
+        .listen('.communication.updated', (event) => {
+          this.dispatchToMemoryMonitor('.communication.updated', event)
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          this.$VueEvent.fire('update_communication', event.communication)
+        })
+        .listen('.communication.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.communication.deleted', event)
+          this.$VueEvent.fire('delete_communication', event.communication)
+        })
+        .listen('.communication.file.migrated', (event) => {
+          this.dispatchToMemoryMonitor('.communication.file.migrated', event)
+          this.$VueEvent.fire('communication.file.migrated', event)
+        })
+        .listen('.mention.created', (event) => {
+          this.dispatchToMemoryMonitor('.mention.created', event)
+          this.$VueEvent.fire('mention', event.mention)
+        })
+        .listen('.incoming_number.created', (event) => {
+          this.dispatchToMemoryMonitor('.incoming_number.created', event)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.incoming_number.campaign_id)
+          if (campaign) {
+            campaign.incoming_number = event.incoming_number.phone_number
+            this.updateCampaign(campaign)
+          }
+        })
+        .listen('.ring_group.created', (event) => {
+          this.dispatchToMemoryMonitor('.ring_group.created', event)
+          this.newRingGroup(event.ring_group)
+          this.$VueEvent.fire('ring_group_created', event.ring_group)
+        })
+        .listen('.ring_group.updated', (event) => {
+          this.dispatchToMemoryMonitor('.ring_group.updated', event)
+          this.updateRingGroup(event.ring_group)
+          this.$VueEvent.fire('ring_group_updated', event.ring_group)
+        })
+        .listen('.ring_group.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.ring_group.deleted', event)
+          this.deleteRingGroup(event.ring_group)
+          this.$VueEvent.fire('ring_group_deleted', event.ring_group)
+        })
+        .listen('.campaign.created', (event) => {
+          this.dispatchToMemoryMonitor('.campaign.created', event)
+          event.campaign.last_call_datetime = event.last_call_datetime
+          this.newCampaign(event.campaign)
+          this.$VueEvent.fire('campaign_created', event.campaign)
+        })
+        .listen('.campaign.updated', (event) => {
+          this.dispatchToMemoryMonitor('.campaign.updated', event)
+          event.campaign.last_call_datetime = event.last_call_datetime
+          this.updateCampaign(event.campaign)
+          this.$VueEvent.fire('campaign_updated', event.campaign)
+        })
+        .listen('.campaign.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.campaign.deleted', event)
+          this.deleteCampaign(event.campaign)
+          this.$VueEvent.fire('campaign_deleted', event.campaign)
+        })
+        .listen('.tag.created', (event) => {
+          this.dispatchToMemoryMonitor('.tag.created', event)
+          this.newTag(event.tag)
+          this.$VueEvent.fire('tag_created', event.tag)
+        })
+        .listen('.tag.updated', (event) => {
+          this.dispatchToMemoryMonitor('.tag.updated', event)
+          if (event.tag.name.includes('_deleted_')) {
+            return
+          }
+
+          this.updateTag(event.tag)
+          this.$VueEvent.fire('tag_updated', event.tag)
+        })
+        .listen('.tag.deleting', (event) => {
+          this.dispatchToMemoryMonitor('.tag.deleting', event)
+          this.deleteTag(event.tag)
+          this.$VueEvent.fire('tag_deleting', event.tag)
+        })
+        .listen('.disposition_status.created', (event) => {
+          this.dispatchToMemoryMonitor('.disposition_status.created', event)
+          this.newDispositionStatus(event.disposition_status)
+          this.$VueEvent.fire('disposition_status_created', event.disposition_status)
+        })
+        .listen('.disposition_status.updated', (event) => {
+          this.dispatchToMemoryMonitor('.disposition_status.updated', event)
+          this.updateDispositionStatus(event.disposition_status)
+          this.$VueEvent.fire('disposition_status_updated', event.disposition_status)
+        })
+        .listen('.disposition_status.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.disposition_status.deleted', event)
+          this.deleteDispositionStatus(event.disposition_status)
+          this.$VueEvent.fire('disposition_status_deleted', event.disposition_status)
+        })
+        .listen('.call_disposition.bulk_created', (event) => {
+          this.dispatchToMemoryMonitor('.call_disposition.bulk_created', event)
+          this.newBulkCallDisposition(event.call_dispositions)
+          this.$VueEvent.fire('call_disposition_bulk_created', event.call_dispositions)
+        })
+        .listen('.call_disposition.created', (event) => {
+          this.dispatchToMemoryMonitor('.call_disposition.created', event)
+          this.newCallDisposition(event.call_disposition)
+          this.$VueEvent.fire('call_disposition_created', event.call_disposition)
+        })
+        .listen('.call_disposition.updated', (event) => {
+          this.updateCallDisposition(event.call_disposition)
+          this.$VueEvent.fire('call_disposition_updated', event.call_disposition)
+        })
+        .listen('.call_disposition.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.call_disposition.deleted', event)
+          this.deleteCallDisposition(event.call_disposition)
+          this.$VueEvent.fire('call_disposition_deleted', event.call_disposition)
+        })
+        .listen('.activity_type.created', (event) => {
+          this.dispatchToMemoryMonitor('.activity_type.created', event)
+          this.newActivityType(event.activity_type)
+          this.$VueEvent.fire('activity_type_created', event.activity_type)
+        })
+        .listen('.activity_type.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.activity_type.deleted', event)
+          this.deleteActivityType(event.activity_type)
+          this.$VueEvent.fire('activity_type_deleted', event.activity_type)
+        })
+        .listen('.contact.created', (event) => {
+          this.dispatchToMemoryMonitor('.contact.created', event)
+          if (event.contact) {
+            if (event.user) {
+              event.contact.user = event.user
+            }
+            if (event.tags) {
+              event.contact.tags = event.tags
+              event.contact.tag_ids = event.contact.tags.map((a) => a.id)
+            }
+            this.$VueEvent.fire('contact_created', event.contact)
+          }
+        })
+        .listen('.contact.updated', (event) => {
+          this.dispatchToMemoryMonitor('.contact.updated', event)
+          if (event.contact) {
+            if (event.user) {
+              event.contact.user = event.user
+            }
+            if (event.tags) {
+              event.contact.tags = event.tags
+              event.contact.tag_ids = event.contact.tags.map((a) => a.id)
+            }
+            if (this.channelChangedFilterFields) {
+              event.contact.communications = this.communications
+            }
+            this.$VueEvent.fire('contact_updated', event.contact)
+          }
+        })
+        .listen('.contact.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.contact.deleted', event)
+          if (event.contact) {
+            if (event.user) {
+              event.contact.user = event.user
+            }
+            this.$VueEvent.fire('delete_contact', event.contact)
+          }
+        })
+        .listen('.contact.marked_all_as_read', (event) => {
+          this.dispatchToMemoryMonitor('.contact.marked_all_as_read', event)
+          this.$VueEvent.fire('mark_contact_communications_all_as_read_processed', event.contact)
+        })
+        .listen('.contact_audit.created', (event) => {
+          this.dispatchToMemoryMonitor('.contact_audit.created', event)
+          let contactAudit = event.audit
+          if (contactAudit) {
+            this.$VueEvent.fire('contact_audit_created', contactAudit)
+          }
+        })
+        .listen('.filter.created', (event) => {
+          this.dispatchToMemoryMonitor('.filter.created', event)
+          if (!this.filters.find((o) => {
+            return o.id === event.filter.id
+          })) {
+            this.newFilter(event.filter)
+          }
+        })
+        .listen('.filter.updated', (event) => {
+          this.dispatchToMemoryMonitor('.filter.updated', event)
+          this.updateFilter(event.filter)
+        })
+        .listen('.filter.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.filter.deleted', event)
+          // for Inbox Filter Types
+          if (event.filter.type === ChannelType.CHANNEL_INBOX) {
+            this.$VueEvent.fire('filter_deleted', event.filter)
+          }
+
+          if (this.filters.find((o) => {
+            return o.id === event.filter.id
+          })) {
+            this.deleteFilter(event.filter)
+          }
+        })
+        .listen('.user.created', (event) => {
+          this.dispatchToMemoryMonitor('.user.created', event)
+          if (this.currentCompany && event.user.company_id && event.user.company_id === this.currentCompany.id) {
+            this.$VueEvent.fire('user_created', event.user)
+          }
+        })
+        .listen('.user.updated', (event) => {
+          this.dispatchToMemoryMonitor('.user.updated', event)
+          this.$VueEvent.fire('user_updated', event.user)
+        })
+        .listen('.user.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.user.deleted', event)
+          if (this.currentCompany && event.user.company_id && event.user.company_id === this.currentCompany.id) {
+            this.$VueEvent.fire('user_deleted', event.user)
+          }
+        })
+        .listen('.workflow.created', (event) => {
+          this.dispatchToMemoryMonitor('.workflow.created', event)
+          this.newWorkflow(event.workflow)
+          this.$VueEvent.fire('workflow_created', event.workflow)
+        })
+        .listen('.workflow.updated', (event) => {
+          this.dispatchToMemoryMonitor('.workflow.updated', event)
+          this.updateWorkflow(event.workflow)
+          this.$VueEvent.fire('workflow_updated', event.workflow)
+        })
+        .listen('.workflow.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.workflow.deleted', event)
+          this.deleteWorkflow(event.workflow)
+          this.$VueEvent.fire('workflow_deleted', event.workflow)
+        })
+        .listen('.export-events', (event) => {
+          this.dispatchToMemoryMonitor('.export-events', event)
+          window.VueEvent.fire('export_event_updates', event)
+        })
+        .listen('.export.created', (event) => {
+          this.dispatchToMemoryMonitor('.export.created', event)
+          window.VueEvent.fire('export_event_create', event)
+        })
+        .listen('.export.updated', (event) => {
+          this.dispatchToMemoryMonitor('.export.updated', event)
+          window.VueEvent.fire('export_event_update', event)
+        })
+        .listen('.export.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.export.deleted', event)
+          window.VueEvent.fire('export_event_delete', event)
+        })
+        .listen('.contact-list.import-csv', (event) => {
+          this.dispatchToMemoryMonitor('.contact-list.import-csv', event)
+          window.VueEvent.fire('contact_list_import_csv', event)
+        })
+        .listen('.contact-list.import-hubspot', (event) => {
+          this.dispatchToMemoryMonitor('.contact-list.import-hubspot', event)
+          window.VueEvent.fire('contact_list_import_hubspot', event)
+        })
+        .listen('.contact-list.import-salesforce', (event) => {
+          this.dispatchToMemoryMonitor('.contact-list.import-salesforce', event)
+          window.VueEvent.fire('contact_list_import_salesforce', event)
+        })
+        .listen('.contact-list.import-zoho', (event) => {
+          this.dispatchToMemoryMonitor('.contact-list.import-zoho', event)
+          window.VueEvent.fire('contact_list_import_zoho', event)
+        })
+        .listen('.contact-list.import-pipedrive', (event) => {
+          this.dispatchToMemoryMonitor('.contact-list.import-pipedrive', event)
+          window.VueEvent.fire('contact_list_import_pipedrive', event)
+        })
+        .listen('.contact-list.import-failed', (event) => {
+          this.dispatchToMemoryMonitor('.contact-list.import-failed', event)
+          window.VueEvent.fire('contact_list_import_failed', event)
+        })
+        .listen('.contact-list.created', (event) => {
+          this.dispatchToMemoryMonitor('.contact-list.created', event)
+          if (this.profile && event.user_id && event.user_id === this.profile.id) {
+            window.VueEvent.fire('contact_list_created', event)
+          }
+        })
+        .listen('.broadcasts.created', (event) => {
+          this.dispatchToMemoryMonitor('.broadcasts.created', event)
+          window.VueEvent.fire('broadcasts_created', event.broadcaster)
+        })
+        .listen('.broadcasts.updated', (event) => {
+          this.dispatchToMemoryMonitor('.broadcasts.updated', event)
+          window.VueEvent.fire('broadcasts_updated', event.broadcaster)
+        })
+        .listen('.broadcasts.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.broadcasts.deleted', event)
+          window.VueEvent.fire('broadcasts_deleted', event.broadcaster)
+        })
+        .listen('.script.deleted', (event) => {
+          this.dispatchToMemoryMonitor('.script.deleted', event)
+          window.VueEvent.fire('script_deleted', event.script)
+        })
+        .listen('.kyc_status_updated', (event) => {
+          this.dispatchToMemoryMonitor('.kyc_status_updated', event)
+          const sameCompany = this.currentCompany && this.currentCompany.id === event.company.id
+          if (sameCompany) {
+            setInterval(() => {
+              // check if there is a current call in progress
+              if (!['MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus)) {
+                this.setCurrentCompany(event.company)
+                this.$VueEvent.fire('kyc_status_updated', event.company)
+              }
+            }, 10000)
+          }
+        })
+
+      window.Echo.private('cache-agent-status-user-' + userId)
+        .listen('.agent_status.updated', (event) => {
+          this.dispatchToMemoryMonitor('.agent_status.updated', event)
+          // make sure this occurs only for the logged user
+          if (!this.profile || !event.user_id || this.profile.id !== event.user_id) {
+            return
+          }
+          this.$VueEvent.fire('agent_status_updated', event)
+        })
+    },
+    broadcastLeave () {
+      if (!window.Echo) {
+        return
+      }
+
+      if (this.profile) {
+        window.Echo.leave('user-' + this.profile.id)
+        window.Echo.leave('company-' + this.profile.company_id)
+        window.Echo.leave('cache-agent-status-' + this.profile.company_id)
+        return
+      }
+
+      window.Echo.disconnect()
+    },
+    dispatchToMemoryMonitor (event, payload) {
+      this.$VueEvent.fire('memory_monitor', { event, payload })
+    }
+  }
+}

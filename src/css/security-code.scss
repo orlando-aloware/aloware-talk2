@@ -1,0 +1,52 @@
+.security-code {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+
+  &-wrapper {
+    display: inline-block;
+    margin: 0px -45px;
+    min-width: 240px;
+    text-align: center;
+
+    @media only screen and (max-device-width: 736px) {
+      max-width: 320px;
+    }
+
+    .security-code-field {
+      display: inline-block;
+      margin-right: 10px;
+      float: left;
+
+      &.security-code-hs-widget-mode {
+        margin-right: 6px;
+      }
+
+      @media only screen and (max-device-width: 736px) {
+        margin-right: 4px;
+      }
+
+      .form-control-input {
+        width: 40px;
+        height: 40px;
+        font-size: 30px;
+        text-align: center;
+        padding: 0;
+        border-radius: 0.25rem;
+
+        &.is-valid {
+          border-style: solid;
+          border-width: thin;
+        }
+
+        @media only screen and (max-device-width: 736px) {
+          width: 42px;
+          height: 42px;
+          margin: 0;
+        }
+      }
+    }
+  }
+}

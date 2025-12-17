@@ -1,0 +1,245 @@
+<template>
+  <div class="message-options" data-testid="message-composer-o">
+    <b-link v-if="messageComposer.mode === 'sms'"
+            href="#"
+            data-testid="add-gif-image-button"
+            :disabled="isTextingDisabled || !canAddMoreAttachments">
+      <q-menu content-class="mx-height-500"
+              ref="giphyMenu"
+              data-testid="add-gif-image-menu"
+              :offset="[0,5]">
+        <div class="row no-wrap q-pa-md">
+          <search-giphy data-testid="message-search-giphy" @selected="onGifSelected"></search-giphy>
+        </div>
+      </q-menu>
+
+      <gif-icon></gif-icon>
+      <q-tooltip data-testid="add-gif-image-tooltip">
+        Add GIF image
+      </q-tooltip>
+    </b-link>
+
+    <b-link v-if="messageComposer.mode === 'sms'"
+            href="#"
+            data-testid="sms-upload-attachment-link"
+            :disabled="!hasSelectedLine || isTextingDisabled || !canAddMoreAttachments">
+      <q-menu ref="attachmentMenu"
+              data-testid="sms-upload-attachment-menu"
+              :offset="[0,5]">
+        <div class="row no-wrap q-pa-md">
+          <attachments :is-broadcast="isBroadcast"
+                       data-testid="sms-upload-attachment-component"
+                       @attachmentUploaded="onAttachmentUploaded"/>
+        </div>
+      </q-menu>
+      <attachment-icon data-testid="message-composer-attachment-icon"></attachment-icon>
+      <q-tooltip data-testid="message-composer-add-tooltip">
+        {{ !hasSelectedLine ? 'Please select a line before adding attachments' : 'Add attachments' }}
+      </q-tooltip>
+    </b-link>
+
+    <b-link v-if="['sms', 'email'].includes(messageComposer.mode)"
+            href="#"
+            data-testid="message-composer-add-template-link"
+            :disabled="isTextingDisabled">
+      <q-menu content-class="mx-height-300"
+              ref="templatesMenu"
+              data-testid="message-composer-add-template-menu"
+              :offset="[0,5]">
+        <div class="row no-wrap q-pa-md">
+          <message-templates @templateSelected="onTemplateSelected" data-testid="message-composer-templates"></message-templates>
+        </div>
+      </q-menu>
+      <calendar-today-icon data-testid="mesasge-composer-calendar-today-icon"></calendar-today-icon>
+      <q-tooltip data-testid="message-composer-add-template-tooltip">
+        Add template
+      </q-tooltip>
+    </b-link>
+
+    <b-link v-if="['sms', 'email'].includes(messageComposer.mode)"
+            href="#"
+            data-testid="message-composer-add-variable-link"
+            :disabled="isTextingDisabled">
+      <q-menu content-class="mx-height-300"
+              ref="variablesMenu"
+              data-testid="message-composer-add-variable-menu"
+              :offset="[0,5]">
+        <div class="row no-wrap q-pa-md">
+          <variables always-open
+                     data-testid="message-composer-variables-selected"
+                     @variableSelected="onVariableSelected">
+          </variables>
+        </div>
+      </q-menu>
+      <variable-icon></variable-icon>
+      <q-tooltip data-testid="message-composer-add-variable-tooltip">
+        Add variable
+      </q-tooltip>
+    </b-link>
+
+    <b-link href="#"
+            data-testid="add-contact-card-link"
+            :disabled="!hasSelectedLine || isTextingDisabled || !canAddMoreAttachments"
+            v-if="messageComposer.mode === 'sms'">
+      <q-menu content-class="mx-height-500 width-300"
+              ref="contactCardMenu"
+              data-testid="add-contact-card-menu"
+              :offset="[0,5]">
+        <contact-card
+          :selectedLine="selectedLine"
+          @contactCardUploaded="onContactCardUploaded"
+          @closeMenu="onContactCardLinkClicked"
+        />
+      </q-menu>
+
+      <contact-card-icon></contact-card-icon>
+      <q-tooltip data-testid="add-contact-card-tooltip">
+        {{ !hasSelectedLine ? 'Please select a line before sending the contact card' : 'Send contact card' }}
+      </q-tooltip>
+    </b-link>
+
+    <b-link v-if="messageComposer.mode === 'sms' && shouldSeeExperimentalAiFeatures"
+            href="#"
+            data-testid="add-suggested-text-messages-button"
+            :disabled="isTextingDisabled">
+      <q-menu content-class="mx-height-500 width-380 ai-effect-container"
+              ref="suggestedTextMessagesMenu"
+              data-testid="add-suggested-text-messages-menu"
+              anchor="bottom left"
+              self="top left"
+              :offset="[0,5]">
+        <text-message-suggestions :contact="contact" @selected="onTextMessageSuggestionSelected" @loaded="onTextMessageSuggestionsLoaded"></text-message-suggestions>
+      </q-menu>
+
+      <sparkle-icon width="18" height="18" color="#9333EA"/>
+      <q-tooltip data-testid="add-suggested-text-messages-tooltip">
+        AloAi-crafted message suggestions based on past interactions with the contact
+      </q-tooltip>
+    </b-link>
+  </div>
+</template>
+
+<script>
+import SearchGiphy from 'components/message-composer/options/search-giphy'
+import GifIcon from 'components/icons/gif-icon'
+import ContactCardIcon from 'components/icons/contact-card-icon.vue'
+import Attachments from 'components/message-composer/options/attachments'
+import AttachmentIcon from 'components/icons/attachment-icon'
+import MessageTemplates from 'components/message-composer/options/message-templates'
+import CalendarTodayIcon from 'components/icons/calendar-today-icon'
+import Variables from 'components/message-composer/options/variables'
+import ContactCard from 'components/message-composer/options/contact-card.vue'
+import VariableIcon from 'components/icons/variable-icon'
+import { mapGetters, mapState } from 'vuex'
+import { aclMixin, userMixin } from 'src/plugins/mixins'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import TextMessageSuggestions from 'components/message-composer/options/text-message-suggestions.vue'
+
+export default {
+  name: 'message-composer-options',
+
+  props: {
+    campaignId: {
+      required: true
+    },
+
+    maxAttachments: {
+      type: Number,
+      default: null
+    },
+
+    isBroadcast: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  components: {
+    TextMessageSuggestions,
+    SparkleIcon,
+    VariableIcon,
+    Variables,
+    CalendarTodayIcon,
+    MessageTemplates,
+    AttachmentIcon,
+    Attachments,
+    GifIcon,
+    SearchGiphy,
+    ContactCard,
+    ContactCardIcon
+  },
+
+  mixins: [
+    aclMixin,
+    userMixin
+  ],
+
+  computed: {
+    ...mapState('cache', ['currentCompany']),
+
+    ...mapGetters('contacts', [
+      'selectedLine',
+      'messageComposer',
+      'contact'
+    ]),
+
+    isTextingDisabled () {
+      return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled
+    },
+
+    canAddMoreAttachments () {
+      if (!this.maxAttachments) {
+        return true
+      }
+
+      const hasGif = this.messageComposer.sms.gif_url !== ''
+
+      return ((hasGif ? 1 : 0) + this.messageComposer.sms.attachments.length) < this.maxAttachments
+    },
+
+    hasSelectedLine () {
+      return this.selectedLine?.id
+    }
+  },
+
+  methods: {
+    onGifSelected (gif) {
+      this.$emit('gifSelected', gif)
+      this.$refs.giphyMenu.hide()
+    },
+
+    onTextMessageSuggestionSelected (suggestion) {
+      this.$emit('textMessageSuggestionSelected', suggestion)
+      this.$refs.suggestedTextMessagesMenu.hide()
+    },
+
+    onTextMessageSuggestionsLoaded () {
+      this.$refs.suggestedTextMessagesMenu.updatePosition()
+    },
+
+    onAttachmentUploaded (files) {
+      this.$emit('attachmentUploaded', files)
+      this.$refs.attachmentMenu.hide()
+    },
+
+    onTemplateSelected (template) {
+      this.$emit('templateSelected', template)
+      this.$refs.templatesMenu.hide()
+    },
+
+    onVariableSelected (variable) {
+      this.$emit('variableSelected', variable)
+      this.$refs.variablesMenu.hide()
+    },
+
+    onContactCardUploaded (files) {
+      this.$emit('attachmentUploaded', files)
+      this.$refs.contactCardMenu.hide()
+    },
+
+    onContactCardLinkClicked () {
+      this.$refs.contactCardMenu.hide()
+    }
+  }
+}
+</script>

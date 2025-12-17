@@ -1,0 +1,4 @@
+export const GROUP_PRIMARY_INFO = 1
+export const GROUP_CONTACT_LOCATION = 2
+export const GROUP_CONTACT_RELEVANCE = 3
+export const GROUP_CONTACT_COMM_METADATA = 4

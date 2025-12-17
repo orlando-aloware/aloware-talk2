@@ -1,0 +1,183 @@
+<template>
+  <b-card class="border-0 tags-wrapper"
+          data-testid="contact-tags-wrapper"
+          v-if="hasPermissionTo('tag contact')">
+    <tag-multi-select label="Tags"
+                      button-text="Modify Tags"
+                      data-testid="contact-tags-multi-select"
+                      :values="tagIds"
+                      :options="combinedTags"
+                      :current="currentTags"
+                      :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                      :optionsIsGrouped="true"
+                      :category="category"
+                      @valuesUpdated="saveTags">
+    </tag-multi-select>
+  </b-card>
+</template>
+
+<script>
+import { aclMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
+import TagMultiSelect from 'src/components/generic-selectors/tag-multi-select'
+import { TAG_CATEGORIES as TagCategories, TAG_CATEGORIES_VALUES as TagCategoriesValues } from 'src/constants/tag-categories'
+import { clone, isEmpty } from 'lodash'
+import * as TagTypes from 'src/constants/tag-types'
+
+export default {
+  name: 'contact-tags',
+
+  mixins: [aclMixin],
+
+  components: {
+    TagMultiSelect
+  },
+
+  props: {
+    contact: {
+      required: true
+    },
+    exclude: {
+      required: false,
+      default: null
+    }
+  },
+
+  data () {
+    return {
+      loadingTag: false,
+      loadingTags: false,
+      options: [],
+      category: TagCategories.CAT_CONTACTS
+    }
+  },
+
+  computed: {
+    ...mapState(['tags']),
+
+    availableTags () {
+      if (this.options) {
+        return this.options.filter((tag) => {
+          return tag.id !== this.exclude
+        })
+      }
+
+      return []
+    },
+
+    tagsAlphabeticalOrder () {
+      if (isEmpty(this.availableTags)) {
+        return this.availableTags
+      }
+
+      let tags = clone(this.availableTags)
+
+      if (TagCategoriesValues.includes(this.category)) {
+        tags = tags.filter(tag => tag.category === this.category)
+      }
+
+      return this.$alphabeticalSort(tags)
+    },
+
+    companyTagsAlphabeticalOrder () {
+      if (this.tagsAlphabeticalOrder.length) {
+        return this.tagsAlphabeticalOrder.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
+      }
+
+      return []
+    },
+
+    importTagsAlphabeticalOrder () {
+      if (TagCategoriesValues.includes(this.category) && this.category !== TagCategories.CAT_CONTACTS) {
+        return []
+      }
+
+      if (this.tagsAlphabeticalOrder.length) {
+        return this.tagsAlphabeticalOrder.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
+      }
+
+      return []
+    },
+
+    combinedTags () {
+      const companyTags = this.companyTagsAlphabeticalOrder
+      const importTags = this.importTagsAlphabeticalOrder
+
+      const tags = []
+
+      if (companyTags && companyTags.length) {
+        tags.push({
+          title: 'Account Tags',
+          children: companyTags
+        })
+      }
+
+      if (importTags && importTags.length) {
+        tags.push({
+          title: 'Import Tags',
+          children: importTags
+        })
+      }
+
+      return tags
+    },
+
+    currentTags () {
+      return this.contact?.tags ?? []
+    },
+
+    tagIds () {
+      if (this.contact?.tag_ids) {
+        return this.contact.tag_ids
+      }
+
+      if (this.contact?.tags) {
+        return this.contact.tags.map((tag) => tag.id)
+      }
+
+      return []
+    }
+  },
+
+  mounted () {
+    if (this.tags) {
+      this.options = this.tags
+    }
+  },
+
+  methods: {
+    saveTags (tags) {
+      if (!this.hasPermissionTo('tag contact')) {
+        return
+      }
+
+      this.loadingTag = true
+
+      this.$axios.post('/api/v1/contact/' + this.contact.id + '/tag', {
+        tags: tags
+      }).then(res => {
+        this.contact.tags = res.data
+        this.contact.tag_ids = this.contact.tags.map((o) => o.id)
+        this.loadingTag = false
+        this.$generalNotification('Tags successfully updated')
+      }).catch(err => {
+        this.$handleErrors(err.response)
+        this.loadingTag = false
+
+        if (this.contact.tags) {
+          this.contact.tag_ids = this.contact.tags.map((o) => o.id)
+        }
+      })
+    }
+  },
+
+  watch: {
+    tags: {
+      deep: true,
+      handler: function () {
+        this.options = this.tags
+      }
+    }
+  }
+}
+</script>

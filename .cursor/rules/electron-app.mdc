@@ -1,0 +1,33 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Electron Application
+
+## Overview
+The project can be built as an Electron desktop application for:
+- macOS
+- Windows
+- Linux
+
+## Electron Configuration
+- Electron-specific code is located in [src-electron/](mdc:src-electron)
+- Electron builder configuration is in [quasar.conf.js](mdc:quasar.conf.js) under the `electron` property
+- App ID: `com.aloware.talk2`
+
+## Building Electron Apps
+- Development: `quasar dev -m electron`
+- macOS production: `yarn build-mac` (without notarizing) or `yarn deploy-mac` (with notarizing)
+- Windows production: `yarn build-win` (without publishing) or `yarn deploy-win` (with publishing)
+- Linux production: `yarn build-linux` (without publishing) or `yarn deploy-linux` (with publishing)
+
+## Notarization
+- macOS apps are notarized using [notarize.js](mdc:notarize.js)
+- Requires appropriate Apple Developer credentials
+
+## Icons and Resources
+- Application icons for different platforms:
+  - macOS: `icons/icon.icns`
+  - Windows: `icons/icon.ico`
+  - Linux: `icons/icon.png`

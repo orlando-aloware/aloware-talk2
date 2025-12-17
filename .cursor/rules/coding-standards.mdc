@@ -1,0 +1,32 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Coding Standards and Best Practices
+
+## JavaScript/Vue Coding Standards
+- Project follows the Vue.js Style Guide
+- ESLint is configured with Standard style and Vue plugin
+- See [.eslintrc.js](mdc:.eslintrc.js) for specific rules
+
+## ESLint Rules
+Key ESLint rules include:
+- Vue Essential (Priority A: Error Prevention)
+- Standard JS style
+- Import/export validation
+
+## Linting
+- Run `yarn lint` to check for linting issues
+- ESLint is also integrated into the build process
+
+## Git Workflow
+- Project uses conventional commits enforced by commitlint
+- See [commitlint.config.js](mdc:commitlint.config.js) for configuration
+- Husky is used for git hooks
+
+## Code Organization
+- Vue components should be modular and reusable
+- Use mixins for shared functionality
+- Store modules should be namespaced
+- Follow Quasar recommended practices for components and layouts

@@ -1,0 +1,73 @@
+import { mapState } from 'vuex'
+import { dispositionsMixin } from 'src/plugins/mixins'
+
+export default {
+  mixins: [dispositionsMixin],
+
+  data () {
+    return {
+      wrapUpPaused: false,
+      wrapUpListeners: {}
+    }
+  },
+
+  computed: {
+    ...mapState([
+      'dialer',
+      'isCallDisposed',
+      'isContactDisposed'
+    ]),
+
+    ...mapState('cache', ['currentCompany']),
+
+    isForcedContactDisposition () {
+      return this.currentCompany && this.currentCompany.force_contact_disposition
+    },
+
+    isContactNotDisposed () {
+      // Skip contact disposition requirement for barge/whisper calls
+      if (this.isBargeOrWhisperCall) {
+        return false
+      }
+
+      const hasContactDisposition = this.isContactDisposed || this.dialer.contact?.disposition_status_id
+
+      return this.isForcedContactDisposition &&
+        !hasContactDisposition
+    }
+  },
+
+  created () {
+    if (this.isForcedContactDisposition || this.isForcedCallDisposition) {
+      this.wrapUpPaused = true
+    }
+
+    this.wrapUpListeners.pauseWrapUp = (pauseWrapUp) => {
+      this.wrapUpPaused = pauseWrapUp
+    }
+
+    this.startDialerWrapUpEvents()
+  },
+
+  methods: {
+    startDialerWrapUpEvents () {
+      this.$VueEvent.listen('pauseWrapUp', this.wrapUpListeners.pauseWrapUp)
+    },
+
+    stopDialerWrapUpEvents () {
+      this.$VueEvent.stop('pauseWrapUp', this.wrapUpListeners.pauseWrapUp)
+    }
+  },
+
+  watch: {
+    isContactNotDisposed (value) {
+      if (!value && !this.isForcedCallDisposition && !this.isForcedSmsSending) {
+        this.wrapUpPaused = false
+      }
+    }
+  },
+
+  beforeDestroy () {
+    this.stopDialerWrapUpEvents()
+  }
+}

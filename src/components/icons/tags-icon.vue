@@ -1,0 +1,25 @@
+<template>
+  <svg :width="width" :height="height" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.1529 1C10.3258 1 9.17338 1.4739 8.5888 2.05849L1.97088 8.67646C0.792557 9.8548 0.795797 11.7559 1.97035 12.9305L5.06965 16.0298C6.25017 17.2103 8.14876 17.2041 9.32361 16.0293L15.9415 9.41128C16.5272 8.82565 17 7.67867 17 6.8471V2.50569C17 1.67855 16.3259 1 15.4943 1H11.1529ZM13.1705 3.19563C14.0732 3.19563 14.8044 3.92682 14.8044 4.82958C14.8044 5.73234 14.0732 6.46354 13.1705 6.46354C12.2677 6.46354 11.5365 5.73234 11.5365 4.82958C11.5365 3.92682 12.2677 3.19563 13.1705 3.19563Z" :stroke="color" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</template>
+
+<script>
+export default {
+  name: 'tags-icon',
+  props: {
+    width: {
+      type: [Number, String],
+      default: 18
+    },
+    height: {
+      type: [Number, String],
+      default: 18
+    },
+    color: {
+      type: String,
+      default: '#62666E'
+    }
+  }
+}
+</script>

@@ -1,0 +1,4 @@
+export const ALL_CONTACTS = 1
+export const CONTACTS_WITH_DNC = 2
+export const CONTACTS_WITHOUT_DNC_WITHOUT_OPTOUT = 3
+export const CONTACTS_WITHOUT_DNC_WITH_OPTOUT = 4

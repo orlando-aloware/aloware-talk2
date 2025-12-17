@@ -1,0 +1,577 @@
+<template>
+  <div class="bulk-action-menu d-flex flex-column border-bottom w-100"
+       :class="bulkActionMenuClass">
+    <div class="menu-actions d-flex flex-row w-100 align-items-center ml-1">
+      <template v-if="checkedCount > 0">
+        <div class="items">
+          <span>{{ checkedCount | numFormat }} selected</span>
+        </div>
+        <template v-if="isPowerDialer && !isAddView">
+          <div class="items">
+            <div :class="optionsDisabledClass"
+                 @click="onMoveToTop">
+              <i class="fa fa-chevron-up"/>
+              Move to Top
+            </div>
+          </div>
+          <div class="items">
+            <div :class="optionsDisabledClass"
+                 @click="onMoveToBottom">
+              <i class="fa fa-chevron-down"/>
+              Move to Bottom
+            </div>
+          </div>
+        </template>
+        <template v-if="isContacts && !isAddView">
+          <div class="items">
+            <a href=""
+               data-testid="bulk-action-menu-add-to-static-list-link"
+               @click="onAddToStaticList">
+              <i class="fa fa-user-plus"></i>
+              Add to Static List
+            </a>
+          </div>
+          <div class="items">
+            <a href=""
+               data-testid="bulk-action-menu-create-static-list-link"
+               @click="onCreateStaticList">
+              <i class="fa fa-plus"></i>
+              Create Static List
+            </a>
+          </div>
+        </template>
+        <div class="items"
+             v-if="showRemoveFromListButton">
+          <a href=""
+             class="text-danger"
+             data-testid="bulk-action-menu-remove-from-list-link"
+             :disabled="disabledRemoveOnList"
+             @click="onRemoveFromList">
+            <i class="fa fa-user-minus text-danger" />
+            Remove {{ contactsWord }} From List
+          </a>
+        </div>
+        <div class="items"
+             v-if="showRemoveFromPdListButton">
+          <a href=""
+             class="text-danger"
+             data-testid="bulk-action-menu-remove-from-pd-list-link"
+             :disabled="disabledRemoveOnPdList"
+             @click="onRemoveFromPdList">
+            <i class="fa fa-user-minus text-danger" />
+            Remove {{ contactsWord }} From List
+          </a>
+        </div>
+        <div class="items"
+             v-if="showDeleteButton">
+          <a href=""
+             class="text-danger"
+             data-testid="bulk-action-menu-delete-link"
+             :disabled="disabledDelete"
+             @click="onDelete">
+            <i class="fa fa-trash text-danger"/>
+            Delete {{ contactsWord }}
+          </a>
+        </div>
+        <div class="items"
+             v-if="showMoreDropdownButton">
+          <b-dropdown size="sm"
+                      text="More"
+                      variant="link"
+                      class="bulk-action-menu-dropdown contacts-options-dropdown p-0 contacts-options-dropdown"
+                      toggle-class="bulk-action-menu-dropdown-btn text-decoration-none"
+                      right
+                      no-caret>
+            <template #button-content>
+              <a href="#"
+                 class="d-flex align-items-center">
+                More
+                <i class="fa fa-chevron-down fs-12 d-flex align-items-center ml-1 text-grey-90" />
+              </a>
+
+            </template>
+
+            <b-dropdown-item href="#"
+                             data-testid="bulk-action-menu-add-to-power-dialer-option"
+                             v-if="shouldShowPowerDialer"
+                             @click="addToPowerDialer">
+              <power-dialer-mobile-icon width="14"
+                                        height="14"
+                                        color="#62666E"/>
+              Add to Power Dialer
+            </b-dropdown-item>
+
+            <b-dropdown-item href="#"
+                             data-testid="bulk-action-menu-enroll-aloai-option"
+                             v-if="shouldShowAloAi"
+                             @click="addToAloAi">
+              <add-user-icon width="14"
+                             height="14"
+                             color="#62666E"/>
+              Enroll in AloAi Agent
+            </b-dropdown-item>
+          </b-dropdown>
+        </div>
+      </template>
+    </div>
+    <div class="height-52 d-flex justify-content-center align-items-center my-2 bg-grey-60 mr-2"
+         v-if="isCheckboxAllChecked">
+      {{ checkedCount | numFormat }} contacts on this page selected.&nbsp;
+      <a href=""
+         data-testid="bulk-action-menu-select-all-link"
+         v-if="canSelectAll"
+         @click.prevent="onClickAll">
+          Select all {{ totalRows | numFormat }} contacts.
+          <slot name="checkall-tooltip"/>
+      </a>
+      <a href=""
+         data-testid="bulk-action-menu-clear-link"
+         v-if="isAllSelected && !isDatatableCountLoading"
+         @click.prevent="onClearAll">
+        Clear selection
+      </a>
+      <q-skeleton class="bg-blue-5 w-100"
+                  type="text"
+                  style="max-width: 120px;"
+                  v-if="!isAllSelected && isDatatableCountLoading"/>
+    </div>
+  </div>
+</template>
+
+<script>
+import { chunk } from 'lodash'
+import { mapActions, mapGetters, mapState } from 'vuex'
+import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
+import { aclMixin } from 'src/plugins/mixins'
+import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
+import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
+import AddUserIcon from 'components/icons/add-user-icon'
+import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
+
+export default {
+  name: 'bulk-action-menu',
+
+  inject: [
+    'selectedContacts'
+  ],
+
+  mixins: [
+    aclMixin
+  ],
+
+  components: { PowerDialerMobileIcon, AddUserIcon },
+
+  props: {
+    id: {
+      type: [Number, String],
+      required: true
+    },
+
+    disabledDelete: {
+      type: Boolean,
+      default: false
+    },
+
+    disabledRemoveOnList: {
+      type: Boolean,
+      default: false
+    },
+
+    disabledRemoveOnPdList: {
+      type: Boolean,
+      default: false
+    },
+
+    totalRows: {
+      type: Number,
+      default: 0
+    },
+
+    isLoading: {
+      type: Boolean,
+      default: false
+    },
+
+    isLoadingMore: {
+      type: Boolean,
+      default: false
+    },
+
+    checkedCount: {
+      type: Number,
+      default: 0
+    },
+
+    hideDeleteOnAllSelected: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  computed: {
+    ...mapState('cache', ['currentCompany']),
+
+    ...mapGetters('contacts', [
+      'selectedList',
+      'lists'
+    ]),
+
+    ...mapGetters('powerDialer', ['myQueue']),
+
+    ...mapState('contacts', [
+      'isAllContactsSelected'
+    ]),
+
+    ...mapState([
+      'isDatatableCountLoading',
+      'isDatatableSelectedAll'
+    ]),
+
+    currentList () {
+      // myQueue is available only in PD
+      if (this.isPowerDialer && this.selectedList.id === this.myQueue.id) {
+        return this.myQueue
+      }
+      return this.lists[this.selectedList.id]
+    },
+
+    contactsWord () {
+      return this.checkedCount > 1 ? 'Contacts' : 'Contact'
+    },
+
+    selectedContactIds () {
+      return this.selectedContacts[this.id].map(contact => contact.contact_list_item_id)
+    },
+
+    isMyQueue () {
+      return this.$route.meta.id === 'power-dialer' ||
+        this.$route.meta.id === 'power-dialer-queue-filter'
+    },
+
+    isDisabledBulkActions () {
+      return this.isAllSelected || this.checkedCount === this.totalRows
+    },
+
+    optionsDisabledClass () {
+      const isCheckedAllClass = this.isDisabledBulkActions ? 'cursor-blocked pe-none disabled' : 'cursor-pointer'
+
+      return [
+        isCheckedAllClass
+      ]
+    },
+
+    isAddView () {
+      return this.isContactsAdd || this.isPowerDialerAdd
+    },
+
+    bulkActionMenuClass () {
+      const hiddenClass = !this.checkedCount ? 'height-0' : ''
+      const isPDBulkClass = this.isPowerDialer && !this.isPowerDialerAdd ? 'bulk-action-menu__power-dialer' : ''
+
+      return [
+        hiddenClass,
+        isPDBulkClass
+      ]
+    },
+
+    isContacts () {
+      return this.$route.name === 'Contacts'
+    },
+
+    isContactsAdd () {
+      return this.$route.name === 'Contacts' && this.$route.path.includes('/add')
+    },
+
+    isPowerDialer () {
+      return this.$route.name === 'Power Dialer'
+    },
+
+    isPowerDialerAdd () {
+      return this.$route?.meta?.id?.includes('power-dialer-add')
+    },
+
+    hasDeletePermission () {
+      return this.hasPermissionTo('archive contact')
+    },
+
+    canDelete () {
+      return this.hideDeleteOnAllSelected ? !this.isDatatableSelectedAll : true
+    },
+
+    canSelectAll () {
+      return !this.isAllSelected && this.checkedCount < this.totalRows && !this.isDatatableCountLoading
+    },
+
+    showDeleteButton () {
+      return this.hasDeletePermission && !this.isAddView && this.canDelete && !this.isPowerDialer &&
+        // hide button when dynamic remote list fetched
+        this.lists[this.id]?.type !== ContactListTypes.DYNAMIC_REMOTE_LIST
+    },
+
+    showRemoveFromListButton () {
+      if (this.isAddView) {
+        return false
+      }
+
+      if (this.isPowerDialer) {
+        return false
+      }
+
+      // if is a default list, dont show
+      if (this.currentList && this.currentList.is_default) {
+        return false
+      }
+
+      // hide for dynamic lists
+      if (this.lists[this.id]?.type === ContactListTypes.DYNAMIC) {
+        return false
+      }
+
+      const isUserOnlyAgentInPublicFolder = this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder
+
+      // do not allow to delete from dynamic remote list
+      if (this.currentList?.type === ContactListTypes.DYNAMIC_REMOTE_LIST) {
+        return false
+      }
+
+      // If user have been granted Delete permission, which is higher than Removing from list permission
+      if (this.hasDeletePermission) {
+        return this.canDelete
+      }
+
+      // if is only agent and not billing admin, or admin, or supervisor and list is public
+      if (isUserOnlyAgentInPublicFolder) {
+        return false
+      }
+
+      return this.canDelete
+    },
+
+    showRemoveFromPdListButton () {
+      if (this.isAddView) {
+        return false
+      }
+
+      if (this.isPowerDialer) {
+        return this.canDelete
+      }
+
+      return false
+    },
+
+    showMoreDropdownButton () {
+      if (!this.isContacts || this.isAddView) {
+        return false
+      }
+
+      // AloAi and Power Dialer disabled
+      if (!this.shouldShowAloAi && !this.shouldShowPowerDialer) {
+        return false
+      }
+
+      return true
+    }
+  },
+
+  data: () => {
+    return {
+      isCheckboxAllChecked: false,
+      isAllSelected: false,
+      selectedContactsCount: 0
+    }
+  },
+
+  methods: {
+    ...mapActions('contacts', [
+      'setBulkDelete',
+      'setAllContactsSelected',
+      'removeContactOpen',
+      'createListOpen',
+      'selectListOpen',
+      'setSelectedStaticList',
+      'setContactRemoveActionType'
+    ]),
+
+    ...mapActions('powerDialer', [
+      'moveContactItems'
+    ]),
+
+    ...mapActions(['setIsDatatableSelectedAll']),
+
+    onDelete (e) {
+      if (this.disabledDelete) {
+        e.preventDefault()
+        return
+      }
+
+      this.setBulkDelete(true)
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_CONTACTS)
+      this.$emit('on-delete')
+      e.preventDefault()
+    },
+
+    onRemoveFromList (e) {
+      if (this.disabledDelete) {
+        e.preventDefault()
+        return
+      }
+
+      this.setBulkDelete(true)
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.$emit('on-remove-from-list')
+      e.preventDefault()
+    },
+
+    onRemoveFromPdList (e) {
+      if (this.disabledRemoveOnPdList) {
+        e.preventDefault()
+        return
+      }
+
+      this.setBulkDelete(true)
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.$emit('on-remove')
+      e.preventDefault()
+    },
+
+    onMoveToTop () {
+      if (this.isDisabledBulkActions) {
+        return
+      }
+
+      this.processMove(MOVE_CONTACTS_DIRECTION.top)
+    },
+
+    onMoveToBottom () {
+      if (this.isDisabledBulkActions) {
+        return
+      }
+
+      this.processMove(MOVE_CONTACTS_DIRECTION.bottom, 'bottom')
+    },
+
+    processMove (direction, text = 'top') {
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to move ${this.checkedCount} contacts to ${text}?`, {
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'Cancel',
+        centered: true
+      }).then(confirm => {
+        if (confirm) {
+          let ids = this.selectedContactIds
+          ids = chunk(ids, 50)
+
+          const isChunked = ids.length > 0
+          this.onMoveContacts(ids, isChunked, direction)
+        }
+      })
+    },
+
+    async onMoveContacts (chunkedContactIds = [], isChunked = false, direction = MOVE_CONTACTS_DIRECTION.top) {
+      const res = await this.moveContactItems({
+        id: this.isMyQueue ? this.myQueue.id : this.id,
+        params: {
+          contact_list_item_ids: chunkedContactIds[0],
+          direction: direction
+        }
+      })
+
+      this.$VueEvent.fire('datatable-reset-sorts')
+
+      if (isChunked) {
+        // remove the used set of contact ids
+        chunkedContactIds.splice(0, 1)
+        const hasMoreChunks = chunkedContactIds.length > 1
+
+        // process the next set of contact ids
+        if (chunkedContactIds.length > 0) {
+          await this.onMoveContacts(chunkedContactIds, hasMoreChunks, direction)
+
+          return
+        }
+      }
+
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
+
+      if (res.data?.message) {
+        this.$VueEvent.fire('clearContacts')
+        this.$emit('moved-contacts', true)
+      }
+
+      this.$generalNotification(
+        res?.data?.message || 'Error in moving contact list items.',
+        res?.data ? 'success' : 'error'
+      )
+    },
+
+    onClickAll () {
+      this.isAllSelected = true
+      this.selectedContactsCount = this.totalRows
+    },
+
+    onClearAll () {
+      this.isAllSelected = false
+      this.selectedContactsCount = this.checkedCount
+      document.querySelector('.data-table-check-all').checked = false
+    },
+
+    resetCheckbox () {
+      this.isCheckboxAllChecked = false
+      this.isAllSelected = false
+    },
+
+    onCreateStaticList (e) {
+      this.createListOpen({
+        type: 1,
+        mode: FROM_BULK_MENU,
+        contact_folder_id: null
+      })
+      e.preventDefault()
+    },
+
+    onAddToStaticList (e) {
+      this.selectListOpen({
+        contact_folder_id: null
+      })
+      this.setSelectedStaticList({ id: null, name: '', type: null })
+      e.preventDefault()
+    },
+
+    addToPowerDialer () {
+      this.$VueEvent.fire('addToPowerDialer')
+    },
+    addToAloAi () {
+      this.$VueEvent.fire('addToAloAi', 'add')
+    }
+  },
+
+  watch: {
+    isAllContactsSelected (value) {
+      this.isCheckboxAllChecked = value
+      this.isAllSelected = false
+    },
+
+    isAllSelected (value) {
+      this.selectedContactsCount = this.totalRows
+      this.setIsDatatableSelectedAll(value)
+      this.$emit('onSelectedAll', value)
+    },
+
+    checkedCount (value) {
+      if (!this.isCheckboxAllChecked) {
+        this.selectedContactsCount = value
+      }
+    },
+
+    selectedContactsCount (value) {
+      if (!this.isCheckboxAllChecked && value !== this.totalRows) {
+        this.resetCheckbox()
+      }
+    }
+  }
+}
+</script>

@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Workflow
+
+## Environment Setup
+- Node.js >= 18.20.1
+- NPM >= 10.5.0 or Yarn >= 1.22.19 (preferred)
+- Install dependencies with `yarn install`
+
+## Development Commands
+- `yarn dev` or `quasar dev` - Start web app in development mode
+- `yarn dev:electron` or `quasar dev -m electron` - Start Electron app in development mode
+- `yarn lint` - Lint code using ESLint
+
+## Building for Production
+- Web: `quasar build` - Builds for web
+- MacOS: `yarn build-mac` - Builds for macOS
+- Windows: `yarn build-win` - Builds for Windows
+- Linux: `yarn build-linux` - Builds for Linux
+
+## ESLint Configuration
+The project uses ESLint with Vue and Standard configuration:
+- [.eslintrc.js](mdc:.eslintrc.js) - ESLint configuration
+- [.eslintignore](mdc:.eslintignore) - Files to ignore for linting
+
+## Deployment
+- Web deployment uses S3 uploads configured in [s3-spa-upload.config.json](mdc:s3-spa-upload.config.json)
+- Different deployment targets (dev1, staging, prod) are available through environment variables

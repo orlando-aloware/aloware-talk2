@@ -1,0 +1,79 @@
+import _ from 'lodash'
+import { mapState } from 'vuex'
+import * as KycLogs from '../../constants/kyc-logs'
+
+export default _.merge({
+  computed: {
+    ...mapState('auth', ['profile']),
+    ...mapState('cache', ['currentCompany']),
+
+    currentKycStatus () {
+      return this.currentCompany?.kyc_status
+    },
+
+    isTrial () {
+      return this.currentCompany?.is_trial
+    },
+
+    isCompanyA2pCampaignApproved () {
+      return this.currentCompany?.is_a2p_campaign_approved
+    },
+
+    isKYCFilled () {
+      return this.currentCompany?.kyc_filled
+    },
+
+    canChangeNameAndEmail () {
+      return this.profile?.company?.kyc_status !== KycLogs.KYC_STATUS_APPROVED
+    }
+  },
+
+  methods: {
+    shouldAllowSmsTraffic (selectedLine) {
+      if (!selectedLine) {
+        return true
+      }
+
+      /**
+       * Allow sms traffic on Dialer and Contact text Composer component
+       */
+      if (!selectedLine.is_10_dlc) {
+        /**
+         *  1 - No A2P Campaign + No 10DLC Line -> Allow messaging
+         *  2 - A2P Campaign  + No 10DLC (TF) ->  Allow messaging
+         */
+        return true
+      }
+
+      if (this.thereAreNotUSLines(selectedLine)) {
+        /**
+         * Allow messaging for non-US lines (Canada, GB, etc)
+         */
+        return true
+      }
+
+      if (this.isTrial) {
+        /**
+         * If it's trial -> Allow messaging, let it fail on compliance
+         */
+        return true
+      }
+
+      /**
+       *   3 - A2P Campaign + 10DLC Line -> Allow messaging
+       *   4 - No A2P Campaign + 10DLC -> Not allowed
+       */
+      return selectedLine.is_10_dlc && selectedLine.has_approved_a2p_use_case
+    },
+
+    onOpenFinishRegistration () {
+      const link = `${process.env.API_URL}/account?tab=compliance&open_register_business_information=true`
+      return window.open(link, '_self')
+    },
+
+    // It verifies if there are not US lines on the selected line
+    thereAreNotUSLines (selectedLine) {
+      return selectedLine?.incoming_numbers?.filter(number => number.country === 'US').length === 0
+    }
+  }
+})

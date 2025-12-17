@@ -1,0 +1,186 @@
+<template>
+  <vue-bootstrap-autocomplete
+    ref="searchField"
+    v-model="query"
+    :data="phoneNumbers"
+    :minMatchingChars="3"
+    :screen-reader-text-serializer="(item) => this.getContactName(item)"
+    :serializer="(item) => item.phone_number"
+    :showAllResults="true"
+    class="important search-form contact-phone-number-search"
+    placeholder="Name or phone number"
+    @hit="changePhoneNumber"
+    @input="lookupPhoneNumber"
+  >
+    <!-- htmlText is bound to the matched text derived from the serializer function -->
+    <!-- data is bound to the matching array element in the data prop -->
+    <template slot="suggestion" slot-scope="{ data }">
+      <div class="contact-name">
+        <span class="text-grey-100">{{ data.phone_number | fixPhone('INTERNATIONAL') }}</span>
+      </div>
+      <span class="text-xs">{{ getContactName(data) }}</span>
+      <template v-if="data.company_name">
+        <br>
+        <span class="text-xs">{{ data.company_name }}</span>
+      </template>
+    </template>
+  </vue-bootstrap-autocomplete>
+</template>
+
+<script>
+import { debounce } from 'lodash'
+import { helperMixin } from 'src/plugins/mixins'
+
+export default {
+  name: 'contact-phone-number-search',
+
+  mixins: [helperMixin],
+
+  props: {
+    value: {
+      required: false
+    },
+
+    no_prepend: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
+
+  data () {
+    return {
+      query: this.value,
+      phoneNumbers: [],
+      selectedPhoneNumber: null
+    }
+  },
+
+  computed: {
+    prependText () {
+      if (this.no_prepend) {
+        return ''
+      }
+
+      return 'To:'
+    }
+  },
+
+  mounted () {
+    this.setupForm()
+  },
+
+  methods: {
+    setupForm (noFocus = false) {
+      this.query = this.value
+      this.$refs.searchField.inputValue = this.query
+      if (!noFocus) {
+        this.focusInput()
+      }
+    },
+
+    focusInput () {
+      setTimeout(() => {
+        if (this.$refs.searchField) {
+          this.$refs.searchField.$refs.input.focus()
+        }
+      }, 100)
+    },
+
+    blurInput () {
+      setTimeout(() => {
+        if (this.$refs.searchField) {
+          this.$refs.searchField.$refs.input.blur()
+        }
+      }, 100)
+    },
+
+    getPhoneNumbers (search) {
+      if (!search) {
+        this.phoneNumbers = []
+        return
+      }
+
+      this.phoneNumbers = []
+
+      // Skip contact search for talk lite users, but still emit events
+      if (this.$store.state.auth.is_focused_power_dialer) {
+        this.$emit('searchResults', false)
+        this.changePhoneNumber({
+          phone_number: this.query,
+          contactName: null,
+          company_name: null,
+          contact_id: null,
+          timezone: null
+        })
+        return
+      }
+
+      this.$emit('searchResults', true)
+
+      this.$axios.get('api/v2/contacts/quick-search', {
+        params: {
+          search: search
+        }
+      }).then((res) => {
+        this.phoneNumbers = res.data.data
+        this.$emit('searchResults', !!this.phoneNumbers.length)
+      }).catch(err => {
+        console.log(err)
+        this.$handleErrors(err.response)
+      }).finally(() => {
+        this.changePhoneNumber({
+          phone_number: this.query,
+          contactName: null,
+          company_name: null,
+          contact_id: null,
+          timezone: null
+        })
+      })
+    },
+
+    changePhoneNumber ($event) {
+      this.selectedPhoneNumber = $event.phone_number
+      // this.$refs.searchField.inputValue = this.selectedPhoneNumber
+
+      this.$emit('change', {
+        currentNumber: this.selectedPhoneNumber,
+        contactName: this.getContactName($event),
+        companyName: $event.company_name,
+        contactId: $event.contact_id,
+        contactTimezone: $event.timezone
+      })
+      // this.blurInput()
+    },
+
+    lookupPhoneNumber (newVal) {
+      if (this.selectedPhoneNumber && this.selectedPhoneNumber !== newVal) {
+        this.changePhoneNumber({
+          phone_number: this.query,
+          contactName: null,
+          company_name: null,
+          contact_id: null,
+          timezone: null
+        })
+      }
+
+      // Use debounce for regular users (API calls), immediate for talk lite users
+      if (this.$store.state.auth.is_focused_power_dialer) {
+        this.getPhoneNumbers(this.query)
+      } else {
+        this.debouncedGetPhoneNumbers()
+      }
+    },
+
+    debouncedGetPhoneNumbers: debounce(function () {
+      this.getPhoneNumbers(this.query)
+    }, 1000)
+  },
+
+  watch: {
+    value () {
+      this.setupForm(true)
+    }
+  }
+}
+</script>

@@ -1,0 +1,175 @@
+<template>
+  <div>
+    <vue-multiselect track-by="id"
+                     label="name"
+                     class="mr-1"
+                     style="width: 100%"
+                     placeholder="Select line"
+                     :searchable="true"
+                     :showNoResults="false"
+                     :close-on-select="true"
+                     :options="formattedLineOptions"
+                     :show-labels="false"
+                     :allow-empty="false"
+                     :preselect-first="preselectFirst"
+                     v-model="line"
+                     data-testid="contact-line-selector"
+                     @select="onSelect">
+      <template v-slot:option="props">
+        <div class="row flex-nowrap">
+          <q-item-section>
+            <q-item-label>{{ props.option.name }}</q-item-label>
+          </q-item-section>
+          <q-item-section v-if="isMessagingBlocked(props.option, checkBlockedMessaging, false, true)" side>
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ getMessagingBlocked(props.option) }}
+            </q-tooltip>
+            <q-badge color="blue">i</q-badge>
+          </q-item-section>
+        </div>
+      </template>
+    </vue-multiselect>
+  </div>
+</template>
+
+<script>
+import VueMultiselect from 'vue-multiselect'
+import LinesMixins from 'src/plugins/mixins/lines.mixin'
+import { aclMixin, selectorMixin } from 'src/boot/mixins'
+
+export default {
+  name: 'contact-line-selector',
+
+  mixins: [
+    aclMixin,
+    LinesMixins,
+    selectorMixin
+  ],
+
+  components: {
+    VueMultiselect
+  },
+
+  props: {
+    value: {
+      type: Number,
+      required: false
+    },
+
+    showPaused: {
+      type: Boolean,
+      default: true
+    },
+
+    useGroups: {
+      type: Boolean,
+      default: true
+    },
+
+    preselectFirst: {
+      type: Boolean,
+      default: false
+    },
+
+    capabilities: {
+      type: Array,
+      default: null
+    },
+
+    checkBlockedMessaging: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  computed: {
+    formattedLineOptions () {
+      const contactLines = { data: [] }
+
+      if (this.capabilities) {
+        return this.campaignsWithCapabilities
+      }
+
+      if (this.contactCampaignsFromCommunications.length > 0) {
+        contactLines.data = [...this.contactCampaignsFromCommunications]
+
+        if (this.useGroups) {
+          contactLines.data.unshift({
+            group: 'Contact Lines',
+            disable: true
+          })
+        }
+      }
+
+      const linesArray = { data: contactLines.data }
+
+      if (this.otherCampaignsFromCommunications && this.otherCampaignsFromCommunications.length > 0) {
+        const otherLines = [...this.otherCampaignsFromCommunications]
+
+        if (this.useGroups) {
+          otherLines.unshift({
+            group: 'Other Lines',
+            disable: true
+          })
+        }
+
+        linesArray.data = [...contactLines.data, ...otherLines]
+      }
+
+      // filter lines if prop is false and only those who has active attribute
+      if (!this.showPaused) {
+        linesArray.data = linesArray.data.filter(line => 'active' in line ? line.active : true)
+      }
+
+      return linesArray.data
+    }
+  },
+
+  data () {
+    return {
+      line: null,
+      campaignsWithCapabilities: []
+    }
+  },
+
+  mounted () {
+    // if component value is set, search for that specific line to fill as the option
+    if (this.value) {
+      this.line = this.formattedLineOptions.find(line => line.id === this.value)
+    }
+    if (this.capabilities) {
+      this.getCampaignsByCapabilities()
+    }
+  },
+
+  methods: {
+    onSelect (selected) {
+      this.$emit('select', selected)
+    },
+
+    getCampaignsByCapabilities () {
+      if (this.hasPermissionTo('list campaign')) {
+        return this.$axios
+          .get('/api/v1/campaign', {
+            mode: 'no-cors',
+            params: {
+              is_lite: true,
+              capabilities: this.capabilities
+            }
+          })
+          .then((res) => {
+            this.campaignsWithCapabilities = res.data.sort((a, b) => {
+              const textA = a.name.toUpperCase()
+              const textB = b.name.toUpperCase()
+              return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+            })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      }
+    }
+  }
+}
+</script>

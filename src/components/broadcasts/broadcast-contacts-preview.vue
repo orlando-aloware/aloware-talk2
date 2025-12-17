@@ -1,0 +1,325 @@
+<template>
+  <div class="contacts-preview">
+    <b-overlay class="h-100 w-100 position-absolute"
+               rounded="sm"
+               :show="true"
+               v-show="loading">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="40px" />
+      </template>
+    </b-overlay>
+
+    <div class="contacts-preview__header"
+         v-if="!loading">
+      Contacts Preview
+      <span class="contacts-preview__header__counter">
+        {{ contactsCount }} {{ contactsCount === 1 ? 'Contact' : 'Contacts' }}
+      </span>
+      <span class="contacts-preview__header__counter contacts-preview__header__counter--dnc"
+            v-if="dncContactsCount > 0">
+        ({{ dncContactsCount }} DNC)
+      </span>
+      <span class="contacts-preview__header__counter contacts-preview__header__counter--dnc"
+            v-if="optedOutContactsCount > 0">
+        ({{ optedOutContactsCount }} Opted Out)
+      </span>
+    </div>
+
+    <datatable class="contacts-preview__body"
+               use-empty-slot
+               :is-empty="contacts.length === 0"
+               :columns="columns"
+               :use-full-height="false"
+               v-if="!loading">
+      <template slot="tbody">
+        <tr class="datatable-row"
+            :key="index"
+            v-for="(contact, index) in contacts">
+          <template v-for="column in columns">
+            <td :key="column.name"
+                v-if="column.name === 'name'">
+              <name-wrapper dnc-badge
+                            opt-out-badge
+                            link-path="/contacts/"
+                            :resource="contact" />
+            </td>
+
+            <td :key="column.name"
+                v-else-if="column.name === 'phone_number'">
+              {{ contact.phone_number | fixPhone('NATIONAL', true, false, true) }}
+            </td>
+
+            <td :key="column.name"
+                v-else-if="column.name === 'created_at'">
+              {{ contact.created_at | fixFullDateTime }}
+            </td>
+          </template>
+        </tr>
+      </template>
+      <template #empty
+                v-if="contacts.length === 0">
+        <div class="empty-state">
+          <div class="h5">
+            {{ noContactsPlaceholder }}
+          </div>
+        </div>
+      </template>
+    </datatable>
+  </div>
+</template>
+
+<script>
+import API from 'src/plugins/api/api'
+import NameWrapper from 'src/components/name-wrapper.vue'
+import Datatable from 'src/components/datatable.vue'
+import { DNC_OPTION_CONTACTS_WITH_DNC, DNC_OPTION_CONTACTS_WITHOUT_DNC_WITH_OPTOUT_ALL } from 'src/constants/contact-filter-dnc-options.vue'
+import { BOOLEAN_OPERATORS } from 'src/constants/contacts-boolean-filter-operators'
+import { isEmpty, parseInt, debounce } from 'lodash'
+
+export default {
+  name: 'broadcast-contacts-preview',
+
+  components: {
+    NameWrapper,
+    Datatable
+  },
+
+  props: {
+    list: {
+      type: Object,
+      required: false,
+      default: () => ({})
+    },
+
+    filters: {
+      type: [Array, Object],
+      required: false
+    },
+
+    integration: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+
+  computed: {
+    columns () {
+      return [
+        {
+          name: 'name',
+          label: 'Name',
+          order: 0,
+          minWidth: 200
+        },
+        {
+          name: 'phone_number',
+          label: 'Phone Number',
+          order: 1
+        },
+        {
+          name: 'created_at',
+          label: 'Date Added',
+          order: 2,
+          minWidth: 140
+        }
+      ]
+    },
+
+    isValid () {
+      return this.contactsCount > 0 && !this.loading
+    },
+
+    noContactsPlaceholder () {
+      switch (true) {
+        case !isEmpty(this.list):
+          return 'No contacts found on the current list'
+        case !isEmpty(this.integration):
+          return 'Contacts preview isn\'t available for integrations'
+        default:
+          return 'No contacts found'
+      }
+    },
+
+    allFilters () {
+      return {
+        ...this.defaultFilters,
+        ...this.currentFilters
+      }
+    }
+  },
+
+  data: () => ({
+    loading: false,
+    contacts: [],
+    contactsCount: 0,
+    dncContactsCount: 0,
+    optedOutContactsCount: 0,
+    defaultFilters: {
+      page: 1,
+      per_page: 25,
+      sort: 'last_engagement_at',
+      order: 'desc',
+      force_slave: 1,
+      relations: ['phoneNumbers']
+    },
+    currentFilters: {}
+  }),
+
+  created () {
+    if (!this.list) {
+      throw new Error('A list or filters are required to preview the contacts')
+    }
+
+    this.init()
+  },
+
+  methods: {
+    init: debounce(function () {
+      this.currentFilters = {}
+
+      switch (true) {
+        case !isEmpty(this.list):
+          this.setContactsListFilter()
+          this.loadContacts()
+          break
+        case !isEmpty(this.integration) && this.integration.name === 'HubSpot':
+          this.setIntegrationHubspot()
+          break
+      }
+    }, 100),
+
+    getContacts () {
+      const cancelToken = window.axios.CancelToken
+      const source = cancelToken.source()
+
+      // load contacts based on filters
+      return API.V2.contacts.list(this.allFilters, source.token)
+        .then(({ data }) => {
+          // only set contacts if it's not integration
+          if (isEmpty(this.integration)) {
+            this.contacts = data.data
+          }
+
+          return Promise.resolve()
+        })
+        .catch(err => {
+          this.$handleErrors(err.response)
+        })
+    },
+
+    getContactsCount (filters = {}) {
+      return API.V2.contacts.counts({ ...filters, ...this.allFilters })
+        .catch(err => {
+          this.$handleErrors(err.response)
+        })
+    },
+
+    loadContacts () {
+      this.loading = true
+
+      // load contacts based on filters
+      const contactsPromise = this.getContacts()
+
+      // load count
+      const countsPromise = this.getContactsCount()
+
+      // load count with DNC
+      const countsDncPromise = this.getContactsCount({
+        filters: {
+          dnc_option: {
+            value: DNC_OPTION_CONTACTS_WITH_DNC,
+            operator: BOOLEAN_OPERATORS.IS_EQUAL_TO
+          }
+        }
+      })
+
+      // load count with opted out
+      const countOptOutPromise = this.getContactsCount({
+        filters: {
+          dnc_option: {
+            value: DNC_OPTION_CONTACTS_WITHOUT_DNC_WITH_OPTOUT_ALL,
+            operator: BOOLEAN_OPERATORS.IS_EQUAL_TO
+          }
+        }
+      })
+
+      Promise.all([
+        contactsPromise,
+        countsPromise,
+        countsDncPromise,
+        countOptOutPromise
+      ])
+        .then((promises) => {
+          this.contactsCount = parseInt(promises[1].data.count)
+          this.dncContactsCount = parseInt(promises[2].data.count)
+          this.optedOutContactsCount = parseInt(promises[3].data.count)
+
+          this.loading = false
+        })
+    },
+
+    setContactsListFilter () {
+      switch (this.list.type) {
+        case 'static':
+          this.currentFilters.list_id = this.list.id
+          break
+
+        case 'dynamic':
+          this.currentFilters.filter_groups = this.list.filters
+          break
+      }
+    },
+
+    async setIntegrationHubspot () {
+      this.loading = true
+
+      this.contactsCount = parseInt(this.integration.list.additionalProperties.hs_list_size)
+
+      // run this to get a preview contact
+      await this.getContacts()
+
+      this.loading = false
+    }
+  },
+
+  watch: {
+    list: {
+      deep: true,
+      handler () {
+        this.init()
+      }
+    },
+
+    integration: {
+      deep: true,
+      handler () {
+        this.init()
+      }
+    },
+
+    isValid (state) {
+      this.$emit('input', state)
+    },
+
+    contactsCount: {
+      immediate: true,
+      handler () {
+        this.$emit('contacts-count', (this.contactsCount - this.dncContactsCount - this.optedOutContactsCount))
+      }
+    },
+
+    dncContactsCount: {
+      immediate: true,
+      handler () {
+        this.$emit('contacts-count', (this.contactsCount - this.dncContactsCount - this.optedOutContactsCount))
+      }
+    }
+  },
+
+  beforeDestroy () {
+    // force invalid state if component is destroyed
+    this.$emit('input', false)
+  }
+}
+</script>

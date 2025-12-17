@@ -1,0 +1,573 @@
+<template>
+  <div class="broadcasts__add__view">
+    <div class="broadcasts__add__view__form">
+      <div class="broadcasts__add__view__form__header">
+        {{ currentStep.name }}
+      </div>
+
+      <div class="broadcasts__add__view__form__content">
+        <transition mode="out-in"
+                    :name="`horizontal-slide-${direction}`">
+          <component ref="mainComponent"
+                     :is="mainComponent"
+                     :contacts-count-valid="currentStep.id === 1 && (contactsCount > 0 || integrationsWithoutContactCount.includes(source.integration?.name))"
+                     v-bind="mainComponentProps"
+                     @input="mainComponentChanged"
+                     @source-updated="onSourceUpdated"
+                     @type-updated="onTypeUpdated"
+                     @rvm-updated="onRvmUpdated"
+                     @price-updated="onPriceUpdated"
+                     @time="onTimeUpdated"
+                     @date-changed="onDateChanged"
+                     @campaign="onCampaignUpdated"
+                     @throttle="onThrottleUpdated"
+                     @restricted-time="onRestrictedTimeChanged"/>
+        </transition>
+      </div>
+
+      <div class="broadcasts__add__view__form__footer">
+        <!-- buttons -->
+        <compact-btn class="mr-2"
+                     variant="outlined-light"
+                     @clicked="back">
+          Back
+        </compact-btn>
+
+        <compact-btn variant="primary"
+                     v-if="currentStep.id === lastStep"
+                     @clicked="send">
+          Send
+        </compact-btn>
+
+        <compact-btn variant="primary"
+                     :disabled="!isStepValid"
+                     v-else
+                    @clicked="next">
+          Next
+        </compact-btn>
+      </div>
+    </div>
+
+    <div class="broadcasts__add__view__details"
+         v-if="footerComponent">
+      <component ref="footerComponent"
+                 :is="footerComponent"
+                 v-bind="footerComponentProps"
+                 @input="footerComponentChanged"
+                 @contacts-count="onContactsLength"/>
+    </div>
+
+    <confirm-dialog id="outside-business-hours-dialog"
+                    :is-open="outsideBusinessHoursDialog.open"
+                    @close="onOutsideBusinessHoursDialogClosed">
+      <template #content>
+        <p>
+          Unable to send bulk message since the current time is outside of your account's defined Broadcast Business Hours - <b>{{ broadcastOperatingHoursText }} {{ companyTimezone.format('z') }}</b>.
+        </p>
+        <p>
+          Schedule this message to be sent on <b>({{ nextScheduledDay }})</b> at <b>{{ nextScheduledHour.format('h:mm A') }}</b>?
+        </p>
+      </template>
+
+      <template #footer>
+        <div>
+          <button class="btn btn-sm btn-light mr-2"
+                  @click="onOutsideBusinessHoursDialogClosed">
+            No
+          </button>
+
+          <button class="btn btn-sm btn-primary"
+                  @click="onOutsideBusinessHoursDialogConfirmed">
+            Yes
+          </button>
+        </div>
+      </template>
+    </confirm-dialog>
+
+    <confirm-dialog id="optout-missing-dialog"
+                    :is-open="optoutMissingDialog.open"
+                    @close="optoutMissingDialog.open = false">
+      <template #content>
+        <p>
+          You haven't included the mandatory opt-out message in the SMS as required by law. Are you sure you want to proceed without it?
+        </p>
+      </template>
+
+      <template #footer>
+        <div>
+          <button class="btn btn-sm btn-light mr-2"
+                  @click="onOptoutMissingDialogClosed">
+            No, I'll add it
+          </button>
+
+          <button class="btn btn-sm btn-primary"
+                  @click="onOptoutMissingDialogConfirmed">
+            Yes, I want to proceed
+          </button>
+        </div>
+      </template>
+    </confirm-dialog>
+
+    <broadcast-send-warning-dialog :is-open="sendWarningDialog.open"
+                                   :campaign="selectedCampaign"
+                                   :use-mms-rate="useMmsRate"
+                                   @submit="onSendWarningDialogConfirmed"
+                                   @close="onSendWarningDialogClosed"/>
+  </div>
+</template>
+
+<script>
+import BroadcastAddCards from './broadcast-add-cards.vue'
+import BroadcastAddViewContacts from './broadcast-add-view-contacts.vue'
+import BroadcastAddViewMessage from './broadcast-add-view-message.vue'
+import BroadcastAddViewPreview from './broadcast-add-view-preview.vue'
+import BroadcastAddViewSchedule from './broadcast-add-view-schedule.vue'
+import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
+import BroadcastSendWarningDialog from './broadcast-send-warning-dialog.vue'
+import CompactBtn from 'components/compact-btn.vue'
+import ConfirmDialog from 'components/confirm-dialog.vue'
+import API from 'src/plugins/api/api'
+import { mapGetters, mapState, mapActions, mapMutations } from 'vuex'
+import { broadcastsMixin, companyTimezone } from 'src/plugins/mixins'
+import { isEmpty } from 'lodash'
+
+export default {
+  name: 'broadcast-add-view',
+
+  mixins: [
+    broadcastsMixin,
+    companyTimezone
+  ],
+
+  components: {
+    BroadcastAddCards,
+    BroadcastAddViewContacts,
+    BroadcastAddViewMessage,
+    BroadcastAddViewPreview,
+    BroadcastAddViewSchedule,
+    BroadcastContactsPreview,
+    BroadcastSendWarningDialog,
+    CompactBtn,
+    ConfirmDialog
+  },
+
+  props: {
+    currentStep: {
+      type: Object,
+      required: true
+    },
+
+    steps: {
+      type: Array,
+      required: true
+    },
+
+    firstStep: {
+      type: Number,
+      required: true
+    },
+
+    lastStep: {
+      type: Number,
+      required: true
+    }
+  },
+
+  computed: {
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
+    ...mapGetters('contacts', [
+      'messageComposer',
+      'messageBodyWithOptout',
+      'isOptoutActive'
+    ]),
+
+    ...mapState('broadcast', [
+      'selectedCampaign',
+      'contactsLength'
+    ]),
+
+    mainComponent () {
+      switch (this.currentStep.id) {
+        case 1:
+          return 'broadcast-add-view-contacts'
+        case 2:
+          return 'broadcast-add-view-message'
+        case 3:
+          return 'broadcast-add-view-schedule'
+        case 4:
+          return 'broadcast-add-view-preview'
+        default:
+          throw new Error('Invalid step ' + this.currentStep.id)
+      }
+    },
+
+    mainComponentProps () {
+      switch (this.currentStep.id) {
+        case 1:
+          return { defaultSource: this.source }
+        case 2:
+          return {
+            propCampaign: this.selectedCampaign,
+            propThrottle: this.throttle,
+            type: this.type,
+            rvm: this.rvm
+          }
+        case 3:
+          return {
+            propCampaign: this.selectedCampaign,
+            propThrottle: this.throttle,
+            propTime: this.time
+          }
+        case 4:
+          return {
+            propCampaign: this.selectedCampaign,
+            date: this.date,
+            isScheduled: this.time.time === 'scheduled',
+            source: this.source,
+            throttle: this.throttle.name,
+            type: this.type,
+            rvm: this.rvm
+          }
+        default:
+          return null
+      }
+    },
+
+    footerComponent () {
+      const isIntegration = !isEmpty(this.source.integration?.list)
+      const isIntegrationHubspot = isIntegration && this.source.integration.name === 'HubSpot'
+
+      switch (true) {
+        // if integrations, enabled only for HubSpot
+        case this.currentStep.id === 1 && (!isEmpty(this.source?.list) || isIntegrationHubspot):
+          return 'broadcast-contacts-preview'
+        // if integrations, enabled only for HubSpot
+        case [2, 3, 4].includes(this.currentStep.id) && (isIntegration ? isIntegrationHubspot : true):
+          return 'broadcast-add-cards'
+        default:
+          return null
+      }
+    },
+
+    footerComponentProps () {
+      switch (true) {
+        case this.currentStep.id === 1:
+          return {
+            list: this.source.list,
+            integration: this.source.integration
+          }
+        case this.currentStep.id === 2 || this.currentStep.id === 3:
+          return {
+            contactsLength: this.contactsLength,
+            estimatedCost: this.price,
+            campaign: this.selectedCampaign
+          }
+        case this.currentStep.id === 4:
+          return {
+            contactsLength: this.contactsLength,
+            estimatedCost: this.price,
+            messagesLength: this.messagesLength,
+            campaign: this.selectedCampaign
+          }
+        default:
+          return null
+      }
+    },
+
+    isStepValid () {
+      switch (this.currentStep.id) {
+        case 1:
+          return this.isMainComponentValid && (this.footerComponent ? this.isFooterComponentValid : true)
+        case 2:
+        case 3:
+        case 4:
+          return this.isMainComponentValid
+        default:
+          throw new Error(`Invalid step ${this.currentStep.id}`)
+      }
+    },
+
+    nextScheduledDay () {
+      // add one day if selected time is greater than opening hours
+      const days = window.moment(this.date).format('HH:mm') > this.companyBroadcastOpenDate.format('HH:mm') ? 1 : 0
+
+      return window.moment(this.date).add(days, 'd').format('MM/DD/YYYY')
+    },
+
+    nextScheduledHour () {
+      return this.companyBroadcastOpenDate.add(1, 'd')
+    }
+  },
+
+  data: function () {
+    return {
+      direction: 'left',
+      isMainComponentValid: false,
+      isFooterComponentValid: false,
+      source: {},
+      type: ['sms', 'rvm'].includes(this.$route.query.type) ? this.$route.query.type : 'sms', // sms, rvm
+      rvm: null,
+      price: 0,
+      throttle: null,
+      time: null, // holds the schedule's time options
+      date: null, // holds the send datetime
+      messagesLength: 0,
+      isRestrictedTime: false,
+      acceptedOutsideBusinessHours: false,
+      outsideBusinessHoursDialog: {
+        open: false
+      },
+      optoutMissingDialog: {
+        open: false
+      },
+      sendWarningDialog: {
+        open: false
+      },
+      contactsCount: 0,
+      // Zoho,Pipedrive and Salesforce don't send back the count of contacts in views/filters
+      integrationsWithoutContactCount: ['Zoho', 'Pipedrive', 'Salesforce']
+    }
+  },
+
+  methods: {
+    ...mapActions('contacts', [
+      'setMessageComposerSmsBody',
+      'setMessageComposerSmsGif',
+      'setMessageComposerAttachments',
+      'setIsOptoutActive',
+      'setSelectedLine'
+    ]),
+
+    ...mapActions('broadcast', [
+      'setSelectedCampaign'
+    ]),
+
+    ...mapMutations('broadcast', [
+      'SET_CONTACTS_LENGTH'
+    ]),
+
+    mainComponentChanged (state) {
+      this.isMainComponentValid = state
+    },
+
+    footerComponentChanged (state) {
+      this.isFooterComponentValid = state
+    },
+
+    onSourceUpdated (source) {
+      this.source = source
+    },
+
+    onTypeUpdated (type) {
+      //
+    },
+
+    onRvmUpdated (file) {
+      this.rvm = file
+    },
+
+    onPriceUpdated (price) {
+      this.price = price
+    },
+
+    onTimeUpdated (time) {
+      this.time = time
+    },
+
+    onDateChanged (date) {
+      this.date = date
+    },
+
+    onCampaignUpdated (campaign) {
+      this.setSelectedCampaign(campaign)
+      this.setSelectedLine(campaign)
+    },
+
+    onThrottleUpdated (throttle) {
+      this.throttle = throttle
+    },
+
+    onRestrictedTimeChanged (restrictedTime) {
+      this.isRestrictedTime = restrictedTime
+    },
+
+    onOutsideBusinessHoursDialogConfirmed () {
+      this.acceptedOutsideBusinessHours = true
+      this.outsideBusinessHoursDialog.open = false
+
+      // update scheduled time properly
+      this.time.time = 'scheduled'
+      this.time.schedule.date = this.nextScheduledDay
+      this.time.schedule.time = this.nextScheduledHour.format('HH:mm')
+      this.date = `${this.time.schedule.date} ${this.time.schedule.time}`
+
+      this.next()
+    },
+
+    onOutsideBusinessHoursDialogClosed () {
+      this.outsideBusinessHoursDialog.open = false
+    },
+
+    onOptoutMissingDialogClosed () {
+      this.optoutMissingDialog.open = false
+    },
+
+    onOptoutMissingDialogConfirmed () {
+      this.optoutMissingDialog.open = false
+      this.goToNextStep()
+      this.setIsOptoutActive(false)
+    },
+
+    onSendWarningDialogClosed () {
+      this.sendWarningDialog.open = false
+    },
+
+    onSendWarningDialogConfirmed () {
+      this.sendWarningDialog.open = false
+      this.goToNextStep()
+    },
+
+    goToNextStep () {
+      this.isMainComponentValid = false
+      this.isFooterComponentValid = false
+
+      this.direction = 'right'
+      this.$emit('next')
+    },
+
+    next () {
+      // send outside business hours confirmation
+      if (this.currentStep.id === 3 && this.isRestrictedTime && !this.acceptedOutsideBusinessHours) {
+        this.outsideBusinessHoursDialog.open = true
+
+        return
+      }
+
+      if (this.currentStep.id === 3 && this.shouldShowWarning) {
+        this.sendWarningDialog.open = true
+
+        return
+      }
+
+      if (this.currentStep.id === 2 && this.type === 'sms' && !this.isOptoutActive) {
+        this.optoutMissingDialog.open = true
+
+        return
+      }
+
+      this.goToNextStep()
+    },
+
+    back () {
+      if (this.currentStep.id === this.firstStep) {
+        this.$router.push({
+          path: '/broadcasts'
+        })
+
+        return
+      }
+
+      this.direction = 'left'
+      this.$emit('back')
+    },
+
+    onContactsLength (count) {
+      this.SET_CONTACTS_LENGTH(count)
+      this.contactsCount = count
+    },
+
+    send () {
+      this.$emit('loading', true)
+
+      let method = null
+      const bulkMessage = {
+        name: '',
+        count: this.contactsLength,
+        campaign_id: this.selectedCampaign.id,
+        run_at_date: this.date.substr(0, 10),
+        run_at_time: this.date.substr(11, 10),
+        message_body: this.messageBodyWithOptout,
+        throttle_limit: this.throttle.value,
+        accept_outside_business_hours: this.acceptedOutsideBusinessHours,
+        is_scheduled: this.time.time === 'scheduled',
+        opt_out_bypassed: !this.isOptoutActive
+      }
+
+      switch (this.type) {
+        case 'sms':
+          method = 'sendBulkMessage'
+
+          // set attachment
+          if (this.messageComposer.sms.gif_url) {
+            bulkMessage.attachment_type = 'gif'
+            bulkMessage.file_name = this.messageComposer.sms.gif_url
+          } else if (this.messageComposer.sms.attachments.length) {
+            bulkMessage.attachment_type = 'media'
+            bulkMessage.file_name = this.messageComposer.sms.attachments[0].uuid
+          }
+
+          break
+        case 'rvm':
+          method = 'sendBulkRvm'
+          bulkMessage.file_name = this.rvm.file_name
+
+          break
+      }
+
+      bulkMessage.contact_list_id = !isEmpty(this.source.list) ? this.source.list.id : null
+
+      // set filters too if list is dynamic
+      if (!isEmpty(this.source.list) && this.source.list.type === 'dynamic') {
+        bulkMessage.talk_filters = this.source.list.filters
+      }
+
+      if (!isEmpty(this.source.integration?.list)) {
+        switch (this.source.integration.name) {
+          case 'HubSpot':
+            bulkMessage.list_id = this.source.integration.list.listId
+
+            break
+          case 'Salesforce':
+            bulkMessage.salesforce_list_id = this.source.integration.list.Id
+
+            break
+          case 'Zoho':
+            bulkMessage.view_id = this.source.integration.list.id
+
+            break
+          case 'Pipedrive':
+            bulkMessage.filter_id = this.source.integration.list.id
+
+            break
+        }
+      }
+
+      API.V1.broadcasts[method](bulkMessage)
+        .then(() => {
+          this.$emit('loading', false)
+
+          this.$generalNotification('We have put your bulk message campaign on our outbound queue. Please wait a few minutes for us to send your messages.', 'success')
+
+          this.$router.push({ path: '/broadcasts' })
+        })
+        .catch(err => {
+          this.$emit('loading', false)
+
+          this.$handleErrors(err.response)
+        })
+    }
+  },
+
+  beforeDestroy () {
+    // clean ups
+    this.setMessageComposerSmsBody('')
+    this.setMessageComposerSmsGif('')
+    this.setMessageComposerAttachments([])
+    this.setSelectedCampaign({})
+    this.rmv = null
+  }
+}
+</script>

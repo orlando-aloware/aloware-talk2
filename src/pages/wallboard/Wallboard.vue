@@ -1,0 +1,131 @@
+<template>
+  <div class="wallboard d-flex w-100"
+       v-if="authenticated">
+    <wallboard-sidebar class="flex-grow-0"/>
+    <div class="d-flex flex-column h-100 flex-grow-1 overflow-hidden">
+      <wallboard-header class="flex-grow-0"/>
+      <router-view></router-view>
+    </div>
+  </div>
+</template>
+
+<script>
+import WallboardHeader from 'src/components/wallboard/wallboard-header.vue'
+import WallboardSidebar from 'src/components/wallboard/wallboard-sidebar.vue'
+import { CALL } from 'src/constants/communication-types'
+import { aclMixin, pollingMixin } from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+
+export default {
+  name: 'Wallboard',
+
+  mixins: [
+    aclMixin,
+    pollingMixin
+  ],
+
+  components: {
+    WallboardHeader,
+    WallboardSidebar
+  },
+
+  computed: {
+    ...mapGetters('auth', [
+      'authenticated',
+      'profile'
+    ]),
+
+    ...mapState('cache', [
+      'currentCompany'
+    ])
+  },
+
+  data: () => ({
+    listeners: {
+      agentUpdated: null,
+      agentStatusUpdated: null,
+      callUpdated: null
+    },
+    CALL
+  }),
+
+  created () {
+    this.fetchLiveCalls()
+    this.fetchParkedCalls()
+    this.fetchQueuedCalls()
+    this.fetchSummary()
+  },
+
+  mounted () {
+    this.listeners.agentUpdated = (agent) => {
+      this.setAgent(agent)
+    }
+
+    this.listeners.agentStatusUpdated = (event) => {
+      this.setAgentStatus(event)
+    }
+
+    this.listeners.callUpdated = (communication) => {
+      if (![CALL].includes(communication.type)) {
+        return
+      }
+
+      // disable live dashboard for reporters
+      if (this.hasReporterAccess) {
+        return
+      }
+
+      // make each call disposition handle the same event
+      this.setLiveCall(communication)
+      this.setParkedCall(communication)
+      this.setQueuedCall(communication)
+    }
+
+    // agent updated event
+    this.$VueEvent.listen('user_updated', this.listeners.agentUpdated)
+
+    // agent status updated event
+    this.$VueEvent.listen('agent_status_updated', this.listeners.agentStatusUpdated)
+
+    // new communication event
+    this.$VueEvent.listen('new_communication', this.listeners.callUpdated)
+
+    // updated communication event
+    this.$VueEvent.listen('update_communication', this.listeners.callUpdated)
+
+    // deleted communication event
+    this.$VueEvent.listen('delete_communication', this.deleteCall)
+
+    this.startUsersPoll()
+  },
+
+  methods: {
+    ...mapActions('wallboard', [
+      'fetchLiveCalls',
+      'fetchParkedCalls',
+      'fetchQueuedCalls',
+      'fetchSummary'
+    ]),
+
+    ...mapMutations('wallboard', {
+      deleteCall: 'DELETE_CALL',
+      setLiveCall: 'SET_LIVE_CALL',
+      setParkedCall: 'SET_PARKED_CALL',
+      setQueuedCall: 'SET_QUEUED_CALL'
+    }),
+
+    ...mapMutations({
+      setAgent: 'UPDATE_USER',
+      setAgentStatus: 'UPDATE_USER_STATUS'
+    })
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('user_updated', this.listeners.agentUpdated)
+    this.$VueEvent.stop('agent_status_updated', this.listeners.agentStatusUpdated)
+    this.$VueEvent.stop('new_communication', this.listeners.callUpdated)
+    this.$VueEvent.stop('update_communication', this.listeners.callUpdated)
+    this.$VueEvent.stop('delete_communication', this.deleteCall)
+  }
+}
+</script>

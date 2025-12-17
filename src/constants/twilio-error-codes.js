@@ -1,0 +1,8 @@
+export const PHONE_USAGE_ERRORS = [
+  31000,
+  31003,
+  31009,
+  31201,
+  53405,
+  31402
+]

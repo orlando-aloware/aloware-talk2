@@ -1,0 +1,184 @@
+<template>
+  <div class='webrtcClass'>
+    <phone @callCompleted="handleCallCompleted" />
+
+    <dialer />
+
+    <div class="p-3"
+         v-if="dialer.parkedCall">
+      <parked-call />
+    </div>
+
+    <select-campaign-dialog v-if="showSelectCampaignDialog"
+                            :campaignId="campaignId"
+                            @cancel-campaign-id='handleCallCompleted'
+                            @change-campaign-id="handleChangeCampaignId"/>
+  </div>
+</template>
+
+<script>
+import Dialer from 'components/dialer/dialer'
+import ParkedCall from 'components/dialer/parked-call.vue'
+import Phone from 'components/dialer/phone'
+import SelectCampaignDialog from 'components/dialer/select-campaign-dialog.vue'
+import {
+  aclMixin,
+  agentMixin,
+  broadcastMixin,
+  dialerDataMixin
+} from 'src/boot/mixins'
+import { mapActions, mapGetters, mapState } from 'vuex'
+
+export default {
+  components: { ParkedCall, Dialer, Phone, SelectCampaignDialog },
+
+  mixins: [
+    aclMixin,
+    agentMixin,
+    broadcastMixin,
+    dialerDataMixin
+  ],
+
+  props: {
+    campaignId: {
+      type: Number,
+      required: false
+    },
+
+    startDialing: {
+      default: true,
+      type: Boolean
+    },
+
+    isAlwaysAskModeEnabled: {
+      default: true,
+      type: Boolean,
+      required: false
+    },
+    initBroadcast: {
+      default: true,
+      type: Boolean,
+      required: false
+    }
+  },
+
+  data () {
+    return {
+      mainListeners: {},
+      isMainEventsStarted: false,
+      campaignsAreLoaded: false
+    }
+  },
+
+  computed: {
+    ...mapState([
+      'ringGroups'
+    ]),
+
+    ...mapState('cache', [
+      'currentCompany',
+      'timezones'
+    ]),
+
+    ...mapState(['dialer', 'isSalesforceWidget']),
+
+    ...mapGetters('auth', ['profile']),
+
+    showSelectCampaignDialog () {
+      const isLoadingDialer = ['GENERATING_TOKEN', 'TOKEN_GENERATED']
+      if (isLoadingDialer.includes(this.dialer?.currentStatus)) {
+        return false
+      }
+
+      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+
+      return this.startDialing &&
+        (this.isAlwaysAskModeEnabled ? true : !this.campaignId) &&
+        !isCallInProgress.includes(this.dialer?.currentStatus) &&
+        this.campaignsAreLoaded &&
+        !this.dialer.parkedCall
+    }
+  },
+
+  methods: {
+    ...mapActions([
+      'updateUserStatus'
+    ]),
+
+    ...mapActions('auth', ['setAgentStatus']),
+
+    initAuth () {
+      if (this.initBroadcast) {
+        this.broadcastInit()
+      }
+
+      this.getUsers()
+      this.getDispositionStatuses()
+      this.getCallDispositions()
+      this.getActivityTypes()
+      this.getTemplates()
+      const campaignsPromise = this.getCampaigns()
+      if (campaignsPromise) {
+        campaignsPromise.then(() => {
+          this.campaignsAreLoaded = true
+        })
+      }
+      this.getRingGroups()
+    },
+
+    startMainEvents () {
+      this.$VueEvent.listen('agent_status_updated', this.mainListeners.agentStatusUpdated)
+    },
+
+    stopMainEvents () {
+      this.$VueEvent.stop('agent_status_updated', this.mainListeners.agentStatusUpdated)
+    },
+
+    unsubscribeFromLiveUpdates () {
+      if (this.authenticated) {
+        this.broadcastLeave()
+      }
+    },
+
+    handleChangeCampaignId (campaignId) {
+      this.$emit('changeCampaignId', campaignId)
+      this.$emit('handleCall', true)
+    },
+
+    handleCallCompleted () {
+      this.$emit('callCompleted')
+    }
+  },
+
+  created () {
+    this.initAuth()
+
+    this.mainListeners.agentStatusUpdated = (event) => {
+      this.updateUserStatus(event)
+
+      if (
+        this.currentCompany?.id === event.company_id &&
+        this.profile?.id === event.user_id &&
+        this.profile.agent_status !== event.agent_status
+      ) {
+        this.setAgentStatus(event.agent_status)
+        console.log('Changed agent status from webrtc::agentStatusUpdated [event]: ', event.agent_status)
+      }
+    }
+
+    if (!this.isMainEventsStarted) {
+      this.isMainEventsStarted = true
+      this.startMainEvents()
+    }
+  },
+
+  mounted () {
+    this.$VueEvent.fire('showLoadingPhone')
+  },
+
+  beforeDestroy () {
+    this.stopMainEvents()
+    this.unsubscribeFromLiveUpdates()
+  }
+}
+</script>

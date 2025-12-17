@@ -1,0 +1,291 @@
+// import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
+import { updateField } from 'vuex-map-fields'
+import { isArray, isEmpty, merge } from 'lodash'
+import * as PowerDialerDefault from 'src/constants/power-dialer-default'
+// import { mergeObjectsAndAddValues } from 'src/plugins/helpers/functions'
+
+export default {
+  updateField,
+
+  SET_MY_QUEUE_LIST: (state, data) => {
+    state.myQueue = data
+  },
+
+  SET_MY_QUEUE_LIST_FILTERS: (state, data) => {
+    state.myQueueListFilters = data
+  },
+
+  SET_MY_QUEUE_LIST_DATA: (state, data) => {
+    if (state.myQueue) {
+      state.myQueue.items = data
+    }
+  },
+
+  SET_CONTACT_RESOURCES: (state, data) => {
+    state.contacts = data
+  },
+
+  RESET_LIST: (state) => {
+    // state.opened = []
+    state.lists = []
+  },
+
+  /**
+   * GENERAL MUTATIONS
+   */
+  SET_SEARCH: (state, value) => {
+    state.search = value
+  },
+
+  RESET_SEARCH: (state) => {
+    state.search = ''
+  },
+
+  SET_PD_LIST_CANCEL_TOKEN (state, token) {
+    state.pdViewCancelToken = token
+  },
+
+  SET_PD_LIST_SOURCE (state, source) {
+    state.pdViewSource = source
+  },
+
+  /**
+   * MOVE &
+   * CREATE MODAL for LISTS
+   */
+  START_DIAL_TOGGLE: (state, value) => {
+    state.isStartingDial = value
+  },
+
+  TOGGLE_TABLE_LOADER: (state, value) => {
+    state.datatableLoader = value
+  },
+
+  /**
+   * DATATABLE ACTIONS
+   */
+  COLUMNS_REORDERED: (state, { id, headers }) => {
+    state.lists = {
+      ...state.lists,
+      [String(id)]: {
+        ...(state.lists[String(id)] || {}),
+        headers
+      }
+    }
+  },
+
+  /**
+   * SESSIONS
+   */
+  TOGGLE_SESSION_LOADER: (state, value) => {
+    state.sessionLoader = value
+  },
+
+  TOGGLE_SESSION_SIDEBAR: (state) => {
+    state.sessionSidebarExpanded = !state.sessionSidebarExpanded
+  },
+
+  CHANGING_SELECTED_CONTACT: (state, isChanging) => {
+    state.changingSelectedContact = isChanging
+  },
+
+  SET_ACTIVE_TASK: (state, payload) => {
+    state.activeTask = payload
+  },
+
+  SET_CONTACTS: (state, payload) => {
+    state.listItems[state.selectedPdList.id].data = payload
+  },
+
+  SET_ACTIVE_FILTER: (state, filter) => {
+    state.activeFilter = filter
+  },
+
+  SET_FILTERED_ENDPOINT: (state, endpoint) => {
+    state.filteredEndpoint = endpoint
+  },
+
+  SET_SESSION_SETTING_GROUPS: (state, data) => {
+    state.sessionSettingGroups.personal = data.personal
+    state.sessionSettingGroups.company = data.company
+  },
+
+  SET_DIALER_SESSION_SETTINGS: (state, data) => {
+    let personal = []
+    let company = []
+    data.forEach(d => {
+      if (d.is_company_scope === 0) {
+        personal.push(d)
+      } else {
+        company.push(d)
+      }
+    })
+    state.dialerSessionSettings = data
+    state.sessionSettingGroups.personal = personal
+    state.sessionSettingGroups.company = company
+  },
+
+  RESET_POWER_DIALER_TASKS: (state) => {
+    state.powerDialerTasks = {
+      in_queue: [],
+      skipped: [],
+      called: [],
+      failed: [],
+      scheduled: [],
+      all: [],
+      redialed: []
+    }
+  },
+
+  SET_SESSION_SETTINGS: (state, data) => {
+    state.sessionSettings = data
+  },
+
+  ADD_NEW_SESSION_SETTING: (state, data) => {
+    state.sessionSettings.push(data)
+  },
+
+  SET_DEFAULT_SETTING: (state, data) => {
+    state.defaultSettings = data
+    // state.sessionSettings = {}
+  },
+
+  CLEAR_SESSION_SETTING: (state) => {
+    state.sessionSettings = {}
+  },
+
+  SET_WARMUP_DURATIONS: (state, data) => {
+    state.warmupDurations = data
+  },
+
+  SET_SELECTED_PD_LIST: (state, data) => {
+    state.selectedPdList = data
+  },
+
+  SET_FINISHED_PD_SESSION: (state, data) => {
+    state.ongoingSession.finishedPdSession = data
+  },
+
+  UPDATE_SESSION_TIMER: (state, data) => {
+    state.ongoingSession.totalSeconds = data
+  },
+
+  UPDATE_COUNTDOWN_TIMER: (state, data) => {
+    state.countdownTimer = data
+  },
+
+  UPDATE_ONGOING_SESSION: (state, data) => {
+    state.ongoingSession = merge(state.ongoingSession, data)
+  },
+
+  RESET_VUEX (state, value) {
+    if (!isArray(value) || isEmpty(value)) {
+      return
+    }
+
+    const powerDialerDefaultState = Object.assign({}, PowerDialerDefault.DEFAULT_STATE)
+
+    // exclude cached state properties(s) for non-cache reset
+    // by removing them from our default state
+    if (value.includes('non-cache')) {
+      delete powerDialerDefaultState.sessionSettings
+      delete powerDialerDefaultState.ongoingSession
+      delete powerDialerDefaultState.sessionCallStatuses
+      delete powerDialerDefaultState.countdownTimer
+      delete powerDialerDefaultState.isSessionRunning
+      delete powerDialerDefaultState.redialed
+    }
+
+    state = Object.assign(state, powerDialerDefaultState)
+
+    if (!value.includes('all')) {
+      return
+    }
+
+    // else, perform state reset
+    state = Object.assign({}, PowerDialerDefault.DEFAULT_STATE)
+  },
+
+  REMOVE_FIRST_IN_QUEUE_TASK (state) {
+    state.powerDialerTasks.in_queue.shift()
+  },
+
+  REQUEUE_POWER_DIALER_TASK (state, payload) {
+    const task = payload.task
+    const taskId = payload.id
+    const index = state.powerDialerTasks.in_queue.findIndex(pdTask => pdTask.contact_list_item_id === taskId)
+
+    // if task is found, remove it and re-add it again in the queue
+    // (we're just moving it to the end of the queue)
+    if (index !== -1) {
+      const removed = state.powerDialerTasks.in_queue.splice(index, 1)
+      state.powerDialerTasks.in_queue.push(removed[0])
+      return
+    }
+
+    // add the task to the end of the queue
+    state.powerDialerTasks.in_queue.push(task)
+  },
+
+  STORE_BULK_ACTION_NOTIFICATION (state, value) {
+    const contactListId = value?.contact_list_id
+
+    if (!contactListId) {
+      return
+    }
+
+    let existingNotification = state.bulkAddContactsNotification[contactListId] ?? {}
+
+    if (!value?.status_report) {
+      return
+    }
+
+    for (const name of ['fail', 'extra', 'success', 'info']) {
+      if (!value.status_report[name]) {
+        continue
+      }
+
+      if (!existingNotification[name]) {
+        existingNotification[name] = {}
+      }
+
+      for (const [key, val] of Object.entries(value.status_report[name])) {
+        // for 'extra' do not sum 'settings' and 'total_items_before_import'
+        if (name === 'extra' && ['settings', 'total_items_before_import'].includes(key)) {
+          // use 'total_items_before_import' from the first mention
+          if (key === 'total_items_before_import') {
+            if (!Object.prototype.hasOwnProperty.call(existingNotification[name], key)) {
+              existingNotification[name][key] = val
+            }
+          } else {
+            existingNotification[name][key] = val
+          }
+        } else {
+          existingNotification[name][key] = (existingNotification[name][key] || 0) + val
+        }
+      }
+    }
+
+    state.bulkAddContactsNotification[contactListId] = existingNotification
+  },
+
+  CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {
+    delete state.bulkAddContactsNotification[contactListId]
+  },
+
+  INCREMENT_REDIALED_TASK_COUNT (state, taskId) {
+    if (state.redialedTasksCount[taskId]) {
+      state.redialedTasksCount[taskId]++
+    } else {
+      state.redialedTasksCount[taskId] = 1
+    }
+  },
+
+  CLEAR_REDIALED_TASKS_COUNT (state) {
+    state.redialedTasksCount = {}
+  },
+
+  CLEAR_SENT_TASKS_SMS_TEMPLATES (state) {
+    state.tasksSentSmsTemplates = {}
+  }
+}
