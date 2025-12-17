@@ -226,7 +226,16 @@ module.exports = function (ctx) {
         // https://www.electron.build/configuration/configuration
         appId: 'com.aloware.talk2',
         mac: {
-          target: ['dmg', 'zip'],
+          target: [
+            {
+              target: 'dmg',
+              arch: 'universal'
+            },
+            {
+              target: 'zip',
+              arch: 'universal'
+            }
+          ],
           type: 'distribution',
           category: 'public.app-category.business',
           entitlements: './src-electron/build/entitlements.mac.plist',
