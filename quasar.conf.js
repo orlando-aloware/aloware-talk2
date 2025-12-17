@@ -87,21 +87,22 @@ module.exports = function (ctx) {
           exclude: /node_modules/
         })
 
-        if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
-          const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-          const sentryPluginInstance = new SentryWebpackPlugin({
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            org: process.env.SENTRY_ORG,
-            project: process.env.SENTRY_PROJECT,
-            // release: process.env.SENTRY_VERSION,
+        // COMMENTED OUT FOR TESTING - Sentry plugin
+        // if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
+        //   const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+        //   const sentryPluginInstance = new SentryWebpackPlugin({
+        //     authToken: process.env.SENTRY_AUTH_TOKEN,
+        //     org: process.env.SENTRY_ORG,
+        //     project: process.env.SENTRY_PROJECT,
+        //     // release: process.env.SENTRY_VERSION,
 
-            // webpack specific configuration
-            include: cfg.output.path,
-            ignore: ['node_modules']
-          })
+        //     // webpack specific configuration
+        //     include: cfg.output.path,
+        //     ignore: ['node_modules']
+        //   })
 
-          cfg.plugins.push(sentryPluginInstance)
-        }
+        //   cfg.plugins.push(sentryPluginInstance)
+        // }
       }
     },
 
@@ -263,21 +264,22 @@ module.exports = function (ctx) {
       nodeIntegration: true,
 
       extendWebpack (cfg) {
-        if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
-          const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-          const sentryPluginInstance = new SentryWebpackPlugin({
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            org: process.env.SENTRY_ORG,
-            project: process.env.SENTRY_PROJECT,
-            // release: process.env.SENTRY_VERSION,
+        // COMMENTED OUT FOR TESTING - Sentry plugin
+        // if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
+        //   const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+        //   const sentryPluginInstance = new SentryWebpackPlugin({
+        //     authToken: process.env.SENTRY_AUTH_TOKEN,
+        //     org: process.env.SENTRY_ORG,
+        //     project: process.env.SENTRY_PROJECT,
+        //     // release: process.env.SENTRY_VERSION,
 
-            // webpack specific configuration
-            include: cfg.output.path,
-            ignore: ['node_modules']
-          })
+        //     // webpack specific configuration
+        //     include: cfg.output.path,
+        //     ignore: ['node_modules']
+        //   })
 
-          cfg.plugins.push(sentryPluginInstance)
-        }
+        //   cfg.plugins.push(sentryPluginInstance)
+        // }
       }
     }
   }
