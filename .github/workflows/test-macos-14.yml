@@ -2,10 +2,6 @@ name: Test macOS 14
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-      - master
 
 jobs:
   test:
