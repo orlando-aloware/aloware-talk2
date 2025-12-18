@@ -249,7 +249,9 @@ module.exports = function (ctx) {
           icon: 'icons/icon.icns'
         },
         win: {
-          target: 'nsis',
+          target: [
+            { target: 'nsis', arch: ['x64'] }
+          ],
           icon: 'icons/icon.ico'
         },
         linux: {
